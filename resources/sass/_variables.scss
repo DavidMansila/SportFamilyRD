@@ -5,3 +5,31 @@ $body-bg: #f8fafc;
 $font-family-sans-serif: 'Nunito', sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
+
+//aqui creamos variables a usar, ejemplo color red
+:root,
+::after,
+::before {
+    // Background color variables
+    --bg-view: #F6F5FA;
+    --bg-white: #ffffff; 
+    --bg-secondary-white: #EFF0F6;
+    --bg-black-primary: #000000;
+    --bg-input: #f8f8f8;
+    --bg-shadow: #EEF2FF;
+    --polaris-color: #515def;
+
+    // Text color variables
+    --txt-white: #ffffff;
+    --txt-secondary-white: #d1d1d1;
+    --txt-black-primary: #000000;
+    --txt-black-secondary: #1f1f1f;
+    --txt-polaris-primary: #515def;
+    --txt-polaris-secondary: #64748B;
+    --txt-polaris-subtitle: #333B69;
+
+    --txt-destructive: #c03a3a;
+    --txt-increase: #00B69B;
+    --txt-decrease: #FE5C73;
+    --txt-title-secundary: #343C6A;
+}
