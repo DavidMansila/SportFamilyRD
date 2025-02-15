@@ -18,3 +18,9 @@
         </form>
     </div>
 </template>
+
+<style lang="scss">
+    .form-group {
+        margin-bottom: 60px;
+    }
+</style>
