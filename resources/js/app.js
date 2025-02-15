@@ -15,6 +15,7 @@ import { createApp } from 'vue';
 
 import ExampleComponent from './components/ExampleComponent.vue';
 import SignUpView from './components/Login/SignUpView.vue';
+import home from './components/home/HomeVIew.vue';
 
 // Create Vue application instance
 const app = createApp({});
@@ -22,6 +23,7 @@ const app = createApp({});
 // Register components
 app.component('example-component', ExampleComponent);
 app.component('signup-component', SignUpView);
+app.component('home-component', home);
 
 /**
  * Finally, we will attach the application instance to a HTML element with
