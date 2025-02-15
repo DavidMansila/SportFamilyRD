@@ -4,6 +4,7 @@
 @section('content')
     <h1>Hola</h1>
     <signup-component></signup-component>
+    {{-- <home-component></home-component> --}}
 @endsection
 
 
