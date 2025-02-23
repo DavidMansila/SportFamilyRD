@@ -16,12 +16,12 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Sign Up</button>
             </form>
-
         </div>
         <div class="right-side"></div>
     </div>
 </template>
 <script>
+import axios from 'axios';
     export default {
         data() {
             return {
@@ -34,6 +34,31 @@
         methods: {
             submitForm() {
                 console.log(this.name, this.email, this.password);
+                axios.post('/register', {//crear
+                    name: this.name,
+                    email: this.email,
+                    password: this.password
+                }).then(response => {
+                    console.log(response);
+                    //alert que diga registrado
+                //swal,
+                }).catch(error => {
+                    console.log(error);
+                    //alert que diga, algo salio mal, lo podemos personalizar 
+                });
+
+
+                axios.put('/api/register', {//actualizar
+                    name: this.name,
+                    email: this.email,
+                    password: this.password
+                })
+                axios.get('/api/register', );
+                axios.delete('/api/register', {//eliminar
+                    name: this.name,
+                    email: this.email,
+                    password: this.password
+                })
             }
         }
     }

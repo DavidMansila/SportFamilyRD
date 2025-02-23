@@ -13,3 +13,7 @@ Route::get('/welcome', function () {
 Route::get('/home', function () {
     return view('welcome');
 });
+
+Route::get('/register', function () {
+    return view('welcome');
+});
