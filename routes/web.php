@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -10,10 +12,9 @@ Route::get('/welcome', function () {
     return view('welcome');
 });
 
-Route::get('/home', function () {
-    return view('welcome');
-});
+//usuarios
+Route::resource( 'user', UserController::class);
 
-Route::get('/register', function () {
-    return view('welcome');
-});
+// Rutas de autenticación
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
