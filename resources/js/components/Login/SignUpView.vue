@@ -1,60 +1,51 @@
 <template>
-  <div class="container" id="container">
-    <!-- Formulario de registro -->
+  <div class="container" ref="container">
     <div class="form-container sign-up-container">
-      <form @submit.prevent="submitForm" id="fsing_up">
-        <h1>Registrate</h1>
-
+      <form @submit.prevent="submitForm">
+        <h1>Create Account</h1>
         <div class="social-container">
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
-
-        <span>o usa tu cuenta para registrarte</span>
-        <input type="text" v-model="name" placeholder="Name" />
-        <input type="email" v-model="email" placeholder="Email" />
-        <input type="password" v-model="password" placeholder="Password" />
-        <button type="submit">Sign Up</button>
+        <input type="text" v-model="registerForm.name" placeholder="Name" required />
+        <input type="email" v-model="registerForm.email" placeholder="Email" required />
+        <input type="password" v-model="registerForm.password" placeholder="Password" required />
+        <button type="submit" :disabled="isSubmitting">Sign Up</button>
       </form>
     </div>
-
-    <!-- Formulario de inicio de sesión -->
     <div class="form-container sign-in-container">
-      <form @submit.prevent="submitLoginForm" id="fsing_in">
-        <h1>Sign In</h1>
-
+      <form @submit.prevent="submitLoginForm">
+        <h1>Sign in</h1>
         <div class="social-container">
-          <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
-
-        <span>o usa tu cuenta</span>
-        <input type="email" v-model="email" placeholder="Email" />
-        <input type="password" v-model="password" placeholder="Password" />
-        <button type="submit">Sign In</button>
+        <input type="email" v-model="loginForm.email" placeholder="Email" required />
+        <input type="password" v-model="loginForm.password" placeholder="Password" required />
+        <button type="submit" :disabled="isSubmitting">Sign In</button>
       </form>
     </div>
-
-    <!-- Overlay -->
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
-          <a href="producto" id="logo-link">
-            <img src="{{ asset('fotos/Logo.png') }}" alt="Logo" />
-          </a>
-          <h1>Bienvenido de vuelta!</h1>
-          <p>para mantenerte en contacto con nosotros favor crea tu cuenta</p>
-          <button class="ghost" id="signIn" @click="toggleForm('signIn')">Sign In</button>
+          <router-link to="/home" class="mb-6">
+  <img src="/SportFamily/public/imagenes/Logo.png" alt="SportFamilyRD Logo" class="logo-main" />
+</router-link>
+<a href="/home">Ir a Home</a>
+          <h1>Welcome Back!</h1>
+          <p>To keep connected with us, please login with your personal info</p>
+          <button class="ghost" @click="toggleForm('signIn')">Sign In</button>
         </div>
         <div class="overlay-panel overlay-right">
-          <a href="producto" id="logo-link">
-            <img src="{{ asset('fotos/Logo.png') }}" alt="Logo" />
-          </a>
-          <h1>Bienvenido!</h1>
-          <p>Aquí puedes ingresar tus datos personales al crear una cuenta</p>
-          <button class="ghost" id="signUp" @click="toggleForm('signUp')">Sign Up</button>
+          <router-link to="/home" class="mb-6">
+  <img src="/SportFamily/public/imagenes/Logo.png" alt="SportFamilyRD Logo" class="logo-main" />
+</router-link>
+<a href="/home">Ir a Home</a>
+          <h1>Hello, Friend!</h1> 
+          <p>Enter your details and start your journey with us</p>
+          <button class="ghost" @click="toggleForm('signUp')">Sign Up</button>
         </div>
       </div>
     </div>
@@ -62,67 +53,53 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   data() {
     return {
-      name: '',
-      email: '',
-      password: '',
+      registerForm: {
+        name: '',
+        email: '',
+        password: '',
+      },
+      loginForm: {
+        email: '',
+        password: '',
+      },
+      isSubmitting: false,
     };
   },
   methods: {
-    submitForm() {
-      // Enviar solicitud para registrar al usuario
-      axios
-        .post('/register', {
-          name: this.name,
-          email: this.email,
-          password: this.password,
-        })
-        .then((response) => {
-          console.log(response);
-          // Mostrar mensaje de éxito
-          alert('Registrado con éxito');
-        })
-        .catch((error) => {
-          console.log(error);
-          // Mostrar mensaje de error
-          alert('Algo salió mal, por favor intenta de nuevo');
-        });
-    },
-
-    submitLoginForm() {
-      // Enviar solicitud para iniciar sesión
-      axios
-        .post('/login', {
-          email: this.email,
-          password: this.password,
-        })
-        .then((response) => {
-          console.log(response);
-          // Manejar inicio de sesión exitoso
-          alert('Bienvenido de nuevo!');
-        })
-        .catch((error) => {
-          console.log(error);
-          // Mostrar mensaje de error
-          alert('Credenciales incorrectas');
-        });
-    },
-
     toggleForm(form) {
-      const container = document.getElementById('container');
       if (form === 'signIn') {
-        container.classList.remove('right-panel-active');
+        this.$refs.container.classList.remove('right-panel-active');
       } else {
-        container.classList.add('right-panel-active');
+        this.$refs.container.classList.add('right-panel-active');
       }
+    },
+    async submitForm() {
+      this.isSubmitting = true;
+      try {
+        console.log('Registering:', this.registerForm);
+        // Aquí iría la lógica para enviar datos al backend
+      } catch (error) {
+        console.error(error);
+      }
+      this.isSubmitting = false;
+    },
+    async submitLoginForm() {
+      this.isSubmitting = true;
+      try {
+        console.log('Logging in:', this.loginForm);
+        // Aquí iría la lógica para enviar datos al backend
+      } catch (error) {
+        console.error(error);
+      }
+      this.isSubmitting = false;
     },
   },
 };
 </script>
+
 
 <style scoped>
 * {
@@ -211,6 +188,15 @@ input {
   padding: 12px 15px;
   margin: 8px 0;
   width: 100%;
+}
+
+.logo-main {
+  width: 120px; /* Ajusta el tamaño del logo */
+  height: auto;
+  transition: transform 0.3s ease-in-out;
+  margin: 20px;
+  position: relative; /* Agregado */
+  z-index: 1000; /* Asegura que el logo esté siempre encima */
 }
 
 .container {
