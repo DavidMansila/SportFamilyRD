@@ -30,19 +30,17 @@
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
-          <router-link to="/home" class="mb-6">
-  <img src="/SportFamily/public/imagenes/Logo.png" alt="SportFamilyRD Logo" class="logo-main" />
-</router-link>
-<a href="/home">Ir a Home</a>
+          <a href="/" class="mb-6">
+             <img src="/imagenes/Logo.png" alt="SportFamilyRD Logo" class="logo-main" />
+          </a>
           <h1>Welcome Back!</h1>
           <p>To keep connected with us, please login with your personal info</p>
           <button class="ghost" @click="toggleForm('signIn')">Sign In</button>
         </div>
         <div class="overlay-panel overlay-right">
-          <router-link to="/home" class="mb-6">
-  <img src="/SportFamily/public/imagenes/Logo.png" alt="SportFamilyRD Logo" class="logo-main" />
-</router-link>
-<a href="/home">Ir a Home</a>
+          <a href="/" class="mb-6">
+             <img src="/imagenes/Logo.png" alt="SportFamilyRD Logo" class="logo-main" />
+          </a>
           <h1>Hello, Friend!</h1> 
           <p>Enter your details and start your journey with us</p>
           <button class="ghost" @click="toggleForm('signUp')">Sign Up</button>
@@ -191,7 +189,7 @@ input {
 }
 
 .logo-main {
-  width: 120px; /* Ajusta el tamaño del logo */
+  width: 250px; /* Ajusta el tamaño del logo */
   height: auto;
   transition: transform 0.3s ease-in-out;
   margin: 20px;

@@ -5,26 +5,30 @@
         <div class ="logo-container"> <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo" />
         <h1>SportFamilyRD</h1></div>
         <div class="nav-links">
-          <router-link to="/Noticias" class="nav-link">Noticias</router-link>
-          <router-link to="/Calendario" class="nav-link">Calendario</router-link>
-          <router-link to="/Tienda" class="nav-link">Tienda</router-link>
-          <router-link to="/Entrenadores" class="nav-link">Entrenadores</router-link>
-          <router-link to="/Foro" class="nav-link">Foro</router-link>
+            <a href="/Noticias" class="nav-link">Noticias</a>
+            <a href="/Calendario" class="nav-link">Calendario</a>
+             <a href="/Tienda" class="nav-link">Tienda</a>
+             <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+             <a href="/Foro" class="nav-link">Foro</a>
         </div>
         <div class="auth-buttons">
-          <button class="auth-btn">Settings</button>
-          <button class="auth-btn">Login</button>
+            <a href="/Settings">
+                  <button class="auth-btn">Ajustes</button>
+            </a>
+            <a href="/Login">
+                 <button class="auth-btn">Login</button>
+            </a>
         </div>
       </nav>
   
       <!-- Banner -->
       <div class="banner">
-        <h1 class="banner-title">Welcome to SportFamilyRD</h1>
+        <h1 class="banner-title">Bienvenido a SportFamilyRD</h1>
       </div>
   
       <!-- Categories Section -->
       <section class="section">
-        <h2 class="section-title">Categories</h2>
+        <h2 class="section-title">Categorias</h2>
         <div class="cards">
           <div v-for="category in categories" :key="category.name" class="card">
             <img :src="category.image" :alt="category.name" class="card-img" />
@@ -35,7 +39,7 @@
   
       <!-- Favorite Products Section -->
       <section class="section">
-        <h2 class="section-title">Favorite Products</h2>
+        <h2 class="section-title">Productos Favoritos</h2>
         <div class="cards">
           <div v-for="product in products" :key="product.name" class="card">
             <img :src="product.image" :alt="product.name" class="card-img" />
@@ -46,7 +50,7 @@
   
       <!-- Featured Threads Section -->
       <section class="section">
-        <h2 class="section-title">Featured Threads</h2>
+        <h2 class="section-title">Temas populares</h2>
         <div class="cards">
           <div v-for="thread in threads" :key="thread.title" class="card">
             <img :src="thread.image" :alt="thread.title" class="card-img" />
@@ -57,8 +61,8 @@
   
       <!-- Call to Action Section -->
       <div class="cta">
-        <p class="cta-text">New in SportFamilyRD Today</p>
-        <p class="cta-subtext">Join our community of sports enthusiasts.</p>
+        <p class="cta-text">Nuevo en SportFamilyRD hoy</p>
+        <p class="cta-subtext">Unete a nuestra comunidad de deportes</p>
       </div>
     </div>
   </template>
