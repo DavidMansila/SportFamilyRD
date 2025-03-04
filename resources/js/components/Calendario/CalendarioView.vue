@@ -1,41 +1,69 @@
 <template>
-  <div class="calendario-page">
-    <h1 class="page-title">Calendario de Eventos Deportivos</h1>
-
-    <!-- Muestra el mes y los botones para navegar entre meses -->
-    <div class="calendar-header">
-      <button @click="changeMonth('prev')">Anterior</button>
-      <h2>{{ monthNames[currentMonth] }} {{ currentYear }}</h2>
-      <button @click="changeMonth('next')">Siguiente</button>
-    </div>
-
-    <!-- Cuadrícula de días del mes -->
-    <div class="calendar-grid">
-      <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-name">
-        {{ day }}
+  <div>
+    <!-- Navbar -->
+    <nav class="navbar2">
+      <div class="logo-container">
+        <a href="/" class="logo-container">
+          <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo" />
+        </a>
+        <h1>SportFamilyRD</h1>
       </div>
-      
-      <div 
-        v-for="day in daysInMonth" 
-        :key="day" 
-        :class="['calendar-day', { 'event-day': hasEvents(day) }]" 
-        @click="selectDay(day)"
-      >
-        {{ day }}
+      <div class="nav-links">
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
       </div>
-    </div>
+      <div class="auth-buttons">
+        <a href="/Settings">
+          <button class="auth-btn">Ajustes</button>
+        </a>
+        <a href="/Login">
+          <button class="auth-btn">Login</button>
+        </a>
+      </div>
+    </nav>
 
-    <!-- Modal para ver los eventos de un día -->
-    <div v-if="selectedDayEvents.length" class="event-modal">
-      <div class="modal-content">
-        <h3>Eventos del día {{ selectedDay }}</h3>
-        <ul>
-          <li v-for="evento in selectedDayEvents" :key="evento.id">
-            <h4>{{ evento.nombre }}</h4>
-            <p>{{ evento.descripcion }}</p>
-          </li>
-        </ul>
-        <button @click="closeModal">Cerrar</button>
+    <!-- Calendario de eventos -->
+    <div class="calendario-page">
+      <h1 class="page-title">Calendario de Eventos Deportivos</h1>
+
+      <!-- Muestra el mes y los botones para navegar entre meses -->
+      <div class="calendar-header">
+        <button @click="changeMonth('prev')" class="calendar-btn">Anterior</button>
+        <h2>{{ monthNames[currentMonth] }} {{ currentYear }}</h2>
+        <button @click="changeMonth('next')" class="calendar-btn">Siguiente</button>
+      </div>
+
+      <!-- Cuadrícula de días del mes -->
+      <div class="calendar-grid">
+        <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-name">
+          {{ day }}
+        </div>
+        
+        <div 
+          v-for="day in daysInMonth" 
+          :key="day" 
+          :class="['calendar-day', { 'event-day': hasEvents(day) }]" 
+          @click="selectDay(day)"
+        >
+          {{ day }}
+        </div>
+      </div>
+
+      <!-- Modal para ver los eventos de un día -->
+      <div v-if="selectedDayEvents.length" class="event-modal">
+        <div class="modal-content">
+          <h3>Eventos del día {{ selectedDay }}</h3>
+          <ul>
+            <li v-for="evento in selectedDayEvents" :key="evento.id">
+              <h4>{{ evento.nombre }}</h4>
+              <p>{{ evento.descripcion }}</p>
+            </li>
+          </ul>
+          <button @click="closeModal" class="close-btn">Cerrar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -45,42 +73,35 @@
 export default {
   data() {
     return {
-      currentMonth: new Date().getMonth(), // Mes actual (0 - 11)
-      currentYear: new Date().getFullYear(), // Año actual
-      selectedDay: null, // Día seleccionado
-      selectedDayEvents: [], // Eventos del día seleccionado
+      currentMonth: new Date().getMonth(),
+      currentYear: new Date().getFullYear(),
+      selectedDay: null,
+      selectedDayEvents: [],
       eventos: [
-            { id: 1, nombre: 'Torneo de Fútbol', fecha: '2025-03-15', descripcion: 'Un torneo de fútbol local.' },
-            { id: 2, nombre: 'Maratón', fecha: '2025-03-25', descripcion: 'Una maratón de 10k.' },
-            { id: 3, nombre: 'Conferencia Deportiva', fecha: '2025-03-15', descripcion: 'Una conferencia sobre el futuro del deporte.' },
-            { id: 4, nombre: 'Partido de Tenis', fecha: '2025-04-18', descripcion: 'Partido amistoso de tenis entre dos equipos.' },
-            { id: 5, nombre: 'Torneo de Baloncesto', fecha: '2025-04-22', descripcion: 'Torneo local de baloncesto con equipos regionales.' },
-            { id: 6, nombre: 'Clínica de Natación', fecha: '2025-05-05', descripcion: 'Clínica intensiva para nadadores principiantes.' },
-            { id: 7, nombre: 'Competencia de Skateboarding', fecha: '2025-05-10', descripcion: 'Competencia de skateboarding en el parque central.' },
-            { id: 8, nombre: 'Curso de Primeros Auxilios Deportivos', fecha: '2025-06-01', descripcion: 'Curso para entrenadores y deportistas sobre primeros auxilios.' },
-            { id: 9, nombre: 'Exhibición de Artes Marciales', fecha: '2025-06-20', descripcion: 'Exhibición de varias disciplinas de artes marciales.' },
-            { id: 10, nombre: 'Torneo de Volleyball', fecha: '2025-07-05', descripcion: 'Torneo de volleyball en la playa con equipos locales.' },
-            { id: 11, nombre: 'Desafío de Ciclismo', fecha: '2025-07-15', descripcion: 'Desafío de ciclismo de montaña con recorrido por rutas difíciles.' }
-                  ],
-      monthNames: [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        { id: 1, nombre: 'Torneo de Fútbol', fecha: '2025-03-15', descripcion: 'Un torneo de fútbol local.' },
+        { id: 2, nombre: 'Maratón', fecha: '2025-03-25', descripcion: 'Una maratón de 10k.' },
+        { id: 3, nombre: 'Conferencia Deportiva', fecha: '2025-03-15', descripcion: 'Una conferencia sobre el futuro del deporte.' },
+        { id: 4, nombre: 'Partido de Tenis', fecha: '2025-04-18', descripcion: 'Partido amistoso de tenis entre dos equipos.' },
+        { id: 5, nombre: 'Torneo de Baloncesto', fecha: '2025-04-22', descripcion: 'Torneo local de baloncesto con equipos regionales.' },
+        { id: 6, nombre: 'Clínica de Natación', fecha: '2025-05-05', descripcion: 'Clínica intensiva para nadadores principiantes.' },
+        { id: 7, nombre: 'Competencia de Skateboarding', fecha: '2025-05-10', descripcion: 'Competencia de skateboarding en el parque central.' },
+        { id: 8, nombre: 'Curso de Primeros Auxilios Deportivos', fecha: '2025-06-01', descripcion: 'Curso para entrenadores y deportistas sobre primeros auxilios.' },
+        { id: 9, nombre: 'Exhibición de Artes Marciales', fecha: '2025-06-20', descripcion: 'Exhibición de varias disciplinas de artes marciales.' },
+        { id: 10, nombre: 'Torneo de Volleyball', fecha: '2025-07-05', descripcion: 'Torneo de volleyball en la playa con equipos locales.' },
+        { id: 11, nombre: 'Desafío de Ciclismo', fecha: '2025-07-15', descripcion: 'Desafío de ciclismo de montaña con recorrido por rutas difíciles.' }
       ],
+      monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
     };
   },
   computed: {
-    // Calcula los días del mes
     daysInMonth() {
       const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
       const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
-      
       let days = [];
-      // Añadir espacios en blanco antes del primer día del mes
       for (let i = 0; i < firstDay; i++) {
         days.push(null);
       }
-      // Añadir los días del mes
       for (let i = 1; i <= daysInMonth; i++) {
         days.push(i);
       }
@@ -88,7 +109,6 @@ export default {
     }
   },
   methods: {
-    // Cambia el mes (siguiente o anterior)
     changeMonth(direction) {
       if (direction === 'prev') {
         if (this.currentMonth === 0) {
@@ -106,8 +126,6 @@ export default {
         }
       }
     },
-
-    // Selecciona un día y muestra sus eventos
     selectDay(day) {
       if (day) {
         this.selectedDay = day;
@@ -117,14 +135,10 @@ export default {
         });
       }
     },
-
-    // Cierra el modal de eventos
     closeModal() {
       this.selectedDay = null;
       this.selectedDayEvents = [];
     },
-
-    // Verifica si un día tiene eventos
     hasEvents(day) {
       return this.eventos.some(evento => {
         const eventDate = new Date(evento.fecha);
@@ -136,53 +150,125 @@ export default {
 </script>
 
 <style scoped>
-
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  color: black;
+/* Estilos Navbar */
+.navbar2 {
+  background: linear-gradient(135deg, #000000, #15ff54);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
-.calendario-page {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
+
+.logo {
+    width: 50px;
+    height: 50px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+    color: #fbbf24;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.auth-btn {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.auth-btn:hover {
+    background-color: white;
+    color: #ff3149;
+}
+  
+
+
 
 .page-title {
   font-size: 2.5rem;
   margin-bottom: 20px;
   text-align: center;
+  color: #333;
+  font-weight: 600;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+}
+
+.calendar-btn {
+  font-size: 1rem;
+  padding: 8px 15px;
+  border-radius: 5px;
+  background-color: #17A2B8;
+  color: white;
+  border: none;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.calendar-btn:hover {
+  background-color: #007bff;
+  transform: translateY(-2px);
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
+  gap: 5px;
   text-align: center;
 }
 
 .calendar-day-name {
   font-weight: bold;
+  font-size: 1rem;
+  color: #333;
 }
 
 .calendar-day {
-  padding: 10px;
-  border-radius: 5px;
+  padding: 12px;
+  border-radius: 8px;
   cursor: pointer;
-  background: #f0f0f0;
-  transition: background 0.3s;
+  background: #f9f9f9;
+  transition: background 0.3s, transform 0.3s;
 }
 
 .calendar-day:hover {
   background: #d0d0d0;
+  transform: translateY(-2px);
 }
 
 .event-day {
@@ -196,31 +282,57 @@ h1 {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 0.5s ease;
 }
 
 .modal-content {
   background-color: white;
   padding: 20px;
-  border-radius: 10px;
-  width: 90%;
+  border-radius: 15px;
+  width: 80%;
   max-width: 600px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.5s ease;
 }
 
 button {
-  margin-top: 20px;
-  padding: 10px 20px;
   background-color: #007bff;
   color: white;
+  padding: 10px 15px;
   border: none;
   border-radius: 5px;
+  font-size: 1rem;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
 button:hover {
   background-color: #0056b3;
+}
+
+.close-btn {
+  background-color: #d9534f;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 </style>

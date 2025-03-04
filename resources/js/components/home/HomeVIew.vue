@@ -2,8 +2,12 @@
     <div>
       <!-- Navbar -->
       <nav class="navbar">
-        <div class ="logo-container"> <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo" />
-        <h1>SportFamilyRD</h1></div>
+        <div class="logo-container">
+        <a href="/" class="logo-container">
+          <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
+        </a>
+        <h1>SportFamilyRD</h1>
+      </div>
         <div class="nav-links">
             <a href="/Noticias" class="nav-link">Noticias</a>
             <a href="/Calendario" class="nav-link">Calendario</a>
@@ -92,7 +96,7 @@
   };
   </script>
   
-  <style>
+  <style scoped>
   /* General styles */
   body {
     font-family: Arial, sans-serif;
@@ -100,16 +104,17 @@
     padding: 0;
   }
 
-  h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: white;
-  }
 
   .logo-container {
     display: flex;
     gap: 1rem;
     flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+  }
   }
   
   .container {
@@ -118,57 +123,66 @@
   
   /* Navbar */
   .navbar {
-    background: linear-gradient(to right, #000000, #ff3149);
+    background: linear-gradient(to right, #000000, #17A2B8);
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  
-  .brand {
-    font-size: 2rem;
-    font-weight: bold;
-    color: white;
-  }
-  
-  .nav-links {
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+}
+
+.nav-links {
     display: flex;
     gap: 2rem;
-  }
-  
-  .nav-link {
+}
+
+.nav-link {
     color: white;
     text-decoration: none;
-    transition: color 0.3s;
-  }
-  
-  .nav-link:hover {
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover {
     color: #fbbf24;
-  }
-  
-  .auth-buttons {
+}
+
+.auth-buttons {
     display: flex;
     gap: 1rem;
-  }
-  
-  .auth-btn {
+}
+
+.auth-btn {
     background: transparent;
     border: 2px solid white;
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
     cursor: pointer;
-    transition: all 0.3s;
-  }
-  
-  .auth-btn:hover {
+    transition: all 0.3s ease-in-out;
+}
+
+.auth-btn:hover {
     background-color: white;
-    color: #3b82f6;
-  }
+    color: #ff3149;
+}
   
   /* Banner */
   .banner {
-    background-image: url("/imagenes/stadium.jpg");
+    background-image: url("/imagenes/estadio.jpg");
     background-size: cover;
     background-position: center;
     height: 25rem;

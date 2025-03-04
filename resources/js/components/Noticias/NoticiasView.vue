@@ -1,14 +1,43 @@
 <template>
   <div class="noticias-page">
-    <h1 class="page-title">Noticias Deportivas</h1>
-    <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
-      <div class="noticia-image">
-        <img :src="noticia.imagen" alt="Imagen de noticia" class="image" />
+    <!-- NavBar -->
+    <nav class="navbar1">
+      <div class="logo-container">
+        <a href="/" class="logo-container">
+          <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
+        </a>
+        <h1>SportFamilyRD</h1>
       </div>
-      <div class="noticia-content">
-        <h3 class="noticia-title">{{ noticia.titulo }}</h3>
-        <p class="noticia-description">{{ noticia.descripcion }}</p>
-        <a :href="'/noticia/' + noticia.id" class="read-more">Leer más</a>
+      <div class="nav-links">
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
+      </div>
+      <div class="auth-buttons">
+        <a href="/Settings">
+          <button class="auth-btn">Ajustes</button>
+        </a>
+        <a href="/Login">
+          <button class="auth-btn">Login</button>
+        </a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1 class="page-title">Sports News</h1>
+
+      <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
+        <div class="noticia-image">
+          <img :src="noticia.imagen" alt="Imagen de noticia" class="image" />
+        </div>
+        <div class="noticia-content">
+          <h3 class="noticia-title">{{ noticia.titulo }}</h3>
+          <p class="noticia-description">{{ noticia.descripcion }}</p>
+          <p class="noticia-source">{{ noticia.fuente }} · {{ noticia.tiempo }} min read</p>
+          <a :href="'/noticia/' + noticia.id" class="read-more">Read more</a>
+        </div>
       </div>
     </div>
   </div>
@@ -22,15 +51,27 @@ export default {
       noticias: [
         { 
           id: 1, 
-          titulo: 'Nuevo evento deportivo', 
-          descripcion: 'Detalles sobre el evento deportivo que se celebrará este fin de semana...', 
-          imagen: 'https://via.placeholder.com/600x400' 
+          titulo: 'Olympic athletes are fighting for their rights to protest', 
+          descripcion: 'The rules have changed but the fight is far from over.', 
+          imagen: 'https://via.placeholder.com/600x300',
+          fuente: 'Vox',
+          tiempo: '4'
         },
         { 
           id: 2, 
-          titulo: 'Liga nacional', 
-          descripcion: 'Resumen de los últimos partidos de la liga nacional...', 
-          imagen: 'https://via.placeholder.com/600x400' 
+          titulo: 'What we learned from the first week of the NBA playoffs', 
+          descripcion: 'The Lakers are out and the league is wide open.', 
+          imagen: 'https://via.placeholder.com/600x300',
+          fuente: 'ESPN',
+          tiempo: '6'
+        },
+        { 
+          id: 3, 
+          titulo: 'The rise of women’s skateboarding', 
+          descripcion: 'As the sport makes its Olympic debut, female skaters are taking center stage.', 
+          imagen: 'https://via.placeholder.com/600x300',
+          fuente: 'The Guardian',
+          tiempo: '5'
         }
       ]
     };
@@ -38,94 +79,188 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped> 
+/* ------------------- ESTILOS DEL NAVBAR ------------------- */
+/* Navbar */
+.navbar1 {
+    background: linear-gradient(to right, #000000, #007BFF);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+    color: #fbbf24;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.auth-btn {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.auth-btn:hover {
+    background-color: white;
+    color: #ff3149;
+}
+  
+
+/* ------------------- ESTILOS DE NOTICIAS ------------------- */
 .noticias-page {
-  max-width: 1200px;
+  font-family: 'Inter', sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.container {
+  max-width: 1100px;
   margin: 0 auto;
   padding: 20px;
-  text-align: center;
 }
 
 .page-title {
-  font-size: 3rem;
+  font-size: 2.5rem;
   color: #333;
-  margin-bottom: 40px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-family: 'Helvetica Neue', sans-serif;
+  margin-bottom: 30px;
+  font-weight: bold;
+  text-align: left;
 }
 
 .noticia-card {
   display: flex;
-  flex-direction: column;
   background: #fff;
-  margin: 25px 0;
-  padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-  overflow: hidden;
+  margin: 20px 0;
+  padding: 20px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
 }
 
 .noticia-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.2);
 }
 
 .noticia-image {
-  margin-bottom: 15px;
-  border-radius: 8px;
-  overflow: hidden;
+  flex: 1;
+  max-width: 250px;
+  margin-right: 20px;
 }
 
 .image {
   width: 100%;
   height: auto;
+  border-radius: 10px;
   object-fit: cover;
-  border-radius: 8px;
 }
 
 .noticia-content {
-  text-align: left;
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .noticia-title {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 15px;
-  font-weight: 600;
+  font-size: 1.6rem;
+  color: #222;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .noticia-description {
   font-size: 1.1rem;
   color: #555;
-  margin-bottom: 20px;
-  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.noticia-source {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 15px;
 }
 
 .read-more {
-  font-size: 1.1rem;
-  color: #007bff;
+  align-self: flex-start;
+  padding: 10px 15px;
+  background: #007bff;
+  color: white;
   font-weight: bold;
   text-decoration: none;
-  transition: color 0.3s;
+  border-radius: 8px;
+  transition: background 0.3s;
 }
 
 .read-more:hover {
-  color: #0056b3;
+  background: #0056b3;
 }
 
-/* Responsive design */
+/* Responsive Design */
 @media (max-width: 768px) {
-  .noticia-card {
+  .navbar {
     flex-direction: column;
-    align-items: center;
+    text-align: center;
   }
 
-  .image {
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .auth-buttons {
+    margin-top: 10px;
+  }
+
+  .noticia-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .noticia-image {
     max-width: 100%;
-    height: auto;
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+
+  .read-more {
+    align-self: center;
   }
 }
 </style>

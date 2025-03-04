@@ -25,23 +25,31 @@ import CrearPostView from './components/Foro/CrearPost.vue';
 
 
 
-
 // Create Vue application instance
 const app = createApp({});
 
 // Register components
 app.component('example-component', ExampleComponent);
 app.component('signup-component', SignUpView);
+
+
 app.component('home-component', HomeView);
+
+
 app.component('noticias-component', NoticiasView);
+
+
 app.component('calendario-component', CalendarioView);
+
+
 app.component('tienda-component', TiendaView);
+
+
 app.component('entrenadores-component', EntrenadoresView);
+
+
 app.component('foro-component', ForoView);
 app.component('crearpost-component', CrearPostView);
-
-
-
 
 
 app.mount('#app');
