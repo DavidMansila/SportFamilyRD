@@ -79,6 +79,7 @@ export default {
 };
 </script>
 
+<<<<<<< HEAD
 <style scoped>
 
 body {
@@ -101,6 +102,9 @@ body {
   }
   
 
+=======
+<style scoped> 
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
 /* Navbar */
 .navbar1 {
@@ -111,9 +115,17 @@ body {
     align-items: center;
 }
 
+<<<<<<< HEAD
   .container {
     margin: 0 auto;
   }
+=======
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 
 .logo {
     width: 50px;

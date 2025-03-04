@@ -27,7 +27,11 @@
 
     <!-- Calendario de eventos -->
     <div class="calendario-page">
+<<<<<<< HEAD
       <h2 class="page-title">Calendario de Eventos Deportivos</h2>
+=======
+      <h1 class="page-title">Calendario de Eventos Deportivos</h1>
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 
       <!-- Muestra el mes y los botones para navegar entre meses -->
       <div class="calendar-header">
@@ -150,7 +154,10 @@ export default {
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 /* Estilos Navbar */
 .navbar2 {
   background: linear-gradient(135deg, #000000, #15ff54);
@@ -164,6 +171,7 @@ export default {
 
 
 .logo-container {
+<<<<<<< HEAD
   display: flex;
     gap: 1rem;
     flex-direction: row;
@@ -180,6 +188,18 @@ export default {
     height: 50px;
 }
 
+=======
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+}
+
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 .nav-links {
     display: flex;
     gap: 2rem;
@@ -221,13 +241,20 @@ export default {
   
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 .page-title {
   font-size: 2.5rem;
   margin-bottom: 20px;
   text-align: center;
   color: #333;
   font-weight: 600;
+<<<<<<< HEAD
   padding-top: 30px;
+=======
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 }
 
 .calendar-header {

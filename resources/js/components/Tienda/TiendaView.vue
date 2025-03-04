@@ -1,8 +1,13 @@
 <template>
   <div class="tienda-page">
 
+<<<<<<< HEAD
     <!-- Nav Bar -->
       <nav class="navbar">
+=======
+    <!-- Barra de navegación -->
+      <nav class="navbar3">
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
         <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
@@ -27,7 +32,11 @@
       </nav>
 
     <!-- Título de la tienda -->
+<<<<<<< HEAD
     <h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
+=======
+    <h1 class="tienda-title">Bienvenido a nuestra Tienda</h1>
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 
     <!-- Barra de búsqueda -->
     <div class="search-bar">
@@ -169,6 +178,7 @@ export default {
 
 <style scoped>
 
+<<<<<<< HEAD
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -244,7 +254,71 @@ body {
 .auth-btn:hover {
     background-color: white;
     color: #ff3149;
+=======
+.tienda-page {
+  font-family: Arial, sans-serif;
+>>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 }
+
+.navbar3{
+  display: flex;
+  justify-content: space-between;
+  background-color: #333;
+  padding: 10px 20px;
+  color: white;
+}
+
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+    color: #fbbf24;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.auth-btn {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.auth-btn:hover {
+    background-color: white;
+    color: #ff3149;
+}
+  
 
 .tienda-title {
   text-align: center;
