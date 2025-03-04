@@ -67,6 +67,44 @@ export default {
     };
   },
   methods: {
+    submitForm() {
+      // Enviar solicitud para registrar al usuario
+      axios.post('/user', {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+        })
+        .then((response) => {
+          console.log(response);
+          // Mostrar mensaje de éxito
+          alert('Registrado con éxito');
+        })
+        .catch((error) => {
+          console.log(error);
+          // Mostrar mensaje de error
+          alert('Algo salió mal, por favor intenta de nuevo');
+        });
+    },
+
+    submitLoginForm() {
+      // Enviar solicitud para iniciar sesión
+      axios
+        .post('/login', {
+          email: this.email,
+          password: this.password,
+        })
+        .then((response) => {
+          console.log(response);
+          // Manejar inicio de sesión exitoso
+          alert('Bienvenido de nuevo!');
+        })
+        .catch((error) => {
+          console.log(error);
+          // Mostrar mensaje de error
+          alert('Credenciales incorrectas');
+        });
+    },
+
     toggleForm(form) {
       if (form === 'signIn') {
         this.$refs.container.classList.remove('right-panel-active');

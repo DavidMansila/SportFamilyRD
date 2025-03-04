@@ -34,7 +34,7 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    {   
         // Validar los datos de entrada
         $request->validate([
             'name' => 'required|string|max:255',
@@ -45,8 +45,11 @@ class UserController extends Controller
         try{
            $user = User::create([
                 'name' => $request->name,
+                'last_name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'user_type'=> 'user',
+                'date' => "2003-03-21"
             ]);
 
             //iniciar sesion automaticamente al crear un usuario
