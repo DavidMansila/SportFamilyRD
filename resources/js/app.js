@@ -18,8 +18,8 @@ import SignUpView from './components/Login/SignUpView.vue';
 import HomeView from './components/home/HomeView.vue';
 import NoticiasView from './components/noticias/NoticiasView.vue';
 import CalendarioView from './components/calendario/CalendarioView.vue';
-import TiendaView from './components/tienda/TiendaView.vue';
-import EntrenadoresView from './components/entrenadores/EntrenadoresView.vue';
+import TiendaView from './components/Tienda/TiendaView.vue';
+import EntrenadoresView from './components/Entrenadores/EntrenadoresView.vue';
 import ForoView from './components/foro/ForoView.vue';
 import CrearPostView from './components/Foro/CrearPost.vue';
 

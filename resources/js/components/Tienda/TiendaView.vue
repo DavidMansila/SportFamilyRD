@@ -1,8 +1,8 @@
 <template>
   <div class="tienda-page">
 
-    <!-- Barra de navegación -->
-      <nav class="navbar3">
+    <!-- Nav Bar -->
+      <nav class="navbar">
         <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
@@ -27,7 +27,7 @@
       </nav>
 
     <!-- Título de la tienda -->
-    <h1 class="tienda-title">Bienvenido a nuestra Tienda</h1>
+    <h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
 
     <!-- Barra de búsqueda -->
     <div class="search-bar">
@@ -165,31 +165,47 @@ export default {
 };
 </script>
 
+
+
 <style scoped>
 
-.tienda-page {
-  font-family: Arial, sans-serif;
-}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
 
-.navbar3{
-  display: flex;
-  justify-content: space-between;
-  background-color: #333;
-  padding: 10px 20px;
-  color: white;
-}
-
-
-.logo-container {
+  
+  /* Navbar */
+  .navbar {
+    background: linear-gradient(to right, #000000, #17A2B8);
+    padding: 1rem 2rem;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
 }
+
 
 .logo {
     width: 50px;
     height: 50px;
 }
+
+.container {
+    margin: 0 auto;
+  }
+  
+.logo-container {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+  }
+  }
 
 .nav-links {
     display: flex;
@@ -229,7 +245,6 @@ export default {
     background-color: white;
     color: #ff3149;
 }
-  
 
 .tienda-title {
   text-align: center;

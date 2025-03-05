@@ -79,7 +79,28 @@ export default {
 };
 </script>
 
-<style scoped> 
+<style scoped>
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+
+  .logo-container {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+  }
+  }
+  
+
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
 /* Navbar */
 .navbar1 {
@@ -90,11 +111,9 @@ export default {
     align-items: center;
 }
 
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
+  .container {
+    margin: 0 auto;
+  }
 
 .logo {
     width: 50px;
