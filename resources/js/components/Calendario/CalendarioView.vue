@@ -27,7 +27,7 @@
 
     <!-- Calendario de eventos -->
     <div class="calendario-page">
-      <h1 class="page-title">Calendario de Eventos Deportivos</h1>
+      <h2 class="page-title">Calendario de Eventos Deportivos</h2>
 
       <!-- Muestra el mes y los botones para navegar entre meses -->
       <div class="calendar-header">
@@ -150,6 +150,7 @@ export default {
 </script>
 
 <style scoped>
+
 /* Estilos Navbar */
 .navbar2 {
   background: linear-gradient(135deg, #000000, #15ff54);
@@ -163,10 +164,16 @@ export default {
 
 
 .logo-container {
-    display: flex;
-    align-items: center;
+  display: flex;
     gap: 1rem;
-}
+    flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    
+}}
 
 .logo {
     width: 50px;
@@ -214,13 +221,13 @@ export default {
   
 
 
-
 .page-title {
   font-size: 2.5rem;
   margin-bottom: 20px;
   text-align: center;
   color: #333;
   font-weight: 600;
+  padding-top: 30px;
 }
 
 .calendar-header {

@@ -12,6 +12,7 @@
         <input type="text" v-model="registerForm.name" placeholder="Name" required />
         <input type="email" v-model="registerForm.email" placeholder="Email" required />
         <input type="password" v-model="registerForm.password" placeholder="Password" required />
+        <input type="password" v-model="registerForm.password_confirmation" placeholder="Password" required />
         <button type="button" :disabled="isSubmitting" @click="submitForm()">Sign Up</button>
       </form>
     </div>
@@ -62,6 +63,7 @@ export default {
         name: '',
         email: '',
         password: '',
+        password_confirmation: '',
       },
 
       loginForm: {

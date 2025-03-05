@@ -120,6 +120,7 @@
   .container {
     margin: 0 auto;
   }
+
   
   /* Navbar */
   .navbar {
@@ -193,10 +194,30 @@
   }
   
   .banner-title {
-    color: rgb(4, 4, 4);
-    font-size: 3rem;
-    font-weight: bold;
-  }
+  color: rgb(255, 255, 255); /* Texto blanco para buen contraste */
+  font-size: 3rem;
+  font-weight: bold;
+  text-align: center;
+  position: relative; /* Necesario para la capa del fondo */
+  z-index: 1; /* Asegura que el texto esté por encima */
+  text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.6); /* Sombra suave para mejorar legibilidad */
+  padding: 20px; /* Espaciado alrededor del texto */
+}
+
+.banner-title::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)); /* Gradiente oscuro */
+  backdrop-filter: blur(12px); /* Difumina el fondo */
+  z-index: -1; /* Coloca el fondo detrás del texto */
+  border-radius: 15px; /* Bordes redondeados para suavizar el fondo */
+  clip-path: ellipse(75% 50% at 50% 50%); /* Forma fluida en el fondo */
+}
+
   
   /* Section Styles */
   .section {
