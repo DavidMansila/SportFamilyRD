@@ -2,12 +2,17 @@
   <div class="tienda-page">
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     <!-- Nav Bar -->
       <nav class="navbar">
 =======
     <!-- Barra de navegación -->
       <nav class="navbar3">
 >>>>>>> 0607206 (Mas cambios en las paginas, mas front)
+=======
+    <!-- Nav Bar -->
+      <nav class="navbar">
+>>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
         <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
@@ -33,10 +38,14 @@
 
     <!-- Título de la tienda -->
 <<<<<<< HEAD
+<<<<<<< HEAD
     <h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
 =======
     <h1 class="tienda-title">Bienvenido a nuestra Tienda</h1>
 >>>>>>> 0607206 (Mas cambios en las paginas, mas front)
+=======
+    <h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
+>>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 
     <!-- Barra de búsqueda -->
     <div class="search-bar">
@@ -179,11 +188,15 @@ export default {
 <style scoped>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
   }
+<<<<<<< HEAD
 
   
   /* Navbar */
@@ -259,26 +272,40 @@ body {
   font-family: Arial, sans-serif;
 >>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 }
+=======
+>>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 
-.navbar3{
-  display: flex;
-  justify-content: space-between;
-  background-color: #333;
-  padding: 10px 20px;
-  color: white;
-}
-
-
-.logo-container {
+  
+  /* Navbar */
+  .navbar {
+    background: linear-gradient(to right, #000000, #17A2B8);
+    padding: 1rem 2rem;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
 }
+
 
 .logo {
     width: 50px;
     height: 50px;
 }
+
+.container {
+    margin: 0 auto;
+  }
+  
+.logo-container {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+  }
+  }
 
 .nav-links {
     display: flex;
@@ -318,7 +345,6 @@ body {
     background-color: white;
     color: #ff3149;
 }
-  
 
 .tienda-title {
   text-align: center;
