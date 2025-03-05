@@ -35,21 +35,22 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {   
+        // dd($request->all());
         // Validar los datos de entrada
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',//ponerle confirmed cuando david mande el front
         ]);
 
         try{
            $user = User::create([
                 'name' => $request->name,
-                'last_name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'user_type'=> 'user',
-                'date' => "2003-03-21"
+                // 'last_name' => $request->name,
+                // 'user_type'=> 'user',
+                // 'date' => "2003-03-21"
             ]);
 
             //iniciar sesion automaticamente al crear un usuario
@@ -60,9 +61,10 @@ class UserController extends Controller
             ], 200);
 
         }catch(\Exception $e){
+            \Log::error('Error al crear usuario: '.$e->getMessage());
             return response()->json([
                 'message' => 'Error: '.$e->getMessage()
-            ], 400);
+            ], 500);
         }
     }
 
