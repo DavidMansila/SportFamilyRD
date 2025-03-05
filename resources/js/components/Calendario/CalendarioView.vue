@@ -53,18 +53,22 @@
       </div>
 
       <!-- Modal para ver los eventos de un día -->
-      <div v-if="selectedDayEvents.length" class="event-modal">
-        <div class="modal-content">
-          <h3>Eventos del día {{ selectedDay }}</h3>
-          <ul>
-            <li v-for="evento in selectedDayEvents" :key="evento.id">
-              <h4>{{ evento.nombre }}</h4>
-              <p>{{ evento.descripcion }}</p>
-            </li>
-          </ul>
-          <button @click="closeModal" class="close-btn">Cerrar</button>
-        </div>
-      </div>
+<div v-if="selectedDayEvents.length" class="event-modal">
+  <div class="modal-content">
+    <h3>Eventos del día {{ selectedDay }}</h3>
+    <ul>
+      <li v-for="evento in selectedDayEvents" :key="evento.id">
+        <h4>{{ evento.nombre }}</h4>
+        <p>{{ evento.descripcion }}</p>
+        <p>Boletos disponibles: {{ evento.boletosDisponibles }}</p>
+        <button @click="comprarBoleto(evento)" :disabled="evento.boletosDisponibles === 0">
+          Comprar boleto
+        </button>
+      </li>
+    </ul>
+    <button @click="closeModal" class="close-btn">Cerrar</button>
+  </div>
+</div>
     </div>
   </div>
 </template>
@@ -78,17 +82,17 @@ export default {
       selectedDay: null,
       selectedDayEvents: [],
       eventos: [
-        { id: 1, nombre: 'Torneo de Fútbol', fecha: '2025-03-15', descripcion: 'Un torneo de fútbol local.' },
-        { id: 2, nombre: 'Maratón', fecha: '2025-03-25', descripcion: 'Una maratón de 10k.' },
-        { id: 3, nombre: 'Conferencia Deportiva', fecha: '2025-03-15', descripcion: 'Una conferencia sobre el futuro del deporte.' },
-        { id: 4, nombre: 'Partido de Tenis', fecha: '2025-04-18', descripcion: 'Partido amistoso de tenis entre dos equipos.' },
-        { id: 5, nombre: 'Torneo de Baloncesto', fecha: '2025-04-22', descripcion: 'Torneo local de baloncesto con equipos regionales.' },
-        { id: 6, nombre: 'Clínica de Natación', fecha: '2025-05-05', descripcion: 'Clínica intensiva para nadadores principiantes.' },
-        { id: 7, nombre: 'Competencia de Skateboarding', fecha: '2025-05-10', descripcion: 'Competencia de skateboarding en el parque central.' },
-        { id: 8, nombre: 'Curso de Primeros Auxilios Deportivos', fecha: '2025-06-01', descripcion: 'Curso para entrenadores y deportistas sobre primeros auxilios.' },
-        { id: 9, nombre: 'Exhibición de Artes Marciales', fecha: '2025-06-20', descripcion: 'Exhibición de varias disciplinas de artes marciales.' },
-        { id: 10, nombre: 'Torneo de Volleyball', fecha: '2025-07-05', descripcion: 'Torneo de volleyball en la playa con equipos locales.' },
-        { id: 11, nombre: 'Desafío de Ciclismo', fecha: '2025-07-15', descripcion: 'Desafío de ciclismo de montaña con recorrido por rutas difíciles.' }
+        { id: 1, nombre: 'Torneo de Fútbol', fecha: '2025-03-15', descripcion: 'Un torneo de fútbol local.', boletosDisponibles: 100 },
+        { id: 2, nombre: 'Maratón', fecha: '2025-03-25', descripcion: 'Una maratón de 10k.', boletosDisponibles: 200 },
+        { id: 3, nombre: 'Conferencia Deportiva', fecha: '2025-03-15', descripcion: 'Una conferencia sobre el futuro del deporte.', boletosDisponibles: 50 },
+        { id: 4, nombre: 'Partido de Tenis', fecha: '2025-04-18', descripcion: 'Partido amistoso de tenis entre dos equipos.', boletosDisponibles: 75 },
+        { id: 5, nombre: 'Torneo de Baloncesto', fecha: '2025-04-22', descripcion: 'Torneo local de baloncesto con equipos regionales.', boletosDisponibles: 120 },
+        { id: 6, nombre: 'Clínica de Natación', fecha: '2025-05-05', descripcion: 'Clínica intensiva para nadadores principiantes.', boletosDisponibles: 60 },
+        { id: 7, nombre: 'Competencia de Skateboarding', fecha: '2025-05-10', descripcion: 'Competencia de skateboarding en el parque central.', boletosDisponibles: 80 },
+        { id: 8, nombre: 'Curso de Primeros Auxilios Deportivos', fecha: '2025-06-01', descripcion: 'Curso para entrenadores y deportistas sobre primeros auxilios.', boletosDisponibles: 90 },
+        { id: 9, nombre: 'Exhibición de Artes Marciales', fecha: '2025-06-20', descripcion: 'Exhibición de varias disciplinas de artes marciales.', boletosDisponibles: 110 },
+        { id: 10, nombre: 'Torneo de Volleyball', fecha: '2025-07-05', descripcion: 'Torneo de volleyball en la playa con equipos locales.', boletosDisponibles: 130 },
+        { id: 11, nombre: 'Desafío de Ciclismo', fecha: '2025-07-15', descripcion: 'Desafío de ciclismo de montaña con recorrido por rutas difíciles.', boletosDisponibles: 150 }
       ],
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
@@ -144,7 +148,7 @@ export default {
         const eventDate = new Date(evento.fecha);
         return eventDate.getDate() === day && eventDate.getMonth() === this.currentMonth;
       });
-    }
+    },
   }
 };
 </script>
@@ -235,6 +239,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
+  padding-left: 110px;
+  padding-right: 110px;
 }
 
 .calendar-btn {
@@ -257,6 +263,8 @@ export default {
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
   text-align: center;
+  padding-left: 100px;
+  padding-right: 100px;
 }
 
 .calendar-day-name {
