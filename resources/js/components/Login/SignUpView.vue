@@ -1,7 +1,8 @@
 <template>
   <div class="container" ref="container">
     <div class="form-container sign-up-container">
-      <form @submit.prevent="submitForm">
+      <form >
+        <!-- @submit.prevent="submitForm" -->
         <h1>Create Account</h1>
         <div class="social-container">
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
@@ -11,9 +12,10 @@
         <input type="text" v-model="registerForm.name" placeholder="Name" required />
         <input type="email" v-model="registerForm.email" placeholder="Email" required />
         <input type="password" v-model="registerForm.password" placeholder="Password" required />
-        <button type="submit" :disabled="isSubmitting">Sign Up</button>
+        <button type="button" :disabled="isSubmitting" @click="submitForm()">Sign Up</button>
       </form>
     </div>
+
     <div class="form-container sign-in-container">
       <form @submit.prevent="submitLoginForm">
         <h1>Sign in</h1>
@@ -51,6 +53,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -59,6 +63,7 @@ export default {
         email: '',
         password: '',
       },
+
       loginForm: {
         email: '',
         password: '',
@@ -67,6 +72,7 @@ export default {
     };
   },
   methods: {
+   
     toggleForm(form) {
       if (form === 'signIn') {
         this.$refs.container.classList.remove('right-panel-active');
@@ -74,21 +80,50 @@ export default {
         this.$refs.container.classList.add('right-panel-active');
       }
     },
+
     async submitForm() {
-      this.isSubmitting = true;
+      // this.isSubmitting = true;
+    
       try {
         console.log('Registering:', this.registerForm);
-        // Aquí iría la lógica para enviar datos al backend
+        
+        axios.post('/user', this.registerForm)
+        .then((response) => {
+          console.log(response);
+       
+          alert('Registrado con éxito');
+        })
+        .catch((error) => {
+          console.log(error);
+         
+          alert('Algo salió mal, por favor intenta de nuevo');
+        });
       } catch (error) {
         console.error(error);
       }
-      this.isSubmitting = false;
+      // this.isSubmitting = false;
     },
+
     async submitLoginForm() {
       this.isSubmitting = true;
       try {
         console.log('Logging in:', this.loginForm);
-        // Aquí iría la lógica para enviar datos al backend
+        
+        axios.post('/login', {
+          email: this.email,
+          password: this.password,
+        })
+        .then((response) => {
+          console.log(response);
+          // Manejar inicio de sesión exitoso
+          alert('Bienvenido de nuevo!');
+        })
+        .catch((error) => {
+          console.log(error);
+          // Mostrar mensaje de error
+          alert('Credenciales incorrectas');
+        });
+
       } catch (error) {
         console.error(error);
       }
@@ -99,7 +134,7 @@ export default {
 </script>
 
 
-<style scoped>
+<style scoped >
 * {
   box-sizing: border-box;
 }
@@ -113,12 +148,13 @@ body {
   font-family: 'Montserrat', sans-serif;
   height: 100vh;
   margin: 0;
-}
 
+}
 h1 {
   font-weight: bold;
   margin: 0;
 }
+
 
 h2 {
   text-align: center;

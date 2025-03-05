@@ -43,7 +43,7 @@ Route::get('/CrearPost', function () {
 
 
 // usuarios
-Route::resource('user', UserController::class);
+Route::resource('/user', UserController::class);
 
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
