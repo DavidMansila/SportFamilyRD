@@ -16,7 +16,7 @@
              <a href="/Foro" class="nav-link">Foro</a>
         </div>
         <div class="auth-buttons">
-            <a href="/Settings">
+            <a href="/Ajustes">
                   <button class="auth-btn">Ajustes</button>
             </a>
             <a href="/Login">
@@ -211,7 +211,6 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)); /* Gradiente oscuro */
   backdrop-filter: blur(12px); /* Difumina el fondo */
   z-index: -1; /* Coloca el fondo detrás del texto */
   border-radius: 15px; /* Bordes redondeados para suavizar el fondo */

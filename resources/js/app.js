@@ -16,12 +16,13 @@ import { createApp } from 'vue';
 import ExampleComponent from './components/ExampleComponent.vue';
 import SignUpView from './components/Login/SignUpView.vue';
 import HomeView from './components/home/HomeView.vue';
-import NoticiasView from './components/noticias/NoticiasView.vue';
+import NoticiasView from './components/Noticias/NoticiasView.vue';
 import CalendarioView from './components/calendario/CalendarioView.vue';
 import TiendaView from './components/Tienda/TiendaView.vue';
 import EntrenadoresView from './components/Entrenadores/EntrenadoresView.vue';
 import ForoView from './components/foro/ForoView.vue';
 import CrearPostView from './components/Foro/CrearPost.vue';
+import AjustesView from './components/Ajustes/AjustesView.vue';
 
 
 
@@ -50,6 +51,8 @@ app.component('entrenadores-component', EntrenadoresView);
 
 app.component('foro-component', ForoView);
 app.component('crearpost-component', CrearPostView);
+
+app.component('ajustes-component', AjustesView);
 
 
 app.mount('#app');

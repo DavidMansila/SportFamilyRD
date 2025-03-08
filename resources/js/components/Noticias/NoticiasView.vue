@@ -171,7 +171,7 @@ body {
 }
   
 
-/* ------------------- ESTILOS DE NOTICIAS ------------------- */
+/* ------------------- ESTILOS DE NOTICIAS ------------------ */
 .noticias-page {
   font-family: 'Inter', sans-serif;
   background-color: #f8f9fa;
