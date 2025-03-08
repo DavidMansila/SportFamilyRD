@@ -79,10 +79,7 @@ export default {
 };
 </script>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
+
 <style scoped>
 
 body {
@@ -104,13 +101,6 @@ body {
   }
   }
   
-
-<<<<<<< HEAD
-=======
-<style scoped> 
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-=======
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
 /* Navbar */
 .navbar1 {
@@ -121,23 +111,20 @@ body {
     align-items: center;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   .container {
     margin: 0 auto;
   }
-=======
+
 .logo-container {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-=======
+
   .container {
     margin: 0 auto;
   }
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
+
 
 .logo {
     width: 50px;

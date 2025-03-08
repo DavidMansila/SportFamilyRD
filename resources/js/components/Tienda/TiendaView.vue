@@ -1,18 +1,8 @@
 <template>
   <div class="tienda-page">
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     <!-- Nav Bar -->
       <nav class="navbar">
-=======
-    <!-- Barra de navegación -->
-      <nav class="navbar3">
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-=======
-    <!-- Nav Bar -->
-      <nav class="navbar">
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
         <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
@@ -37,15 +27,7 @@
       </nav>
 
     <!-- Título de la tienda -->
-<<<<<<< HEAD
-<<<<<<< HEAD
     <h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
-=======
-    <h1 class="tienda-title">Bienvenido a nuestra Tienda</h1>
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-=======
-    <h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 
     <!-- Barra de búsqueda -->
     <div class="search-bar">
@@ -115,7 +97,7 @@ export default {
         { id: 4, nombre: 'Camiseta Deportiva Mujer', precio: '$25', categoria: 'ropa-mujer', imagen: '/imagenes/tshirt-woman.jpg' },
         { id: 5, nombre: 'Proteína en Polvo', precio: '$45', categoria: 'proteinas', imagen: '/imagenes/protein.jpg' },
         { id: 6, nombre: 'Barras Energéticas', precio: '$15', categoria: 'barras', imagen: '/imagenes/protein-bars.jpg' },
-        { id: 7, nombre: 'Balón de Basketball', precio: '$40', categoria: 'basketball', imagen: '/imagenes/basketball.jpg' },
+        { id: 7, nombre: 'Balón de Basketball', precio: '$40', categoria: 'basketball', imagen: '/imagenes/basketbal.jpg' },
         { id: 8, nombre: 'Camiseta Deportiva Hombre', precio: '$35', categoria: 'ropa-hombre', imagen: '/imagenes/soccer-shirt.jpg' },
         { id: 9, nombre: 'Camiseta Deportiva Niño', precio: '$20', categoria: 'ropa-ninos', imagen: '/imagenes/tshirt-kids.jpg' },
         { id: 10, nombre: 'Gorra Deportiva', precio: '$20', categoria: 'accesorios', imagen: '/imagenes/cap.jpg' },
@@ -187,17 +169,11 @@ export default {
 
 <style scoped>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
   }
-<<<<<<< HEAD
-
   
   /* Navbar */
   .navbar {
@@ -266,14 +242,10 @@ body {
 
 .auth-btn:hover {
     background-color: white;
-    color: #ff3149;
-=======
+    color: #ff3149;}
+
 .tienda-page {
-  font-family: Arial, sans-serif;
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-}
-=======
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
+  font-family: Arial, sans-serif;}
 
   
   /* Navbar */
@@ -437,4 +409,5 @@ body {
   border-radius: 5px;
   display: none;
 }
+
 </style>

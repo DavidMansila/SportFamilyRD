@@ -27,15 +27,8 @@
 
     <!-- Calendario de eventos -->
     <div class="calendario-page">
-<<<<<<< HEAD
-<<<<<<< HEAD
+    
       <h2 class="page-title">Calendario de Eventos Deportivos</h2>
-=======
-      <h1 class="page-title">Calendario de Eventos Deportivos</h1>
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-=======
-      <h2 class="page-title">Calendario de Eventos Deportivos</h2>
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 
       <!-- Muestra el mes y los botones para navegar entre meses -->
       <div class="calendar-header">
@@ -162,14 +155,7 @@ export default {
 </script>
 
 <style scoped>
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-=======
-
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 /* Estilos Navbar */
 .navbar2 {
   background: linear-gradient(135deg, #000000, #15ff54);
@@ -183,8 +169,6 @@ export default {
 
 
 .logo-container {
-<<<<<<< HEAD
-<<<<<<< HEAD
   display: flex;
     gap: 1rem;
     flex-direction: row;
@@ -199,14 +183,9 @@ export default {
 .logo {
     width: 50px;
     height: 50px;
-}
-
-=======
     display: flex;
     align-items: center;
-=======
-  display: flex;
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
+    display: flex;
     gap: 1rem;
     flex-direction: row;
 
@@ -222,7 +201,6 @@ export default {
     height: 50px;
 }
 
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
 .nav-links {
     display: flex;
     gap: 2rem;
@@ -262,29 +240,14 @@ export default {
     color: #ff3149;
 }
   
-
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-=======
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 .page-title {
   font-size: 2.5rem;
   margin-bottom: 20px;
   text-align: center;
   color: #333;
   font-weight: 600;
-<<<<<<< HEAD
-<<<<<<< HEAD
   padding-top: 30px;
-=======
->>>>>>> 0607206 (Mas cambios en las paginas, mas front)
-=======
   padding-top: 30px;
->>>>>>> 0d3bd1c (Arreglo de las vistas y doble password en registro)
 }
 
 .calendar-header {
