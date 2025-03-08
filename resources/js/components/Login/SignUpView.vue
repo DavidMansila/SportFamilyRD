@@ -90,8 +90,8 @@ export default {
         axios.post('/user', this.registerForm)
         .then((response) => {
           console.log(response);
-       
           alert('Registrado con éxito');
+          window.location.href = '/';
         })
         .catch((error) => {
           console.log(error);
@@ -110,13 +110,14 @@ export default {
         console.log('Logging in:', this.loginForm);
         
         axios.post('/login', {
-          email: this.email,
-          password: this.password,
+          email: this.loginForm.email,
+          password: this.loginForm.password,
         })
         .then((response) => {
           console.log(response);
           // Manejar inicio de sesión exitoso
           alert('Bienvenido de nuevo!');
+          window.location.href = '/';
         })
         .catch((error) => {
           console.log(error);
