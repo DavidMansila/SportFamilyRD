@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('url');//https.....
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
-        });
+        });    
     }
 
     /**

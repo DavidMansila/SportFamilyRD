@@ -61,7 +61,7 @@ class UserController extends Controller
             ], 200);
 
         }catch(\Exception $e){
-            \Log::error('Error al crear usuario: '.$e->getMessage());
+            // \Log::error('Error al crear usuario: '.$e->getMessage());
             return response()->json([
                 'message' => 'Error: '.$e->getMessage()
             ], 500);
