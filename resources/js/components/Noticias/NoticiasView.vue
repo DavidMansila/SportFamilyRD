@@ -28,6 +28,16 @@
     <div class="container">
       <h1 class="page-title">Sports News</h1>
 
+      <!-- Mostrar error si no se cargan las noticias -->
+      <div v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div v-if="isLoading" class="loading-message">
+        Cargando noticias...
+      </div>
+
+      <!-- Mostrar las noticias -->
       <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
         <div class="noticia-image">
           <img :src="noticia.imagen" alt="Imagen de noticia" class="image" />
@@ -44,41 +54,36 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-  name: 'NoticiasComponent',
   data() {
     return {
-      noticias: [
-        { 
-          id: 1, 
-          titulo: 'Olympic athletes are fighting for their rights to protest', 
-          descripcion: 'The rules have changed but the fight is far from over.', 
-          imagen: 'https://via.placeholder.com/600x300',
-          fuente: 'Vox',
-          tiempo: '4'
-        },
-        { 
-          id: 2, 
-          titulo: 'What we learned from the first week of the NBA playoffs', 
-          descripcion: 'The Lakers are out and the league is wide open.', 
-          imagen: 'https://via.placeholder.com/600x300',
-          fuente: 'ESPN',
-          tiempo: '6'
-        },
-        { 
-          id: 3, 
-          titulo: 'The rise of women’s skateboarding', 
-          descripcion: 'As the sport makes its Olympic debut, female skaters are taking center stage.', 
-          imagen: 'https://via.placeholder.com/600x300',
-          fuente: 'The Guardian',
-          tiempo: '5'
-        }
-      ]
+      noticias: [],  // Cambié "news" por "noticias"
+      isLoading: false,
+      errorMessage: '',
     };
-  }
+  },
+  methods: {
+    async fetchNews() {
+      this.isLoading = true;  // Iniciar el estado de carga
+      try {
+       const response = await axios.get('http://127.0.0.1:8000/Noticias');
+        console.log('Datos de noticias:', response.data);  // Verifica si los datos están llegando correctamente
+        this.noticias = response.data;  // Asigna los datos a la variable "noticias"
+      } catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';  // Mostrar mensaje de error
+      } finally {
+        this.isLoading = false;  // Finaliza el estado de carga
+      }
+    },
+  },
+  mounted() {
+    this.fetchNews();  // Llamamos la función cuando el componente se monta
+  },
 };
 </script>
-
 
 <style scoped>
 
