@@ -126,7 +126,32 @@ export default {
 
 
 <style scoped>
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
+
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
+
+.logo-container {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+  }
+  }
+  
+  .container {
+    margin: 0 auto;
+  }
+
 .navbar {
   background: linear-gradient(to right, #000000, #007BFF);
   padding: 1rem 2rem;
@@ -144,13 +169,14 @@ export default {
 .logo-container {
   display: flex;
   gap: 1rem;
-  flex-direction: row;
+  align-items: center;
 }
 
 .logo-container h1 {
   font-size: 2rem;
   font-weight: bold;
-  color: rgb(255, 255, 255);
+  color: white;
+  margin: 0;
 }
 
 .nav-links {
@@ -161,8 +187,8 @@ export default {
 .nav-link {
   color: white;
   text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 500;
   transition: color 0.3s ease-in-out;
 }
 
@@ -191,6 +217,8 @@ export default {
   background-color: white;
   color: #ff3149;
 }
+
+
 
 /* ------------------- ESTILOS DE NOTICIAS ------------------ */
 .noticias-page {
