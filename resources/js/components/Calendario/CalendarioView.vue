@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Navbar -->
-    <nav class="navbar2">
+    <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo" />
@@ -16,7 +16,7 @@
         <a href="/Foro" class="nav-link">Foro</a>
       </div>
       <div class="auth-buttons">
-        <a href="/Settings">
+        <a href="/Ajustes">
           <button class="auth-btn">Ajustes</button>
         </a>
         <a href="/Login">
@@ -157,34 +157,29 @@ export default {
 <style scoped>
 
 /* Estilos Navbar */
-.navbar2 {
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
+
+/* Navbar */
+.navbar {
   background: linear-gradient(135deg, #000000, #15ff54);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.logo {
+  width: 50px;
+  height: 50px;
+}
 
 .logo-container {
-  display: flex;
-    gap: 1rem;
-    flex-direction: row;
-
-    h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-    
-}}
-
-.logo {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
     display: flex;
     gap: 1rem;
     flex-direction: row;
@@ -193,51 +188,46 @@ export default {
     font-size: 2rem;
     font-weight: bold;
     color: rgb(255, 255, 255);
-    
-}}
-
-.logo {
-    width: 50px;
-    height: 50px;
-}
+  }
+  }
 
 .nav-links {
-    display: flex;
-    gap: 2rem;
+  display: flex;
+  gap: 2rem;
 }
 
 .nav-link {
-    color: white;
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: color 0.3s ease-in-out;
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: color 0.3s ease-in-out;
 }
 
 .nav-link:hover {
-    color: #fbbf24;
+  color: #fbbf24;
 }
 
 .auth-buttons {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  gap: 1rem;
 }
 
 .auth-btn {
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    padding: 0.5rem 1.2rem;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
 .auth-btn:hover {
-    background-color: white;
-    color: #ff3149;
+  background-color: white;
+  color: #ff3149;
 }
   
 .page-title {

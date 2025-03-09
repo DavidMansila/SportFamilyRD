@@ -1,7 +1,7 @@
 <template>
   <div class="noticias-page">
     <!-- NavBar -->
-    <nav class="navbar1">
+    <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
@@ -16,7 +16,7 @@
         <a href="/Foro" class="nav-link">Foro</a>
       </div>
       <div class="auth-buttons">
-        <a href="/Settings">
+        <a href="/Ajustes">
           <button class="auth-btn">Ajustes</button>
         </a>
         <a href="/Login">
@@ -26,18 +26,9 @@
     </nav>
 
     <div class="container">
-      <h1 class="page-title">Sports News</h1>
+      <h2 class="page-title">Sports News</h2>
 
-      <!-- Mostrar error si no se cargan las noticias -->
-      <div v-if="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
-
-      <div v-if="isLoading" class="loading-message">
-        Cargando noticias...
-      </div>
-
-      <!-- Mostrar las noticias -->
+      <!-- Lista de noticias -->
       <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
         <div class="noticia-image">
           <img :src="noticia.imagen" alt="Imagen de noticia" class="image" />
@@ -46,135 +37,140 @@
           <h3 class="noticia-title">{{ noticia.titulo }}</h3>
           <p class="noticia-description">{{ noticia.descripcion }}</p>
           <p class="noticia-source">{{ noticia.fuente }} · {{ noticia.tiempo }} min read</p>
-          <a :href="'/noticia/' + noticia.id" class="read-more">Read more</a>
+          <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pop-up de noticia completa -->
+    <div v-if="noticiaSeleccionada" class="popup-overlay" @click="cerrarNoticia">
+      <div class="popup-content" @click.stop>
+        <button class="btn-cerrar" @click="cerrarNoticia">×</button>
+        <img :src="noticiaSeleccionada.imagen" alt="Imagen de noticia" class="popup-imagen" />
+        <div class="popup-info">
+          <h3 class="popup-titulo">{{ noticiaSeleccionada.titulo }}</h3>
+          <p class="popup-descripcion">{{ noticiaSeleccionada.descripcion }}</p>
+          <p class="popup-fuente">{{ noticiaSeleccionada.fuente }} · {{ noticiaSeleccionada.tiempo }} min read</p>
         </div>
       </div>
     </div>
   </div>
 </template>
 
+
+
+
 <script>
 import axios from 'axios';
 
 export default {
+  name: 'NoticiasComponent', // Nombre del componente
   data() {
     return {
-      noticias: [],  // Cambié "news" por "noticias"
-      isLoading: false,
-      errorMessage: '',
+      noticias: [], // Lista de noticias (vacía inicialmente)
+      isLoading: false, // Estado de carga
+      errorMessage: '', // Mensaje de error
+      noticiaSeleccionada: null, // Noticia seleccionada para el pop-up
     };
   },
   methods: {
+    abrirNoticia(noticia) {
+      this.noticiaSeleccionada = noticia; // Abre el pop-up con la noticia seleccionada
+    },
+    cerrarNoticia() {
+      this.noticiaSeleccionada = null; // Cierra el pop-up
+    },
     async fetchNews() {
-      this.isLoading = true;  // Iniciar el estado de carga
+      this.isLoading = true; // Iniciar el estado de carga
+      this.errorMessage = ''; // Limpiar mensajes de error anteriores
       try {
-       const response = await axios.get('http://127.0.0.1:8000/Noticias');
-        console.log('Datos de noticias:', response.data);  // Verifica si los datos están llegando correctamente
-        this.noticias = response.data;  // Asigna los datos a la variable "noticias"
+        const response = await axios.get('http://localhost:8000/Noticias'); // URL
+        console.log('Datos de noticias:', response.data); // Verifica si los datos están llegando
+        this.noticias = response.data; // Asigna los datos a la variable "noticias"
       } catch (error) {
         console.error('Error al obtener las noticias:', error);
-        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';  // Mostrar mensaje de error
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.'; // Mostrar mensaje de error
       } finally {
-        this.isLoading = false;  // Finaliza el estado de carga
+        this.isLoading = false; // Finaliza el estado de carga
       }
     },
   },
   mounted() {
-    this.fetchNews();  // Llamamos la función cuando el componente se monta
+    this.fetchNews(); // Llamamos la función cuando el componente se monta
   },
 };
 </script>
 
+
+
+
+
 <style scoped>
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-
-
-  .logo-container {
-    display: flex;
-    gap: 1rem;
-    flex-direction: row;
-
-    h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-  }
-  }
-  
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
-/* Navbar */
-.navbar1 {
-    background: linear-gradient(to right, #000000, #007BFF);
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.navbar {
+  background: linear-gradient(to right, #000000, #007BFF);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
-  .container {
-    margin: 0 auto;
-  }
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-  .container {
-    margin: 0 auto;
-  }
-
 
 .logo {
-    width: 50px;
-    height: 50px;
+  width: 50px;
+  height: 50px;
+}
+
+.logo-container {
+  display: flex;
+  gap: 1rem;
+  flex-direction: row;
+}
+
+.logo-container h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: rgb(255, 255, 255);
 }
 
 .nav-links {
-    display: flex;
-    gap: 2rem;
+  display: flex;
+  gap: 2rem;
 }
 
 .nav-link {
-    color: white;
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: color 0.3s ease-in-out;
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: color 0.3s ease-in-out;
 }
 
 .nav-link:hover {
-    color: #fbbf24;
+  color: #fbbf24;
 }
 
 .auth-buttons {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  gap: 1rem;
 }
 
 .auth-btn {
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    padding: 0.5rem 1.2rem;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
 .auth-btn:hover {
-    background-color: white;
-    color: #ff3149;
+  background-color: white;
+  color: #ff3149;
 }
-  
 
 /* ------------------- ESTILOS DE NOTICIAS ------------------ */
 .noticias-page {
@@ -261,10 +257,78 @@ body {
   text-decoration: none;
   border-radius: 8px;
   transition: background 0.3s;
+  cursor: pointer;
+  border: none;
 }
 
 .read-more:hover {
   background: #0056b3;
+}
+
+/* ------------------- ESTILOS DEL POP-UP ------------------ */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 2rem;
+  max-width: 800px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cerrar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+}
+
+.popup-imagen {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.popup-info {
+  text-align: left;
+}
+
+.popup-titulo {
+  font-size: 2rem;
+  color: #222;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.popup-descripcion {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.popup-fuente {
+  font-size: 1rem;
+  color: #777;
 }
 
 /* Responsive Design */
@@ -296,6 +360,18 @@ body {
 
   .read-more {
     align-self: center;
+  }
+
+  .popup-content {
+    padding: 1rem;
+  }
+
+  .popup-titulo {
+    font-size: 1.5rem;
+  }
+
+  .popup-descripcion {
+    font-size: 1rem;
   }
 }
 </style>
