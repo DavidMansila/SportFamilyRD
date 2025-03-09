@@ -17,7 +17,7 @@
              <a href="/Foro" class="nav-link">Foro</a>
         </div>
         <div class="auth-buttons">
-            <a href="/Settings">
+          <a href="/Ajustes">
                   <button class="auth-btn">Ajustes</button>
             </a>
             <a href="/Login">
@@ -27,7 +27,7 @@
       </nav>
 
 
-    <h1 class="page-title">Lista de Entrenadores</h1>
+    <h2 class="page-title">Lista de Entrenadores</h2>
 
     <!-- Sección para enviar solicitud de ser entrenador -->
     <div class="solicitud-entrenador">
@@ -169,9 +169,15 @@ body {
 
 .logo-container {
     display: flex;
-    align-items: center;
     gap: 1rem;
-}
+    flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+  }
+  }
 
 .logo {
     width: 50px;

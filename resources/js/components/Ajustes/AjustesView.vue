@@ -35,7 +35,7 @@
       <!-- Main Content -->
       <div class="content flex-1 p-8 flex justify-center items-start">
         <div class="settings-card bg-white p-8 rounded-2xl shadow-lg w-full max-w-4xl">
-          <h1 class="page-title text-3xl font-semibold text-gray-800 mb-8">Configuración</h1>
+          <h2 class="page-title text-3xl font-semibold text-gray-800 mb-8">Configuración</h2>
   
           <!-- Perfil -->
           <div v-if="vista === 'perfil'">

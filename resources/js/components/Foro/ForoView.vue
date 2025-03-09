@@ -17,7 +17,7 @@
              <a href="/Foro" class="nav-link">Foro</a>
         </div>
         <div class="auth-buttons">
-            <a href="/Settings">
+          <a href="/Ajustes">
                   <button class="auth-btn">Ajustes</button>
             </a>
             <a href="/Login">
