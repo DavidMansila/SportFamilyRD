@@ -31,12 +31,12 @@
       <!-- Lista de noticias -->
       <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
         <div class="noticia-image">
-          <img :src="noticia.imagen" alt="Imagen de noticia" class="image" />
+          <img src="https://th.bing.com/th/id/OIP.SwvZPcCkze8R1IQhvfhhDQHaDF?w=202&h=84&c=7&r=0&o=5&dpr=1.5&pid=1.7" alt="Imagen de noticia" class="image" />
         </div>
         <div class="noticia-content">
-          <h3 class="noticia-title">{{ noticia.titulo }}</h3>
-          <p class="noticia-description">{{ noticia.descripcion }}</p>
-          <p class="noticia-source">{{ noticia.fuente }} · {{ noticia.tiempo }} min read</p>
+          <h3 class="noticia-title">{{ noticia.title }}</h3>
+          <p class="noticia-description">{{ noticia.content }}</p>
+          <p class="noticia-source">{{ noticia.source }} · {{ noticia.published_at }} min read</p>
           <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
         </div>
       </div>
@@ -81,22 +81,26 @@ export default {
       this.noticiaSeleccionada = null; // Cierra el pop-up
     },
     async fetchNews() {
-      this.isLoading = true; // Iniciar el estado de carga
-      this.errorMessage = ''; // Limpiar mensajes de error anteriores
-      try {
-        const response = await axios.get('http://localhost:8000/Noticias'); // URL
-        console.log('Datos de noticias:', response.data); // Verifica si los datos están llegando
-        this.noticias = response.data; // Asigna los datos a la variable "noticias"
-      } catch (error) {
+      this.isLoading = true; 
+      this.errorMessage = ''; 
+
+      axios.get('news')
+      .then((response) => {
+        console.log('Datos de noticias:', response.data);
+        this.noticias = response.data.news;
+      })
+      .catch((error) => {
         console.error('Error al obtener las noticias:', error);
         this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.'; // Mostrar mensaje de error
-      } finally {
-        this.isLoading = false; // Finaliza el estado de carga
-      }
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
     },
+      
   },
   mounted() {
-    this.fetchNews(); // Llamamos la función cuando el componente se monta
+    this.fetchNews(); 
   },
 };
 </script>
