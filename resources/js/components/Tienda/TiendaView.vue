@@ -308,7 +308,24 @@ body {
   background-color: #f9f9f9;
 }
 
-/* Navbar */
+/* ------------------- ESTILOS DEL NAVBAR ------------------- */
+
+.logo-container {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+  }
+  }
+  
+  .container {
+    margin: 0 auto;
+  }
+
 .navbar {
   background: linear-gradient(to right, #000000, #17a2b8);
   padding: 1rem 2rem;
@@ -325,8 +342,8 @@ body {
 
 .logo-container {
   display: flex;
-  align-items: center;
   gap: 1rem;
+  align-items: center;
 }
 
 .logo-container h1 {
@@ -344,8 +361,8 @@ body {
 .nav-link {
   color: white;
   text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 500;
   transition: color 0.3s ease-in-out;
 }
 
@@ -374,6 +391,9 @@ body {
   background-color: white;
   color: #ff3149;
 }
+
+
+
 
 /* Título de la tienda */
 .tienda-title {
