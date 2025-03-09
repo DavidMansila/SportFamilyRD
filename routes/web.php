@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,7 +10,7 @@ Route::get('/', function () {
     return view('Home.HomeView');
 });
 
-// Rutas
+// Rutas para las vistas
 Route::get('/Login', function () {
     return view('Login.signUp');
 });
@@ -40,10 +41,13 @@ Route::get('/CrearPost', function () {
 
 
 
-
+//Rutas para funciones en el back
 
 // usuarios
 Route::resource('/user', UserController::class);
+
+//Noticias
+Route::resource('/news', NewsController::class);
 
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
