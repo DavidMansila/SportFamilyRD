@@ -28,21 +28,17 @@
     <!-- Calendario de eventos -->
     <div class="calendario-page">
     
-      <h2 class="page-title">Calendario de Eventos Deportivos</h2>
-
-      <!-- Muestra el mes y los botones para navegar entre meses -->
+<!-- Calendario -->
+<div class="calendario-container">
       <div class="calendar-header">
-        <button @click="changeMonth('prev')" class="calendar-btn">Anterior</button>
+        <button @click="changeMonth('prev')" class="calendar-btn">◄</button>
         <h2>{{ monthNames[currentMonth] }} {{ currentYear }}</h2>
-        <button @click="changeMonth('next')" class="calendar-btn">Siguiente</button>
+        <button @click="changeMonth('next')" class="calendar-btn">►</button>
       </div>
-
-      <!-- Cuadrícula de días del mes -->
       <div class="calendar-grid">
         <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-name">
           {{ day }}
         </div>
-        
         <div 
           v-for="day in daysInMonth" 
           :key="day" 
@@ -52,24 +48,7 @@
           {{ day }}
         </div>
       </div>
-
-      <!-- Modal para ver los eventos de un día -->
-<div v-if="selectedDayEvents.length" class="event-modal">
-  <div class="modal-content">
-    <h3>Eventos del día {{ selectedDay }}</h3>
-    <ul>
-      <li v-for="evento in selectedDayEvents" :key="evento.id">
-        <h4>{{ evento.nombre }}</h4>
-        <p>{{ evento.descripcion }}</p>
-        <p>Boletos disponibles: {{ evento.boletosDisponibles }}</p>
-        <button @click="comprarBoleto(evento)" :disabled="evento.boletosDisponibles === 0">
-          Comprar boleto
-        </button>
-      </li>
-    </ul>
-    <button @click="closeModal" class="close-btn">Cerrar</button>
-  </div>
-</div>
+    </div>
 
 <!-- Sección de eventos ordenados -->
 <div class="eventos-ordenados">
@@ -237,14 +216,17 @@ export default {
 };
 </script>
 
-<style scoped>
 
-/* Estilos Navbar */
+
+
+<style scoped>
+/* Estilos generales */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif; /* Fuente moderna */
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
+  background-color: #f8f9fa; /* Fondo claro */
+  color: #333; /* Color de texto principal */
 }
 
 /* Navbar */
@@ -263,16 +245,17 @@ body {
 }
 
 .logo-container {
-    display: flex;
-    gap: 1rem;
-    flex-direction: row;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
 
-    h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-  }
-  }
+.logo-container h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
 
 .nav-links {
   display: flex;
@@ -282,8 +265,8 @@ body {
 .nav-link {
   color: white;
   text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 500;
   transition: color 0.3s ease-in-out;
 }
 
@@ -312,74 +295,102 @@ body {
   background-color: white;
   color: #ff3149;
 }
-  
-.page-title {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #333;
-  font-weight: 600;
-  padding-top: 30px;
-  padding-top: 30px;
+
+/* Contenedor del calendario */
+.calendario-container {
+  background-color: #ffffff; /* Fondo blanco */
+  border-radius: 15px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  padding: 20px; /* Padding equilibrado */
+  margin: 20px auto;
+  max-width: 800px; /* Tamaño recomendable */
 }
 
+/* Encabezado del calendario */
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-left: 110px;
-  padding-right: 110px;
+  margin-bottom: 20px;
+  background-color: #007bff; /* Fondo azul */
+  padding: 10px 20px; /* Padding equilibrado */
+  border-radius: 10px;
+  color: white; /* Texto blanco */
+}
+
+.calendar-header h2 {
+  font-size: 1.8rem; /* Tamaño equilibrado */
+  font-weight: 600;
+  margin: 0;
 }
 
 .calendar-btn {
-  font-size: 1rem;
-  padding: 8px 15px;
-  border-radius: 5px;
-  background-color: #17A2B8;
-  color: white;
+  background-color: transparent;
   border: none;
-  transition: background 0.3s, transform 0.3s;
+  color: white;
+  font-size: 1.8rem; /* Tamaño equilibrado */
+  cursor: pointer;
+  transition: transform 0.3s;
 }
 
 .calendar-btn:hover {
-  background-color: #007bff;
-  transform: translateY(-2px);
+  transform: scale(1.2);
 }
 
+/* Cuadrícula de días */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 10px; /* Espacio equilibrado */
   text-align: center;
-  padding-left: 100px;
-  padding-right: 100px;
 }
 
 .calendar-day-name {
   font-weight: bold;
-  font-size: 1rem;
-  color: #333;
+  font-size: 1rem; /* Tamaño equilibrado */
+  color: #007bff; /* Color azul */
+  padding: 10px; /* Padding equilibrado */
+  background-color: #f0f8ff; /* Fondo azul claro */
+  border-radius: 8px; /* Bordes redondeados */
 }
 
 .calendar-day {
-  padding: 12px;
-  border-radius: 8px;
+  padding: 15px; /* Tamaño equilibrado */
+  border-radius: 8px; /* Bordes redondeados */
   cursor: pointer;
-  background: #f9f9f9;
+  background: #ffffff;
+  border: 1px solid #e0e0e0; /* Borde sutil */
   transition: background 0.3s, transform 0.3s;
+  font-size: 1rem; /* Texto equilibrado */
 }
 
 .calendar-day:hover {
-  background: #d0d0d0;
+  background: #f0f8ff; /* Fondo azul claro al pasar el mouse */
   transform: translateY(-2px);
 }
 
 .event-day {
-  background-color: #007bff;
+  background-color: #007bff; /* Fondo azul */
   color: white;
+  border: none;
 }
 
+/* Estilos para días vacíos (cuando no hay día en la cuadrícula) */
+.calendar-day:empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.page-title {
+  font-size: 2rem; /* Tamaño equilibrado */
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Modal de eventos */
 .event-modal {
   position: fixed;
   top: 0;
@@ -397,16 +408,31 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 15px;
-  width: 80%;
+  width: 90%;
   max-width: 600px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
   animation: slideIn 0.5s ease;
 }
 
-button {
+.modal-content h3 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.modal-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.modal-content li {
+  margin-bottom: 15px;
+}
+
+.modal-content button {
   background-color: #007bff;
   color: white;
-  padding: 10px 15px;
+  padding: 8px 15px;
   border: none;
   border-radius: 5px;
   font-size: 1rem;
@@ -414,7 +440,7 @@ button {
   transition: background 0.3s;
 }
 
-button:hover {
+.modal-content button:hover {
   background-color: #0056b3;
 }
 
@@ -422,24 +448,7 @@ button:hover {
   background-color: #d9534f;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-50px);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
+/* Eventos ordenados */
 .eventos-ordenados {
   margin-top: 40px;
   padding: 20px;
@@ -460,7 +469,8 @@ button:hover {
   align-items: center;
   padding: 15px;
   margin-bottom: 15px;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0; /* Borde sutil */
   border-radius: 10px;
   transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -514,77 +524,6 @@ button:hover {
   cursor: not-allowed;
 }
 
-
-.carrito {
-  margin-top: 40px;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: block; /* Asegúrate de que no esté oculto */
-}
-
-.carrito h2 {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.carrito-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  margin-bottom: 15px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.carrito-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-}
-
-.carrito-info {
-  flex: 1;
-}
-
-.carrito-info h3 {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.carrito-info p {
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.eliminar-btn {
-  background-color: #d9534f;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.eliminar-btn:hover {
-  background-color: #c9302c;
-}
-
-.total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-}
-
 /* Botón flotante del carrito */
 .carrito-btn {
   position: fixed;
@@ -592,7 +531,7 @@ button:hover {
   right: 20px;
   background-color: #007bff;
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
   border-radius: 50px;
   font-size: 1rem;
@@ -725,6 +664,7 @@ button:hover {
   background-color: #c9302c;
 }
 
+/* Animaciones */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -742,6 +682,4 @@ button:hover {
     transform: translateY(0);
   }
 }
-
-
 </style>
