@@ -9,9 +9,10 @@
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
-        <input type="text" v-model="registerForm.name" placeholder="Name" required />
-        <input type="email" v-model="registerForm.email" placeholder="Email" required />
-        <input type="password" v-model="registerForm.password" placeholder="Password" required />
+        <input type="text" v-model="registerForm.name" placeholder="Nombre" required />
+        <input type="email" v-model="registerForm.email" placeholder="Correo" required />
+        <input type="password" v-model="registerForm.password" placeholder="Contraseña" required />
+        <input type="password" v-model="registerForm.password_confirmation" placeholder="Confirmar contraseña" required />
         <button type="button" :disabled="isSubmitting" @click="submitForm()">Sign Up</button>
       </form>
     </div>
@@ -24,8 +25,8 @@
           <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
-        <input type="email" v-model="loginForm.email" placeholder="Email" required />
-        <input type="password" v-model="loginForm.password" placeholder="Password" required />
+        <input type="email" v-model="loginForm.email" placeholder="Correo" required />
+        <input type="password" v-model="loginForm.password" placeholder="Contraseña" required />
         <button type="submit" :disabled="isSubmitting">Sign In</button>
       </form>
     </div>
@@ -62,6 +63,7 @@ export default {
         name: '',
         email: '',
         password: '',
+        password_confirmation: '',
       },
 
       loginForm: {

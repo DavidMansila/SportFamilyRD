@@ -16,13 +16,13 @@ import { createApp } from 'vue';
 import ExampleComponent from './components/ExampleComponent.vue';
 import SignUpView from './components/Login/SignUpView.vue';
 import HomeView from './components/home/HomeView.vue';
-import NoticiasView from './components/noticias/NoticiasView.vue';
+import NoticiasView from './components/Noticias/NoticiasView.vue';
 import CalendarioView from './components/calendario/CalendarioView.vue';
-import TiendaView from './components/tienda/TiendaView.vue';
-import EntrenadoresView from './components/entrenadores/EntrenadoresView.vue';
+import TiendaView from './components/Tienda/TiendaView.vue';
+import EntrenadoresView from './components/Entrenadores/EntrenadoresView.vue';
 import ForoView from './components/foro/ForoView.vue';
 import CrearPostView from './components/Foro/CrearPost.vue';
-
+import AjustesView from './components/Ajustes/AjustesView.vue';
 
 
 
@@ -32,16 +32,27 @@ const app = createApp({});
 // Register components
 app.component('example-component', ExampleComponent);
 app.component('signup-component', SignUpView);
+
+
 app.component('home-component', HomeView);
+
+
 app.component('noticias-component', NoticiasView);
+
+
 app.component('calendario-component', CalendarioView);
+
+
 app.component('tienda-component', TiendaView);
+
+
 app.component('entrenadores-component', EntrenadoresView);
+
+
 app.component('foro-component', ForoView);
 app.component('crearpost-component', CrearPostView);
 
-
-
+app.component('ajustes-component', AjustesView);
 
 
 app.mount('#app');
