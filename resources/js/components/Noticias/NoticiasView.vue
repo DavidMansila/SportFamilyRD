@@ -55,6 +55,7 @@
       </div>
     </div>
   </div>
+  
 </template>
 
 
@@ -65,6 +66,7 @@ import axios from 'axios';
 
 export default {
   name: 'NoticiasComponent', // Nombre del componente
+
   data() {
     return {
       noticias: [], // Lista de noticias (vacía inicialmente)
@@ -97,9 +99,23 @@ export default {
         this.isLoading = false;
       });
     },
-      
+    noticiasScrape(){
+      axios.get('/scrape')
+      .then((response) => {
+        console.log('Datos de noticias:', response.data);
+        this.noticias = response.data.news;
+      })
+      .catch((error) => {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.'; // Mostrar mensaje de error
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+    },
   },
   mounted() {
+    this.noticiasScrape(); 
     this.fetchNews(); 
   },
 };
