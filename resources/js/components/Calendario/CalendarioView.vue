@@ -312,7 +312,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  background-color: #008624; /* Fondo azul */
+  background-color: #007bff; /* Fondo azul */
   padding: 10px 20px; /* Padding equilibrado */
   border-radius: 10px;
   color: white; /* Texto blanco */
