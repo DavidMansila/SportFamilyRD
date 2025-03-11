@@ -19,8 +19,8 @@
             <a href="/Ajustes">
                   <button class="auth-btn">Ajustes</button>
             </a>
-            <a href="/Login">
-                 <button class="auth-btn">Login</button>
+            <a :href=" login ? '/Login' : '/Logout' ">
+                <button class="auth-btn">{{ login ? "Login" : "logout" }}</button>
             </a>
         </div>
       </nav>
@@ -75,6 +75,8 @@
   export default {
     data() {
       return {
+        login:true, 
+
         categories: [
           { name: "Futbol", image: "/imagenes/football.jpg" },
           { name: "Basketball", image: "/imagenes/basketball.jpg" },

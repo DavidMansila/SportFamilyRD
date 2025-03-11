@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,7 +59,8 @@ Route::post('/logout', [AuthController::class, 'logout']);
 
 
 
-
+//scraper
+Route::get('/scrape', [ScrapperController::class, 'scrape']);
 
 
 
