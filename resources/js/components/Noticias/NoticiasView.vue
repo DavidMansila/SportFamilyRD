@@ -46,11 +46,11 @@
     <div v-if="noticiaSeleccionada" class="popup-overlay" @click="cerrarNoticia">
       <div class="popup-content" @click.stop>
         <button class="btn-cerrar" @click="cerrarNoticia">×</button>
-        <img :src="noticiaSeleccionada.imagen" alt="Imagen de noticia" class="popup-imagen" />
+        <img src="https://th.bing.com/th/id/OIP.SwvZPcCkze8R1IQhvfhhDQHaDF?w=202&h=84&c=7&r=0&o=5&dpr=1.5&pid=1.7" alt="Imagen de noticia" class="image" />
         <div class="popup-info">
-          <h3 class="popup-titulo">{{ noticiaSeleccionada.titulo }}</h3>
-          <p class="popup-descripcion">{{ noticiaSeleccionada.descripcion }}</p>
-          <p class="popup-fuente">{{ noticiaSeleccionada.fuente }} · {{ noticiaSeleccionada.tiempo }} min read</p>
+          <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
+          <p class="popup-descripcion">{{ noticiaSeleccionada.content }}</p>
+          <p class="popup-fuente">{{ noticiaSeleccionada.source }} · {{ noticiaSeleccionada.tiempo }} min read</p>
         </div>
       </div>
     </div>
@@ -60,9 +60,8 @@
 
 
 
-
 <script>
-import axios from 'axios';
+import axios from 'axios'; // get post put delete
 
 export default {
   name: 'NoticiasComponent', // Nombre del componente
@@ -75,13 +74,17 @@ export default {
       noticiaSeleccionada: null, // Noticia seleccionada para el pop-up
     };
   },
+
   methods: {
+    
     abrirNoticia(noticia) {
       this.noticiaSeleccionada = noticia; // Abre el pop-up con la noticia seleccionada
     },
+
     cerrarNoticia() {
       this.noticiaSeleccionada = null; // Cierra el pop-up
     },
+
     async fetchNews() {
       this.isLoading = true; 
       this.errorMessage = ''; 
@@ -99,6 +102,7 @@ export default {
         this.isLoading = false;
       });
     },
+
     noticiasScrape(){
       axios.get('/scrape')
       .then((response) => {
@@ -113,6 +117,7 @@ export default {
         this.isLoading = false;
       });
     },
+      
   },
   mounted() {
     this.noticiasScrape(); 
@@ -120,7 +125,6 @@ export default {
   },
 };
 </script>
-
 
 
 
