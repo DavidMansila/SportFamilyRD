@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\News;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
@@ -11,6 +12,7 @@ class ScrapperController extends Controller
     public function scrape()
     {
         $client = new Client();
+
         $response = $client->request('GET', 'https://lidom.com/');
         $html = (string) $response->getBody();
 
@@ -29,7 +31,7 @@ class ScrapperController extends Controller
             $headline = $node->filter('.entry-title')->text();
             $link = $node->filter('a.cover-link')->attr('href');
             return [
-                'headline' => $headline,
+                'title' => $headline,
                 'link' => $link
             ];
         });
@@ -40,6 +42,8 @@ class ScrapperController extends Controller
             'links' => $links,
             'news' => $news,
         ];
+        
+    
 
         return response()->json($newsData);
     }
