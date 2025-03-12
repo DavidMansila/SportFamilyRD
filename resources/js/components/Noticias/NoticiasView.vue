@@ -42,11 +42,11 @@
       <!-- Lista de noticias -->
       <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
         <div class="noticia-image">
-          <img src="https://th.bing.com/th/id/OIP.SwvZPcCkze8R1IQhvfhhDQHaDF?w=202&h=84&c=7&r=0&o=5&dpr=1.5&pid=1.7" alt="Imagen de noticia" class="image" />
+          <img :src="noticia.image" alt="Imagen de noticia" class="image" />
         </div>
         <div class="noticia-content">
           <h3 class="noticia-title">{{ noticia.title }}</h3>
-          <p class="noticia-subtitle">{{ noticia.subtitle }}</p>
+          <p class="noticia-subtitle">{{ noticia.subtitle }}</p> <!-- no hay campo subtitle, esos 2 se pueden ir, acomoda el front en base a ese -->
           <p class="noticia-author">{{ noticia.author }}</p>
           <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
         </div>
@@ -62,7 +62,7 @@
         <div class="popup-info">
           <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
           <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
-          <p class="popup-fuente">{{ noticiaSeleccionada.source }}</p>
+         <p class="popup-fuente">{{ noticiaSeleccionada.source }}</p> <!-- no hay campo source  -->
         </div>
       </div>
     </div>
@@ -135,7 +135,7 @@ export default {
       try {
         const response = await axios.get('/scrape');
         console.log('Datos de noticias:', response.data);
-        this.noticias = response.data.news;
+        this.noticias = response.data.baseball_news;
       } catch (error) {
         console.error('Error al obtener las noticias:', error);
         this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
