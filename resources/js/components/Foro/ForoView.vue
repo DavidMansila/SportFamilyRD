@@ -79,8 +79,9 @@ body {
     padding: 0;
   }
 
+/* ------------------- ESTILOS DEL NAVBAR ------------------- */
 
-  .logo-container {
+.logo-container {
     display: flex;
     gap: 1rem;
     flex-direction: row;
@@ -96,64 +97,70 @@ body {
     margin: 0 auto;
   }
 
-  
-  /* Navbar */
-  .navbar {
-    background: linear-gradient(to right, #000000, #f4b5ff);
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+.navbar {
+  background: linear-gradient(to right, #000000, #f4b5ff);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
-    width: 50px;
-    height: 50px;
+  width: 50px;
+  height: 50px;
+}
+
+.logo-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.logo-container h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
 }
 
 .nav-links {
-    display: flex;
-    gap: 2rem;
+  display: flex;
+  gap: 2rem;
 }
 
 .nav-link {
-    color: white;
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: color 0.3s ease-in-out;
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.3s ease-in-out;
 }
 
 .nav-link:hover {
-    color: #fbbf24;
+  color: #fbbf24;
 }
 
 .auth-buttons {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  gap: 1rem;
 }
 
 .auth-btn {
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    padding: 0.5rem 1.2rem;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
 .auth-btn:hover {
-    background-color: white;
-    color: #ff3149;
+  background-color: white;
+  color: #ff3149;
 }
 
 
