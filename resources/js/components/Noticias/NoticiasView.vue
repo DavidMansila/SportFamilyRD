@@ -119,6 +119,7 @@ export default {
     },
       
   },
+
   mounted() {
     this.noticiasScrape(); 
     this.fetchNews(); 
