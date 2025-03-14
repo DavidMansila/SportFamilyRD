@@ -243,7 +243,7 @@ body {
 
 .auth-btn:hover {
   background-color: white;
-  color: #ff3149;
+  color: #007BFF;
 }
 
 

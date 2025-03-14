@@ -39,38 +39,53 @@
       />
     </div>
 
-    <!-- Filtros de categorías -->
+
+    
+    <!-- Filtros -->
     <div class="filtros-container">
-      <div class="categorias-horizontal">
+  <div class="categorias-horizontal">
+    <!-- Opción "Ver todos" -->
+    <div class="categoria-item">
+      <div
+        class="categoria-header"
+        @click="seleccionarSubcategoria('')"
+      >
+        <h4>Ver todos</h4>
+      </div>
+    </div>
+
+    <!-- Categorías principales -->
+    <div
+      v-for="(categoria, index) in categorias"
+      :key="index"
+      class="categoria-item"
+    >
+      <div
+        class="categoria-header"
+        @click="toggleAcordeon(index)"
+        :class="{ active: categoriaActiva === index }"
+      >
+        <h4>{{ categoria.nombre }}</h4>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div
+        class="categoria-opciones"
+        :class="{ active: categoriaActiva === index }"
+      >
         <div
-          v-for="(categoria, index) in categorias"
-          :key="index"
-          class="categoria-item"
+          v-for="(opcion, i) in categoria.opciones"
+          :key="i"
+          class="categoria-opcion"
+          @click="seleccionarSubcategoria(opcion.valor)"
         >
-          <div
-            class="categoria-header"
-            @click="toggleAcordeon(index)"
-            :class="{ active: categoriaActiva === index }"
-          >
-            <h4>{{ categoria.nombre }}</h4>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div
-            class="categoria-opciones"
-            :class="{ active: categoriaActiva === index }"
-          >
-            <div
-              v-for="(opcion, i) in categoria.opciones"
-              :key="i"
-              class="categoria-opcion"
-              @click="seleccionarSubcategoria(opcion.valor)"
-            >
-              <label>{{ opcion.texto }}</label>
-            </div>
-          </div>
+          <label>{{ opcion.texto }}</label>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+
 
     <!-- Productos -->
     <div class="productos-container">
@@ -315,12 +330,18 @@ export default {
       this.productoSeleccionado = null;
     },
     toggleAcordeon(index) {
-      this.categoriaActiva = this.categoriaActiva === index ? null : index;
-    },
-    seleccionarSubcategoria(subcategoria) {
-      this.subcategoriaSeleccionada = subcategoria;
-      this.filtrarProductos();
-    },
+    // Si la categoría ya está activa, se cierra
+    if (this.categoriaActiva === index) {
+      this.categoriaActiva = null;
+    } else {
+      // Si no, se abre la categoría seleccionada
+      this.categoriaActiva = index;
+    }
+  },
+  seleccionarSubcategoria(subcategoria) {
+    this.subcategoriaSeleccionada = subcategoria;
+    this.filtrarProductos();
+  },
     filtrarProductos() {
       let productosFiltrados = this.productos;
 
@@ -422,7 +443,7 @@ body {
 
 .auth-btn:hover {
   background-color: white;
-  color: #ff3149;
+  color: #17a2b8;
 }
 
 /* ------------------- ESTILOS DE LA TIENDA ------------------- */
@@ -496,10 +517,12 @@ body {
 
 /* ------------------- ESTILOS DE LAS CATEGORÍAS HORIZONTALES ------------------- */
 .filtros-container {
-  display: flex;
-  justify-content: center;
-  margin: 1rem auto;
-  width: 70%; /* Ancho del 70% */
+  display: flex
+;
+    justify-content: center;
+    margin: 1rem auto;
+    width: 70%;
+    flex-direction: column-reverse;
 }
 
 .categorias-horizontal {
@@ -547,11 +570,11 @@ body {
 
 .categoria-opciones {
   padding: 1rem;
-  display: none;
+  display: none; /* Por defecto, las opciones están ocultas */
 }
 
 .categoria-opciones.active {
-  display: block;
+  display: block; /* Solo la categoría activa muestra sus opciones */
 }
 
 .categoria-opcion {
@@ -572,8 +595,6 @@ body {
   color: #2c3e50;
   cursor: pointer;
 }
-
-
 
 
 /* ------------------- ESTILOS DE LOS PRODUCTOS ------------------- */

@@ -30,12 +30,13 @@
     <h2 class="page-title">Lista de Entrenadores</h2>
 
     <!-- Sección para enviar solicitud de ser entrenador -->
-    <div class="solicitud-entrenador">
-      <h2 class="section-title">¿Quieres ser entrenador?</h2>
-      <p class="section-description">Únete a nuestro equipo y ayuda a otros a alcanzar sus metas deportivas.</p>
-      <a href="/Solicitud" class="btn btn-primary">Enviar Solicitud</a>
-    </div>
-
+    <div class="contenedor">
+  <div class="solicitud-entrenador">
+    <h2 class="section-title">¿Quieres ser entrenador?</h2>
+    <p class="section-description">Únete a nuestro equipo y ayuda a otros a alcanzar sus metas deportivas.</p>
+    <a href="/Solicitud" class="btn btn-primary">Enviar Solicitud</a>
+  </div>
+</div>
     <!-- Lista de entrenadores -->
     <div class="entrenador-list">
       <div
@@ -229,8 +230,10 @@ body {
 
 .auth-btn:hover {
   background-color: white;
-  color: #ff3149;
+  color: #ffb16c;
 }
+
+
 
 /* Estilos Generales de la Página */
 .page-title {
@@ -242,41 +245,55 @@ body {
 }
 
 /* Sección de solicitud de entrenador */
-.solicitud-entrenador {
-  background: linear-gradient(to right, #000000, #676767);
-  border-radius: 12px;
-  padding: 40px 20px;
-  margin-bottom: 40px;
-  text-align: center;
-  color: white;
+.contenedor {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  width: 100%; /* Ocupa todo el ancho disponible */
+  padding-bottom: 50px;
 }
 
+/* Estilos del cuadro grande */
+.solicitud-entrenador {
+  width: 80%;
+  background: #000000;
+  padding: 40px 20px;
+  text-align: center;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos adicionales (opcional) */
 .section-title {
   font-size: 2rem;
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
 }
 
 .section-description {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 
 .btn-primary {
-  background-color: rgb(0, 0, 0);
-  color: #ffffff;
-  padding: 12px 30px;
-  font-size: 1.1rem;
-  border-radius: 25px;
+  background-color: #464646;
+  color: rgb(255, 255, 255);
+  padding: 0.75rem 1.5rem;
   border: none;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s ease-in-out;
 }
 
 .btn-primary:hover {
-  background-color: #000000;
-  transform: translateY(-2px);
-  color: burlywood;
+  background-color: #ffb16c;
+  color: white;
 }
+
 
 /* Lista de entrenadores */
 .entrenador-list {
@@ -350,7 +367,7 @@ body {
 
 .btn-link {
   background-color: transparent;
-  color: #6a11cb;
+  color: #00741b;
   text-decoration: none;
 }
 
@@ -359,12 +376,12 @@ body {
 }
 
 .btn-message {
-  background-color: #28a745;
+  background-color: #464646;
   color: white;
 }
 
 .btn-message:hover {
-  background-color: #218838;
+  background-color: #ffb16c;
 }
 
 /* Estilos del pop-up */
