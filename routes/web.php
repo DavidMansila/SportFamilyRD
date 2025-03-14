@@ -4,6 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ReplyController;
 use Illuminate\Support\Facades\Route;
 
 // Página de inicio
@@ -49,6 +52,11 @@ Route::get('/Foro', function () {
 });
 
 
+Route::get('/Publicacion', function () {
+    return view('Foro.ForoPublicaciones');
+});
+
+
 Route::get('/CrearPost', function () {
     return view('Foro.CrearPost');
 });
@@ -58,6 +66,8 @@ Route::get('/CrearPost', function () {
 Route::get('/Ajustes', function () {
     return view('Ajustes.AjustesView');
 });
+
+
 
 
 
@@ -80,7 +90,9 @@ Route::get('/scrape', [ScrapperController::class, 'scrape']);
 
 
 
-
+Route::apiResource('posts', PostController::class);
+Route::apiResource('comments', CommentController::class);
+Route::apiResource('replies', ReplyController::class);
 
 
 

@@ -14,13 +14,12 @@ import TiendaView from './components/Tienda/TiendaView.vue';
 import EntrenadoresView from './components/Entrenadores/EntrenadoresView.vue';
 import SolicitudView from './components/Entrenadores/SolicitudView.vue';
 import ForoView from './components/foro/ForoView.vue';
+import ForoPublicaciones from './components/Foro/ForoPublicaciones.vue';
 import CrearPostView from './components/Foro/CrearPost.vue';
 import AjustesView from './components/Ajustes/AjustesView.vue';
 
 
-
 //import Store from './storage'; // Importa el store
-
 
 
 // Create Vue application instance
@@ -56,6 +55,7 @@ app.component('solicitud-component', SolicitudView);
 
 app.component('foro-component', ForoView);
 app.component('crearpost-component', CrearPostView);
+app.component('publicacion-component', ForoPublicaciones);
 
 app.component('ajustes-component', AjustesView);
 

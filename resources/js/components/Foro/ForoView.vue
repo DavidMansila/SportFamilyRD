@@ -1,44 +1,52 @@
 <template>
   <div class="foro-page">
 
-        <!-- Navbar -->
-        <nav class="navbar">
-        <div class="logo-container">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
         <h1>SportFamilyRD</h1>
       </div>
-        <div class="nav-links">
-            <a href="/Noticias" class="nav-link">Noticias</a>
-            <a href="/Calendario" class="nav-link">Calendario</a>
-             <a href="/Tienda" class="nav-link">Tienda</a>
-             <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-             <a href="/Foro" class="nav-link">Foro</a>
-        </div>
-        <div class="auth-buttons">
-          <a href="/Ajustes">
-                  <button class="auth-btn">Ajustes</button>
-            </a>
-            <a href="/Login">
-                 <button class="auth-btn">Login</button>
-            </a>
-        </div>
-      </nav>
-
+      <div class="nav-links">
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
+      </div>
+      <div class="auth-buttons">
+        <a href="/Ajustes">
+          <button class="auth-btn">Ajustes</button>
+        </a>
+        <a href="/Login">
+          <button class="auth-btn">Login</button>
+        </a>
+      </div>
+    </nav>
 
     <h2 class="titulo-foro">Foro de Discusión</h2>
 
-    <!-- Sección de Posts -->
-    <div class="posts-container">
+   <!-- Sección de Posts -->
+   <div class="posts-container">
       <div
         v-for="post in posts"
         :key="post.id"
         class="post-card"
       >
-        <h3 class="post-titulo">{{ post.titulo }}</h3>
+        <div class="post-header">
+          <h3 class="post-titulo">{{ post.titulo }}</h3>
+          <span class="post-date">Publicado el {{ post.fecha }}</span>
+        </div>
         <p class="post-contenido">{{ post.contenido }}</p>
-        <a :href="'/foro/post/' + post.id" class="btn-leer">Leer más</a>
+        <div class="post-footer">
+          <a href="/Publicacion" class="btn-leer">Leer Mas</a>
+          <div class="post-stats">
+            <span class="post-likes">👍 {{ post.likes }}</span>
+            <span class="post-comments">💬 {{ post.comentarios }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -55,48 +63,30 @@ export default {
   data() {
     return {
       posts: [
-        { id: 1, titulo: '¿Quién es tu jugador favorito?', contenido: 'Hablemos de nuestros jugadores favoritos en el fútbol.' },
-        { id: 2, titulo: 'Consejos para correr más rápido', contenido: '¿Qué ejercicios te ayudan a correr más rápido?' },
-        { id: 3, titulo: 'Mejores trucos para jugar baloncesto', contenido: 'Comparte tus mejores trucos y técnicas para el baloncesto.' },
-        { id: 4, titulo: '¿Qué opinas de la inteligencia artificial en el deporte?', contenido: 'Abre un debate sobre el futuro de la IA en los deportes.' },
-      ]
+        { id: 1, titulo: '¿Quién es tu jugador favorito?', contenido: 'Hablemos de nuestros jugadores favoritos en el fútbol.', fecha: '12/10/2023', likes: 15, comentarios: 8 },
+        { id: 2, titulo: 'Consejos para correr más rápido', contenido: '¿Qué ejercicios te ayudan a correr más rápido?', fecha: '10/10/2023', likes: 22, comentarios: 12 },
+        { id: 3, titulo: 'Mejores trucos para jugar baloncesto', contenido: 'Comparte tus mejores trucos y técnicas para el baloncesto.', fecha: '08/10/2023', likes: 30, comentarios: 18 },
+        { id: 4, titulo: '¿Qué opinas de la inteligencia artificial en el deporte?', contenido: 'Abre un debate sobre el futuro de la IA en los deportes.', fecha: '05/10/2023', likes: 45, comentarios: 25 },
+      ],
     };
   },
   methods: {
     crearPost() {
       alert("Crear un nuevo post (aquí iría la lógica para abrir un formulario).");
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
-
-
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
 
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
-
-.logo-container {
-    display: flex;
-    gap: 1rem;
-    flex-direction: row;
-
-    h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-  }
-  }
-  
-  .container {
-    margin: 0 auto;
-  }
-
 .navbar {
   background: linear-gradient(to right, #000000, #f4b5ff);
   padding: 1rem 2rem;
@@ -109,6 +99,7 @@ body {
 .logo {
   width: 50px;
   height: 50px;
+  border-radius: 50%;
 }
 
 .logo-container {
@@ -163,9 +154,7 @@ body {
   color: #ff3149;
 }
 
-
 /* Estilos Generales del Foro */
-
 .titulo-foro {
   font-size: 2.5rem;
   color: #333;
@@ -182,6 +171,7 @@ body {
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
 }
 
 /* Estilo para cada tarjeta de post */
@@ -199,15 +189,25 @@ body {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Título de cada post */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
 .post-titulo {
   font-size: 1.6rem;
   font-weight: bold;
   color: #007bff;
-  margin-bottom: 15px;
+  margin: 0;
 }
 
-/* Contenido del post */
+.post-date {
+  font-size: 0.9rem;
+  color: #777;
+}
+
 .post-contenido {
   font-size: 1.1rem;
   color: #555;
@@ -216,7 +216,12 @@ body {
   line-height: 1.6;
 }
 
-/* Enlace "Leer más" */
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .btn-leer {
   color: #007bff;
   text-decoration: none;
@@ -229,6 +234,16 @@ body {
 .btn-leer:hover {
   color: #0056b3;
   border-color: #0056b3;
+}
+
+.post-stats {
+  display: flex;
+  gap: 10px;
+}
+
+.post-likes, .post-comments {
+  font-size: 0.9rem;
+  color: #777;
 }
 
 /* Botón para crear un nuevo post */
@@ -256,6 +271,22 @@ body {
 @media (max-width: 768px) {
   .posts-container {
     grid-template-columns: 1fr;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .auth-buttons {
+    margin-top: 1rem;
   }
 }
 </style>
