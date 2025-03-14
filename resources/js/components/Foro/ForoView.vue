@@ -26,10 +26,11 @@
       </div>
     </nav>
 
+    <!-- Título del Foro -->
     <h2 class="titulo-foro">Foro de Discusión</h2>
 
-   <!-- Sección de Posts -->
-   <div class="posts-container">
+    <!-- Sección de Posts -->
+    <div class="posts-container">
       <div
         v-for="post in posts"
         :key="post.id"
@@ -41,7 +42,7 @@
         </div>
         <p class="post-contenido">{{ post.contenido }}</p>
         <div class="post-footer">
-          <a href="/Publicacion" class="btn-leer">Leer Mas</a>
+          <router-link :to="`/foro/post/${post.id}`" class="btn-leer">Leer más</router-link>
           <div class="post-stats">
             <span class="post-likes">👍 {{ post.likes }}</span>
             <span class="post-comments">💬 {{ post.comentarios }}</span>
@@ -80,15 +81,15 @@ export default {
 
 <style scoped>
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
+  background-color: #f8f9fa;
 }
 
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
 .navbar {
-  background: linear-gradient(to right, #000000, #f4b5ff);
+  background: linear-gradient(to right, #000000, #6a11cb);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -129,7 +130,7 @@ body {
 }
 
 .nav-link:hover {
-  color: #fbbf24;
+  color: #ffd700;
 }
 
 .auth-buttons {
@@ -199,7 +200,7 @@ body {
 .post-titulo {
   font-size: 1.6rem;
   font-weight: bold;
-  color: #007bff;
+  color: #6a11cb;
   margin: 0;
 }
 
@@ -223,17 +224,17 @@ body {
 }
 
 .btn-leer {
-  color: #007bff;
+  color: #6a11cb;
   text-decoration: none;
   font-weight: bold;
   font-size: 1.1rem;
-  border-bottom: 2px solid #007bff;
+  border-bottom: 2px solid #6a11cb;
   transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .btn-leer:hover {
-  color: #0056b3;
-  border-color: #0056b3;
+  color: #4a0d9b;
+  border-color: #4a0d9b;
 }
 
 .post-stats {
@@ -253,7 +254,7 @@ body {
 }
 
 .btn-crear-post {
-  background-color: #28a745;
+  background-color: #6a11cb;
   color: white;
   font-size: 1.2rem;
   padding: 12px 30px;
@@ -264,7 +265,7 @@ body {
 }
 
 .btn-crear-post:hover {
-  background-color: #218838;
+  background-color: #4a0d9b;
 }
 
 /* Estilos Responsivos */
