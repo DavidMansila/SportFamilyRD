@@ -28,6 +28,18 @@
     <div class="container">
       <h2 class="page-title">Sports News</h2>
 
+   <!-- Filtro de deportes con botones -->
+   <div class="filtro-deportes">
+        <button
+          v-for="deporte in deportes"
+          :key="deporte.value"
+          @click="deporteSeleccionado = deporte.value"
+          :class="['filtro-btn', { active: deporteSeleccionado === deporte.value }]"
+        >
+          {{ deporte.label }}
+        </button>
+      </div>
+
       <!-- Lista de noticias -->
       <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
         <div class="noticia-image">
@@ -59,73 +71,85 @@
 </template>
 
 
-
 <script>
-import axios from 'axios'; // get post put delete
+import axios from 'axios';
 
 export default {
-  name: 'NoticiasComponent', // Nombre del componente
+  name: 'NoticiasComponent',
 
   data() {
     return {
-      noticias: [], // Lista de noticias (vacía inicialmente)
-      isLoading: false, // Estado de carga
-      errorMessage: '', // Mensaje de error
-      noticiaSeleccionada: null, // Noticia seleccionada para el pop-up
+      noticias: [], // Lista completa de noticias
+      isLoading: false,
+      errorMessage: '',
+      noticiaSeleccionada: null,
+      deporteSeleccionado: 'todos', // Deporte seleccionado (valor inicial: 'todos')
+      deportes: [
+        { value: 'todos', label: 'Todos' },
+        { value: 'futbol', label: 'Fútbol' },
+        { value: 'baloncesto', label: 'Baloncesto' },
+        { value: 'tenis', label: 'Tenis' },
+        { value: 'beisbol', label: 'Béisbol' },
+      ],
     };
   },
 
+  computed: {
+    // Filtra las noticias según el deporte seleccionado
+    noticiasFiltradas() {
+      if (this.deporteSeleccionado === 'todos') {
+        return this.noticias; // Mostrar todas las noticias
+      } else {
+        return this.noticias.filter(noticia => noticia.categoria === this.deporteSeleccionado);
+      }
+    },
+  },
+
   methods: {
-    
     abrirNoticia(noticia) {
-      this.noticiaSeleccionada = noticia; // Abre el pop-up con la noticia seleccionada
+      this.noticiaSeleccionada = noticia;
     },
 
     cerrarNoticia() {
-      this.noticiaSeleccionada = null; // Cierra el pop-up
+      this.noticiaSeleccionada = null;
     },
 
     async fetchNews() {
-      this.isLoading = true; 
-      this.errorMessage = ''; 
+      this.isLoading = true;
+      this.errorMessage = '';
 
-      axios.get('news')
-      .then((response) => {
+      try {
+        const response = await axios.get('news');
         console.log('Datos de noticias:', response.data);
         this.noticias = response.data.news;
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error al obtener las noticias:', error);
-        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.'; // Mostrar mensaje de error
-      })
-      .finally(() => {
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
         this.isLoading = false;
-      });
+      }
     },
 
-    noticiasScrape(){
-      axios.get('/scrape')
-      .then((response) => {
+    async noticiasScrape() {
+      try {
+        const response = await axios.get('/scrape');
         console.log('Datos de noticias:', response.data);
         this.noticias = response.data.news;
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error al obtener las noticias:', error);
-        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.'; // Mostrar mensaje de error
-      })
-      .finally(() => {
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
         this.isLoading = false;
-      });
+      }
     },
-      
   },
+
   mounted() {
-    this.noticiasScrape(); 
-    this.fetchNews(); 
+    this.noticiasScrape();
+    this.fetchNews();
   },
 };
 </script>
-
 
 
 
@@ -426,4 +450,52 @@ body {
     font-size: 1rem;
   }
 }
+
+
+.filtro-deportes {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.filtro-btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #007bff;
+  background-color: #fff;
+  border: 2px solid #007bff;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.filtro-btn:hover {
+  background-color: #007bff;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.filtro-btn.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filtro-deportes {
+    justify-content: center;
+  }
+
+  .filtro-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+
 </style>
