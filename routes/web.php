@@ -16,33 +16,49 @@ Route::get('/Login', function () {
     return view('Login.signUp');
 });
 
+
+
 Route::get('/Noticias', function () {
     return view('Noticias.NoticiasView');
 });
 
-Route::get('/Tienda', function () {
-    return view('Tienda.TiendaView');
-});
-
-Route::get('/Entrenadores', function () {
-    return view('Entrenadores.EntrenadoresView');
-});
-
-Route::get('/Foro', function () {
-    return view('Foro.ForoView');
-});
 
 Route::get('/Calendario', function () {
     return view('Calendario.CalendarioView');
 });
 
+
+Route::get('/Tienda', function () {
+    return view('Tienda.TiendaView');
+});
+
+
+
+Route::get('/Entrenadores', function () {
+    return view('Entrenadores.EntrenadoresView');
+});
+
+Route::get('/Solicitud', function () {
+    return view('Entrenadores.SolicitudView');
+});
+
+
+
+Route::get('/Foro', function () {
+    return view('Foro.ForoView');
+});
+
+
 Route::get('/CrearPost', function () {
     return view('Foro.CrearPost');
 });
 
+
+
 Route::get('/Ajustes', function () {
     return view('Ajustes.AjustesView');
 });
+
 
 
 //Rutas para funciones en el back
