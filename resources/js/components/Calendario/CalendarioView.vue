@@ -220,18 +220,19 @@ export default {
 
 
 <style scoped>
+
 /* Estilos generales */
 body {
-  font-family: 'Poppins', sans-serif; /* Fuente moderna */
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f8f9fa; /* Fondo claro */
-  color: #333; /* Color de texto principal */
+  background-color: #f8f9fa;
+  color: #000000;
 }
 
 /* Navbar */
 .navbar {
-  background: linear-gradient(135deg, #000000, #2c3e50); /* Degradado oscuro */
+  background: linear-gradient(135deg, #000000, #00b746);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -271,7 +272,7 @@ body {
 }
 
 .nav-link:hover {
-  color: #3498db; /* Azul claro al pasar el mouse */
+  color: #fbbf24;
 }
 
 .auth-buttons {
@@ -293,7 +294,7 @@ body {
 
 .auth-btn:hover {
   background-color: white;
-  color: #2c3e50; /* Color oscuro al pasar el mouse */
+  color: #00b746; /* Color oscuro al pasar el mouse */
 }
 
 /* Contenedor del calendario */

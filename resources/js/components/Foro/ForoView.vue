@@ -42,7 +42,7 @@
         </div>
         <p class="post-contenido">{{ post.contenido }}</p>
         <div class="post-footer">
-          <router-link :to="`/foro/post/${post.id}`" class="btn-leer">Leer más</router-link>
+          <a href="/Publicacion" class="btn-leer">Leer más</a>
           <div class="post-stats">
             <span class="post-likes">👍 {{ post.likes }}</span>
             <span class="post-comments">💬 {{ post.comentarios }}</span>
@@ -79,15 +79,33 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped>   
 body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f8f9fa;
-}
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
 
-/* ------------------- ESTILOS DEL NAVBAR ------------------- */
+
+  .logo-container {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+
+    h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+  }
+  }
+  
+  .container {
+    margin: 0 auto;
+  }
+
+  
+
+/* Navbar */
 .navbar {
   background: linear-gradient(to right, #000000, #6a11cb);
   padding: 1rem 2rem;
@@ -100,7 +118,6 @@ body {
 .logo {
   width: 50px;
   height: 50px;
-  border-radius: 50%;
 }
 
 .logo-container {
@@ -130,7 +147,7 @@ body {
 }
 
 .nav-link:hover {
-  color: #ffd700;
+  color: #fbbf24;
 }
 
 .auth-buttons {
@@ -152,8 +169,9 @@ body {
 
 .auth-btn:hover {
   background-color: white;
-  color: #ff3149;
+  color: #6a11cb;
 }
+
 
 /* Estilos Generales del Foro */
 .titulo-foro {
@@ -200,7 +218,7 @@ body {
 .post-titulo {
   font-size: 1.6rem;
   font-weight: bold;
-  color: #6a11cb;
+  color: #000000;
   margin: 0;
 }
 
@@ -224,17 +242,16 @@ body {
 }
 
 .btn-leer {
-  color: #6a11cb;
+  color: #7b00ff;
   text-decoration: none;
   font-weight: bold;
   font-size: 1.1rem;
-  border-bottom: 2px solid #6a11cb;
+  border-bottom: 2px solid #000000;
   transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .btn-leer:hover {
-  color: #4a0d9b;
-  border-color: #4a0d9b;
+  color: #0008ff;
 }
 
 .post-stats {
