@@ -1,23 +1,15 @@
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
+
 
 import './bootstrap';
 import { createApp } from 'vue';
 
-/**
- * Next, we will create a fresh Vue application instance. You may then begin
- * registering components with the application instance so they are ready
- * to use in your application's views. An example is included for you.
- */
+
 
 import ExampleComponent from './components/ExampleComponent.vue';
 import SignUpView from './components/Login/SignUpView.vue';
 import HomeView from './components/home/HomeView.vue';
 import NoticiasView from './components/Noticias/NoticiasView.vue';
-import CalendarioView from './components/calendario/CalendarioView.vue';
+import CalendarioView from './components/Calendario/CalendarioView.vue';
 import TiendaView from './components/Tienda/TiendaView.vue';
 import EntrenadoresView from './components/Entrenadores/EntrenadoresView.vue';
 import ForoView from './components/foro/ForoView.vue';
@@ -26,8 +18,19 @@ import AjustesView from './components/Ajustes/AjustesView.vue';
 
 
 
+//import Store from './storage'; // Importa el store
+
+
+
 // Create Vue application instance
 const app = createApp({});
+
+
+
+// Create Vue application instance
+//const app = createApp(App)
+//.use(Store) // Usa el store
+//.mount('#app');
 
 // Register components
 app.component('example-component', ExampleComponent);
