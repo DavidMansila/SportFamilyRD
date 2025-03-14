@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('last_name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->date('user_type');
+            $table->string('role')->default('usuario'); // Rol predeterminado: 'usuario'
             $table->date('date');
             // $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

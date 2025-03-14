@@ -103,4 +103,9 @@ class UserController extends Controller
     {
         User::where('id', $id)->delete();
     }
+
+    
 }
+
+
+

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('author');
             $table->string('source');//listin diario, el nacional, etc
             $table->string('url');//https.....
+            $table->string('categoria');// Si es futbol, baloncesto, etc
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });    
