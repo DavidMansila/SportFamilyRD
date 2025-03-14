@@ -17,7 +17,7 @@ class ScrapperController extends Controller
             $client = new Client([
                 'verify' => false, // Desactivar la verificación SSL
             ]);
-        
+
             // Hacer la solicitud GET
             $response = $client->request('GET', 'https://lidom.com/');
             $html = (string) $response->getBody();
@@ -30,37 +30,38 @@ class ScrapperController extends Controller
             // Crear el objeto Crawler con el HTML obtenido
             $crawler = new Crawler($html);
 
-        // Get news headlines and their links
-        $news = $crawler->filter('.entry-box')->each(function (Crawler $node) {
-            $headline = $node->filter('.entry-title')->text();
-            $link = $node->filter('a.cover-link')->attr('href');
-            return [
-                'title' => $headline,
-                'link' => $link
+            // Obtener el título de la página
+            $title = $crawler->filter('title')->text();
+
+            // Obtener todos los enlaces en la página
+            $links = $crawler->filter('a')->each(function (Crawler $node) {
+                return $node->attr('href');
+            });
+
+            // Obtener los titulares de noticias y sus enlaces
+            $news = $crawler->filter('.entry-box')->each(function (Crawler $node) {
+                $headline = $node->filter('.entry-title')->text();  // Titular
+                $link = $node->filter('a.cover-link')->attr('href'); // Enlace
+                return [
+                    'headline' => $headline,
+                    'link' => $link
+                ];
+            });
+
+            // Verificar si se obtuvieron noticias
+            if (empty($news)) {
+                return response()->json(['message' => 'No se encontraron noticias'], 404);
+            }
+
+            // Agrupar los datos en una variable separada
+            $newsData = [
+                'title' => $title,
+                'links' => $links,
+                'news' => $news,
             ];
-        });
 
-        // Obtener el título de la página
-        $title = $crawler->filter('title')->text();
-
-        // Obtener todos los enlaces en la página
-        $links = $crawler->filter('a')->each(function (Crawler $node) {
-            return $node->attr('href');
-        });
-
-        // Verificar si se obtuvieron noticias
-        if (empty($news)) {
-            return response()->json(['message' => 'No se encontraron noticias'], 404);
-        }
-
-        // Group the news in a separate variable
-        $newsData = [
-            'title' => $title,
-            'links' => $links,
-            'news' => $news,
-        ];
-
-        return response()->json($newsData);
+            // Devolver los datos como JSON
+            return response()->json($newsData);
         } catch (\Exception $e) {
             // Log de error
             Log::error('Error en Scraper: ' . $e->getMessage());
