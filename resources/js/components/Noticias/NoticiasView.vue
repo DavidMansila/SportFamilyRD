@@ -47,12 +47,13 @@
         </div>
         <div class="noticia-content">
           <h3 class="noticia-title">{{ noticia.title }}</h3>
-          <p class="noticia-description">{{ noticia.content }}</p>
-          <p class="noticia-source">{{ noticia.source }} · {{ noticia.published_at }} min read</p>
+          <p class="noticia-subtitle">{{ noticia.subtitle }}</p>
+          <p class="noticia-author">{{ noticia.author }}</p>
           <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
         </div>
       </div>
     </div>
+    
 
     <!-- Pop-up de noticia completa -->
     <div v-if="noticiaSeleccionada" class="popup-overlay" @click="cerrarNoticia">
@@ -61,13 +62,12 @@
         <img src="https://th.bing.com/th/id/OIP.SwvZPcCkze8R1IQhvfhhDQHaDF?w=202&h=84&c=7&r=0&o=5&dpr=1.5&pid=1.7" alt="Imagen de noticia" class="image" />
         <div class="popup-info">
           <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
-          <p class="popup-descripcion">{{ noticiaSeleccionada.content }}</p>
-          <p class="popup-fuente">{{ noticiaSeleccionada.source }} · {{ noticiaSeleccionada.tiempo }} min read</p>
+          <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
+          <p class="popup-fuente">{{ noticiaSeleccionada.source }}</p>
         </div>
       </div>
     </div>
   </div>
-  
 </template>
 
 
@@ -90,6 +90,8 @@ export default {
         { value: 'baloncesto', label: 'Baloncesto' },
         { value: 'tenis', label: 'Tenis' },
         { value: 'beisbol', label: 'Béisbol' },
+        { value: 'natacion', label: 'Natación' },
+        { value: 'voleyball', label: 'Voleyball' },
       ],
     };
   },
@@ -145,8 +147,8 @@ export default {
   },
 
   mounted() {
-    this.noticiasScrape();
     this.fetchNews();
+    this.noticiasScrape();
   },
 };
 </script>
@@ -318,7 +320,7 @@ body {
   margin-bottom: 15px;
 }
 
-.noticia-source {
+.noticia-subtitle {
   font-size: 0.9rem;
   color: #777;
   margin-bottom: 15px;

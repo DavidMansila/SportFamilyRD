@@ -42,8 +42,13 @@ class ScrapperController extends Controller
             $news = $crawler->filter('.entry-box')->each(function (Crawler $node) {
                 $headline = $node->filter('.entry-title')->text();  // Titular
                 $link = $node->filter('a.cover-link')->attr('href'); // Enlace
+                
                 return [
-                    'headline' => $headline,
+                    'title' => $headline,
+                    //subtitle => $subtitle,
+                    //image => $image,
+                    //autor => $autor,
+                    //date => $date,
                     'link' => $link
                 ];
             });
@@ -56,6 +61,10 @@ class ScrapperController extends Controller
             // Agrupar los datos en una variable separada
             $newsData = [
                 'title' => $title,
+                //subtitle => $subtitle,
+                //image => $image,
+                //autor => $autor,
+                //date => $date,
                 'links' => $links,
                 'news' => $news,
             ];

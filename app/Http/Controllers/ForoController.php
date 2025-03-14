@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Reply;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -23,3 +25,35 @@ class PostController extends Controller
         return Post::with('comments.replies')->findOrFail($id);
     }
 }
+
+
+class CommentController extends Controller
+{
+    public function store(Request $request)
+    {
+        $comment = Comment::create($request->all());
+        return response()->json($comment, 201);
+    }
+}
+
+
+
+class ReplyController extends Controller
+{
+    public function store(Request $request)
+    {
+        $reply = Reply::create($request->all());
+        return response()->json($reply, 201);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
