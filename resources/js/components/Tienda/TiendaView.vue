@@ -25,41 +25,50 @@
       </div>
     </nav>
 
-    <!-- Título de la tienda -->
-    <h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
+<!-- Título de la tienda -->
+<h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
 
-    <!-- Barra de búsqueda y Filtros -->
+    <!-- Barra de búsqueda -->
+    <div class="search-container">
+      <input
+        type="text"
+        v-model="busqueda"
+        placeholder="Buscar productos..."
+        @input="filtrarPorBusqueda"
+        class="search-input"
+      />
+    </div>
+
+    <!-- Filtros de categorías -->
     <div class="filtros-container">
-      <div class="search-bar">
-        <input
-          type="text"
-          v-model="busqueda"
-          placeholder="Buscar productos..."
-          @input="filtrarPorBusqueda"
-          class="search-input"
-        />
-      </div>
-      <div class="filters">
-        <select v-model="categoriaSeleccionada" class="filter-select" @change="filtrarProductos">
-          <option value="">Todas las categorías</option>
-          <optgroup label="Deportes">
-            <option value="futbol">Fútbol</option>
-            <option value="basketball">Baloncesto</option>
-            <option value="tenis">Tenis</option>
-          </optgroup>
-          <optgroup label="Ropa">
-            <option value="ropa-hombre">Ropa Hombre</option>
-            <option value="ropa-mujer">Ropa Mujer</option>
-            <option value="ropa-ninos">Ropa Niños</option>
-          </optgroup>
-          <optgroup label="Consumibles">
-            <option value="proteinas">Proteínas</option>
-            <option value="barras">Barras energéticas</option>
-          </optgroup>
-          <optgroup label="Accesorios">
-            <option value="accesorios">Accesorios</option>
-          </optgroup>
-        </select>
+      <div class="categorias-horizontal">
+        <div
+          v-for="(categoria, index) in categorias"
+          :key="index"
+          class="categoria-item"
+        >
+          <div
+            class="categoria-header"
+            @click="toggleAcordeon(index)"
+            :class="{ active: categoriaActiva === index }"
+          >
+            <h4>{{ categoria.nombre }}</h4>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div
+            class="categoria-opciones"
+            :class="{ active: categoriaActiva === index }"
+          >
+            <div
+              v-for="(opcion, i) in categoria.opciones"
+              :key="i"
+              class="categoria-opcion"
+              @click="seleccionarSubcategoria(opcion.valor)"
+            >
+              <label>{{ opcion.texto }}</label>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -223,8 +232,40 @@ export default {
           descripcion: 'Gorra deportiva ajustable.',
         },
       ],
+      categorias: [
+        {
+          nombre: 'Deportes',
+          opciones: [
+            { valor: 'futbol', texto: 'Fútbol' },
+            { valor: 'basketball', texto: 'Baloncesto' },
+            { valor: 'tenis', texto: 'Tenis' },
+          ],
+        },
+        {
+          nombre: 'Ropa',
+          opciones: [
+            { valor: 'ropa-hombre', texto: 'Ropa Hombre' },
+            { valor: 'ropa-mujer', texto: 'Ropa Mujer' },
+            { valor: 'ropa-ninos', texto: 'Ropa Niños' },
+          ],
+        },
+        {
+          nombre: 'Consumibles',
+          opciones: [
+            { valor: 'proteinas', texto: 'Proteínas' },
+            { valor: 'barras', texto: 'Barras energéticas' },
+          ],
+        },
+        {
+          nombre: 'Accesorios',
+          opciones: [
+            { valor: 'accesorios', texto: 'Accesorios' },
+          ],
+        },
+      ],
+      categoriaActiva: null, // Índice de la categoría activa
+      subcategoriaSeleccionada: '', // Subcategoría seleccionada
       carrito: [],
-      categoriaSeleccionada: '',
       busqueda: '',
       productoAgregado: null,
       productosFiltrados: [],
@@ -234,7 +275,7 @@ export default {
     };
   },
   created() {
-    this.productosFiltrados = this.productos;
+    this.productosFiltrados = this.productos; // Mostrar todos los productos al inicio
   },
   computed: {
     calcularTotal() {
@@ -273,15 +314,24 @@ export default {
       this.popupVisible = false;
       this.productoSeleccionado = null;
     },
+    toggleAcordeon(index) {
+      this.categoriaActiva = this.categoriaActiva === index ? null : index;
+    },
+    seleccionarSubcategoria(subcategoria) {
+      this.subcategoriaSeleccionada = subcategoria;
+      this.filtrarProductos();
+    },
     filtrarProductos() {
       let productosFiltrados = this.productos;
 
-      if (this.categoriaSeleccionada) {
+      // Filtrar por subcategoría
+      if (this.subcategoriaSeleccionada) {
         productosFiltrados = productosFiltrados.filter(
-          (producto) => producto.categoria === this.categoriaSeleccionada
+          (producto) => producto.categoria === this.subcategoriaSeleccionada
         );
       }
 
+      // Filtrar por búsqueda
       if (this.busqueda) {
         productosFiltrados = productosFiltrados.filter((producto) =>
           producto.nombre.toLowerCase().includes(this.busqueda.toLowerCase())
@@ -298,34 +348,17 @@ export default {
 </script>
 
 
-
 <style scoped>
 /* Estilos generales */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif; /* Fuente moderna */
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
+  background-color: #f8f9fa; /* Fondo claro */
+  color: #333; /* Color de texto principal */
 }
 
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
-
-.logo-container {
-    display: flex;
-    gap: 1rem;
-    flex-direction: row;
-
-    h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-  }
-  }
-  
-  .container {
-    margin: 0 auto;
-  }
-
 .navbar {
   background: linear-gradient(to right, #000000, #17a2b8);
   padding: 1rem 2rem;
@@ -392,30 +425,21 @@ body {
   color: #ff3149;
 }
 
-
-
+/* ------------------- ESTILOS DE LA TIENDA ------------------- */
 
 /* Título de la tienda */
 .tienda-title {
   text-align: center;
   margin-top: 2rem;
   font-size: 2.5rem;
-  color: #333;
+  color: #2c3e50; /* Texto oscuro */
+  font-weight: 700; /* Texto más grueso */
 }
 
+
+
 /* Filtros y barra de búsqueda */
-.filtros-container {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  max-width: 1200px;
-  margin: 2rem auto;
-}
+
 
 .search-bar {
   flex: 1;
@@ -425,26 +449,135 @@ body {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #e0e0e0; /* Borde gris claro */
   border-radius: 5px;
   outline: none;
+  transition: border-color 0.3s ease-in-out;
 }
 
-.filters {
-  flex: 1;
+.search-input:focus {
+  border-color: #17a2b8; /* Borde azul al enfocar */
 }
 
-.filter-select {
+
+
+/* ------------------- ESTILOS DE LA TIENDA ------------------- */
+
+/* Título de la tienda */
+.tienda-title {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 2.5rem;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+/* Barra de búsqueda */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem auto;
+  width: 70%; /* Ancho del 70% */
+}
+
+.search-input {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #e0e0e0;
   border-radius: 5px;
   outline: none;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.search-input:focus {
+  border-color: #17a2b8;
+}
+
+/* ------------------- ESTILOS DE LAS CATEGORÍAS HORIZONTALES ------------------- */
+.filtros-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem auto;
+  width: 70%; /* Ancho del 70% */
+}
+
+.categorias-horizontal {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.categoria-item {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
+  flex: 1 1 200px; /* Flex para que las categorías se ajusten */
+  max-width: 250px; /* Ancho máximo */
+}
+
+.categoria-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #17a2b8;
+  color: white;
+  border-radius: 10px 10px 0 0;
+}
+
+.categoria-header h4 {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.categoria-header i {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease-in-out;
+}
+
+.categoria-header.active i {
+  transform: rotate(180deg);
+}
+
+.categoria-opciones {
+  padding: 1rem;
+  display: none;
+}
+
+.categoria-opciones.active {
+  display: block;
+}
+
+.categoria-opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.categoria-opcion:hover {
+  background-color: #f8f9fa;
+}
+
+.categoria-opcion label {
+  font-size: 1rem;
+  color: #2c3e50;
   cursor: pointer;
 }
 
-/* Productos */
+
+
+
+/* ------------------- ESTILOS DE LOS PRODUCTOS ------------------- */
+
 .productos-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -455,16 +588,17 @@ body {
 }
 
 .producto-card {
-  background-color: #fff;
+  background-color: #ffffff; /* Fondo blanco */
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
   overflow: hidden;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   cursor: pointer;
 }
 
 .producto-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada al pasar el mouse */
 }
 
 .producto-imagen-container {
@@ -484,20 +618,22 @@ body {
 }
 
 .producto-info {
-  padding: 1rem;
+  padding: 1.5rem;
   text-align: center;
 }
 
 .producto-nombre {
   font-size: 1.25rem;
-  color: #333;
+  color: #2c3e50; /* Texto oscuro */
   margin-bottom: 0.5rem;
+  font-weight: 600; /* Texto más grueso */
 }
 
 .producto-precio {
   font-size: 1.1rem;
-  color: #17a2b8;
+  color: #17a2b8; /* Azul claro */
   margin-bottom: 1rem;
+  font-weight: 500; /* Texto semi-grueso */
 }
 
 /* Pop-up de detalles del producto */
@@ -515,13 +651,13 @@ body {
 }
 
 .popup-content {
-  background-color: #fff;
+  background-color: #ffffff; /* Fondo blanco */
   border-radius: 10px;
   padding: 2rem;
   max-width: 600px;
   width: 90%;
   position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
 }
 
 .btn-cerrar {
@@ -532,7 +668,12 @@ body {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #333;
+  color: #2c3e50; /* Texto oscuro */
+  transition: color 0.3s ease-in-out;
+}
+
+.btn-cerrar:hover {
+  color: #17a2b8; /* Azul claro al pasar el mouse */
 }
 
 .popup-imagen {
@@ -540,7 +681,7 @@ body {
   max-height: 300px;
   object-fit: cover;
   border-radius: 10px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .popup-info {
@@ -548,26 +689,28 @@ body {
 }
 
 .popup-nombre {
-  font-size: 1.5rem;
-  color: #333;
+  font-size: 1.75rem;
+  color: #2c3e50; /* Texto oscuro */
   margin-bottom: 1rem;
+  font-weight: 700; /* Texto más grueso */
 }
 
 .popup-descripcion {
   font-size: 1rem;
-  color: #666;
-  margin-bottom: 1rem;
+  color: #666; /* Texto gris */
+  margin-bottom: 1.5rem;
 }
 
 .popup-precio {
-  font-size: 1.25rem;
-  color: #17a2b8;
+  font-size: 1.5rem;
+  color: #17a2b8; /* Azul claro */
   margin-bottom: 1.5rem;
+  font-weight: 600; /* Texto más grueso */
 }
 
 .btn-comprar {
   padding: 0.75rem 1.5rem;
-  background-color: #17a2b8;
+  background-color: #17a2b8; /* Azul claro */
   color: white;
   border: none;
   border-radius: 5px;
@@ -577,7 +720,7 @@ body {
 }
 
 .btn-comprar:hover {
-  background-color: #138496;
+  background-color: #138496; /* Azul más oscuro al pasar el mouse */
 }
 
 /* Carrito */
@@ -589,7 +732,7 @@ body {
 
 .btn-carrito {
   padding: 0.75rem 1.5rem;
-  background-color: #17a2b8;
+  background-color: #17a2b8; /* Azul claro */
   color: white;
   border: none;
   border-radius: 5px;
@@ -599,7 +742,7 @@ body {
 }
 
 .btn-carrito:hover {
-  background-color: #138496;
+  background-color: #138496; /* Azul más oscuro al pasar el mouse */
 }
 
 /* Pop-up del carrito */
@@ -608,10 +751,11 @@ body {
 }
 
 .carrito-titulo {
-  font-size: 1.5rem;
-  color: #333;
+  font-size: 1.75rem;
+  color: #2c3e50; /* Texto oscuro */
   margin-bottom: 1.5rem;
   text-align: center;
+  font-weight: 700; /* Texto más grueso */
 }
 
 .carrito-productos {
@@ -640,17 +784,18 @@ body {
 
 .carrito-nombre {
   font-size: 1rem;
-  color: #333;
+  color: #2c3e50; /* Texto oscuro */
   margin-bottom: 0.25rem;
+  font-weight: 600; /* Texto más grueso */
 }
 
 .carrito-precio {
   font-size: 0.9rem;
-  color: #17a2b8;
+  color: #17a2b8; /* Azul claro */
 }
 
 .btn-eliminar {
-  background-color: #ff4d4d;
+  background-color: #ff4d4d; /* Rojo */
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -660,20 +805,21 @@ body {
 }
 
 .btn-eliminar:hover {
-  background-color: #cc0000;
+  background-color: #cc0000; /* Rojo más oscuro al pasar el mouse */
 }
 
 .carrito-total {
   text-align: right;
   font-size: 1.25rem;
-  color: #333;
+  color: #2c3e50; /* Texto oscuro */
   margin-bottom: 1.5rem;
+  font-weight: 600; /* Texto más grueso */
 }
 
 .btn-finalizar {
   width: 100%;
   padding: 0.75rem;
-  background-color: #17a2b8;
+  background-color: #17a2b8; /* Azul claro */
   color: white;
   border: none;
   border-radius: 5px;
@@ -683,7 +829,7 @@ body {
 }
 
 .btn-finalizar:hover {
-  background-color: #138496;
+  background-color: #138496; /* Azul más oscuro al pasar el mouse */
 }
 
 /* Notificación */
@@ -692,11 +838,11 @@ body {
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #333;
+  background-color: #2c3e50; /* Fondo oscuro */
   color: white;
   padding: 1rem 2rem;
   border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
   animation: fadeInOut 3s ease-in-out;
 }
 

@@ -25,30 +25,30 @@
       </div>
     </nav>
 
-    <!-- Calendario de eventos -->
+<!-- Calendario de eventos -->
     <div class="calendario-page">
-    
-<!-- Calendario -->
-<div class="calendario-container">
-      <div class="calendar-header">
-        <button @click="changeMonth('prev')" class="calendar-btn">◄</button>
-        <h2>{{ monthNames[currentMonth] }} {{ currentYear }}</h2>
-        <button @click="changeMonth('next')" class="calendar-btn">►</button>
-      </div>
-      <div class="calendar-grid">
-        <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-name">
-          {{ day }}
+      <!-- Calendario -->
+      <div class="calendario-container">
+        <div class="calendar-header">
+          <button @click="changeMonth('prev')" class="calendar-btn">◄</button>
+          <h2>{{ monthNames[currentMonth] }} {{ currentYear }}</h2>
+          <button @click="changeMonth('next')" class="calendar-btn">►</button>
         </div>
-        <div 
-          v-for="day in daysInMonth" 
-          :key="day" 
-          :class="['calendar-day', { 'event-day': hasEvents(day) }]" 
-          @click="selectDay(day)"
-        >
-          {{ day }}
+        <div class="calendar-grid">
+          <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-name">
+            {{ day }}
+          </div>
+          <div 
+            v-for="day in daysInMonth" 
+            :key="day" 
+            :class="['calendar-day', { 'event-day': hasEvents(day), 'selected-day': selectedDay === day }]" 
+            @click="selectDay(day)"
+          >
+            {{ day }}
+            <div v-if="hasEvents(day)" class="event-indicator"></div>
+          </div>
         </div>
       </div>
-    </div>
 
 <!-- Sección de eventos ordenados -->
 <div class="eventos-ordenados">
@@ -231,7 +231,7 @@ body {
 
 /* Navbar */
 .navbar {
-  background: linear-gradient(135deg, #000000, #15ff54);
+  background: linear-gradient(135deg, #000000, #2c3e50); /* Degradado oscuro */
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -271,7 +271,7 @@ body {
 }
 
 .nav-link:hover {
-  color: #fbbf24;
+  color: #3498db; /* Azul claro al pasar el mouse */
 }
 
 .auth-buttons {
@@ -293,17 +293,17 @@ body {
 
 .auth-btn:hover {
   background-color: white;
-  color: #ff3149;
+  color: #2c3e50; /* Color oscuro al pasar el mouse */
 }
 
 /* Contenedor del calendario */
 .calendario-container {
   background-color: #ffffff; /* Fondo blanco */
   border-radius: 15px;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  padding: 20px; /* Padding equilibrado */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  padding: 20px;
   margin: 20px auto;
-  max-width: 800px; /* Tamaño recomendable */
+  max-width: 800px;
 }
 
 /* Encabezado del calendario */
@@ -312,14 +312,15 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  background-color: #007bff; /* Fondo azul */
-  padding: 10px 20px; /* Padding equilibrado */
+  background-color: #3498db; /* Azul claro */
+  padding: 10px 20px;
   border-radius: 10px;
   color: white; /* Texto blanco */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
 }
 
 .calendar-header h2 {
-  font-size: 1.8rem; /* Tamaño equilibrado */
+  font-size: 1.8rem;
   font-weight: 600;
   margin: 0;
 }
@@ -327,141 +328,104 @@ body {
 .calendar-btn {
   background-color: transparent;
   border: none;
-  color: white;
-  font-size: 1.8rem; /* Tamaño equilibrado */
+  color: white; /* Texto blanco */
+  font-size: 1.8rem;
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: transform 0.3s, color 0.3s;
 }
 
 .calendar-btn:hover {
   transform: scale(1.2);
+  color: #2c3e50; /* Color oscuro al pasar el mouse */
 }
 
 /* Cuadrícula de días */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 10px; /* Espacio equilibrado */
+  gap: 10px;
   text-align: center;
 }
 
 .calendar-day-name {
   font-weight: bold;
-  font-size: 1rem; /* Tamaño equilibrado */
-  color: #007bff; /* Color azul */
-  padding: 10px; /* Padding equilibrado */
-  background-color: #f0f8ff; /* Fondo azul claro */
-  border-radius: 8px; /* Bordes redondeados */
+  font-size: 1rem;
+  color: #3498db; /* Azul claro */
+  padding: 10px;
+  background-color: #f0f0f0; /* Fondo gris claro */
+  border-radius: 8px;
+  text-transform: uppercase; /* Mayúsculas para los nombres de los días */
 }
 
 .calendar-day {
-  padding: 15px; /* Tamaño equilibrado */
-  border-radius: 8px; /* Bordes redondeados */
+  padding: 15px;
+  border-radius: 8px;
   cursor: pointer;
-  background: #ffffff;
-  border: 1px solid #e0e0e0; /* Borde sutil */
-  transition: background 0.3s, transform 0.3s;
-  font-size: 1rem; /* Texto equilibrado */
+  background: #ffffff; /* Fondo blanco */
+  border: 1px solid #e0e0e0; /* Borde gris claro */
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+  font-size: 1rem;
+  color: #333; /* Texto oscuro */
+  position: relative;
 }
 
 .calendar-day:hover {
-  background: #f0f8ff; /* Fondo azul claro al pasar el mouse */
+  background: #3498db; /* Azul claro al pasar el mouse */
+  color: white; /* Texto blanco al pasar el mouse */
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra al pasar el mouse */
 }
 
 .event-day {
-  background-color: #007bff; /* Fondo azul */
-  color: white;
+  background-color: #3498db; /* Azul claro */
+  color: white; /* Texto blanco */
   border: none;
 }
 
-/* Estilos para días vacíos (cuando no hay día en la cuadrícula) */
+.event-day:hover {
+  background-color: #2980b9; /* Azul más oscuro al pasar el mouse */
+}
+
+.selected-day {
+  background-color: #2c3e50; /* Fondo oscuro */
+  color: white; /* Texto blanco */
+  border: 2px solid #3498db; /* Borde azul claro */
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3); /* Sombra azul */
+}
+
+.event-indicator {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: white; /* Punto blanco */
+  border-radius: 50%;
+}
+
+/* Estilos para días vacíos */
 .calendar-day:empty {
   background: transparent;
   border: none;
   cursor: default;
 }
 
-.page-title {
-  font-size: 2rem; /* Tamaño equilibrado */
-  margin-bottom: 20px;
-  text-align: center;
-  color: #333;
-  font-weight: 600;
-}
-
-/* Modal de eventos */
-.event-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.5s ease;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  animation: slideIn 0.5s ease;
-}
-
-.modal-content h3 {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.modal-content ul {
-  list-style: none;
-  padding: 0;
-}
-
-.modal-content li {
-  margin-bottom: 15px;
-}
-
-.modal-content button {
-  background-color: #007bff;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.modal-content button:hover {
-  background-color: #0056b3;
-}
-
-.close-btn {
-  background-color: #d9534f;
-}
-
-/* Eventos ordenados */
+/* Sección de eventos ordenados */
 .eventos-ordenados {
   margin-top: 40px;
   padding: 20px;
   background-color: #ffffff;
   border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); /* Sombra suave */
 }
 
 .eventos-ordenados h2 {
   font-size: 2rem;
-  color: #333;
+  color: #2c3e50; /* Texto oscuro */
   margin-bottom: 20px;
   text-align: center;
+  font-weight: 700; /* Texto más grueso */
 }
 
 .evento-item {
@@ -470,21 +434,21 @@ body {
   padding: 15px;
   margin-bottom: 15px;
   background-color: #ffffff;
-  border: 1px solid #e0e0e0; /* Borde sutil */
+  border: 1px solid #e0e0e0; /* Borde gris claro */
   border-radius: 10px;
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .evento-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Sombra al pasar el mouse */
 }
 
 .evento-fecha {
   flex: 0 0 120px;
   font-size: 1.1rem;
   font-weight: bold;
-  color: #007bff;
+  color: #3498db; /* Azul claro */
   margin-right: 20px;
 }
 
@@ -494,8 +458,9 @@ body {
 
 .evento-info h3 {
   font-size: 1.5rem;
-  color: #333;
+  color: #2c3e50; /* Texto oscuro */
   margin-bottom: 10px;
+  font-weight: 600; /* Texto más grueso */
 }
 
 .evento-info p {
@@ -505,18 +470,19 @@ body {
 }
 
 .evento-info button {
-  background-color: #007bff;
-  color: white;
+  background-color: #3498db; /* Azul claro */
+  color: white; /* Texto blanco */
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.3s;
 }
 
 .evento-info button:hover {
-  background-color: #0056b3;
+  background-color: #2980b9; /* Azul más oscuro al pasar el mouse */
+  transform: translateY(-2px);
 }
 
 .evento-info button:disabled {
@@ -529,8 +495,8 @@ body {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #007bff;
-  color: white;
+  background-color: #3498db; /* Azul claro */
+  color: white; /* Texto blanco */
   padding: 12px 24px;
   border: none;
   border-radius: 50px;
@@ -542,7 +508,7 @@ body {
 }
 
 .carrito-btn:hover {
-  background-color: #0056b3;
+  background-color: #2980b9; /* Azul más oscuro al pasar el mouse */
   transform: translateY(-2px);
 }
 
@@ -567,15 +533,16 @@ body {
   border-radius: 15px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Sombra suave */
   animation: slideIn 0.3s ease;
 }
 
 .carrito-contenido h2 {
   font-size: 2rem;
-  color: #333;
+  color: #2c3e50; /* Texto oscuro */
   margin-bottom: 20px;
   text-align: center;
+  font-weight: 700; /* Texto más grueso */
 }
 
 .carrito-item {

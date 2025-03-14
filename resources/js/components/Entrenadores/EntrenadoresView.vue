@@ -3,185 +3,168 @@
 
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="logo-container">
+      <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
         <h1>SportFamilyRD</h1>
       </div>
-        <div class="nav-links">
-            <a href="/Noticias" class="nav-link">Noticias</a>
-            <a href="/Calendario" class="nav-link">Calendario</a>
-             <a href="/Tienda" class="nav-link">Tienda</a>
-             <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-             <a href="/Foro" class="nav-link">Foro</a>
+      <div class="nav-links">
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
+      </div>
+      <div class="auth-buttons">
+        <a href="/Ajustes">
+          <button class="auth-btn">Ajustes</button>
+        </a>
+        <a href="/Login">
+          <button class="auth-btn">Login</button>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Título de la página -->
+    <h2 class="page-title">Lista de Entrenadores</h2>
+
+    <!-- Sección para enviar solicitud de ser entrenador -->
+    <div class="solicitud-entrenador">
+      <h2 class="section-title">¿Quieres ser entrenador?</h2>
+      <p class="section-description">Únete a nuestro equipo y ayuda a otros a alcanzar sus metas deportivas.</p>
+      <a href="/Solicitud" class="btn btn-primary">Enviar Solicitud</a>
+    </div>
+
+    <!-- Lista de entrenadores -->
+    <div class="entrenador-list">
+      <div
+        v-for="entrenador in entrenadores"
+        :key="entrenador.id"
+        class="entrenador-card"
+      >
+        <div class="card-content">
+          <img :src="entrenador.foto" alt="foto de entrenador" class="entrenador-foto" />
+          <h3 class="entrenador-nombre">{{ entrenador.nombre }}</h3>
+          <p class="entrenador-deporte">{{ entrenador.deporte }}</p>
+          <p class="entrenador-experiencia">{{ entrenador.experiencia }}</p>
+          <p class="entrenador-testimonio">"{{ entrenador.testimonio }}"</p>
+          <div class="entrenador-acciones">
+            <button @click="verPerfil(entrenador)" class="btn btn-link">Ver perfil</button>
+            <button @click="sendMessage(entrenador)" class="btn btn-message">Enviar Solicitud</button>
+          </div>
         </div>
-        <div class="auth-buttons">
-          <a href="/Ajustes">
-                  <button class="auth-btn">Ajustes</button>
-            </a>
-            <a href="/Login">
-                 <button class="auth-btn">Login</button>
-            </a>
-        </div>
-      </nav>
+      </div>
+    </div>
 
-
-      <h2 class="page-title">Lista de Entrenadores</h2>
-
-<!-- Sección para enviar solicitud de ser entrenador -->
-<div class="solicitud-entrenador">
-  <h2 class="section-title">¿Quieres ser entrenador?</h2>
-  <a href="/Solicitud" class="btn btn-primary">Enviar Solicitud</a>
-</div>
-
-<!-- Lista de entrenadores -->
-<div class="entrenador-list">
-  <div v-for="entrenador in entrenadores" :key="entrenador.id" class="entrenador-card">
-    <div class="card-content">
-      <img :src="entrenador.foto" alt="foto de entrenador" class="entrenador-foto" />
-      <h3 class="entrenador-nombre">{{ entrenador.nombre }}</h3>
-      <p class="entrenador-deporte">{{ entrenador.deporte }}</p>
-      <p class="entrenador-experiencia">{{ entrenador.experiencia }}</p>
-      <p class="entrenador-testimonio">"{{ entrenador.testimonio }}"</p>
-      <button @click="verPerfil(entrenador)" class="btn btn-link">Ver perfil</button>
-      <button @click="sendMessage(entrenador)" class="btn btn-message">Enviar Solicitud</button>
+    <!-- Pop-up del perfil del entrenador -->
+    <div v-if="entrenadorSeleccionado" class="popup-overlay" @click="cerrarPerfil">
+      <div class="popup-content" @click.stop>
+        <button class="btn-cerrar" @click="cerrarPerfil">×</button>
+        <img :src="entrenadorSeleccionado.foto" alt="foto de entrenador" class="popup-foto" />
+        <h3 class="popup-nombre">{{ entrenadorSeleccionado.nombre }}</h3>
+        <p class="popup-deporte">{{ entrenadorSeleccionado.deporte }}</p>
+        <p class="popup-experiencia">{{ entrenadorSeleccionado.experiencia }}</p>
+        <p class="popup-testimonio">"{{ entrenadorSeleccionado.testimonio }}"</p>
+      </div>
     </div>
   </div>
-</div>
-
-<!-- Pop-up del perfil del entrenador -->
-<div v-if="entrenadorSeleccionado" class="popup-overlay" @click="cerrarPerfil">
-  <div class="popup-content" @click.stop>
-    <button class="btn-cerrar" @click="cerrarPerfil">×</button>
-    <img :src="entrenadorSeleccionado.foto" alt="foto de entrenador" class="popup-foto" />
-    <h3 class="popup-nombre">{{ entrenadorSeleccionado.nombre }}</h3>
-    <p class="popup-deporte">{{ entrenadorSeleccionado.deporte }}</p>
-    <p class="popup-experiencia">{{ entrenadorSeleccionado.experiencia }}</p>
-    <p class="popup-testimonio">"{{ entrenadorSeleccionado.testimonio }}"</p>
-  </div>
-</div>
-</div>
 </template>
 
 <script>
 export default {
-name: 'EntrenadoresComponent',
-data() {
-return {
-  entrenadores: [
-    {
-      id: 1,
-      nombre: 'Carlos Pérez',
-      deporte: 'Fútbol',
-      experiencia: '10 años entrenando fútbol a nivel profesional.',
-      foto: 'https://via.placeholder.com/300',
-      testimonio: '¡Es un entrenador increíble! Me ayudó a mejorar mi técnica.',
+  name: 'EntrenadoresComponent',
+  data() {
+    return {
+      entrenadores: [
+        {
+          id: 1,
+          nombre: 'Carlos Pérez',
+          deporte: 'Fútbol',
+          experiencia: '10 años entrenando fútbol a nivel profesional.',
+          foto: 'https://via.placeholder.com/300',
+          testimonio: '¡Es un entrenador increíble! Me ayudó a mejorar mi técnica.',
+        },
+        {
+          id: 2,
+          nombre: 'Ana Gómez',
+          deporte: 'Tenis',
+          experiencia: '5 años entrenando a jugadores jóvenes y adultos.',
+          foto: 'https://via.placeholder.com/300',
+          testimonio: '¡Ana tiene una gran visión estratégica del juego!',
+        },
+        {
+          id: 3,
+          nombre: 'Juan Díaz',
+          deporte: 'Baloncesto',
+          experiencia: '15 años entrenando en colegios y academias de baloncesto.',
+          foto: 'https://via.placeholder.com/300',
+          testimonio: 'Gracias a Juan, mi rendimiento ha mejorado enormemente en los partidos.',
+        },
+        {
+          id: 4,
+          nombre: 'Laura Martínez',
+          deporte: 'Natación',
+          experiencia: '8 años de experiencia entrenando a nadadores de nivel olímpico.',
+          foto: 'https://via.placeholder.com/300',
+          testimonio: 'Laura sabe cómo motivar a sus nadadores, ¡es la mejor!',
+        },
+        {
+          id: 5,
+          nombre: 'Ricardo Gómez',
+          deporte: 'Ciclismo',
+          experiencia: '6 años entrenando atletas en competiciones nacionales e internacionales.',
+          foto: 'https://via.placeholder.com/300',
+          testimonio: 'Ricardo me ayudó a mejorar mi resistencia y mi rendimiento en cada carrera.',
+        },
+        {
+          id: 6,
+          nombre: 'Sofia Martínez',
+          deporte: 'Atletismo',
+          experiencia: '7 años de experiencia trabajando con atletas de todas las edades.',
+          foto: 'https://via.placeholder.com/300',
+          testimonio: 'Sofia me enseñó cómo entrenar mi mente tanto como mi cuerpo.',
+        },
+        {
+          id: 7,
+          nombre: 'David López',
+          deporte: 'Artes Marciales',
+          experiencia: '12 años enseñando artes marciales en academias de prestigio.',
+          foto: 'https://via.placeholder.com/300',
+          testimonio: 'Gracias a David, mi disciplina y enfoque en la vida han mejorado.',
+        },
+      ],
+      entrenadorSeleccionado: null, // Entrenador seleccionado para el pop-up
+    };
+  },
+  methods: {
+    // Simula el envío de una solicitud de mensaje a un entrenador
+    sendMessage(entrenador) {
+      alert(`Solicitud enviada al entrenador ${entrenador.nombre}. Se le ha notificado.`);
     },
-    {
-      id: 2,
-      nombre: 'Ana Gómez',
-      deporte: 'Tenis',
-      experiencia: '5 años entrenando a jugadores jóvenes y adultos.',
-      foto: 'https://via.placeholder.com/300',
-      testimonio: '¡Ana tiene una gran visión estratégica del juego!',
-    },
-    {
-      id: 3,
-      nombre: 'Juan Díaz',
-      deporte: 'Baloncesto',
-      experiencia: '15 años entrenando en colegios y academias de baloncesto.',
-      foto: 'https://via.placeholder.com/300',
-      testimonio: 'Gracias a Juan, mi rendimiento ha mejorado enormemente en los partidos.',
-    },
-    {
-      id: 4,
-      nombre: 'Laura Martínez',
-      deporte: 'Natación',
-      experiencia: '8 años de experiencia entrenando a nadadores de nivel olímpico.',
-      foto: 'https://via.placeholder.com/300',
-      testimonio: 'Laura sabe cómo motivar a sus nadadores, ¡es la mejor!',
-    },
-    {
-      id: 5,
-      nombre: 'Ricardo Gómez',
-      deporte: 'Ciclismo',
-      experiencia: '6 años entrenando atletas en competiciones nacionales e internacionales.',
-      foto: 'https://via.placeholder.com/300',
-      testimonio: 'Ricardo me ayudó a mejorar mi resistencia y mi rendimiento en cada carrera.',
-    },
-    {
-      id: 6,
-      nombre: 'Sofia Martínez',
-      deporte: 'Atletismo',
-      experiencia: '7 años de experiencia trabajando con atletas de todas las edades.',
-      foto: 'https://via.placeholder.com/300',
-      testimonio: 'Sofia me enseñó cómo entrenar mi mente tanto como mi cuerpo.',
-    },
-    {
-      id: 7,
-      nombre: 'David López',
-      deporte: 'Artes Marciales',
-      experiencia: '12 años enseñando artes marciales en academias de prestigio.',
-      foto: 'https://via.placeholder.com/300',
-      testimonio: 'Gracias a David, mi disciplina y enfoque en la vida han mejorado.',
-    }
-  ],
-  entrenadorSeleccionado: null, // Entrenador seleccionado para el pop-up
-};
-},
-methods: {
-// Redirige al formulario para enviar solicitud de ser entrenador
-//redirect() {
-  //this.$router.push("/Solicitud");
-//},
 
-// Simula el envío de una solicitud de mensaje a un entrenador
-sendMessage(entrenador) {
-  alert(`Solicitud enviada al entrenador ${entrenador.nombre}. Se le ha notificado.`);
-},
+    // Muestra el pop-up con la información del entrenador
+    verPerfil(entrenador) {
+      this.entrenadorSeleccionado = entrenador;
+    },
 
-// Muestra el pop-up con la información del entrenador
-verPerfil(entrenador) {
-  this.entrenadorSeleccionado = entrenador;
-},
-
-// Cierra el pop-up
-cerrarPerfil() {
-  this.entrenadorSeleccionado = null;
-},
-},
+    // Cierra el pop-up
+    cerrarPerfil() {
+      this.entrenadorSeleccionado = null;
+    },
+  },
 };
 </script>
 
-
-
 <style scoped>
-
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+}
 
 /* ------------------- ESTILOS DEL NAVBAR ------------------- */
-
-.logo-container {
-    display: flex;
-    gap: 1rem;
-    flex-direction: row;
-
-    h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-  }
-  }
-  
-  .container {
-    margin: 0 auto;
-  }
-
 .navbar {
   background: linear-gradient(to right, #000000, #ffb16c);
   padding: 1rem 2rem;
@@ -194,6 +177,7 @@ body {
 .logo {
   width: 50px;
   height: 50px;
+  border-radius: 50%;
 }
 
 .logo-container {
@@ -223,7 +207,7 @@ body {
 }
 
 .nav-link:hover {
-  color: #fbbf24;
+  color: #ffd700;
 }
 
 .auth-buttons {
@@ -248,12 +232,7 @@ body {
   color: #ff3149;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
+/* Estilos Generales de la Página */
 .page-title {
   font-size: 2.5rem;
   color: #333;
@@ -264,17 +243,12 @@ body {
 
 /* Sección de solicitud de entrenador */
 .solicitud-entrenador {
-  background: linear-gradient(to right, #000000, #ffb16c);
+  background: linear-gradient(to right, #000000, #676767);
   border-radius: 12px;
   padding: 40px 20px;
   margin-bottom: 40px;
   text-align: center;
   color: white;
-}
-
-.solicitud-content {
-  max-width: 600px;
-  margin: 0 auto;
 }
 
 .section-title {
@@ -288,8 +262,8 @@ body {
 }
 
 .btn-primary {
-  background-color: white;
-  color: #007bff;
+  background-color: rgb(0, 0, 0);
+  color: #ffffff;
   padding: 12px 30px;
   font-size: 1.1rem;
   border-radius: 25px;
@@ -299,53 +273,25 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: #f8f9fa;
+  background-color: #000000;
   transform: translateY(-2px);
-}
-
-/* Filtro de deportes */
-.filtro-deportes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 30px;
-}
-
-.filtro-btn {
-  padding: 10px 20px;
-  font-size: 1rem;
-  color: #007bff;
-  background-color: white;
-  border: 2px solid #007bff;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-.filtro-btn:hover {
-  background-color: #007bff;
-  color: white;
-}
-
-.filtro-btn.active {
-  background-color: #007bff;
-  color: white;
+  color: burlywood;
 }
 
 /* Lista de entrenadores */
 .entrenador-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .entrenador-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  width: 280px;
   padding: 20px;
   text-align: center;
   transition: all 0.3s ease-in-out;
@@ -404,7 +350,7 @@ body {
 
 .btn-link {
   background-color: transparent;
-  color: #007bff;
+  color: #6a11cb;
   text-decoration: none;
 }
 
@@ -419,38 +365,6 @@ body {
 
 .btn-message:hover {
   background-color: #218838;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .page-title {
-    font-size: 2rem;
-  }
-
-  .solicitud-entrenador {
-    padding: 20px;
-  }
-
-  .section-title {
-    font-size: 1.5rem;
-  }
-
-  .section-description {
-    font-size: 1rem;
-  }
-
-  .filtro-deportes {
-    gap: 8px;
-  }
-
-  .filtro-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-  }
-
-  .entrenador-card {
-    width: 100%;
-  }
 }
 
 /* Estilos del pop-up */
@@ -521,6 +435,26 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .solicitud-entrenador {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .section-description {
+    font-size: 1rem;
+  }
+
+  .entrenador-list {
+    grid-template-columns: 1fr;
+  }
+
   .popup-content {
     padding: 1rem;
   }
@@ -535,7 +469,4 @@ body {
     font-size: 1rem;
   }
 }
-
-
 </style>
-
