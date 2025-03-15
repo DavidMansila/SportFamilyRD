@@ -4,7 +4,7 @@
     <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
-          <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
+          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
       </div>
       <div class="nav-links">

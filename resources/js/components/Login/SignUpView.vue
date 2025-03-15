@@ -34,7 +34,7 @@
       <div class="overlay">
         <div class="overlay-panel overlay-left">
           <a href="/" class="mb-6">
-             <img src="/imagenes/Logo.png" alt="SportFamilyRD Logo" class="logo-main" />
+             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
           </a>
           <h1>Welcome Back!</h1>
           <p>To keep connected with us, please login with your personal info</p>
@@ -42,7 +42,7 @@
         </div>
         <div class="overlay-panel overlay-right">
           <a href="/" class="mb-6">
-             <img src="/imagenes/Logo.png" alt="SportFamilyRD Logo" class="logo-main" />
+             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
           </a>
           <h1>Hello, Friend!</h1> 
           <p>Enter your details and start your journey with us</p>
