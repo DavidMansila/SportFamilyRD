@@ -7,7 +7,7 @@
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
-        <h1>SportFamilyRD</h1>
+
       </div>
       <div class="nav-links">
         <a href="/Noticias" class="nav-link">Noticias</a>
@@ -27,7 +27,7 @@
     </nav>
 
     <!-- Título del Foro -->
-    <h2 class="titulo-foro">Foro de Discusión</h2>
+    <h1 class="titulo-foro">Foro de Discusión</h1>
 
     <!-- Sección de Posts -->
     <div class="posts-container">
@@ -80,62 +80,42 @@ export default {
 </script>
 
 <style scoped>   
-body {
+
+  /* General styles */
+  body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
   }
 
 
-  .logo-container {
-    display: flex;
-    gap: 1rem;
-    flex-direction: row;
-
-    h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-  }
-  }
-  
-  .container {
-    margin: 0 auto;
-  }
-
-  
-
 /* Navbar */
 .navbar {
   background: linear-gradient(to right, #000000, #6a11cb);
   padding: 1rem 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Distribuye el espacio entre los elementos */
   align-items: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-  width: 50px;
-  height: 50px;
-}
-
+/* Logo a la izquierda */
 .logo-container {
   display: flex;
-  gap: 1rem;
   align-items: center;
 }
 
-.logo-container h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  color: white;
-  margin: 0;
+.logo {
+  width: 200px; /* Tamaño del logo */
+  height: 65px;
 }
 
+/* Enlaces en el centro */
 .nav-links {
   display: flex;
   gap: 2rem;
+  flex-grow: 1; /* Ocupa el espacio disponible */
+  justify-content: center; /* Centra los enlaces */
 }
 
 .nav-link {
@@ -150,6 +130,7 @@ body {
   color: #fbbf24;
 }
 
+/* Botones a la derecha */
 .auth-buttons {
   display: flex;
   gap: 1rem;
@@ -171,6 +152,7 @@ body {
   background-color: white;
   color: #6a11cb;
 }
+
 
 
 /* Estilos Generales del Foro */
