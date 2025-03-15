@@ -27,31 +27,8 @@
   };
   </script>
   
+
+  
   <style scoped>
-  /* Estilos para el foro */
-  .foro-page {
-    text-align: center;
-  }
-  
-  .post-card {
-    margin: 10px;
-    padding: 15px;
-    background: #f4f4f4;
-    border-radius: 5px;
-  }
-  
-  .btn-crear-post {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    text-decoration: none;
-  }
-  
-  .btn-crear-post:hover {
-    background-color: #0056b3;
-  }
-  </style>
-  
+@import '../../../scss/Foro/crearpost.scss';
+</style>
