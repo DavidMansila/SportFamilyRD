@@ -53,9 +53,88 @@
 
     <!-- Botón de Crear Nuevo Post -->
     <div class="crear-post-container">
-      <button @click="crearPost" class="btn-crear-post">Crear un nuevo post</button>
+      <button @click="abrirModal" class="btn-crear-post">Crear un nuevo post</button>
     </div>
   </div>
+
+    <!-- Modal para crear un nuevo post -->
+    <div v-if="mostrarModal" class="modal">
+      <div class="modal-contenido">
+        <!-- Encabezado del modal -->
+        <div class="modal-header">
+          <h2>Crear un nuevo post</h2>
+          <button @click="cerrarModal" class="modal-cerrar-btn">×</button>
+        </div>
+
+        <!-- Formulario de creación de post -->
+        <form @submit.prevent="guardarPost" class="modal-formulario">
+          <!-- Campo: Título -->
+          <div class="form-group">
+            <label for="titulo">Título</label>
+            <input
+              v-model="nuevoPost.titulo"
+              id="titulo"
+              type="text"
+              placeholder="Escribe un título"
+              required
+            />
+          </div>
+
+          <!-- Campo: Contenido -->
+          <div class="form-group">
+            <label for="contenido">Contenido</label>
+            <textarea
+              v-model="nuevoPost.contenido"
+              id="contenido"
+              placeholder="Escribe el contenido de tu post"
+              required
+            ></textarea>
+          </div>
+
+          <!-- Campo: Categoría -->
+          <div class="form-group">
+            <label for="categoria">Categoría</label>
+            <select v-model="nuevoPost.categoria" id="categoria" required>
+              <option value="">Selecciona una categoría</option>
+              <option value="Deporte">Deporte</option>
+              <option value="Gym">Gym</option>
+              <option value="Experiencia">Experiencia</option>
+              <option value="Lugares">Lugares</option>
+            </select>
+          </div>
+
+          <!-- Campo: Etiquetas -->
+          <div class="form-group">
+            <label for="etiquetas">Etiquetas</label>
+            <input
+              v-model="nuevoPost.etiquetas"
+              id="etiquetas"
+              type="text"
+              placeholder="Escribe etiquetas separadas por comas"
+            />
+          </div>
+
+          <!-- Campo: Imagen -->
+          <div class="form-group">
+            <label for="imagen">Subir imagen</label>
+            <input
+              type="file"
+              id="imagen"
+              @change="manejarSubidaImagen"
+              accept="image/*"
+            />
+          </div>
+
+          <!-- Botones del formulario -->
+          <div class="form-botones">
+            <button type="submit" class="btn-guardar">Guardar</button>
+            <button type="button" @click="cerrarModal" class="btn-cancelar">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
 </template>
 
 <script>
@@ -69,11 +148,58 @@ export default {
         { id: 3, titulo: 'Mejores trucos para jugar baloncesto', contenido: 'Comparte tus mejores trucos y técnicas para el baloncesto.', fecha: '08/10/2023', likes: 30, comentarios: 18 },
         { id: 4, titulo: '¿Qué opinas de la inteligencia artificial en el deporte?', contenido: 'Abre un debate sobre el futuro de la IA en los deportes.', fecha: '05/10/2023', likes: 45, comentarios: 25 },
       ],
-    };
-  },
-  methods: {
-    crearPost() {
-      alert("Crear un nuevo post (aquí iría la lógica para abrir un formulario).");
+      mostrarModal: false,
+      nuevoPost: {
+        titulo: '',
+        contenido: '',
+        categoria: '',
+        etiquetas: '',
+        imagen: null,
+    },
+  };
+},
+methods: {
+    // Abrir el modal
+    abrirModal() {
+      this.mostrarModal = true;
+    },
+    // Cerrar el modal
+    cerrarModal() {
+      this.mostrarModal = false;
+      this.limpiarFormulario();
+    },
+    // Guardar el post
+    guardarPost() {
+      const nuevoId = this.posts.length + 1;
+      this.posts.unshift({
+        id: nuevoId,
+        titulo: this.nuevoPost.titulo,
+        contenido: this.nuevoPost.contenido,
+        categoria: this.nuevoPost.categoria,
+        etiquetas: this.nuevoPost.etiquetas.split(',').map(tag => tag.trim()),
+        imagen: this.nuevoPost.imagen,
+        fecha: new Date().toLocaleDateString(),
+        likes: 0,
+        comentarios: 0,
+      });
+      this.cerrarModal();
+    },
+    // Limpiar el formulario
+    limpiarFormulario() {
+      this.nuevoPost = {
+        titulo: '',
+        contenido: '',
+        categoria: '',
+        etiquetas: '',
+        imagen: null,
+      };
+    },
+    // Manejar la subida de imágenes
+    manejarSubidaImagen(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.nuevoPost.imagen = URL.createObjectURL(file);
+      }
     },
   },
 };

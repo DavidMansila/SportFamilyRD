@@ -134,7 +134,6 @@ body {
   color: white;
 }
 
-
 /* Lista de entrenadores */
 .entrenador-list {
   display: grid;
@@ -152,6 +151,7 @@ body {
   padding: 20px;
   text-align: center;
   transition: all 0.3s ease-in-out;
+  border: 1px solid #e0e0e0; /* Borde sutil */
 }
 
 .entrenador-card:hover {
@@ -165,12 +165,14 @@ body {
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 15px;
+  border: 2px solid #e0e0e0; /* Borde para la foto */
 }
 
 .entrenador-nombre {
   font-size: 1.5rem;
   color: #333;
   margin-bottom: 10px;
+  font-weight: bold; /* Resaltar el nombre */
 }
 
 .entrenador-deporte,
@@ -183,6 +185,7 @@ body {
 
 .entrenador-deporte {
   font-weight: bold;
+  color: #ff6347; /* Color destacado para el deporte */
 }
 
 .entrenador-testimonio {
@@ -203,6 +206,7 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
 }
 
 .btn-link {
