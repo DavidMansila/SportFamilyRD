@@ -1,0 +1,327 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(to right, #000000, #ffb16c);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between; /* Distribuye el espacio entre los elementos */
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Logo a la izquierda */
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 250px; /* Tamaño del logo */
+  height: 80px;
+}
+
+/* Enlaces en el centro */
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  flex-grow: 1; /* Ocupa el espacio disponible */
+  justify-content: center; /* Centra los enlaces */
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+  color: #fbbf24;
+}
+
+/* Botones a la derecha */
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.auth-btn {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.auth-btn:hover {
+  background-color: white;
+  color: #ffb16c;
+}
+
+
+
+/* Estilos Generales de la Página */
+.page-title {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 40px;
+  text-align: center;
+  padding-top: 30px;
+}
+
+/* Sección de solicitud de entrenador */
+.contenedor {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  width: 100%; /* Ocupa todo el ancho disponible */
+  padding-bottom: 50px;
+}
+
+/* Estilos del cuadro grande */
+.solicitud-entrenador {
+  width: 80%;
+  background: #000000;
+  padding: 40px 20px;
+  text-align: center;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos adicionales (opcional) */
+.section-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.section-description {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-primary {
+  background-color: #464646;
+  color: rgb(255, 255, 255);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #ffb16c;
+  color: white;
+}
+
+
+/* Lista de entrenadores */
+.entrenador-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.entrenador-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+}
+
+.entrenador-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.entrenador-foto {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.entrenador-nombre {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.entrenador-deporte,
+.entrenador-experiencia,
+.entrenador-testimonio {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.entrenador-deporte {
+  font-weight: bold;
+}
+
+.entrenador-testimonio {
+  font-style: italic;
+  color: #777;
+}
+
+.entrenador-acciones {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-link {
+  background-color: transparent;
+  color: #00741b;
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.btn-message {
+  background-color: #464646;
+  color: white;
+}
+
+.btn-message:hover {
+  background-color: #ffb16c;
+}
+
+/* Estilos del pop-up */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cerrar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+}
+
+.popup-foto {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.popup-nombre {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.popup-deporte,
+.popup-experiencia,
+.popup-testimonio {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.popup-deporte {
+  font-weight: bold;
+}
+
+.popup-testimonio {
+  font-style: italic;
+  color: #777;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .solicitud-entrenador {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .section-description {
+    font-size: 1rem;
+  }
+
+  .entrenador-list {
+    grid-template-columns: 1fr;
+  }
+
+  .popup-content {
+    padding: 1rem;
+  }
+
+  .popup-nombre {
+    font-size: 1.5rem;
+  }
+
+  .popup-deporte,
+  .popup-experiencia,
+  .popup-testimonio {
+    font-size: 1rem;
+  }
+}
