@@ -26,6 +26,7 @@
       </div>
     </nav>
 
+
     <!-- Título de la página -->
     <h1 class="page-title">Lista de Entrenadores</h1>
 
@@ -51,12 +52,13 @@
           <p class="entrenador-experiencia">{{ entrenador.experiencia }}</p>
           <p class="entrenador-testimonio">"{{ entrenador.testimonio }}"</p>
           <div class="entrenador-acciones">
-            <button @click="verPerfil(entrenador)" class="btn btn-link">Ver perfil</button>
+            <button @click="verPerfil(entrenador)" class="btn btn-link">Ver</button>
             <button @click="sendMessage(entrenador)" class="btn btn-message">Enviar Solicitud</button>
           </div>
         </div>
       </div>
     </div>
+
 
     <!-- Pop-up del perfil del entrenador -->
     <div v-if="entrenadorSeleccionado" class="popup-overlay" @click="cerrarPerfil">
@@ -71,6 +73,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
