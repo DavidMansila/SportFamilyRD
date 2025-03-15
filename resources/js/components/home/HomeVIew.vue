@@ -6,7 +6,6 @@
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
-        <h1>SportFamilyRD</h1>
       </div>
         <div class="nav-links">
             <a href="/Noticias" class="nav-link">Noticias</a>
@@ -112,36 +111,28 @@
   background: linear-gradient(to right, #000000, #ff3149);
   padding: 1rem 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Distribuye el espacio entre los elementos */
   align-items: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-  width: 30%;
-  height: 30%;
+/* Logo a la izquierda */
+.logo-container {
+  display: flex;
+  align-items: center;
 }
 
-.logo-container {
-    display: flex;
-    gap: 1rem;
-    flex-direction: row;
+.logo {
+  width: 200px; /* Tamaño del logo */
+  height: 65px;
+}
 
-    h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-  }
-  }
-  
-  .container {
-    margin: 0 auto;
-  }
-
-
+/* Enlaces en el centro */
 .nav-links {
   display: flex;
   gap: 2rem;
+  flex-grow: 1; /* Ocupa el espacio disponible */
+  justify-content: center; /* Centra los enlaces */
 }
 
 .nav-link {
@@ -156,6 +147,7 @@
   color: #fbbf24;
 }
 
+/* Botones a la derecha */
 .auth-buttons {
   display: flex;
   gap: 1rem;
@@ -177,6 +169,8 @@
   background-color: white;
   color: #ff3149;
 }
+
+
   
   /* Banner */
   .banner {
@@ -276,13 +270,6 @@
     align-items: center;
     gap: 1rem;
 }
-
-.logo {
-    width: 50px;
-    height: 50px;
-}
-
-
 
 
   </style>

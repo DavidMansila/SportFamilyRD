@@ -6,7 +6,6 @@
         <a href="/" class="logo-container">
           <img src="/imagenes/logo.png" alt="SportFamilyRD Logo" class="logo" />
         </a>
-        <h1>SportFamilyRD</h1>
       </div>
       <div class="nav-links">
         <a href="/Noticias" class="nav-link">Noticias</a>
@@ -370,46 +369,41 @@ export default {
 
 
 <style scoped>
-/* Estilos generales */
+/* General styles */
 body {
-  font-family: 'Poppins', sans-serif; /* Fuente moderna */
-  margin: 0;
-  padding: 0;
-  background-color: #f8f9fa; /* Fondo claro */
-  color: #333; /* Color de texto principal */
-}
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
 
-/* ------------------- ESTILOS DEL NAVBAR ------------------- */
+
+/* Navbar */
 .navbar {
   background: linear-gradient(to right, #000000, #17a2b8);
   padding: 1rem 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Distribuye el espacio entre los elementos */
   align-items: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-  width: 50px;
-  height: 50px;
-}
-
+/* Logo a la izquierda */
 .logo-container {
   display: flex;
-  gap: 1rem;
   align-items: center;
 }
 
-.logo-container h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  color: white;
-  margin: 0;
+.logo {
+  width: 200px; /* Tamaño del logo */
+  height: 65px;
 }
 
+/* Enlaces en el centro */
 .nav-links {
   display: flex;
   gap: 2rem;
+  flex-grow: 1; /* Ocupa el espacio disponible */
+  justify-content: center; /* Centra los enlaces */
 }
 
 .nav-link {
@@ -424,6 +418,7 @@ body {
   color: #fbbf24;
 }
 
+/* Botones a la derecha */
 .auth-buttons {
   display: flex;
   gap: 1rem;
@@ -445,6 +440,8 @@ body {
   background-color: white;
   color: #17a2b8;
 }
+
+
 
 /* ------------------- ESTILOS DE LA TIENDA ------------------- */
 
