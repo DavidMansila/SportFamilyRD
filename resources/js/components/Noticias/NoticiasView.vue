@@ -135,8 +135,9 @@ export default {
       try {
         const response = await axios.get('/scrape');
         console.log('Datos de noticias:', response.data);
-        this.noticias = response.data.baseball_news;
-      } catch (error) {
+        this.noticias = response.data.Baseball_news;
+      }
+      catch (error) {
         console.error('Error al obtener las noticias:', error);
         this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
       } finally {
@@ -146,8 +147,8 @@ export default {
   },
 
   mounted() {
-    this.fetchNews();
-    this.noticiasScrape();
+    this.fetchNews(); 
+    this.noticiasScrape(); 
   },
 };
 </script>

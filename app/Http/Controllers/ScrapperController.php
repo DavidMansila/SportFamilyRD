@@ -10,7 +10,9 @@ class ScrapperController extends Controller
 {
     public function scrape()
     {
-        $client = new Client();
+        $client = new Client([
+            'verify' => false, // Desactivar la verificación SSL
+        ]);
 
         $response = $client->request('GET', 'https://lidom.com/');
         $html = (string) $response->getBody();
