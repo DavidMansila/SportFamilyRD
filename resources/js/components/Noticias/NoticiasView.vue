@@ -46,7 +46,7 @@
         </div>
         <div class="noticia-content">
           <h3 class="noticia-title">{{ noticia.title }}</h3>
-          <p class="noticia-subtitle">{{ noticia.subtitle }}</p> <!-- no hay campo subtitle, esos 2 se pueden ir, acomoda el front en base a ese -->
+          <p class="noticia-subtitle">{{ noticia.subtitle }}</p> <!-- todo no hay campo subtitle, esos 2 se pueden ir, acomoda el front en base a ese -->
           <p class="noticia-author">{{ noticia.author }}</p>
           <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
         </div>
@@ -58,11 +58,11 @@
     <div v-if="noticiaSeleccionada" class="popup-overlay" @click="cerrarNoticia">
       <div class="popup-content" @click.stop>
         <button class="btn-cerrar" @click="cerrarNoticia">×</button>
-        <img src="https://th.bing.com/th/id/OIP.SwvZPcCkze8R1IQhvfhhDQHaDF?w=202&h=84&c=7&r=0&o=5&dpr=1.5&pid=1.7" alt="Imagen de noticia" class="image" />
+        <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="image" />
         <div class="popup-info">
           <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
           <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
-         <p class="popup-fuente">{{ noticiaSeleccionada.source }}</p> <!-- no hay campo source  -->
+         <p class="popup-fuente">{{ noticiaSeleccionada.source }}</p> <!-- todo no hay campo source  -->
         </div>
       </div>
     </div>
@@ -115,27 +115,11 @@ export default {
       this.noticiaSeleccionada = null;
     },
 
-    async fetchNews() {
-      this.isLoading = true;
-      this.errorMessage = '';
-
-      try {
-        const response = await axios.get('news');
-        console.log('Datos de noticias:', response.data);
-        this.noticias = response.data.news;
-      } catch (error) {
-        console.error('Error al obtener las noticias:', error);
-        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
     async noticiasScrape() {
       try {
         const response = await axios.get('/scrape');
         console.log('Datos de noticias:', response.data);
-        this.noticias = response.data.Baseball_news;
+        this.noticias = response.data.baseball_news;
       }
       catch (error) {
         console.error('Error al obtener las noticias:', error);
@@ -147,7 +131,6 @@ export default {
   },
 
   mounted() {
-    this.fetchNews(); 
     this.noticiasScrape(); 
   },
 };
