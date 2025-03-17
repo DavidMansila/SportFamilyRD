@@ -2,81 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\News;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
-use Illuminate\Support\Facades\Log;
 
 class ScrapperController extends Controller
 {
     public function scrape()
     {
-        try {
-            // Crear un cliente HTTP
-            $client = new Client([
-                'verify' => false, // Desactivar la verificación SSL
-            ]);
+        $client = new Client([
+            'verify' => false, // Desactivar la verificación SSL
+        ]);
 
-            // Hacer la solicitud GET
-            $response = $client->request('GET', 'https://lidom.com/');
-            $html = (string) $response->getBody();
+        $response = $client->request('GET', 'https://lidom.com/');
+        $html = (string) $response->getBody();
 
-            // Verificar si la respuesta fue exitosa
-            if ($response->getStatusCode() !== 200) {
-                return response()->json(['error' => 'Error al obtener la página'], 500);
+        $crawler = new Crawler($html);
+
+
+        $baseball_news = $crawler->filter('.entry-box')->each(function (Crawler $node) use ($client) {
+            $headline = $node->filter('.entry-title')->text();
+            $link = $node->filter('a.cover-link')->attr('href');
+            $author = $node->filter('.volanta')->text(); 
+
+            //2do scraping 
+            $description = '';
+            $image = '';
+            try {
+                $response = $client->request('GET', $link);
+                $html = (string) $response->getBody();
+                $subCrawler = new Crawler($html);
+
+                $description = $subCrawler->filter('.article-body')->text();
+
+                $image = $subCrawler->filter('.preview-images img')->attr('src');
+            } catch (\Exception $e) {
+                $description = 'No description available';
+                $image = 'No image available';
             }
 
-            // Crear el objeto Crawler con el HTML obtenido
-            $crawler = new Crawler($html);
-
-            // Obtener el título de la página
-            $title = $crawler->filter('title')->text();
-
-            // Obtener todos los enlaces en la página
-            $links = $crawler->filter('a')->each(function (Crawler $node) {
-                return $node->attr('href');
-            });
-
-            // Obtener los titulares de noticias y sus enlaces
-            $news = $crawler->filter('.entry-box')->each(function (Crawler $node) {
-                $headline = $node->filter('.entry-title')->text();  // Titular
-                $link = $node->filter('a.cover-link')->attr('href'); // Enlace
-                
-                return [
-                    'title' => $headline,
-                    //subtitle => $subtitle,
-                    //image => $image,
-                    //autor => $autor,
-                    //date => $date,
-                    'link' => $link
-                ];
-            });
-
-            // Verificar si se obtuvieron noticias
-            if (empty($news)) {
-                return response()->json(['message' => 'No se encontraron noticias'], 404);
-            }
-
-            // Agrupar los datos en una variable separada
-            $newsData = [
-                'title' => $title,
-                //subtitle => $subtitle,
-                //image => $image,
-                //autor => $autor,
-                //date => $date,
-                'links' => $links,
-                'news' => $news,
+            return [
+                'title' => $headline,
+                'link' => $link,
+                'description' => $description,
+                'image' => $image,
+                'author' => $author,
             ];
+        });
 
-            // Devolver los datos como JSON
-            return response()->json($newsData);
-        } catch (\Exception $e) {
-            // Log de error
-            Log::error('Error en Scraper: ' . $e->getMessage());
-
-            // Devolver error si algo salió mal
-            return response()->json(['error' => 'Hubo un problema al procesar la solicitud'], 500);
-        }
+        return response()->json([
+            'baseball_news' => $baseball_news,
+        ]);
     }
 }

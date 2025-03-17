@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ReplyController;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
 
 // Página de inicio
@@ -84,7 +85,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 
-
+//Middleware:  ... rutas que necesiten estar logeado
 //scraper
 Route::get('/scrape', [ScrapperController::class, 'scrape']);
 
