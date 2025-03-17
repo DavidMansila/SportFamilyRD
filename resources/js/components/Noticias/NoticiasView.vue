@@ -31,7 +31,7 @@
       <!-- Lista de noticias -->
       <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
         <div class="noticia-image">
-          <img src="https://th.bing.com/th/id/OIP.SwvZPcCkze8R1IQhvfhhDQHaDF?w=202&h=84&c=7&r=0&o=5&dpr=1.5&pid=1.7" alt="Imagen de noticia" class="image" />
+          <img :src="noticia.image" alt="Imagen de noticia" class="image" />
         </div>
         <div class="noticia-content">
           <h3 class="noticia-title">{{ noticia.title }}</h3>
@@ -49,7 +49,7 @@
         <img src="https://th.bing.com/th/id/OIP.SwvZPcCkze8R1IQhvfhhDQHaDF?w=202&h=84&c=7&r=0&o=5&dpr=1.5&pid=1.7" alt="Imagen de noticia" class="image" />
         <div class="popup-info">
           <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
-          <p class="popup-descripcion">{{ noticiaSeleccionada.content }}</p>
+          <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
           <p class="popup-fuente">{{ noticiaSeleccionada.source }} · {{ noticiaSeleccionada.tiempo }} min read</p>
         </div>
       </div>
@@ -107,7 +107,7 @@ export default {
       axios.get('/scrape')
       .then((response) => {
         console.log('Datos de noticias:', response.data);
-        this.noticias = response.data.news;
+        this.noticias = response.data.Baseball_news;
       })
       .catch((error) => {
         console.error('Error al obtener las noticias:', error);
@@ -121,8 +121,8 @@ export default {
   },
 
   mounted() {
-    this.noticiasScrape(); 
     this.fetchNews(); 
+    this.noticiasScrape(); 
   },
 };
 </script>
