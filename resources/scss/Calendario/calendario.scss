@@ -193,6 +193,8 @@ body {
   cursor: default;
 }
 
+
+
 /* Sección de eventos ordenados */
 .eventos-ordenados {
   margin-top: 40px;
@@ -221,10 +223,10 @@ body {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.evento-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Sombra al pasar el mouse */
-}
+//.evento-item:hover {
+ // transform: translateY(-5px);
+ // box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Sombra al pasar el mouse */
+//}
 
 .evento-fecha {
   flex: 0 0 120px;

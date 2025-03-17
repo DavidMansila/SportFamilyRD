@@ -86,41 +86,6 @@ body {
 }
 
 
-
-/* Filtros y barra de búsqueda */
-
-
-.search-bar {
-  flex: 1;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #e0e0e0; /* Borde gris claro */
-  border-radius: 5px;
-  outline: none;
-  transition: border-color 0.3s ease-in-out;
-}
-
-.search-input:focus {
-  border-color: #17a2b8; /* Borde azul al enfocar */
-}
-
-
-
-/* ------------------- ESTILOS DE LA TIENDA ------------------- */
-
-/* Título de la tienda */
-.tienda-title {
-  text-align: center;
-  margin-top: 2rem;
-  font-size: 2.5rem;
-  color: #2c3e50;
-  font-weight: 700;
-}
-
 /* Barra de búsqueda */
 .search-container {
   display: flex;
@@ -168,13 +133,11 @@ body {
   transition: transform 0.3s ease-in-out;
   cursor: pointer;
   flex: 1 1 200px; /* Flex para que las categorías se ajusten */
-  max-width: 250px; /* Ancho máximo */
+  max-width: 180px; /* Ancho máximo */
 }
 
 .categoria-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  text-align: center;
   padding: 1rem;
   background-color: #17a2b8;
   color: white;
@@ -245,10 +208,10 @@ body {
   cursor: pointer;
 }
 
-.producto-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada al pasar el mouse */
-}
+//.producto-card:hover {
+ // transform: translateY(-5px);
+ // box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada al pasar el mouse */
+//}
 
 .producto-imagen-container {
   position: relative;
