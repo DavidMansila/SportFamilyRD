@@ -50,23 +50,24 @@
           <p class="noticia-author">{{ noticia.author }}</p>
           <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
         </div>
+        </div>
       </div>
     </div>
     
 
     <!-- Pop-up de noticia completa -->
     <div v-if="noticiaSeleccionada" class="popup-overlay" @click="cerrarNoticia">
-      <div class="popup-content" @click.stop>
-        <button class="btn-cerrar" @click="cerrarNoticia">×</button>
-        <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="image" />
-        <div class="popup-info">
-          <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
-          <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
-         <p class="popup-fuente">{{ noticiaSeleccionada.source }}</p> <!-- todo no hay campo source  -->
-        </div>
-      </div>
+  <div class="popup-content" @click.stop>
+    <button class="btn-cerrar" @click="cerrarNoticia">×</button>
+    <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="image" />
+    <div class="popup-info">
+      <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
+      <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
     </div>
   </div>
+</div>
+
+
 </template>
 
 
