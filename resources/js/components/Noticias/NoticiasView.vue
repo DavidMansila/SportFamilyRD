@@ -47,7 +47,10 @@
         <div class="noticia-content">
           <h3 class="noticia-title">{{ noticia.title }}</h3>
           <p class="noticia-subtitle">{{ noticia.subtitle }}</p> <!-- todo no hay campo subtitle, esos 2 se pueden ir, acomoda el front en base a ese -->
-          <p class="noticia-author">{{ noticia.author }}</p>
+          <p class="noticia-author">
+              <span class="author-name">{{ noticia.author }}</span>   · 
+              <span class="noticia-date">{{ noticia.date }}</span>
+          </p>
           <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
         </div>
         </div>
@@ -88,7 +91,6 @@ export default {
         { value: 'todos', label: 'Todos' },
         { value: 'futbol', label: 'Fútbol' },
         { value: 'baloncesto', label: 'Baloncesto' },
-        { value: 'tenis', label: 'Tenis' },
         { value: 'beisbol', label: 'Béisbol' },
         { value: 'natacion', label: 'Natación' },
         { value: 'voleyball', label: 'Voleyball' },
