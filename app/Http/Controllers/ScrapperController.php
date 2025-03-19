@@ -11,8 +11,8 @@ class ScrapperController extends Controller
     public function scrape()
     {
         $client = new Client([
-            'verify' => false, // Desactivar la verificación SSL
-        ]);
+            'verify' => false, // todo ponerlo normal ahora que le funciona a mansilla Desactivar la verificación SSL
+        ]);//todo ejemplo new client
 
         $response = $client->request('GET', 'https://lidom.com/');
         $html = (string) $response->getBody();
@@ -28,6 +28,8 @@ class ScrapperController extends Controller
             //2do scraping 
             $description = '';
             $image = '';
+            $subtitle = '';
+            $date = '';
             try {
                 $response = $client->request('GET', $link);
                 $html = (string) $response->getBody();
@@ -36,9 +38,16 @@ class ScrapperController extends Controller
                 $description = $subCrawler->filter('.article-body')->text();
 
                 $image = $subCrawler->filter('.preview-images img')->attr('src');
+
+                $subtitle = $subCrawler->filter('.nota-top-part h2')->text();
+
+                // Extraer fecha del atributo datetime en el <time> dentro del div "extra-holder"
+                $date = $subCrawler->filter(' .autor .extra-holder time')->attr('datetime');
             } catch (\Exception $e) {
                 $description = 'No description available';
                 $image = 'No image available';
+                $subtitle = 'No subtitle available';
+                $date = 'No date available';
             }
 
             return [
@@ -47,6 +56,8 @@ class ScrapperController extends Controller
                 'description' => $description,
                 'image' => $image,
                 'author' => $author,
+                'subtitle' => $subtitle,
+                'date' => $date,
             ];
         });
 
