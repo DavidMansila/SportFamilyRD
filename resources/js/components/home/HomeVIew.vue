@@ -15,13 +15,25 @@
              <a href="/Entrenadores" class="nav-link">Entrenadores</a>
              <a href="/Foro" class="nav-link">Foro</a>
         </div>
-        <div class="auth-buttons">
-            <a href="/Ajustes">
-                  <button class="auth-btn">Ajustes</button>
+
+        <div class="Imagenes">
+
+            <a class="Carrito">
+                <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
             </a>
-            <a :href=" login ? '/Login' : '/Logout' ">
-                <button class="auth-btn">{{ login ? "Login" : "logout" }}</button>
+
+            <a href= "/Ajustes" class="Ajustes">
+                <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
             </a>
+
+            <a class="Perfil">
+                <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+            </a>
+
+            <a :href=" login ? '/Login' : '/Logout' " class="Logout">
+                <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
+            </a>
+
         </div>
       </nav>
   
