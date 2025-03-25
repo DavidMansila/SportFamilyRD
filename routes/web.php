@@ -69,9 +69,6 @@ Route::get('/Ajustes', function () {
 });
 
 
-
-
-
 //Rutas para funciones en el back
 
 // usuarios

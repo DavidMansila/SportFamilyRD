@@ -17,6 +17,7 @@ import ForoView from './components/foro/ForoView.vue';
 import ForoPublicaciones from './components/Foro/ForoPublicaciones.vue';
 import CrearPostView from './components/Foro/CrearPost.vue';
 import AjustesView from './components/Ajustes/AjustesView.vue';
+//import CarritoView from './components/Carrito/CarritoView.vue';
 
 
 //import Store from './storage'; // Importa el store
@@ -58,6 +59,8 @@ app.component('crearpost-component', CrearPostView);
 app.component('publicacion-component', ForoPublicaciones);
 
 app.component('ajustes-component', AjustesView);
+
+//app.component('carrito-component', CarritoView);
 
 
 app.mount('#app');

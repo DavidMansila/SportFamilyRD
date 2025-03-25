@@ -19,8 +19,7 @@ class ScrapperController extends Controller
 
         $crawler = new Crawler($html);
 
-
-        $baseball_news = $crawler->filter('.entry-box')->each(function (Crawler $node) use ($client) {
+            $baseball_news = $crawler->filter('.entry-box')->each(function (Crawler $node) use ($client) {
             $headline = $node->filter('.entry-title')->text();
             $link = $node->filter('a.cover-link')->attr('href');
             $author = $node->filter('.volanta')->text(); 
