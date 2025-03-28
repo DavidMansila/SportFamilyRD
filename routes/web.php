@@ -72,9 +72,10 @@ Route::post('/logout', [AuthController::class, 'logout']);
 
 //scraper
 Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
+Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
 
 
-
+//todo chequear esto
 Route::apiResource('posts', PostController::class);
 Route::apiResource('comments', CommentController::class);
 Route::apiResource('replies', ReplyController::class);

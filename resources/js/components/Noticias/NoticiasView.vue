@@ -75,6 +75,7 @@
     </div>
     
     <paginatorComponent
+     
       v-model="currentPage"
       :total-items="noticias.length"
       :items-per-page="itemsPerPage"
@@ -114,7 +115,8 @@ export default {
       itemsPerPage: 7,
 
       noticias: [], // Lista completa de noticias
-      isLoading: false,
+      noticiasFutbol: [], // Lista completa de noticias
+      isLoading: true,
       errorMessage: '',
       noticiaSeleccionada: null,
       deporteSeleccionado: 'todos', // Deporte seleccionado (valor inicial: 'todos')
@@ -190,10 +192,29 @@ export default {
         this.isLoading = false;
       }
     },
+    
+    async getFutbolNews() {
+      try {
+        const response = await axios.get('/futbol_news');
+
+        console.log('Datos de noticias:', response.data);
+        this.noticias = response.data.futbol_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+
+
   },
 
   mounted() {
     this.getBaseballNews(); 
+    this.getFutbolNews(); 
   },
 };
 </script>
