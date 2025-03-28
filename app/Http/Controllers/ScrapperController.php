@@ -29,6 +29,7 @@ class ScrapperController extends Controller
             $image = '';
             $subtitle = '';
             $date = '';
+            
             try {
                 $response = $client->request('GET', $link);
                 $html = (string) $response->getBody();
