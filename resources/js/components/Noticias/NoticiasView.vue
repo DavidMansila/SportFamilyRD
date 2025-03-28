@@ -43,8 +43,8 @@
     <div class="container">
       <h2 class="page-title">Sports News</h2>
 
-   <!-- Filtro de deportes con botones -->
-   <div class="filtro-deportes">
+      <!-- Filtro de deportes con botones -->
+      <div class="filtro-deportes">
         <button
           v-for="deporte in deportes"
           :key="deporte.value"
@@ -56,48 +56,63 @@
       </div>
 
       <!-- Lista de noticias -->
-      <div v-for="noticia in noticias" :key="noticia.id" class="noticia-card">
-        <div class="noticia-image">
-          <img :src="noticia.image" alt="Imagen de noticia" class="image" />
-        </div>
-        <div class="noticia-content">
-          <h3 class="noticia-title">{{ noticia.title }}</h3>
-          <p class="noticia-subtitle">{{ noticia.subtitle }}</p> <!-- todo no hay campo subtitle, esos 2 se pueden ir, acomoda el front en base a ese -->
-          <p class="noticia-author">
-              <span class="author-name">{{ noticia.author }}</span>   · 
-              <span class="noticia-date">{{ noticia.date }}</span>
-          </p>
-          <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
-        </div>
+        <div v-for="noticia in paginatedNews" :key="noticia.id" class="noticia-card">
+          <div class="noticia-image">
+            <img :src="noticia.image" alt="Imagen de noticia" class="image" />
+          </div>
+
+          <div class="noticia-content">
+            <h3 class="noticia-title">{{ noticia.title }}</h3>
+            <p class="noticia-subtitle">{{ noticia.subtitle }}</p> <!-- todo no hay campo subtitle, esos 2 se pueden ir, acomoda el front en base a ese -->
+            <p class="noticia-author">
+                <span class="author-name">{{ noticia.author }}</span>   · 
+                <span class="noticia-date">{{ noticia.date }}</span>
+            </p>
+            <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
+          </div>
         </div>
       </div>
     </div>
     
+    <paginatorComponent
+      v-model="currentPage"
+      :total-items="noticias.length"
+      :items-per-page="itemsPerPage"
+      :max-pages-shown="5"
+    />
 
     <!-- Pop-up de noticia completa -->
     <div v-if="noticiaSeleccionada" class="popup-overlay" @click="cerrarNoticia">
-  <div class="popup-content" @click.stop>
-    <button class="btn-cerrar" @click="cerrarNoticia">×</button>
-    <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="image" />
-    <div class="popup-info">
-      <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
-      <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
+      <div class="popup-content" @click.stop>
+        <button class="btn-cerrar" @click="cerrarNoticia">×</button>
+        <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="image" />
+        <div class="popup-info">
+          <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
+          <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
+  
 
 </template>
 
 
 <script>
 import axios from 'axios';
+import paginatorComponent from '@/components/paginatorComponent.vue';
 
 export default {
   name: 'NoticiasComponent',
+  components: {
+    paginatorComponent,
+  },
 
   data() {
     return {
+      //paginator
+      currentPage:1,
+      itemsPerPage: 7,
+
       noticias: [], // Lista completa de noticias
       isLoading: false,
       errorMessage: '',
@@ -121,8 +136,14 @@ export default {
         return this.noticias; // Mostrar todas las noticias
       } else {
         return this.noticias.filter(noticia => noticia.categoria === this.deporteSeleccionado);
-      }
+      } 
     },
+
+    paginatedNews() {
+          const start = (this.currentPage - 1) * this.itemsPerPage;
+          const end = start + this.itemsPerPage;
+          return this.noticias.slice(start, end);
+      },
   },
 
   methods: {

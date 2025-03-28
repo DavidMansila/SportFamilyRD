@@ -19,6 +19,11 @@ import CrearPostView from './components/Foro/CrearPost.vue';
 import AjustesView from './components/Ajustes/AjustesView.vue';
 //import CarritoView from './components/Carrito/CarritoView.vue';
 
+//paginate
+import VueAwesomePaginate from "vue-awesome-paginate";
+import "vue-awesome-paginate/dist/style.css";
+
+
 
 //import Store from './storage'; // Importa el store
 
@@ -62,5 +67,5 @@ app.component('ajustes-component', AjustesView);
 
 //app.component('carrito-component', CarritoView);
 
-
+app.use(VueAwesomePaginate);
 app.mount('#app');
