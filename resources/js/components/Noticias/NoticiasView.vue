@@ -155,9 +155,9 @@ export default {
       this.noticiaSeleccionada = null;
     },
 
-    async noticiasScrape() {
+    async getBaseballNews() {
       try {
-        const response = await axios.get('/scrape');
+        const response = await axios.get('/baseball_news');
 
 
        // switch (this.deporteSeleccionado) {
@@ -193,7 +193,7 @@ export default {
   },
 
   mounted() {
-    this.noticiasScrape(); 
+    this.getBaseballNews(); 
   },
 };
 </script>

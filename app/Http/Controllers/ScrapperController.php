@@ -8,7 +8,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ScrapperController extends Controller
 {
-    public function scrape()
+    public function baseballNews()
     {
         $client = new Client([
             'verify' => false, // todo ponerlo normal ahora que le funciona a mansilla Desactivar la verificación SSL

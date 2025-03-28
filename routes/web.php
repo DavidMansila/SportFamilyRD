@@ -70,9 +70,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 
-//Middleware:  ... rutas que necesiten estar logeado
 //scraper
-Route::get('/scrape', [ScrapperController::class, 'scrape']);
+Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
 
 
 

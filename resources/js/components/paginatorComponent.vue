@@ -10,6 +10,7 @@
 
             :show-breakpoint-buttons="false"
             :show-jump-buttons="true"
+            :show-ending-buttons="true"
             
             paginate-buttons-class="btn"
             active-page-class="btn-active"
