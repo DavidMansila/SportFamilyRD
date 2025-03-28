@@ -213,8 +213,8 @@ export default {
   },
 
   mounted() {
-    this.getBaseballNews(); 
     this.getFutbolNews(); 
+    this.getBaseballNews(); 
   },
 };
 </script>
