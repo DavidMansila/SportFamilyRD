@@ -208,13 +208,42 @@ export default {
       }
     },
 
+    async getBasketballNews() {
+      try {
+        const response = await axios.get('/basketball_news');
 
+        this.noticias = response.data.basketball_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+
+    async getVoleyballNews() {
+      try {
+        const response = await axios.get('/voleyball_news');
+
+        this.noticias = response.data.voleyball_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
   },
 
   mounted() {
-    this.getFutbolNews(); 
+    this.getBasketballNews();
     this.getBaseballNews(); 
+    this.getFutbolNews(); 
+    this.getVoleyballNews();
   },
 };
 </script>
