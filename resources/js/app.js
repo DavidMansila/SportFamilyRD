@@ -65,6 +65,7 @@ app.component('publicacion-component', ForoPublicaciones);
 
 app.component('ajustes-component', AjustesView);
 
+
 //app.component('carrito-component', CarritoView);
 
 app.use(VueAwesomePaginate);

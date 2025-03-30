@@ -189,16 +189,6 @@ body {
   font-size: 12px;
 }
 
-
-
-
-
-
-
-
-
-
-
 .read-more {
   align-self: flex-start;
   padding: 10px 15px;
@@ -216,68 +206,125 @@ body {
   background: #0056b3;
 }
 
+
+
+
+
 /* ------------------- ESTILOS DEL POP-UP ------------------ */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(3px);
 }
 
 .popup-content {
-  position: relative;
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
+  background: white;
+  border-radius: 8px;
   max-width: 90%;
-  max-height: 90%;
-  width: 600px; /* Ancho máximo del pop-up */
-  overflow-y: auto; /* Permite el scroll vertical */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2rem;
+  position: relative;
+  width: 600px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 .btn-cerrar {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 1rem;
+  right: 1rem;
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 1.5rem;
   cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
 }
 
-.popup-content .image {
+.btn-cerrar:hover {
+  color: #333;
+}
+
+/* Imagen del popup */
+.popup-image-container {
+  width: 100%;
+  height: 350px; /* Altura fija para la imagen */
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.popup-image {
   width: 100%;
   max-height: 300px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 4px;
+  margin-bottom: 1rem;
 }
 
+/* Contenido del popup */
 .popup-info {
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .popup-titulo {
-  font-size: 24px;
-  margin-bottom: 10px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+
+.popup-author-date {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
 }
 
 .popup-descripcion {
   font-size: 16px;
-  line-height: 1.6;
-  margin-bottom: 10px;
+  line-height: 1.8;
+  color: #444;
+  white-space: pre-line; /* Respeta los saltos de línea */
+  text-align: justify;
+  margin-bottom: 20px;
 }
 
-.popup-fuente {
-  font-size: 14px;
-  color: #666;
+/* Estilo para párrafos dentro de la descripción */
+.popup-descripcion p {
+  margin-bottom: 15px; /* Espaciado entre párrafos */
 }
+
+/* Estilo para listas */
+.popup-descripcion ul, .popup-descripcion ol {
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.popup-descripcion li {
+  margin-bottom: 8px;
+}
+
+/* Estilo para citas */
+.popup-descripcion blockquote {
+  border-left: 4px solid #007bff;
+  padding-left: 15px;
+  margin: 15px 0;
+  color: #555;
+  font-style: italic;
+}
+
+
 
 
 
@@ -313,4 +360,83 @@ body {
   color: #fff;
   border-color: #007bff;
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+
+
+
+
+/* Estilos para el mensaje de carga */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0,0,0,0.1);
+  border-left-color: #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.loading-text {
+  font-size: 1.2rem;
+  color: #555;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para el mensaje de error */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-text {
+  font-size: 1.2rem;
+  color: #d9534f;
+  margin-bottom: 1.5rem;
+  max-width: 80%;
+}
+
+.retry-btn {
+  padding: 0.5rem 1.5rem;
+  background-color: #5bc0de;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.retry-btn:hover {
+  background-color: #31b0d5;
+}
+
+/* Estilos para cuando no hay noticias */
+.no-news {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #777;
 }
