@@ -89,6 +89,8 @@
   
 
   <script>
+  // import carritoComponent from './CarritoComponent.vue';
+
   export default {
     data() {
       return {

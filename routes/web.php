@@ -20,23 +20,17 @@ Route::get('/Login', function () {
     return view('Login.signUp');
 });
 
-
-
 Route::get('/Noticias', function () {
     return view('Noticias.NoticiasView');
 });
-
 
 Route::get('/Calendario', function () {
     return view('Calendario.CalendarioView');
 });
 
-
 Route::get('/Tienda', function () {
     return view('Tienda.TiendaView');
 });
-
-
 
 Route::get('/Entrenadores', function () {
     return view('Entrenadores.EntrenadoresView');
@@ -46,23 +40,17 @@ Route::get('/Solicitud', function () {
     return view('Entrenadores.SolicitudView');
 });
 
-
-
 Route::get('/Foro', function () {
     return view('Foro.ForoView');
 });
-
 
 Route::get('/Publicacion', function () {
     return view('Foro.ForoPublicaciones');
 });
 
-
 Route::get('/CrearPost', function () {
     return view('Foro.CrearPost');
 });
-
-
 
 Route::get('/Ajustes', function () {
     return view('Ajustes.AjustesView');
@@ -82,12 +70,14 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 
-//Middleware:  ... rutas que necesiten estar logeado
 //scraper
-Route::get('/scrape', [ScrapperController::class, 'scrape']);
+Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
+Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
+Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
+Route::get('/voleyball_news', [ScrapperController::class, 'volleyballNews']);
 
 
-
+//todo chequear esto
 Route::apiResource('posts', PostController::class);
 Route::apiResource('comments', CommentController::class);
 Route::apiResource('replies', ReplyController::class);
