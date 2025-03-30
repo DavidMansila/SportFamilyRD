@@ -1,101 +1,121 @@
 <template>
   <div class="noticias-page">
-
-      <!-- Navbar -->
-      <nav class="navbar">
-        <div class="logo-container">
-          <a href="/" class="logo-container">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="logo-container">
+        <a href="/" class="logo-container">
           <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
       </div>
-        <div class="nav-links">
-            <a href="/Noticias" class="nav-link">Noticias</a>
-            <a href="/Calendario" class="nav-link">Calendario</a>
-             <a href="/Tienda" class="nav-link">Tienda</a>
-             <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-             <a href="/Foro" class="nav-link">Foro</a>
-        </div>
+      <div class="nav-links">
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
+      </div>
 
-        <div class="Imagenes">
+      <div class="Imagenes">
+        <a class="Carrito">
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
+        </a>
+        <a href="/Ajustes" class="Ajustes">
+          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
+        </a>
+        <a class="Perfil">
+          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+        </a>
+        <a :href="login ? '/Login' : '/Logout'" class="Logout">
+          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
+        </a>
+      </div>
+    </nav>
 
-            <a class="Carrito">
-                <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
-            </a>
-
-            <a href= "/Ajustes" class="Ajustes">
-                <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
-            </a>
-
-            <a class="Perfil">
-                <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
-            </a>
-
-            <a :href=" login ? '/Login' : '/Logout' " class="Logout">
-                <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
-            </a>
-
-        </div>
-      </nav>
-
-
-
-      
+    <!-- Contenido principal -->
     <div class="container">
       <h2 class="page-title">Sports News</h2>
 
-      <!-- Filtro de deportes con botones -->
+      <!-- Filtro de deportes -->
       <div class="filtro-deportes">
         <button
           v-for="deporte in deportes"
           :key="deporte.value"
-          @click="deporteSeleccionado = deporte.value"
+          @click="cambiarDeporte(deporte.value)"
           :class="['filtro-btn', { active: deporteSeleccionado === deporte.value }]"
         >
           {{ deporte.label }}
         </button>
       </div>
 
-      <!-- Lista de noticias -->
-        <div v-for="noticia in paginatedNews" :key="noticia.id" class="noticia-card">
-          <div class="noticia-image">
-            <img :src="noticia.image" alt="Imagen de noticia" class="image" />
-          </div>
+      <!-- Estados de carga -->
+      <div v-if="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p class="loading-text">Cargando noticias...</p>
+      </div>
 
-          <div class="noticia-content">
-            <h3 class="noticia-title">{{ noticia.title }}</h3>
-            <p class="noticia-subtitle">{{ noticia.subtitle }}</p> <!-- todo no hay campo subtitle, esos 2 se pueden ir, acomoda el front en base a ese -->
-            <p class="noticia-author">
-                <span class="author-name">{{ noticia.author }}</span>   · 
+      <div v-else-if="errorMessage" class="error-container">
+        <div class="error-icon">⚠️</div>
+        <p class="error-text">{{ errorMessage }}</p>
+        <button @click="cargarNoticias" class="retry-btn">Reintentar</button>
+      </div>
+
+      <!-- Lista de noticias -->
+      <div v-else>
+        <div v-if="paginatedNews.length > 0">
+          <div 
+            v-for="noticia in paginatedNews" 
+            :key="noticia.id" 
+            class="noticia-card"
+            @click="abrirNoticia(noticia)"
+          >
+            <div class="noticia-image">
+              <img :src="noticia.image" alt="Imagen de noticia" class="image"/>
+            </div>
+            <div class="noticia-content">
+              <h3 class="noticia-title">{{ noticia.title }}</h3>
+              <p class="noticia-author">
+                <span class="author-name">{{ noticia.author }}</span> · 
                 <span class="noticia-date">{{ noticia.date }}</span>
-            </p>
-            <button @click="abrirNoticia(noticia)" class="read-more">Read more</button>
+              </p>
+              <button class="read-more">Leer más</button>
+            </div>
           </div>
         </div>
+        <div v-else class="no-news">
+          <p>No hay noticias disponibles para esta categoría.</p>
+        </div>
       </div>
+
+      <!-- Paginación -->
+      <paginatorComponent
+        v-model="currentPage"
+        :total-items="noticiasFiltradas.length"
+        :items-per-page="itemsPerPage"
+        :max-pages-shown="5"
+      />
     </div>
-    
-    <paginatorComponent
-     
-      v-model="currentPage"
-      :total-items="noticias.length"
-      :items-per-page="itemsPerPage"
-      :max-pages-shown="5"
-    />
 
     <!-- Pop-up de noticia completa -->
-    <div v-if="noticiaSeleccionada" class="popup-overlay" @click="cerrarNoticia">
-      <div class="popup-content" @click.stop>
+    <div 
+      v-if="noticiaSeleccionada" 
+      class="popup-overlay" 
+      @click.self="cerrarNoticia"
+    >
+      <div class="popup-content">
         <button class="btn-cerrar" @click="cerrarNoticia">×</button>
-        <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="image" />
+        <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="popup-image"/>
         <div class="popup-info">
           <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
+          <p class="popup-author">
+            Por {{ noticiaSeleccionada.author }} · {{ noticiaSeleccionada.date }}
+          </p>
           <p class="popup-descripcion">{{ noticiaSeleccionada.description }}</p>
         </div>
       </div>
     </div>
-  
-
+  </div>
 </template>
+
 
 
 <script>
@@ -107,19 +127,16 @@ export default {
   components: {
     paginatorComponent,
   },
-
   data() {
     return {
-      //paginator
-      currentPage:1,
+      currentPage: 1,
       itemsPerPage: 7,
-
-      noticias: [], // Lista completa de noticias
-      noticiasFutbol: [], // Lista completa de noticias
-      isLoading: true,
+      noticias: [], // Todas las noticias
+      noticiasFiltradas: [], // Noticias filtradas por deporte
+      isLoading: false,
       errorMessage: '',
       noticiaSeleccionada: null,
-      deporteSeleccionado: 'todos', // Deporte seleccionado (valor inicial: 'todos')
+      deporteSeleccionado: 'todos',
       deportes: [
         { value: 'todos', label: 'Todos' },
         { value: 'futbol', label: 'Fútbol' },
@@ -130,121 +147,65 @@ export default {
       ],
     };
   },
-
   computed: {
-    // Filtra las noticias según el deporte seleccionado
-    noticiasFiltradas() {
-      if (this.deporteSeleccionado === 'todos') {
-        return this.noticias; // Mostrar todas las noticias
-      } else {
-        return this.noticias.filter(noticia => noticia.categoria === this.deporteSeleccionado);
-      } 
+    paginatedNews() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.noticiasFiltradas.slice(start, end);
+    },
+  },
+  methods: {
+    async cargarNoticias() {
+      this.isLoading = true;
+      try {
+        const [futbol, baloncesto, beisbol] = await Promise.all([
+          axios.get('/futbol_news'),
+          axios.get('/basketball_news'), 
+          axios.get('/baseball_news')
+        ]);
+
+        // Asignamos categorías a cada noticia
+        this.noticias = [
+          ...futbol.data.futbol_news.map(n => ({ ...n, categoria: 'futbol' })),
+          ...baloncesto.data.basketball_news.map(n => ({ ...n, categoria: 'baloncesto' })),
+          ...beisbol.data.baseball_news.map(n => ({ ...n, categoria: 'beisbol' }))
+        ];
+
+        this.filtrarNoticias();
+      } catch (error) {
+        this.errorMessage = 'Error al cargar noticias';
+      } finally {
+        this.isLoading = false;
+      }
     },
 
-    paginatedNews() {
-          const start = (this.currentPage - 1) * this.itemsPerPage;
-          const end = start + this.itemsPerPage;
-          return this.noticias.slice(start, end);
-      },
-  },
+    filtrarNoticias() {
+      if (this.deporteSeleccionado === 'todos') {
+        this.noticiasFiltradas = [...this.noticias];
+      } else {
+        this.noticiasFiltradas = this.noticias.filter(
+          noticia => noticia.categoria === this.deporteSeleccionado
+        );
+      }
+      this.currentPage = 1; // Resetear paginación
+    },
 
-  methods: {
+    cambiarDeporte(deporte) {
+      this.deporteSeleccionado = deporte;
+      this.filtrarNoticias();
+    },
+
     abrirNoticia(noticia) {
       this.noticiaSeleccionada = noticia;
     },
 
     cerrarNoticia() {
       this.noticiaSeleccionada = null;
-    },
-
-    async getBaseballNews() {
-      try {
-        const response = await axios.get('/baseball_news');
-
-
-       // switch (this.deporteSeleccionado) {
-       //   case 'futbol':
-        //    this.noticias = response.data.soccer_news;
-        //    break;
-        //  case 'baloncesto':
-        //    this.noticias = response.data.basketball_news;
-       //     break;
-       //   case 'beisbol':
-        //    this.noticias = response.data.baseball_news;
-       //     break;
-      //    case 'natacion':
-      //      this.noticias = response.data.swimming_news;
-     //       break;
-     //     case 'voleyball':
-     //       this.noticias = response.data.volleyball_news;
-      //      break;
-       //   default:
-      //      this.noticias = response.data.news;
-     //   }
-
-        console.log('Datos de noticias:', response.data);
-        this.noticias = response.data.baseball_news;
-      }
-      catch (error) {
-        console.error('Error al obtener las noticias:', error);
-        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
-      } finally {
-        this.isLoading = false;
-      }
-    },
-    
-    async getFutbolNews() {
-      try {
-        const response = await axios.get('/futbol_news');
-
-        console.log('Datos de noticias:', response.data);
-        this.noticias = response.data.futbol_news;
-      }
-      catch (error) {
-        console.error('Error al obtener las noticias:', error);
-        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    async getBasketballNews() {
-      try {
-        const response = await axios.get('/basketball_news');
-
-        this.noticias = response.data.basketball_news;
-      }
-      catch (error) {
-        console.error('Error al obtener las noticias:', error);
-        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
-      } finally {
-        this.isLoading = false;
-      }
-    },
-    
-
-    async getVoleyballNews() {
-      try {
-        const response = await axios.get('/voleyball_news');
-
-        this.noticias = response.data.voleyball_news;
-      }
-      catch (error) {
-        console.error('Error al obtener las noticias:', error);
-        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
+    }
   },
-
-  mounted() {
-    this.getBasketballNews();
-    this.getBaseballNews(); 
-    this.getFutbolNews(); 
-    this.getVoleyballNews();
-  },
+  created() {
+    this.cargarNoticias();
+  }
 };
 </script>
 
