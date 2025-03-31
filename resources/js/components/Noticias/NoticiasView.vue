@@ -240,10 +240,10 @@ export default {
   },
 
   mounted() {
+    // this.getBaseballNews(); 
+    // this.getVoleyballNews();
+    // this.getFutbolNews(); 
     this.getBasketballNews();
-    this.getBaseballNews(); 
-    this.getFutbolNews(); 
-    this.getVoleyballNews();
   },
 };
 </script>
