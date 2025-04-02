@@ -274,7 +274,7 @@ export default {
       try {
         const response = await axios.get('/voleyball_news');
 
-        this.noticias = response.data.voleyball_news;
+        this.noticias = response.data.volleyball_news;
       }
       catch (error) {
         console.error('Error al obtener las noticias:', error);
@@ -287,10 +287,10 @@ export default {
   },
 
   mounted() {
-    // this.getBaseballNews(); 
-    // this.getVoleyballNews();
-    // this.getFutbolNews(); 
+    this.getBaseballNews(); 
+    this.getFutbolNews(); 
     this.getBasketballNews();
+    this.getVoleyballNews();
   },
   created() {
     this.cargarNoticias();
