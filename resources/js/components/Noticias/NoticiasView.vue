@@ -201,7 +201,111 @@ export default {
 
     cerrarNoticia() {
       this.noticiaSeleccionada = null;
-    }
+    
+    },
+
+    async getBaseballNews() {
+      try {
+        const response = await axios.get('/baseball_news');
+
+
+       // switch (this.deporteSeleccionado) {
+       //   case 'futbol':
+        //    this.noticias = response.data.soccer_news;
+        //    break;
+        //  case 'baloncesto':
+        //    this.noticias = response.data.basketball_news;
+       //     break;
+       //   case 'beisbol':
+        //    this.noticias = response.data.baseball_news;
+       //     break;
+      //    case 'natacion':
+      //      this.noticias = response.data.swimming_news;
+     //       break;
+     //     case 'voleyball':
+     //       this.noticias = response.data.volleyball_news;
+      //      break;
+       //   default:
+      //      this.noticias = response.data.news;
+     //   }
+
+        console.log('Datos de noticias:', response.data);
+        this.noticias = response.data.baseball_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+    async getFutbolNews() {
+      try {
+        const response = await axios.get('/futbol_news');
+
+        console.log('Datos de noticias:', response.data);
+        this.noticias = response.data.futbol_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async getBasketballNews() {
+      try {
+        const response = await axios.get('/basketball_news');
+
+        this.noticias = response.data.basketball_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+
+    async getVoleyballNews() {
+      try {
+        const response = await axios.get('/volleyball_news');
+
+        this.noticias = response.data.volleyball_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async getSwimmingNews() {
+      try {
+        const response = await axios.get('/swimming_news');
+
+        this.noticias = response.data.swimming_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+  },
+
+  mounted() {
+    this.getBaseballNews(); 
+    this.getFutbolNews(); 
+    this.getBasketballNews();
+    this.getVoleyballNews();
+    this.getSwimmingNews()
   },
   created() {
     this.cargarNoticias();

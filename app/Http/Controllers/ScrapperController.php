@@ -211,8 +211,8 @@ class ScrapperController extends Controller
     
     //     $crawler = new Crawler($html);
     
-    //     // Extraer los enlaces de las noticias
-    //     $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a')->each(function (Crawler $node) {
+    //     // Ajustar el selector para evitar duplicados
+    //     $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a:first-of-type')->each(function (Crawler $node) {
     //         try {
     //             return $node->attr('href'); // Extraer solo el enlace
     //         } catch (\Exception $e) {
@@ -220,37 +220,33 @@ class ScrapperController extends Controller
     //         }
     //     });
     
-    //     // Filtrar enlaces no válidos
-    //     $links = array_filter($links);
+    //     // Eliminar duplicados en los enlaces
+    //     $links = array_unique($links);
     
     //     // Segundo scraping: Obtener los datos de cada enlace
     //     $promises = [];
-    //     foreach ($links as $link) { 
+    //     foreach ($links as $link) {
     //         $promises[] = $client->getAsync($link);
     //     }
     
     //     $responses = Utils::settle($promises)->wait();
     
     //     $articles = [];
-     
     //     foreach ($responses as $index => $response) {
     //         if ($response['state'] === 'fulfilled') {
     //             try {
     //                 $html = (string) $response['value']->getBody();
     //                 $subCrawler = new Crawler($html);
-
+    
     //                 // Extraer datos desde la página del enlace
     //                 $title = $subCrawler->filter('div.col-md-12.col-xs-12 h1.single-title')->text();
-
     //                 $author = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(1)->text();
     //                 $date = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(2)->text();
-
     //                 $image = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box figure.nota-img amp-img')->attr('src');
-
     //                 $description = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box div.nota p')->each(function (Crawler $pNode) {
     //                     return $pNode->text();
     //                 });
-
+    
     //                 $articles[] = [
     //                     'title' => $title,
     //                     'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
@@ -269,15 +265,6 @@ class ScrapperController extends Controller
     //                     'link' => $links[$index], // Usar el enlace original
     //                 ];
     //             }
-    //         } else {
-    //             $articles[] = [
-    //                 'title' => 'No title available',
-    //                 'author' => 'No author available',
-    //                 'date' => 'No date available',
-    //                 'image' => 'No image available',
-    //                 'description' => 'No description available',
-    //                 'link' => $links[$index], // Usar el enlace original
-    //             ];
     //         }
     //     }
     
@@ -286,7 +273,7 @@ class ScrapperController extends Controller
     //     ]);
     // }
 
-    //??las funciones almacenadas en el chache por 2 dias, podemos manipular el tiempo
+    //??abajo las funciones almacenadas en el cache por 2 dias, podemos manipular el tiempo asi esta optimizado el tiempo de carga
 
     public function baseballNews()
     {
@@ -355,7 +342,7 @@ class ScrapperController extends Controller
                             'date' => $date,
                             'image' => $image,
                             'description' => implode("\n", $description[0] ?? []),
-                            'link' => $links[$index], // Usar el enlace original
+                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     } catch (\Exception $e) {
                         $articles[] = [
@@ -365,7 +352,7 @@ class ScrapperController extends Controller
                             'date' => 'No date available',
                             'image' => 'No image available',
                             'description' => 'No description available',
-                            'link' => $links[$index], // Usar el enlace original
+                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     }
                 }
@@ -437,7 +424,7 @@ class ScrapperController extends Controller
                             'date' => $date,
                             'subtitle' => $subtitle,
                             'description' => implode("\n", $description),
-                            'link' => $links[$index], // Usar el enlace original
+                            // 'link' => $links[$index], // Usar el enlace original
                             'author' => $author,
                         ];
                     } catch (\Exception $e) {
@@ -448,7 +435,7 @@ class ScrapperController extends Controller
                             'subtitle' => 'No subtitle available',
                             'description' => 'No description available',
                             'author' => 'No author available',
-                            'link' => $links[$index], // Usar el enlace original
+                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     }
                 }
@@ -462,90 +449,77 @@ class ScrapperController extends Controller
         ]);
     }
 
+
     public function basketballNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché
-        $articles = \Cache::remember('basketball_news', now()->addDays(2), function () {
-            $client = new Client([
-                'verify' => false,
-            ]);
-
-            // Primer scraping: Obtener solo los enlaces
-            $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
-            $html = (string) $response->getBody();
-
-            $crawler = new Crawler($html);
-
-            // Extraer los enlaces de las noticias
-            $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a')->each(function (Crawler $node) {
-                try {
-                    return $node->attr('href'); // Extraer solo el enlace
-                } catch (\Exception $e) {
-                    return null;
-                }
-            });
-
-            // Filtrar enlaces no válidos
-            $links = array_filter($links);
-
-            // Segundo scraping: Obtener los datos de cada enlace
-            $promises = [];
-            foreach ($links as $link) {
-                $promises[] = $client->getAsync($link);
+        $client = new Client([
+            'verify' => false,
+        ]);
+    
+        // Primer scraping: Obtener solo los enlaces
+        $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
+        $html = (string) $response->getBody();
+    
+        $crawler = new Crawler($html);
+    
+        // Ajustar el selector para evitar duplicados
+        $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a:first-of-type')->each(function (Crawler $node) {
+            try {
+                return trim($node->attr('href')); // Extraer y normalizar el enlace
+            } catch (\Exception $e) {
+                return null;
             }
-
-            $responses = Utils::settle($promises)->wait();
-
-            $articles = [];
-
-            foreach ($responses as $index => $response) {
-                if ($response['state'] === 'fulfilled') {
-                    try {
-                        $html = (string) $response['value']->getBody();
-                        $subCrawler = new Crawler($html);
-
-                        // Extraer datos desde la página del enlace
-                        $title = $subCrawler->filter('div.col-md-12.col-xs-12 h1.single-title')->text();
-                        $author = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(1)->text();
-                        $date = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(2)->text();
-                        $image = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box figure.nota-img amp-img')->attr('src');
-                        $description = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box div.nota p')->each(function (Crawler $pNode) {
-                            return $pNode->text();
-                        });
-
-                        $articles[] = [
-                            'title' => $title,
-                            'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
-                            'date' => $date,
-                            'image' => $image,
-                            'description' => implode("\n", $description),
-                            'link' => $links[$index], // Usar el enlace original
-                        ];
-                    } catch (\Exception $e) {
-                        $articles[] = [
-                            'title' => 'No title available',
-                            'author' => 'No author available',
-                            'date' => 'No date available',
-                            'image' => 'No image available',
-                            'description' => 'No description available',
-                            'link' => $links[$index], // Usar el enlace original
-                        ];
-                    }
-                } else {
+        });
+    
+        // Filtrar enlaces no válidos y eliminar duplicados
+        $links = array_filter($links);
+        $links = array_unique($links);
+    
+        // Segundo scraping: Obtener los datos de cada enlace
+        $promises = [];
+        foreach ($links as $link) {
+            $promises[] = $client->getAsync($link);
+        }
+    
+        $responses = Utils::settle($promises)->wait();
+    
+        $articles = [];
+        foreach ($responses as $index => $response) {
+            if ($response['state'] === 'fulfilled') {
+                try {
+                    $html = (string) $response['value']->getBody();
+                    $subCrawler = new Crawler($html);
+    
+                    // Extraer datos desde la página del enlace
+                    $title = $subCrawler->filter('div.col-md-12.col-xs-12 h1.single-title')->text();
+                    $author = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(1)->text();
+                    $date = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(2)->text();
+                    $image = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box figure.nota-img amp-img')->attr('src');
+                    $description = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box div.nota p')->each(function (Crawler $pNode) {
+                        return $pNode->text();
+                    });
+    
+                    $articles[] = [
+                        'title' => $title,
+                        'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
+                        'date' => $date,
+                        'image' => $image,
+                        'description' => implode("\n", $description),
+                        'subtitle' => 'No subtitle available',
+                    ];
+                } catch (\Exception $e) {
                     $articles[] = [
                         'title' => 'No title available',
                         'author' => 'No author available',
                         'date' => 'No date available',
                         'image' => 'No image available',
                         'description' => 'No description available',
-                        'link' => $links[$index], // Usar el enlace original
+                        'subtitle' => 'No subtitle available',
                     ];
                 }
             }
-
-            return $articles;
-        });
-
+        }
+    
         return response()->json([
             'basketball_news' => $articles,
         ]);
@@ -554,7 +528,8 @@ class ScrapperController extends Controller
     public function volleyballNews()
     {
         // Usar Cache::remember para almacenar los resultados en caché durante 2 días
-        $articles = \Cache::remember('volleyball_news', now()->addDays(2), function () {
+        $articles = (function () {
+         // \Cache::remember('volleyball_news', now()->addDays(2), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -565,57 +540,64 @@ class ScrapperController extends Controller
     
             do {
                 try {
-                    // Realizar la solicitud HTTP
                     $response = $client->request('GET', $currentPage);
                     $html = (string) $response->getBody();
                     $crawler = new Crawler($html);
     
-                    // Extraer los enlaces de las noticias
-                    $links = $crawler->filter('SELECTOR_DE_LOS_ENLACES')->each(function (Crawler $node) {
+                    // Extraer los enlaces únicos de las etiquetas <a class="link-div">
+                    $links = $crawler->filter('div.mg-posts-sec.mg-posts-modul-6 div.mg-posts-sec-inner article div.col-12.col-md-6 div.mg-post-thumb.back-img.md a.link-div')->each(function (Crawler $node) {
                         try {
-                            return $node->attr('href'); // Extraer solo el enlace
+                            return trim($node->attr('href'));
                         } catch (\Exception $e) {
                             return null;
                         }
                     });
     
-                    // Filtrar enlaces no válidos
+                    // Filtrar enlaces no válidos y eliminar duplicados
                     $links = array_filter($links);
+                    $links = array_unique($links);
     
-                    // Scraping de cada noticia
+                    // Segundo scraping: Obtener los datos de cada enlace
+                    $promises = [];
                     foreach ($links as $link) {
-                        try {
-                            $response = $client->request('GET', $link);
-                            $html = (string) $response->getBody();
-                            $subCrawler = new Crawler($html);
+                        $promises[] = $client->getAsync($link);
+                    }
     
-                            // Extraer datos desde la página del enlace
-                            $title = $subCrawler->filter('SELECTOR_DEL_TITULO')->text();
-                            $author = $subCrawler->filter('SELECTOR_DEL_AUTOR')->text();
-                            $date = $subCrawler->filter('SELECTOR_DE_LA_FECHA')->text();
-                            $image = $subCrawler->filter('SELECTOR_DE_LA_IMAGEN')->attr('src');
-                            $description = $subCrawler->filter('SELECTOR_DE_LA_DESCRIPCION')->each(function (Crawler $pNode) {
-                                return $pNode->text();
-                            });
+                    $responses = Utils::settle($promises)->wait();
     
-                            $articles[] = [
-                                'title' => $title,
-                                'author' => $author,
-                                'date' => $date,
-                                'image' => $image,
-                                'description' => implode("\n", $description),
-                                'link' => $link,
-                            ];
-                        } catch (\Exception $e) {
-                            // Manejo de errores para noticias individuales
-                            $articles[] = [
-                                'title' => 'No title available',
-                                'author' => 'No author available',
-                                'date' => 'No date available',
-                                'image' => 'No image available',
-                                'description' => 'No description available',
-                                'link' => $link,
-                            ];
+                    foreach ($responses as $index => $response) {
+                        if ($response['state'] === 'fulfilled') {
+                            try {
+                                $html = (string) $response['value']->getBody();
+                                $subCrawler = new Crawler($html);
+    
+                                // Extraer datos desde la página del enlace
+                                $title = $subCrawler->filter('div.mg-header h1.title.single')->text();
+                                $author = $subCrawler->filter('div.media.mg-info-author-block div.media-body h4 a')->text();
+                                $date = $subCrawler->filter('div.media.mg-info-author-block div.media-body span.mg-blog-date')->text();
+                                $image = $subCrawler->filter('img.img-fluid.wp-post-image')->attr('src');
+                                $description = $subCrawler->filter('article.page-content-single.small.single p')->each(function (Crawler $pNode) {
+                                    return $pNode->text();
+                                });
+    
+                                $articles[] = [
+                                    'title' => $title,
+                                    'author' => $author,
+                                    'date' => $date,
+                                    'image' => $image,
+                                    'description' => implode("\n", $description),
+                                    'subtitle' => 'No subtitle available',
+                                ];
+                            } catch (\Exception $e) {
+                                $articles[] = [
+                                    'title' => 'No title available',
+                                    'author' => 'No author available',
+                                    'date' => 'No date available',
+                                    'image' => 'No image available',
+                                    'description' => 'No description available',
+                                    'subtitle' => 'No subtitle available',
+                                ];
+                            }
                         }
                     }
     
@@ -629,7 +611,7 @@ class ScrapperController extends Controller
             } while ($currentPage);
     
             return $articles;
-        });
+        })();
     
         return response()->json([
             'volleyball_news' => $articles,
@@ -639,78 +621,37 @@ class ScrapperController extends Controller
 
     public function swimmingNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché durante 2 días
         $articles = \Cache::remember('swimming_news', now()->addDays(2), function () {
             $client = new Client([
                 'verify' => false,
             ]);
-
-            // Aquí debes agregar la URL de la página de noticias de natación
-            $response = $client->request('GET', 'URL_DE_NOTICIAS_DE_NATACION');
+    
+            $response = $client->request('GET', 'https://cdndeportes.com.do/tag/natacion/');
             $html = (string) $response->getBody();
-
+    
             $crawler = new Crawler($html);
-
-            // Extraer los enlaces de las noticias
-            $links = $crawler->filter('SELECTOR_DE_LOS_ENLACES')->each(function (Crawler $node) {
+    
+            // Extraer los enlaces y subtítulos
+            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) {
                 try {
-                    return $node->attr('href'); // Extraer solo el enlace
+                    $link = $node->filter('h4 a')->attr('href'); // Extraer el enlace
+                    $subtitle = $node->filter('div.desc')->text(); // Extraer el subtítulo
+    
+                    return [
+                        'link' => trim($link),
+                        'subtitle' => trim($subtitle),
+                    ];
                 } catch (\Exception $e) {
                     return null;
                 }
             });
-
-            // Filtrar enlaces no válidos
-            $links = array_filter($links);
-
-            // Segundo scraping: Obtener los datos de cada enlace
-            $promises = [];
-            foreach ($links as $link) {
-                $promises[] = $client->getAsync($link);
-            }
-
-            $responses = Utils::settle($promises)->wait();
-
-            $articles = [];
-            foreach ($responses as $index => $response) {
-                if ($response['state'] === 'fulfilled') {
-                    try {
-                        $html = (string) $response['value']->getBody();
-                        $subCrawler = new Crawler($html);
-
-                        // Extraer datos desde la página del enlace
-                        $title = $subCrawler->filter('SELECTOR_DEL_TITULO')->text();
-                        $author = $subCrawler->filter('SELECTOR_DEL_AUTOR')->text();
-                        $date = $subCrawler->filter('SELECTOR_DE_LA_FECHA')->text();
-                        $image = $subCrawler->filter('SELECTOR_DE_LA_IMAGEN')->attr('src');
-                        $description = $subCrawler->filter('SELECTOR_DE_LA_DESCRIPCION')->each(function (Crawler $pNode) {
-                            return $pNode->text();
-                        });
-
-                        $articles[] = [
-                            'title' => $title,
-                            'author' => $author,
-                            'date' => $date,
-                            'image' => $image,
-                            'description' => implode("\n", $description),
-                            'link' => $links[$index], // Usar el enlace original
-                        ];
-                    } catch (\Exception $e) {
-                        $articles[] = [
-                            'title' => 'No title available',
-                            'author' => 'No author available',
-                            'date' => 'No date available',
-                            'image' => 'No image available',
-                            'description' => 'No description available',
-                            'link' => $links[$index], // Usar el enlace original
-                        ];
-                    }
-                }
-            }
-
-            return $articles;
+    
+            // Filtrar resultados no válidos
+            $linksAndSubtitles = array_filter($linksAndSubtitles);
+    
+            return $linksAndSubtitles;
         });
-
+    
         return response()->json([
             'swimming_news' => $articles,
         ]);
