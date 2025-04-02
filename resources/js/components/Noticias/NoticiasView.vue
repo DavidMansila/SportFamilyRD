@@ -117,7 +117,6 @@
 </template>
 
 
-
 <script>
 import axios from 'axios';
 import paginatorComponent from '@/components/paginatorComponent.vue';
@@ -209,6 +208,7 @@ export default {
   }
 };
 </script>
+
 
 
 <style scoped>
