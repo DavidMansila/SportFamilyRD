@@ -599,7 +599,7 @@ class ScrapperController extends Controller
                     $currentPage = null;
                 }
             } while ($currentPage);
-    
+            // Almacenar los artículos en caché
             return $articles;
         })();
     
