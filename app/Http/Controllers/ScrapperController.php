@@ -317,7 +317,6 @@ class ScrapperController extends Controller
 
                         // Extraer datos desde la página del enlace
                         $title = $subCrawler->filter('section.nota-top-part h1')->text();
-                        $subtitle = $subCrawler->filter('section.nota-top-part h2')->text();
                         $author = $subCrawler->filter('div.autor div.extra-holder p')->text();
                         $date = $subCrawler->filter('div.autor div.extra-holder time')->text();
                         $image = $subCrawler->filter('div.preview-images figure img')->attr('src');
@@ -337,7 +336,6 @@ class ScrapperController extends Controller
 
                         $articles[] = [
                             'title' => $title,
-                            'subtitle' => $subtitle,
                             'author' => $author,
                             'date' => $date,
                             'image' => $image,
@@ -347,7 +345,6 @@ class ScrapperController extends Controller
                     } catch (\Exception $e) {
                         $articles[] = [
                             'title' => 'No title available',
-                            'subtitle' => 'No subtitle available',
                             'author' => 'No author available',
                             'date' => 'No date available',
                             'image' => 'No image available',
@@ -411,7 +408,6 @@ class ScrapperController extends Controller
                         $title = $subCrawler->filter('.post_title.entry-title')->text();
                         $image = $subCrawler->filter('.post_featured img')->attr('src');
                         $date = $subCrawler->filter('.post_meta_item.post_date')->text();
-                        $subtitle = $subCrawler->filter('.post_content_inner')->text();
                         $author = $subCrawler->filter('.post_meta_item.post_categories')->text();
     
                         $description = $subCrawler->filter('.content .post_content.post_content_single.entry-content p')->each(function (Crawler $pNode) {
@@ -422,7 +418,6 @@ class ScrapperController extends Controller
                             'title' => $title,
                             'image' => $image,
                             'date' => $date,
-                            'subtitle' => $subtitle,
                             'description' => implode("\n", $description),
                             // 'link' => $links[$index], // Usar el enlace original
                             'author' => $author,
@@ -432,7 +427,6 @@ class ScrapperController extends Controller
                             'title' => 'No title available',
                             'image' => 'No image available',
                             'date' => 'No date available',
-                            'subtitle' => 'No subtitle available',
                             'description' => 'No description available',
                             'author' => 'No author available',
                             // 'link' => $links[$index], // Usar el enlace original
@@ -505,7 +499,6 @@ class ScrapperController extends Controller
                         'date' => $date,
                         'image' => $image,
                         'description' => implode("\n", $description),
-                        'subtitle' => 'No subtitle available',
                     ];
                 } catch (\Exception $e) {
                     $articles[] = [
@@ -514,7 +507,6 @@ class ScrapperController extends Controller
                         'date' => 'No date available',
                         'image' => 'No image available',
                         'description' => 'No description available',
-                        'subtitle' => 'No subtitle available',
                     ];
                 }
             }
@@ -586,7 +578,6 @@ class ScrapperController extends Controller
                                     'date' => $date,
                                     'image' => $image,
                                     'description' => implode("\n", $description),
-                                    'subtitle' => 'No subtitle available',
                                 ];
                             } catch (\Exception $e) {
                                 $articles[] = [
@@ -595,7 +586,6 @@ class ScrapperController extends Controller
                                     'date' => 'No date available',
                                     'image' => 'No image available',
                                     'description' => 'No description available',
-                                    'subtitle' => 'No subtitle available',
                                 ];
                             }
                         }
@@ -609,7 +599,7 @@ class ScrapperController extends Controller
                     $currentPage = null;
                 }
             } while ($currentPage);
-    
+            // Almacenar los artículos en caché
             return $articles;
         })();
     
@@ -635,11 +625,9 @@ class ScrapperController extends Controller
             $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) {
                 try {
                     $link = $node->filter('h4 a')->attr('href'); // Extraer el enlace
-                    $subtitle = $node->filter('div.desc')->text(); // Extraer el subtítulo
     
                     return [
                         'link' => trim($link),
-                        'subtitle' => trim($subtitle),
                     ];
                 } catch (\Exception $e) {
                     return null;
