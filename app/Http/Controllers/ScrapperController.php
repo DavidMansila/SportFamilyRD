@@ -621,78 +621,37 @@ class ScrapperController extends Controller
 
     public function swimmingNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché durante 2 días
         $articles = \Cache::remember('swimming_news', now()->addDays(2), function () {
             $client = new Client([
                 'verify' => false,
             ]);
-
-            // Aquí debes agregar la URL de la página de noticias de natación
-            $response = $client->request('GET', 'URL_DE_NOTICIAS_DE_NATACION');
+    
+            $response = $client->request('GET', 'https://cdndeportes.com.do/tag/natacion/');
             $html = (string) $response->getBody();
-
+    
             $crawler = new Crawler($html);
-
-            // Extraer los enlaces de las noticias
-            $links = $crawler->filter('SELECTOR_DE_LOS_ENLACES')->each(function (Crawler $node) {
+    
+            // Extraer los enlaces y subtítulos
+            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) {
                 try {
-                    return $node->attr('href'); // Extraer solo el enlace
+                    $link = $node->filter('h4 a')->attr('href'); // Extraer el enlace
+                    $subtitle = $node->filter('div.desc')->text(); // Extraer el subtítulo
+    
+                    return [
+                        'link' => trim($link),
+                        'subtitle' => trim($subtitle),
+                    ];
                 } catch (\Exception $e) {
                     return null;
                 }
             });
-
-            // Filtrar enlaces no válidos
-            $links = array_filter($links);
-
-            // Segundo scraping: Obtener los datos de cada enlace
-            $promises = [];
-            foreach ($links as $link) {
-                $promises[] = $client->getAsync($link);
-            }
-
-            $responses = Utils::settle($promises)->wait();
-
-            $articles = [];
-            foreach ($responses as $index => $response) {
-                if ($response['state'] === 'fulfilled') {
-                    try {
-                        $html = (string) $response['value']->getBody();
-                        $subCrawler = new Crawler($html);
-
-                        // Extraer datos desde la página del enlace
-                        $title = $subCrawler->filter('SELECTOR_DEL_TITULO')->text();
-                        $author = $subCrawler->filter('SELECTOR_DEL_AUTOR')->text();
-                        $date = $subCrawler->filter('SELECTOR_DE_LA_FECHA')->text();
-                        $image = $subCrawler->filter('SELECTOR_DE_LA_IMAGEN')->attr('src');
-                        $description = $subCrawler->filter('SELECTOR_DE_LA_DESCRIPCION')->each(function (Crawler $pNode) {
-                            return $pNode->text();
-                        });
-
-                        $articles[] = [
-                            'title' => $title,
-                            'author' => $author,
-                            'date' => $date,
-                            'image' => $image,
-                            'description' => implode("\n", $description),
-                            'link' => $links[$index], // Usar el enlace original
-                        ];
-                    } catch (\Exception $e) {
-                        $articles[] = [
-                            'title' => 'No title available',
-                            'author' => 'No author available',
-                            'date' => 'No date available',
-                            'image' => 'No image available',
-                            'description' => 'No description available',
-                            'link' => $links[$index], // Usar el enlace original
-                        ];
-                    }
-                }
-            }
-
-            return $articles;
+    
+            // Filtrar resultados no válidos
+            $linksAndSubtitles = array_filter($linksAndSubtitles);
+    
+            return $linksAndSubtitles;
         });
-
+    
         return response()->json([
             'swimming_news' => $articles,
         ]);

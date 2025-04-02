@@ -74,7 +74,8 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
 Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
 Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
-Route::get('/voleyball_news', [ScrapperController::class, 'volleyballNews']);
+Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
+Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
 
 
 //todo chequear esto

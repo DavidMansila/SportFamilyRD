@@ -272,9 +272,23 @@ export default {
 
     async getVoleyballNews() {
       try {
-        const response = await axios.get('/voleyball_news');
+        const response = await axios.get('/volleyball_news');
 
         this.noticias = response.data.volleyball_news;
+      }
+      catch (error) {
+        console.error('Error al obtener las noticias:', error);
+        this.errorMessage = 'Algo salió mal al cargar las noticias. Por favor, intenta de nuevo más tarde.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async getSwimmingNews() {
+      try {
+        const response = await axios.get('/swimming_news');
+
+        this.noticias = response.data.swimming_news;
       }
       catch (error) {
         console.error('Error al obtener las noticias:', error);
@@ -291,6 +305,7 @@ export default {
     this.getFutbolNews(); 
     this.getBasketballNews();
     this.getVoleyballNews();
+    this.getSwimmingNews()
   },
   created() {
     this.cargarNoticias();
