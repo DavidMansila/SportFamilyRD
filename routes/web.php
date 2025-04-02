@@ -6,6 +6,7 @@ use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReplyController;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,10 @@ Route::resource('/user', UserController::class);
 
 //Noticias
 Route::resource('/news', NewsController::class);
+
+//productos
+Route::resource('/products', ProductController::class);
+
 
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
