@@ -29,7 +29,7 @@
                 <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
             </a>
 
-            <a :href=" login ? '/Login' : '/Logout' " class="Logout">
+            <a :href="'/Login'" class="Logout">    
                 <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
             </a>
 
