@@ -51,7 +51,6 @@
       />
     </div>
 
-
     
     <!-- Filtros -->
     <div class="filtros-container">
@@ -108,11 +107,11 @@
         @click="abrirPopup(producto)"
       >
         <div class="producto-imagen-container">
-          <img :src="producto.imagen" alt="Imagen del producto" class="producto-imagen" />
+          <img :src="producto.image" alt="Imagen del producto" class="producto-imagen" />
         </div>
         <div class="producto-info">
-          <h3 class="producto-nombre">{{ producto.nombre }}</h3>
-          <p class="producto-precio">{{ producto.precio }}</p>
+          <h3 class="producto-nombre">{{ producto.name }}</h3>
+          <p class="producto-precio">{{ producto.price }} RD$ </p>
         </div>
       </div>
     </div>
@@ -121,11 +120,11 @@
     <div v-if="popupVisible" class="popup-overlay" @click="cerrarPopup">
       <div class="popup-content" @click.stop>
         <button class="btn-cerrar" @click="cerrarPopup">×</button>
-        <img :src="productoSeleccionado.imagen" alt="Imagen del producto" class="popup-imagen" />
+        <img :src="productoSeleccionado.image" alt="Imagen del producto" class="popup-imagen" />
         <div class="popup-info">
-          <h3 class="popup-nombre">{{ productoSeleccionado.nombre }}</h3>
-          <p class="popup-descripcion">{{ productoSeleccionado.descripcion }}</p>
-          <p class="popup-precio">{{ productoSeleccionado.precio }}</p>
+          <h3 class="popup-nombre">{{ productoSeleccionado.name }}</h3>
+          <p class="popup-descripcion">{{ productoSeleccionado.description }}</p>
+          <p class="popup-precio"> {{ productoSeleccionado.price}} RD$ </p>
           <button @click="agregarAlCarrito(productoSeleccionado)" class="btn-comprar">
             Agregar al carrito
           </button>
@@ -147,10 +146,10 @@
         <h2 class="carrito-titulo">Carrito de Compras</h2>
         <div class="carrito-productos">
           <div v-for="(item, index) in carrito" :key="index" class="carrito-item">
-            <img :src="item.imagen" alt="Imagen del producto" class="carrito-imagen" />
+            <img :src="item.image" alt="Imagen del producto" class="carrito-imagen" />
             <div class="carrito-info">
-              <h3 class="carrito-nombre">{{ item.nombre }}</h3>
-              <p class="carrito-precio">{{ item.precio }}</p>
+              <h3 class="carrito-nombre">{{ item.name }}</h3>
+              <p class="carrito-precio">{{ item.price }}</p>
             </div>
             <button @click="eliminarDelCarrito(index)" class="btn-eliminar">Eliminar</button>
           </div>
@@ -167,9 +166,9 @@
       <p>{{ productoAgregado.nombre }} agregado al carrito</p>
     </div>
   </div>
+
+  
 </template>
-
-
 
 
 <script>
@@ -178,86 +177,6 @@
     data() {
       return {
         productos: [
-          {
-            id: 1,
-            nombre: 'Balón de Fútbol Adidas',
-            precio: '30',
-            categoria: 'futbol',
-            imagen: '/imagenes/balon-futbol.jpg',
-            descripcion: 'Balón oficial de la liga profesional, tamaño 5.',
-          },
-          {
-            id: 2,
-            nombre: 'Raqueta de Tenis Wilson',
-            precio: '120',
-            categoria: 'tenis',
-            imagen: '/imagenes/raqueta-tenis.jpg',
-            descripcion: 'Raqueta profesional para tenistas avanzados.',
-          },
-          {
-            id: 3,
-            nombre: 'Zapatillas Nike Running',
-            precio: '90',
-            categoria: 'ropa-hombre',
-            imagen: '/imagenes/zapatillas-running.jpg',
-            descripcion: 'Zapatillas cómodas y duraderas para running.',
-          },
-          {
-            id: 4,
-            nombre: 'Camiseta Deportiva Mujer',
-            precio: '25',
-            categoria: 'ropa-mujer',
-            imagen: '/imagenes/camiseta-mujer.jpg',
-            descripcion: 'Camiseta transpirable para actividades deportivas.',
-          },
-          {
-            id: 5,
-            nombre: 'Proteína en Polvo Whey',
-            precio: '45',
-            categoria: 'proteinas',
-            imagen: '/imagenes/proteina-whey.jpg',
-            descripcion: 'Proteína de suero para recuperación muscular.',
-          },
-          {
-            id: 6,
-            nombre: 'Barras Energéticas Power',
-            precio: '15',
-            categoria: 'barras',
-            imagen: '/imagenes/barras-energeticas.jpg',
-            descripcion: 'Barras energéticas para un impulso rápido.',
-          },
-          {
-            id: 7,
-            nombre: 'Balón de Basketball Spalding',
-            precio: '40',
-            categoria: 'basketball',
-            imagen: '/imagenes/balon-basketball.jpg',
-            descripcion: 'Balón oficial de la NBA, tamaño 7.',
-          },
-          {
-            id: 8,
-            nombre: 'Camiseta Deportiva Hombre',
-            precio: '35',
-            categoria: 'ropa-hombre',
-            imagen: '/imagenes/camiseta-hombre.jpg',
-            descripcion: 'Camiseta deportiva para hombres.',
-          },
-          {
-            id: 9,
-            nombre: 'Camiseta Deportiva Niño',
-            precio: '20',
-            categoria: 'ropa-ninos',
-            imagen: '/imagenes/camiseta-nino.jpg',
-            descripcion: 'Camiseta deportiva para niños.',
-          },
-          {
-            id: 10,
-            nombre: 'Gorra Deportiva Nike',
-            precio: '20',
-            categoria: 'accesorios',
-            imagen: '/imagenes/gorra-deportiva.jpg',
-            descripcion: 'Gorra deportiva ajustable.',
-          },
         ],
         categorias: [
           {
@@ -266,6 +185,7 @@
               { valor: 'futbol', texto: 'Fútbol' },
               { valor: 'basketball', texto: 'Baloncesto' },
               { valor: 'tenis', texto: 'Tenis' },
+
             ],
           },
           {
@@ -301,16 +221,12 @@
         carritoVisible: false,
       };
     },
-    
-    created() {
-      this.productosFiltrados = this.productos; 
-      this.getProducts();
-    },
 
     computed: {
+
       calcularTotal() {
         return this.carrito.reduce((total, producto) => {
-          return total + parseFloat(producto.precio);
+          return total + parseFloat(producto.price);
         }, 0).toFixed(2);
       },
     },
@@ -356,6 +272,7 @@
         this.popupVisible = false;
         this.productoSeleccionado = null;
       },
+
       toggleAcordeon(index) {
       // Si la categoría ya está activa, se cierra
       if (this.categoriaActiva === index) {
@@ -392,6 +309,12 @@
         this.filtrarProductos();
       },
     },
+    
+    mounted() {
+      this.productosFiltrados = this.productos; 
+      this.getProducts();
+    },
+
   };
 </script>
 

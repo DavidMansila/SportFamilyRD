@@ -49,6 +49,8 @@
     <a href="/Solicitud" class="btn btn-primary">Enviar Solicitud</a>
   </div>
 </div>
+
+
     <!-- Lista de entrenadores -->
     <div class="entrenador-list">
       <div
@@ -63,15 +65,15 @@
           <p class="entrenador-experiencia">{{ entrenador.experiencia }}</p>
           <p class="entrenador-testimonio">"{{ entrenador.testimonio }}"</p>
           <div class="entrenador-acciones">
-            <button @click="verPerfil(entrenador)" class="btn btn-link">Ver</button>
-            <button @click="sendMessage(entrenador)" class="btn btn-message">Enviar Solicitud</button>
+            <!-- <button @click="verPerfil(entrenador)" class="btn btn-link">Ver</button> -->
+            <button @click="sendMessage(entrenador)" class="btn btn-message">Solicitud de mensaje</button>
           </div>
         </div>
       </div>
     </div>
 
 
-    <!-- Pop-up del perfil del entrenador -->
+    <!-- Pop-up del perfil del entrenador
     <div v-if="entrenadorSeleccionado" class="popup-overlay" @click="cerrarPerfil">
       <div class="popup-content" @click.stop>
         <button class="btn-cerrar" @click="cerrarPerfil">×</button>
@@ -81,7 +83,8 @@
         <p class="popup-experiencia">{{ entrenadorSeleccionado.experiencia }}</p>
         <p class="popup-testimonio">"{{ entrenadorSeleccionado.testimonio }}"</p>
       </div>
-    </div>
+    </div> -->
+
   </div>
 </template>
 
@@ -97,7 +100,7 @@ export default {
           nombre: 'Carlos Pérez',
           deporte: 'Fútbol',
           experiencia: '10 años entrenando fútbol a nivel profesional.',
-          foto: 'https://via.placeholder.com/300',
+          foto: '/imagenes/Entrenador1.png',
           testimonio: '¡Es un entrenador increíble! Me ayudó a mejorar mi técnica.',
         },
         {
@@ -105,7 +108,7 @@ export default {
           nombre: 'Ana Gómez',
           deporte: 'Tenis',
           experiencia: '5 años entrenando a jugadores jóvenes y adultos.',
-          foto: 'https://via.placeholder.com/300',
+          foto: '/imagenes/Entrenador2.png',
           testimonio: '¡Ana tiene una gran visión estratégica del juego!',
         },
         {
@@ -113,7 +116,7 @@ export default {
           nombre: 'Juan Díaz',
           deporte: 'Baloncesto',
           experiencia: '15 años entrenando en colegios y academias de baloncesto.',
-          foto: 'https://via.placeholder.com/300',
+          foto: '/imagenes/Entrenador3.png',
           testimonio: 'Gracias a Juan, mi rendimiento ha mejorado enormemente en los partidos.',
         },
         {
@@ -121,7 +124,7 @@ export default {
           nombre: 'Laura Martínez',
           deporte: 'Natación',
           experiencia: '8 años de experiencia entrenando a nadadores de nivel olímpico.',
-          foto: 'https://via.placeholder.com/300',
+          foto: '/imagenes/Entrenador4.png',
           testimonio: 'Laura sabe cómo motivar a sus nadadores, ¡es la mejor!',
         },
         {
@@ -129,7 +132,7 @@ export default {
           nombre: 'Ricardo Gómez',
           deporte: 'Ciclismo',
           experiencia: '6 años entrenando atletas en competiciones nacionales e internacionales.',
-          foto: 'https://via.placeholder.com/300',
+          foto: '/imagenes/Entrenador5.png',
           testimonio: 'Ricardo me ayudó a mejorar mi resistencia y mi rendimiento en cada carrera.',
         },
         {
@@ -137,7 +140,7 @@ export default {
           nombre: 'Sofia Martínez',
           deporte: 'Atletismo',
           experiencia: '7 años de experiencia trabajando con atletas de todas las edades.',
-          foto: 'https://via.placeholder.com/300',
+          foto: '/imagenes/Entrenador6.png',
           testimonio: 'Sofia me enseñó cómo entrenar mi mente tanto como mi cuerpo.',
         },
         {
@@ -145,28 +148,25 @@ export default {
           nombre: 'David López',
           deporte: 'Artes Marciales',
           experiencia: '12 años enseñando artes marciales en academias de prestigio.',
-          foto: 'https://via.placeholder.com/300',
+          foto: '/imagenes/Entrenador7.png',
           testimonio: 'Gracias a David, mi disciplina y enfoque en la vida han mejorado.',
         },
       ],
-      entrenadorSeleccionado: null, // Entrenador seleccionado para el pop-up
     };
   },
   methods: {
+    
     // Simula el envío de una solicitud de mensaje a un entrenador
     sendMessage(entrenador) {
-      alert(`Solicitud enviada al entrenador ${entrenador.nombre}. Se le ha notificado.`);
+      if (this.solicitudesEnviadas[entrenador.id]) {
+        alert(`Ya has enviado una solicitud de mensaje al entrenador ${entrenador.nombre}.`);
+      } else {
+        this.solicitudesEnviadas[entrenador.id] = true;
+        alert(`Solicitud enviada al entrenador ${entrenador.nombre}. Se le ha notificado.`);
+      }
     },
 
-    // Muestra el pop-up con la información del entrenador
-    verPerfil(entrenador) {
-      this.entrenadorSeleccionado = entrenador;
-    },
 
-    // Cierra el pop-up
-    cerrarPerfil() {
-      this.entrenadorSeleccionado = null;
-    },
   },
 };
 </script>
