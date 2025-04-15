@@ -106,162 +106,307 @@ body {
 
 
 
-/* Estilos Generales de la Página */
-.page-title {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 40px;
-  text-align: center;
-  padding-top: 30px;
+/* Estilos base */
+.entrenadores-page {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #2D3748;
+  background-color: #F7FAFC;
+  min-height: 100vh;
 }
 
-/* Sección de solicitud de entrenador */
-.contenedor {
+/* Hero Section */
+.hero-section {
+  position: relative;
+  height: 400px;
   display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center; /* Centra verticalmente */
-  width: 100%; /* Ocupa todo el ancho disponible */
-  padding-bottom: 50px;
-}
-
-/* Estilos del cuadro grande */
-.solicitud-entrenador {
-  width: 80%;
-  background: #000000;
-  padding: 40px 20px;
-  text-align: center;
-  border-radius: 12px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  background-color: #b6b6b6;
+  color: white;
+  overflow: hidden;
 }
 
-/* Estilos adicionales (opcional) */
-.section-title {
-  font-size: 2rem;
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.9),
+    rgba(0, 0, 0, 0.7)
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 3rem;
+  font-weight: 800;
   margin-bottom: 1rem;
+  line-height: 1.2;
   color: white;
 }
 
-.section-description {
-  font-size: 1.2rem;
+.hero-subtitle {
+  font-size: 1.25rem;
+  max-width: 600px;
+  margin: 0 auto;
+  opacity: 0.9;
+  color: #E2E8F0;
+}
+
+/* CTA Section */
+.cta-container {
+  max-width: 1200px;
+  margin: -50px auto 3rem;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.cta-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cta-text h2 {
+  font-size: 1.5rem;
+  color: #2D3748;
+  margin-bottom: 0.5rem;
+}
+
+.cta-text p {
+  color: #718096;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #4C51BF;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #434190;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 81, 191, 0.2);
+}
+
+.arrow-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Controls Section */
+.controls-section {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  padding: 0 2rem;
+}
+
+.search-container {
+  position: relative;
+  max-width: 400px;
   margin-bottom: 1.5rem;
 }
 
-.btn-primary {
-  background-color: #464646;
-  color: rgb(255, 255, 255);
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 5px;
-  text-decoration: none;
+.search-container input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
   font-size: 1rem;
-  transition: background-color 0.3s ease-in-out;
+  transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
-  background-color: #ffb16c;
+.search-container input:focus {
+  outline: none;
+  border-color: #4C51BF;
+  box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #718096;
+}
+
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-tabs button {
+  padding: 0.5rem 1.25rem;
+  background-color: #EDF2F7;
+  border: none;
+  border-radius: 50px;
+  color: #4A5568;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-tabs button:hover {
+  background-color: #E2E8F0;
+}
+
+.filter-tabs button.active {
+  background-color: #4C51BF;
   color: white;
 }
 
-/* Lista de entrenadores */
-.entrenador-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+/* Entrenadores Grid */
+.entrenadores-container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: 0 auto 4rem;
+  padding: 0 2rem;
+}
+
+.entrenadores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
 }
 
 .entrenador-card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center;
-  transition: all 0.3s ease-in-out;
-  border: 1px solid #e0e0e0; /* Borde sutil */
-}
-
-//.entrenador-card:hover {
- // transform: translateY(-5px);
- // box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-//}
-
-.entrenador-foto {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  border: 2px solid #e0e0e0; /* Borde para la foto */
-}
-
-.entrenador-nombre {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 10px;
-  font-weight: bold; /* Resaltar el nombre */
-}
-
-.entrenador-deporte,
-.entrenador-experiencia,
-.entrenador-testimonio {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 10px;
-}
-
-.entrenador-deporte {
-  font-weight: bold;
-  color: #ff6347; /* Color destacado para el deporte */
-}
-
-.entrenador-testimonio {
-  font-style: italic;
-  color: #777;
-}
-
-.entrenador-acciones {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 15px;
-}
-
-.btn {
-  padding: 10px 20px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
-  transition: background-color 0.3s ease-in-out;
 }
 
-.btn-link {
-  background-color: transparent;
-  color: #00741b;
-  text-decoration: none;
+.entrenador-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
 }
 
-.btn-link:hover {
-  text-decoration: underline;
+.card-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
 }
 
-.btn-message {
-  background-color: #464646;
+.card-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.entrenador-card:hover .card-image-container img {
+  transform: scale(1.05);
+}
+
+.deporte-tag {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background-color: #4C51BF;
   color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
-.btn-message:hover {
-  background-color: #ffb16c;
+.card-content {
+  padding: 1.5rem;
 }
 
-/* Estilos del pop-up */
-.popup-overlay {
+.card-header {
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2D3748;
+  margin-bottom: 0.25rem;
+}
+
+.rating {
+  color: #CBD5E0;
+}
+
+.rating .filled {
+  color: #F6AD55;
+}
+
+.experiencia {
+  color: #4A5568;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.testimonio {
+  font-style: italic;
+  color: #718096;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #4C51BF;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+  background-color: #434190;
+}
+
+.message-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Modal de Perfil */
+.profile-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -272,93 +417,261 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
 }
 
-.popup-content {
-  background-color: white;
-  border-radius: 12px;
-  padding: 2rem;
-  max-width: 500px;
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 800px;
   width: 90%;
-  position: relative;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
 }
 
-.btn-cerrar {
+.close-modal {
   position: absolute;
   top: 1rem;
   right: 1rem;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   cursor: pointer;
-  color: #333;
+  transition: all 0.3s ease;
 }
 
-.popup-foto {
+.close-modal:hover {
+  background-color: #EDF2F7;
+}
+
+.close-modal svg {
+  width: 24px;
+  height: 24px;
+  color: #718096;
+}
+
+.modal-header {
+  display: flex;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-bottom: 1px solid #EDF2F7;
+}
+
+.profile-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profile-image img {
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 15px;
 }
 
-.popup-nombre {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 10px;
+.profile-info {
+  flex: 1;
 }
 
-.popup-deporte,
-.popup-experiencia,
-.popup-testimonio {
-  font-size: 1.1rem;
-  color: #555;
-  margin-bottom: 10px;
+.profile-info h2 {
+  font-size: 1.75rem;
+  color: #2D3748;
+  margin-bottom: 0.5rem;
 }
 
-.popup-deporte {
+.deporte-badge {
+  display: inline-block;
+  background-color: #4C51BF;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.modal-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stars {
+  color: #CBD5E0;
+}
+
+.stars .filled {
+  color: #F6AD55;
+}
+
+.rating-text {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.modal-body {
+  padding: 0 2rem 2rem;
+}
+
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.section h3 {
+  font-size: 1.25rem;
+  color: #2D3748;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.especialidades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.especialidades span {
+  background-color: #EDF2F7;
+  color: #4A5568;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+}
+
+.logros {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.logros li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #4A5568;
+}
+
+.logros li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #4C51BF;
   font-weight: bold;
 }
 
-.popup-testimonio {
-  font-style: italic;
-  color: #777;
+.testimonios {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-/* Responsive Design */
+.testimonio {
+  background-color: #F7FAFC;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #4C51BF;
+}
+
+.testimonio p {
+  font-style: italic;
+  color: #4A5568;
+  margin-bottom: 0.25rem;
+}
+
+.autor {
+  font-size: 0.85rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #EDF2F7;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.primary-btn {
+  background-color: #4C51BF;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+  background-color: #434190;
+}
+
+/* Animaciones */
+.cards-enter-active,
+.cards-leave-active {
+  transition: all 0.5s ease;
+}
+.cards-enter-from,
+.cards-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
+  .hero-section {
+    height: 300px;
+  }
+  
   .page-title {
     font-size: 2rem;
   }
-
-  .solicitud-entrenador {
-    padding: 20px;
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
   }
-
-  .section-title {
-    font-size: 1.5rem;
+  
+  .cta-card {
+    flex-direction: column;
+    text-align: center;
   }
-
-  .section-description {
-    font-size: 1rem;
+  
+  .modal-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
+  
+  .profile-image {
+    width: 100px;
+    height: 100px;
+  }
+}
 
-  .entrenador-list {
+@media (max-width: 480px) {
+  .entrenadores-grid {
     grid-template-columns: 1fr;
   }
-
-  .popup-content {
-    padding: 1rem;
-  }
-
-  .popup-nombre {
-    font-size: 1.5rem;
-  }
-
-  .popup-deporte,
-  .popup-experiencia,
-  .popup-testimonio {
-    font-size: 1rem;
+  
+  .filter-tabs {
+    justify-content: center;
   }
 }
