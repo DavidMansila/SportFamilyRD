@@ -1,111 +1,249 @@
 <template>
-  <div>
-          <!-- Navbar -->
-          <nav class="navbar">
-        <div class="logo-container">
-          <a href="/" class="logo-container">
+  <div class="app-container">
+    <!-- Navbar (manteniendo el original) -->
+    <nav class="navbar">
+      <div class="logo-container">
+        <a href="/" class="logo-container">
           <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
       </div>
-        <div class="nav-links">
-            <a href="/Noticias" class="nav-link">Noticias</a>
-            <a href="/Calendario" class="nav-link">Calendario</a>
-             <a href="/Tienda" class="nav-link">Tienda</a>
-             <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-             <a href="/Foro" class="nav-link">Foro</a>
+      <div class="nav-links">
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
+      </div>
+      <div class="Imagenes">
+        <a class="Carrito">
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
+        </a>
+        <a href= "/Ajustes" class="Ajustes">
+          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
+        </a>
+        <a class="Perfil">
+          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+        </a>
+        <a :href="'/Login'" class="Logout">    
+          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Vista principal del calendario -->
+    <div class="calendar-view" :class="{ 'event-view-active': selectedEvent }">
+      <!-- Vista de calendario -->
+      <div class="calendar-main">
+        <div class="calendar-controls">
+          <button @click="changeMonth('prev')" class="control-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <h1 class="calendar-title">{{ monthNames[currentMonth] }} {{ currentYear }}</h1>
+          <button @click="changeMonth('next')" class="control-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
         </div>
 
-        <div class="Imagenes">
-
-            <a class="Carrito">
-                <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
-            </a>
-
-            <a href= "/Ajustes" class="Ajustes">
-                <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
-            </a>
-
-            <a class="Perfil">
-                <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
-            </a>
-
-            <a :href=" login ? '/Login' : '/Logout' " class="Logout">
-                <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
-            </a>
-
-        </div>
-      </nav>
-
-<!-- Calendario de eventos -->
-    <div class="calendario-page">
-      <!-- Calendario -->
-      <div class="calendario-container">
-        <div class="calendar-header">
-          <button @click="changeMonth('prev')" class="calendar-btn">◄</button>
-          <h1>{{ monthNames[currentMonth] }} {{ currentYear }}</h1>
-          <button @click="changeMonth('next')" class="calendar-btn">►</button>
-        </div>
         <div class="calendar-grid">
-          <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-name">
+          <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-header">
             {{ day }}
           </div>
           <div 
             v-for="day in daysInMonth" 
             :key="day" 
-            :class="['calendar-day', { 'event-day': hasEvents(day), 'selected-day': selectedDay === day }]" 
+            :class="['calendar-day', { 
+              'has-events': hasEvents(day), 
+              'selected-day': selectedDay === day,
+              'current-day': isCurrentDay(day)
+            }]" 
             @click="selectDay(day)"
           >
-            {{ day }}
-            <div v-if="hasEvents(day)" class="event-indicator"></div>
+            <span class="day-number">{{ day }}</span>
+            <div v-if="hasEvents(day)" class="event-dots">
+              <span v-for="(event, index) in getEventsForDay(day)" :key="index" 
+                :style="{ backgroundColor: event.categoryColor || '#3498db' }"></span>
+            </div>
           </div>
         </div>
       </div>
 
-<!-- Sección de eventos ordenados -->
-<div class="eventos-ordenados">
-  <h2>Próximos Eventos</h2>
-  <ul>
-    <li v-for="evento in eventosOrdenados" :key="evento.id" class="evento-item">
-      <div class="evento-fecha">{{ formatDate(evento.fecha) }}</div>
-      <div class="evento-info">
-        <h3>{{ evento.nombre }}</h3>
-        <p>{{ evento.descripcion }}</p>
-        <p>Boletos disponibles: {{ evento.boletosDisponibles }}</p>
-        <button @click="comprarBoleto(evento)" :disabled="evento.boletosDisponibles === 0">
-          Comprar boleto
-        </button>
-      </div>
-    </li>
-  </ul>
-</div>
-
-    <!-- Botón flotante del carrito -->
-    <button class="carrito-btn" @click="mostrarCarrito = !mostrarCarrito">
-      🛒 Carrito ({{ carrito.length }})
-    </button>
-
-    <!-- Popup del carrito -->
-    <div v-if="mostrarCarrito" class="carrito-popup">
-      <div class="carrito-contenido">
-        <h2>Carrito de Compras</h2>
-        <ul>
-          <li v-for="(item, index) in carrito" :key="item.id" class="carrito-item">
-            <div class="carrito-info">
-              <h3>{{ item.nombre }}</h3>
-              <p>Cantidad: {{ item.cantidad }}</p>
-              <p>Precio: ${{ item.precio * item.cantidad }}</p>
+      <!-- Panel lateral de eventos del día -->
+      <div class="events-sidebar">
+        <h2 v-if="selectedDay">Eventos del {{ selectedDay }} de {{ monthNames[currentMonth] }}</h2>
+        <h2 v-else>Selecciona un día</h2>
+        
+        <div v-if="selectedDayEvents.length > 0" class="events-list">
+          <div 
+            v-for="event in selectedDayEvents" 
+            :key="event.id" 
+            class="event-card"
+            @click="openEventDetail(event)"
+            :style="{ borderLeft: `4px solid ${event.categoryColor || '#3498db'}` }"
+          >
+            <div class="event-time">{{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}</div>
+            <h3 class="event-title">{{ event.nombre }}</h3>
+            <div class="event-meta">
+              <span class="event-location">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                {{ event.location || 'Ubicación no especificada' }}
+              </span>
+              <span class="event-price" v-if="event.precio">${{ event.precio }}</span>
+              <span class="event-price free" v-else>Gratis</span>
             </div>
-            <button @click="eliminarDelCarrito(index)" class="eliminar-btn">Eliminar</button>
-          </li>
-        </ul>
-        <div class="total">
-          <h3>Total: ${{ calcularTotal }}</h3>
-          <button @click="finalizarCompra" class="comprar-btn">Finalizar Compra</button>
+          </div>
         </div>
-        <button @click="mostrarCarrito = false" class="cerrar-btn">Cerrar</button>
+        <div v-else-if="selectedDay" class="no-events">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+          </svg>
+          <p>No hay eventos programados para este día</p>
+        </div>
+        <div v-else class="select-day-prompt">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <p>Selecciona un día para ver los eventos</p>
+        </div>
       </div>
     </div>
 
+    <!-- Vista detallada del evento (se superpone) -->
+    <div class="event-detail-view" v-if="selectedEvent" @click.self="closeEventDetail">
+      <div class="event-detail-container">
+        <button class="close-btn" @click="closeEventDetail">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        
+        <div class="event-header">
+          <div class="event-date">
+            <div class="event-day">{{ new Date(selectedEvent.fecha).getDate() }}</div>
+            <div class="event-month">{{ monthNames[new Date(selectedEvent.fecha).getMonth()].substring(0, 3) }}</div>
+          </div>
+          <div class="event-title-container">
+            <h2>{{ selectedEvent.nombre }}</h2>
+            <div class="event-meta">
+              <span class="event-time">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                {{ formatTime(selectedEvent.startTime) }} - {{ formatTime(selectedEvent.endTime) }}
+              </span>
+              <span class="event-location">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                {{ selectedEvent.location || 'Ubicación no especificada' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="event-content">
+          <div class="event-description">
+            <h3>Descripción</h3>
+            <p>{{ selectedEvent.descripcion }}</p>
+          </div>
+          
+          <div class="event-tickets">
+            <h3>Boletos</h3>
+            <div class="ticket-info">
+              <span class="ticket-price">${{ selectedEvent.precio }} <small>c/u</small></span>
+              <span class="ticket-available">{{ selectedEvent.boletosDisponibles }} disponibles</span>
+            </div>
+            
+            <div class="ticket-controls" v-if="selectedEvent.boletosDisponibles > 0">
+              <div class="quantity-selector">
+                <button @click="decrementTicket" :disabled="ticketQuantity <= 1">-</button>
+                <span>{{ ticketQuantity }}</span>
+                <button @click="incrementTicket" :disabled="ticketQuantity >= selectedEvent.boletosDisponibles">+</button>
+              </div>
+              <button class="add-to-cart-btn" @click="addToCart">
+                Añadir al carrito - ${{ selectedEvent.precio * ticketQuantity }}
+              </button>
+            </div>
+            <div v-else class="sold-out">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+              </svg>
+              <span>AGOTADO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini carrito flotante -->
+    <div class="mini-cart" :class="{ 'active': cartItems.length > 0 }" @click="toggleCartPopup">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+      <span class="cart-count">{{ cartItems.reduce((total, item) => total + item.quantity, 0) }}</span>
+    </div>
+
+    <!-- Popup del carrito -->
+    <div class="cart-popup" v-if="showCartPopup">
+      <div class="cart-header">
+        <h3>Tu Carrito</h3>
+        <button class="close-cart" @click="toggleCartPopup">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="cart-items" v-if="cartItems.length > 0">
+        <div class="cart-item" v-for="(item, index) in cartItems" :key="index">
+          <div class="item-info">
+            <h4>{{ item.name }}</h4>
+            <div class="item-meta">
+              <span>${{ item.price }} x {{ item.quantity }}</span>
+              <span class="item-total">${{ item.price * item.quantity }}</span>
+            </div>
+          </div>
+          <button class="remove-item" @click.stop="removeFromCart(index)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="empty-cart" v-else>
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <p>Tu carrito está vacío</p>
+      </div>
+      
+      <div class="cart-footer" v-if="cartItems.length > 0">
+        <div class="cart-total">
+          <span>Total:</span>
+          <span>${{ cartTotal }}</span>
+        </div>
+        <button class="checkout-btn" @click="checkout">Proceder al pago</button>
+      </div>
     </div>
   </div>
 </template>
@@ -116,25 +254,88 @@ export default {
     return {
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
-      selectedDay: null,
+      selectedDay: new Date().getDate(),
       selectedDayEvents: [],
-      eventos: [
-        { id: 1, nombre: 'Torneo de Fútbol', fecha: '2025-03-15', descripcion: 'Un torneo de fútbol local.', boletosDisponibles: 100, precio: 50 },
-        { id: 2, nombre: 'Maratón', fecha: '2025-03-25', descripcion: 'Una maratón de 10k.', boletosDisponibles: 200, precio: 30 },
-        { id: 3, nombre: 'Conferencia Deportiva', fecha: '2025-03-15', descripcion: 'Una conferencia sobre el futuro del deporte.', boletosDisponibles: 50, precio: 20 },
-        { id: 4, nombre: 'Partido de Tenis', fecha: '2025-04-18', descripcion: 'Partido amistoso de tenis entre dos equipos.', boletosDisponibles: 75, precio: 40 },
-        { id: 5, nombre: 'Torneo de Baloncesto', fecha: '2025-04-22', descripcion: 'Torneo local de baloncesto con equipos regionales.', boletosDisponibles: 120, precio: 25 },
-        { id: 6, nombre: 'Clínica de Natación', fecha: '2025-05-05', descripcion: 'Clínica intensiva para nadadores principiantes.', boletosDisponibles: 60, precio: 35 },
-        { id: 7, nombre: 'Competencia de Skateboarding', fecha: '2025-05-10', descripcion: 'Competencia de skateboarding en el parque central.', boletosDisponibles: 80, precio: 15 },
-        { id: 8, nombre: 'Curso de Primeros Auxilios Deportivos', fecha: '2025-06-01', descripcion: 'Curso para entrenadores y deportistas sobre primeros auxilios.', boletosDisponibles: 90, precio: 10 },
-        { id: 9, nombre: 'Exhibición de Artes Marciales', fecha: '2025-06-20', descripcion: 'Exhibición de varias disciplinas de artes marciales.', boletosDisponibles: 110, precio: 20 },
-        { id: 10, nombre: 'Torneo de Volleyball', fecha: '2025-07-05', descripcion: 'Torneo de volleyball en la playa con equipos locales.', boletosDisponibles: 130, precio: 30 },
-        { id: 11, nombre: 'Desafío de Ciclismo', fecha: '2025-07-15', descripcion: 'Desafío de ciclismo de montaña con recorrido por rutas difíciles.', boletosDisponibles: 150, precio: 50 }
-      ],
+      selectedEvent: null,
+      ticketQuantity: 1,
+      showCartPopup: false,
+      cartItems: [],
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-      carrito: [], // Carrito de compras
-      mostrarCarrito: false, // Controla la visibilidad del popup del carrito
+      eventos: [
+        { 
+          id: 1, 
+          nombre: 'Torneo de Fútbol', 
+          fecha: '2025-03-15', 
+          startTime: '09:00',
+          endTime: '18:00',
+          descripcion: 'Un emocionante torneo de fútbol local con equipos de toda la región. Ven a apoyar a tu equipo favorito y disfruta de un día lleno de deporte y diversión.', 
+          boletosDisponibles: 100, 
+          precio: 50,
+          location: 'Estadio Municipal',
+          categoryColor: '#3498db'
+        },
+        { 
+          id: 2, 
+          nombre: 'Maratón Ciudad', 
+          fecha: '2025-03-25', 
+          startTime: '07:00',
+          endTime: '12:00',
+          descripcion: 'Participa en nuestra maratón anual de 10k. Rutas certificadas, medallas para todos los participantes y premios para los ganadores.', 
+          boletosDisponibles: 200, 
+          precio: 30,
+          location: 'Parque Central',
+          categoryColor: '#e74c3c'
+        },
+        { 
+          id: 3, 
+          nombre: 'Conferencia Deportiva', 
+          fecha: '2025-03-15', 
+          startTime: '14:00',
+          endTime: '17:00',
+          descripcion: 'Conferencia con expertos en deporte y salud. Aprende sobre las últimas tendencias en entrenamiento, nutrición y psicología deportiva.', 
+          boletosDisponibles: 50, 
+          precio: 20,
+          location: 'Centro de Convenciones',
+          categoryColor: '#2ecc71'
+        },
+        { 
+          id: 4, 
+          nombre: 'Partido de Tenis', 
+          fecha: '2025-04-18', 
+          startTime: '10:00',
+          endTime: '13:00',
+          descripcion: 'Partido amistoso de tenis entre los equipos regionales. Exhibición de dobles con jugadores profesionales.', 
+          boletosDisponibles: 75, 
+          precio: 40,
+          location: 'Club de Tenis',
+          categoryColor: '#9b59b6'
+        },
+        { 
+          id: 5, 
+          nombre: 'Torneo de Baloncesto', 
+          fecha: '2025-04-22', 
+          startTime: '08:00',
+          endTime: '20:00',
+          descripcion: 'Torneo local de baloncesto con equipos regionales. Tres categorías: infantil, juvenil y adultos.', 
+          boletosDisponibles: 120, 
+          precio: 25,
+          location: 'Coliseo Municipal',
+          categoryColor: '#f39c12'
+        },
+        { 
+          id: 6, 
+          nombre: 'Clínica de Natación', 
+          fecha: '2025-05-05', 
+          startTime: '15:00',
+          endTime: '18:00',
+          descripcion: 'Clínica intensiva para nadadores principiantes e intermedios. Instructores certificados y grupos reducidos.', 
+          boletosDisponibles: 60, 
+          precio: 35,
+          location: 'Piscina Olímpica',
+          categoryColor: '#1abc9c'
+        }
+      ]
     };
   },
   computed: {
@@ -142,20 +343,25 @@ export default {
       const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
       const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
       let days = [];
+      
+      // Días vacíos para alinear el primer día del mes
       for (let i = 0; i < firstDay; i++) {
         days.push(null);
       }
+      
+      // Días del mes
       for (let i = 1; i <= daysInMonth; i++) {
         days.push(i);
       }
+      
       return days;
     },
-    eventosOrdenados() {
-      return this.eventos.slice().sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-    },
-    calcularTotal() {
-      return this.carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
+    cartTotal() {
+      return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     }
+  },
+  mounted() {
+    this.updateSelectedDayEvents();
   },
   methods: {
     changeMonth(direction) {
@@ -166,7 +372,7 @@ export default {
         } else {
           this.currentMonth--;
         }
-      } else if (direction === 'next') {
+      } else {
         if (this.currentMonth === 11) {
           this.currentMonth = 0;
           this.currentYear++;
@@ -174,60 +380,116 @@ export default {
           this.currentMonth++;
         }
       }
+      
+      this.selectedDay = null;
+      this.selectedDayEvents = [];
     },
     selectDay(day) {
       if (day) {
         this.selectedDay = day;
-        this.selectedDayEvents = this.eventos.filter(evento => {
-          const eventDate = new Date(evento.fecha);
-          return eventDate.getDate() === day && eventDate.getMonth() === this.currentMonth;
-        });
+        this.updateSelectedDayEvents();
       }
     },
-    closeModal() {
-      this.selectedDay = null;
-      this.selectedDayEvents = [];
+    updateSelectedDayEvents() {
+      this.selectedDayEvents = this.eventos.filter(evento => {
+        const eventDate = new Date(evento.fecha);
+        return eventDate.getDate() === this.selectedDay && 
+               eventDate.getMonth() === this.currentMonth && 
+               eventDate.getFullYear() === this.currentYear;
+      });
     },
     hasEvents(day) {
       return this.eventos.some(evento => {
         const eventDate = new Date(evento.fecha);
-        return eventDate.getDate() === day && eventDate.getMonth() === this.currentMonth;
+        return eventDate.getDate() === day && 
+               eventDate.getMonth() === this.currentMonth && 
+               eventDate.getFullYear() === this.currentYear;
       });
     },
-    formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+    getEventsForDay(day) {
+      return this.eventos.filter(evento => {
+        const eventDate = new Date(evento.fecha);
+        return eventDate.getDate() === day && 
+               eventDate.getMonth() === this.currentMonth && 
+               eventDate.getFullYear() === this.currentYear;
+      });
     },
-    comprarBoleto(evento) {
-    const itemEnCarrito = this.carrito.find(item => item.id === evento.id);
-    if (itemEnCarrito) {
-      itemEnCarrito.cantidad++;
-    } else {
-      this.carrito.push({ ...evento, cantidad: 1 });
+    isCurrentDay(day) {
+      const today = new Date();
+      return day === today.getDate() && 
+             this.currentMonth === today.getMonth() && 
+             this.currentYear === today.getFullYear();
+    },
+    formatTime(time) {
+      if (!time) return '';
+      const [hours, minutes] = time.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${minutes} ${ampm}`;
+    },
+    openEventDetail(event) {
+      this.selectedEvent = event;
+      this.ticketQuantity = 1;
+    },
+    closeEventDetail() {
+      this.selectedEvent = null;
+    },
+    incrementTicket() {
+      if (this.ticketQuantity < this.selectedEvent.boletosDisponibles) {
+        this.ticketQuantity++;
+      }
+    },
+    decrementTicket() {
+      if (this.ticketQuantity > 1) {
+        this.ticketQuantity--;
+      }
+    },
+    addToCart() {
+      const existingItem = this.cartItems.find(item => item.id === this.selectedEvent.id);
+      
+      if (existingItem) {
+        existingItem.quantity += this.ticketQuantity;
+      } else {
+        this.cartItems.push({
+          id: this.selectedEvent.id,
+          name: this.selectedEvent.nombre,
+          price: this.selectedEvent.precio,
+          quantity: this.ticketQuantity
+        });
+      }
+      
+      // Actualizar disponibilidad
+      const event = this.eventos.find(e => e.id === this.selectedEvent.id);
+      if (event) {
+        event.boletosDisponibles -= this.ticketQuantity;
+      }
+      
+      this.closeEventDetail();
+      this.showCartPopup = true;
+    },
+    removeFromCart(index) {
+      const removedItem = this.cartItems[index];
+      
+      // Devolver boletos al evento
+      const event = this.eventos.find(e => e.id === removedItem.id);
+      if (event) {
+        event.boletosDisponibles += removedItem.quantity;
+      }
+      
+      this.cartItems.splice(index, 1);
+    },
+    toggleCartPopup() {
+      this.showCartPopup = !this.showCartPopup;
+    },
+    checkout() {
+      alert(`Compra realizada por $${this.cartTotal}. ¡Gracias por tu compra!`);
+      this.cartItems = [];
+      this.showCartPopup = false;
     }
-    evento.boletosDisponibles--;
-    console.log('Carrito:', this.carrito); // Depuración
-  },
-  eliminarDelCarrito(index) {
-    const item = this.carrito[index];
-    item.cantidad--;
-    if (item.cantidad === 0) {
-      this.carrito.splice(index, 1);
-    }
-    const evento = this.eventos.find(e => e.id === item.id);
-    evento.boletosDisponibles++;
-    console.log('Carrito después de eliminar:', this.carrito); // Depuración
-  },
-  finalizarCompra() {
-    alert('Compra finalizada. Gracias por su compra.');
-    this.carrito = [];
-    console.log('Carrito después de finalizar compra:', this.carrito); // Depuración
-  }
   }
 };
 </script>
-
-
 
 
 <style scoped>

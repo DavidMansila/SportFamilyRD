@@ -25,7 +25,7 @@
         <a class="Perfil">
           <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
         </a>
-        <a :href="login ? '/Login' : '/Logout'" class="Logout">
+        <a :href="'/Login'" class="Logout">
           <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
         </a>
       </div>
@@ -141,7 +141,7 @@ export default {
         { value: 'futbol', label: 'Fútbol' },
         { value: 'baloncesto', label: 'Baloncesto' },
         { value: 'beisbol', label: 'Béisbol' },
-        { value: 'natacion', label: 'Natación' },
+        //{ value: 'natacion', label: 'Natación' },
         { value: 'volleyball', label: 'Voleibol' },
       ],
     };
@@ -162,7 +162,7 @@ export default {
           axios.get('/basketball_news'),
           axios.get('/baseball_news'),
           axios.get('/volleyball_news'),
-          axios.get('/swimming_news')
+          //axios.get('/swimming_news')
         ]);
 
         this.noticias = [
@@ -170,7 +170,7 @@ export default {
           ...baloncesto.data.basketball_news.map(n => ({ ...n, categoria: 'baloncesto' })),
           ...beisbol.data.baseball_news.map(n => ({ ...n, categoria: 'beisbol' })),
           ...volleyball.data.volleyball_news.map(n => ({ ...n, categoria: 'volleyball' })),
-          ...natacion.data.swimming_news.map(n => ({ ...n, categoria: 'natacion' })),
+          //...natacion.data.swimming_news.map(n => ({ ...n, categoria: 'natacion' })),
         ];
 
         this.filtrarNoticias();
