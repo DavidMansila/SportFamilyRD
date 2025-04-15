@@ -85,7 +85,7 @@
                 <p class="noticia-excerpt">{{ truncateText(noticia.description, 120) }}</p>
                 <div class="noticia-meta">
                   <span class="author-name">{{ noticia.author }}</span>
-                  <span class="noticia-date">{{ formatDate(noticia.date) }}</span>
+                  <span class="noticia-date">{{ noticia.date }}</span>
                 </div>
               </div>
               <button class="read-more">Leer más <span class="arrow">→</span></button>
@@ -129,7 +129,7 @@
               <span class="author-avatar">{{ getInitials(noticiaSeleccionada.author) }}</span>
               <div class="author-info">
                 <span class="popup-author">Por {{ noticiaSeleccionada.author }}</span>
-                <span class="popup-date">{{ formatDate(noticiaSeleccionada.date) }}</span>
+                <span class="popup-date">{{ noticiaSeleccionada.date }}</span>
               </div>
             </div>
           </div>
@@ -246,10 +246,6 @@ export default {
     truncateText(text, length) {
       return text.length > length ? text.substring(0, length) + '...' : text;
     },
-    formatDate(dateString) {
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString('es-ES', options);
-    },
     getCategoryName(category) {
       const deporte = this.deportes.find(d => d.value === category);
       return deporte ? deporte.label : 'Noticia';
@@ -258,7 +254,6 @@ export default {
       return name.split(' ').map(n => n[0]).join('').toUpperCase();
     },
     formatDescription(desc) {
-      // Convierte saltos de línea en <br> y URLs en enlaces
       return desc
         .replace(/\n/g, '<br>')
         .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
