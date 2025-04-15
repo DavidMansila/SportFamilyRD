@@ -520,8 +520,8 @@ class ScrapperController extends Controller
     public function volleyballNews()
     {
         // Usar Cache::remember para almacenar los resultados en caché durante 2 días
-        $articles = (function () {
-         // \Cache::remember('volleyball_news', now()->addDays(2), function () {
+        $articles =
+          \Cache::remember('volleyball_news', now()->addDays(2), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -601,7 +601,7 @@ class ScrapperController extends Controller
             } while ($currentPage);
             // Almacenar los artículos en caché
             return $articles;
-        })();
+        });
     
         return response()->json([
             'volleyball_news' => $articles,
