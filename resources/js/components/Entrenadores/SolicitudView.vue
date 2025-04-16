@@ -21,8 +21,8 @@
         <a href="/Ajustes" class="Ajustes">
           <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
         </a>
-        <a class="Perfil">
-          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+        <a href= "/Perfil" class="Perfil">
+                <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
         </a>
         <a :href="'/Login'" class="Logout">
           <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
