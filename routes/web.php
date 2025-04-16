@@ -21,6 +21,11 @@ Route::get('/Login', function () {
     return view('Login.signUp');
 });
 
+// Rutas para las vistas
+Route::get('/Directorio', function () {
+    return view('Directorio.DirectorioView');
+});
+
 Route::get('/Noticias', function () {
     return view('Noticias.NoticiasView');
 });

@@ -8,7 +8,7 @@
   
 /* Navbar */
 .navbar {
-  background: linear-gradient(to right, #000000, #ff3149);
+  background: linear-gradient(to right, #000000, #978500);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between; /* Distribuye el espacio entre los elementos */
@@ -115,8 +115,8 @@
     display: flex;
     align-items: center;
     padding: 40px;
-    background: linear-gradient(135deg, #3498db, #2c3e50);
-    color: white;
+    background: #f7f7f7;
+    color: rgb(0, 0, 0);
     position: relative;
   }
   
@@ -194,9 +194,9 @@
     position: absolute;
     top: 20px;
     right: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid white;
-    color: white;
+    background: rgba(139, 139, 139, 0.2);
+    border: 1px solid rgb(0, 0, 0);
+    color: rgb(0, 0, 0);
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
