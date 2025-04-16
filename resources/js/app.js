@@ -7,7 +7,7 @@ import { createApp } from 'vue';
 
 import ExampleComponent from './components/ExampleComponent.vue';
 import SignUpView from './components/Login/SignUpView.vue';
-import HomeView from './components/home/HomeView.vue';
+import HomeView from './components/Home/HomeVIew.vue';
 import NoticiasView from './components/Noticias/NoticiasView.vue';
 import CalendarioView from './components/Calendario/CalendarioView.vue';
 import TiendaView from './components/Tienda/TiendaView.vue';
@@ -17,6 +17,7 @@ import ForoView from './components/foro/ForoView.vue';
 import ForoPublicaciones from './components/Foro/ForoPublicaciones.vue';
 import CrearPostView from './components/Foro/CrearPost.vue';
 import AjustesView from './components/Ajustes/AjustesView.vue';
+import PerfilView from './components/Ajustes/PerfilView.vue';
 //import CarritoView from './components/Carrito/CarritoView.vue';
 
 //paginate
@@ -64,6 +65,7 @@ app.component('crearpost-component', CrearPostView);
 app.component('publicacion-component', ForoPublicaciones);
 
 app.component('ajustes-component', AjustesView);
+app.component('perfil-component', PerfilView);
 
 
 //app.component('carrito-component', CarritoView);

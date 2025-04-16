@@ -57,6 +57,10 @@ Route::get('/Ajustes', function () {
     return view('Ajustes.AjustesView');
 });
 
+Route::get('/Perfil', function () {
+    return view('Ajustes.PerfilView');
+});
+
 
 //Rutas para funciones en el back
 
