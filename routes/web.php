@@ -54,10 +54,6 @@ Route::get('/Publicacion', function () {
     return view('Foro.ForoPublicaciones');
 });
 
-Route::get('/CrearPost', function () {
-    return view('Foro.CrearPost');
-});
-
 Route::get('/Ajustes', function () {
     return view('Ajustes.AjustesView');
 });
