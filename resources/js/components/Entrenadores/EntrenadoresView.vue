@@ -189,6 +189,53 @@
       </div>
     </transition>
   </div>
+
+
+  <!-- Burbuja de Mensajes Flotante -->
+<div class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
+  <div class="message-icon">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
+  </div>
+  
+  <div class="messages-container" v-if="mostrarMensajes">
+    <div class="messages-header">
+      <h3>Mensajes</h3>
+      <button class="close-btn" @click.stop="toggleMensajes">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="messages-list">
+      <div v-for="(mensaje, index) in mensajes" :key="index" class="message-item">
+        <img :src="mensaje.entrenador.foto" :alt="mensaje.entrenador.nombre" class="message-avatar">
+        <div class="message-content">
+          <div class="message-header">
+            <span class="sender-name">{{ mensaje.entrenador.nombre }}</span>
+            <span class="message-time">{{ mensaje.hora }}</span>
+          </div>
+          <p class="message-text">{{ mensaje.texto }}</p>
+        </div>
+      </div>
+      
+      <div v-if="mensajes.length === 0" class="empty-messages">
+        No tienes mensajes nuevos
+      </div>
+    </div>
+    
+    <div class="messages-footer">
+      <button class="view-all-btn" @click.stop="verTodosLosMensajes">
+        Ver todos los mensajes
+      </button>
+    </div>
+  </div>
+</div>
+
+
 </template>
 
 
@@ -202,6 +249,8 @@ export default {
       deporteActivo: 'Todos',
       deportes: ['Todos', 'Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
       entrenadorSeleccionado: null,
+      mostrarMensajes: false,
+      nuevosMensajes: 2,
       entrenadores: [
         {
           id: 1,
@@ -392,6 +441,26 @@ export default {
             }
           ]
         }
+      ],
+      mensajes: [
+        {
+          entrenador: {
+            nombre: 'Carlos Pérez',
+            foto: '/imagenes/Entrenador1.png'
+          },
+          texto: 'Hola, estoy interesado en tus servicios. ¿Podríamos hablar?',
+          hora: '10:30 AM',
+          leido: false
+        },
+        {
+          entrenador: {
+            nombre: 'Ana Gómez',
+            foto: '/imagenes/Entrenador2.png'
+          },
+          texto: 'Confirmado el entrenamiento para el viernes a las 5pm',
+          hora: 'Ayer',
+          leido: false
+        }
       ]
     }
   },
@@ -428,6 +497,16 @@ export default {
     contactarEntrenador(entrenador) {
       alert(`Solicitud de contacto enviada a ${entrenador.nombre}. Te responderá pronto.`);
       this.cerrarPerfil();
+    },
+    toggleMensajes() {
+     this.mostrarMensajes = !this.mostrarMensajes;
+   if (this.mostrarMensajes && this.nuevosMensajes > 0) {
+     this.nuevosMensajes = 0; // Resetear notificaciones al abrir
+  }
+},
+    verTodosLosMensajes() {
+       // Navegar a la página completa de mensajes
+       this.$router.push('/Mensajes');
     }
   }
 }
@@ -435,6 +514,21 @@ export default {
 
 
 
+
 <style scoped>
   @import '../../../scss/Entrenadores/entrenadores.scss';
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

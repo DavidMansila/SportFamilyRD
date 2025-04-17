@@ -1,6 +1,7 @@
 
 <template>
   <div class="noticias-page">
+
     <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
@@ -32,14 +33,14 @@
       </div>
     </nav>
 
-    <!-- Contenido principal mejorado -->
+    <!-- Contenido principal -->
     <div class="container">
       <div class="header-section">
         <h2 class="page-title">Últimas Noticias Deportivas</h2>
         <p class="page-subtitle">Mantente informado con lo último del mundo del deporte</p>
       </div>
 
-      <!-- Filtro de deportes mejorado -->
+      <!-- Filtro de deportes -->
       <div class="filtro-deportes">
         <button
           v-for="deporte in deportes"
@@ -52,7 +53,7 @@
         </button>
       </div>
 
-      <!-- Estados de carga mejorados -->
+      <!-- Estados de carga -->
       <div v-if="isLoading" class="loading-container">
         <div class="spinner"></div>
         <p class="loading-text">Cargando noticias...</p>
@@ -64,7 +65,7 @@
         <button @click="cargarNoticias" class="retry-btn">Reintentar</button>
       </div>
 
-      <!-- Lista de noticias mejorada -->
+      <!-- Lista de noticias -->
       <div v-else>
         <div v-if="paginatedNews.length > 0" class="news-grid">
           <div 
@@ -93,7 +94,7 @@
           </div>
         </div>
         <div v-else class="no-news">
-          <img src="/imagenes/no-news.svg" alt="No hay noticias" class="no-news-img"/>
+          <img src="/imagenes/no-news.png" alt="No hay noticias" class="no-news-img"/>
           <p>No hay noticias disponibles para esta categoría.</p>
           <button @click="resetFilters" class="retry-btn">Ver todas las noticias</button>
         </div>
@@ -108,7 +109,7 @@
       />
     </div>
 
-    <!-- Pop-up de noticia mejorado -->
+    <!-- Pop-up de noticia -->
     <transition name="fade">
       <div 
         v-if="noticiaSeleccionada" 
@@ -159,6 +160,9 @@
   </div>
 </template>
 
+
+
+
 <script>
 import axios from 'axios';
 import paginatorComponent from '@/components/paginatorComponent.vue';
@@ -184,6 +188,7 @@ export default {
         { value: 'baloncesto', label: 'Baloncesto' },
         { value: 'beisbol', label: 'Béisbol' },
         { value: 'volleyball', label: 'Voleibol' },
+        { value: 'swimming', label: 'Natacion' },
       ],
     };
   },
@@ -204,6 +209,7 @@ export default {
           axios.get('/basketball_news'),
           axios.get('/baseball_news'),
           axios.get('/volleyball_news'),
+          //axios.get('/swimming_news'),
         ]);
 
         this.noticias = [
@@ -211,6 +217,7 @@ export default {
           ...baloncesto.data.basketball_news.map(n => ({ ...n, categoria: 'baloncesto' })),
           ...beisbol.data.baseball_news.map(n => ({ ...n, categoria: 'beisbol' })),
           ...volleyball.data.volleyball_news.map(n => ({ ...n, categoria: 'volleyball' })),
+          //...volleyball.data.swimming_news.map(n => ({ ...n, categoria: 'swimming' })),
         ];
 
         this.filtrarNoticias();
