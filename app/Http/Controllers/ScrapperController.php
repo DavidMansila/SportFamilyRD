@@ -630,10 +630,27 @@ class ScrapperController extends Controller
                     $html = (string) $response->getBody();
                     $subCrawler = new Crawler($html);
 
-                    // Hacer un dd para inspeccionar el HTML del segundo scraping
-                    dd($html);
+                    // Extraer datos desde la página del enlace
+                    $title = $subCrawler->filter('div.elementor-widget-container h1.elementor-heading-title.elementor-size-default')->text();
+                    $image = $subCrawler->filter('div.elementor-element.elementor-element-a663d17.elementor-widget.elementor-widget-theme-post-featured-image.elementor-widget-image div.elementor-widget-container img')->attr('src');
+                    $author = $subCrawler->filter('div.elementor-author-box .elementor-author-box__text .elementor-author-box__name')->text();
+
+                    // Ajustar selector para descripción
+                    $description = $subCrawler->filter('div.elementor-element.elementor-element-0259b0e.elementor-widget.elementor-widget-theme-post-content .elementor-widget-container p')->each(function (Crawler $pNode) {
+                        return trim($pNode->text());
+                    });
+
+                    // Ajustar selector para fecha
+                    $date = $subCrawler->filter('div.elementor-widget-container .post-single .page_comments ul.inline li')->reduce(function (Crawler $node) {
+                        return $node->text() !== '' && strpos($node->text(), ',') !== false;
+                    })->text();
 
                     return [
+                        'title' => $title,
+                        'image' => $image,
+                        'author' => $author,
+                        'description' => implode("\n", $description),
+                        'date' => $date,
                         'link' => trim($link),
                     ];
                 } catch (\Exception $e) {

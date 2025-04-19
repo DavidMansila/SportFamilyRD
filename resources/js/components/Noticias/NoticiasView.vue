@@ -209,7 +209,7 @@ export default {
           axios.get('/basketball_news'),
           axios.get('/baseball_news'),
           axios.get('/volleyball_news'),
-        //  axios.get('/swimming_news')
+         axios.get('/swimming_news')
         ]);
 
         this.noticias = [
