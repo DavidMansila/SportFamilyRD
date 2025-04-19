@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 
 class ScrapperController extends Controller
 {
-
+    //?? abajo las antiguas funciones de scrapping, las cuales no se usan en el controlador, pero pueden ser utiles para el futuro
     // public function baseballNews()
     // {
     //     $client = new Client([
@@ -198,7 +198,6 @@ class ScrapperController extends Controller
     //     ]);
     // }
 
-
     // public function basketballNews()
     // {
     //     $client = new Client([
@@ -214,13 +213,14 @@ class ScrapperController extends Controller
     //     // Ajustar el selector para evitar duplicados
     //     $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a:first-of-type')->each(function (Crawler $node) {
     //         try {
-    //             return $node->attr('href'); // Extraer solo el enlace
+    //             return trim($node->attr('href')); // Extraer y normalizar el enlace
     //         } catch (\Exception $e) {
     //             return null;
     //         }
     //     });
     
-    //     // Eliminar duplicados en los enlaces
+    //     // Filtrar enlaces no válidos y eliminar duplicados
+    //     $links = array_filter($links);
     //     $links = array_unique($links);
     
     //     // Segundo scraping: Obtener los datos de cada enlace
@@ -253,7 +253,6 @@ class ScrapperController extends Controller
     //                     'date' => $date,
     //                     'image' => $image,
     //                     'description' => implode("\n", $description),
-    //                     'link' => $links[$index], // Usar el enlace original
     //                 ];
     //             } catch (\Exception $e) {
     //                 $articles[] = [
@@ -262,7 +261,6 @@ class ScrapperController extends Controller
     //                     'date' => 'No date available',
     //                     'image' => 'No image available',
     //                     'description' => 'No description available',
-    //                     'link' => $links[$index], // Usar el enlace original
     //                 ];
     //             }
     //         }
@@ -273,7 +271,7 @@ class ScrapperController extends Controller
     //     ]);
     // }
 
-    //??abajo las funciones almacenadas en el cache por 2 dias, podemos manipular el tiempo asi esta optimizado el tiempo de carga
+    //?? abajo las funciones almacenadas en el cache por 2 dias, podemos manipular el tiempo asi esta optimizado el tiempo de carga
 
     public function baseballNews()
     {
@@ -363,7 +361,6 @@ class ScrapperController extends Controller
         ]);
     }
 
-
     public function futbolNews()
     {
         // Usar Cache::remember para almacenar los resultados en caché
@@ -443,75 +440,79 @@ class ScrapperController extends Controller
         ]);
     }
 
-
+    //todo chequear si basket tiene cache remenber
     public function basketballNews()
     {
-        $client = new Client([
-            'verify' => false,
-        ]);
-    
-        // Primer scraping: Obtener solo los enlaces
-        $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
-        $html = (string) $response->getBody();
-    
-        $crawler = new Crawler($html);
-    
-        // Ajustar el selector para evitar duplicados
-        $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a:first-of-type')->each(function (Crawler $node) {
-            try {
-                return trim($node->attr('href')); // Extraer y normalizar el enlace
-            } catch (\Exception $e) {
-                return null;
-            }
-        });
-    
-        // Filtrar enlaces no válidos y eliminar duplicados
-        $links = array_filter($links);
-        $links = array_unique($links);
-    
-        // Segundo scraping: Obtener los datos de cada enlace
-        $promises = [];
-        foreach ($links as $link) {
-            $promises[] = $client->getAsync($link);
-        }
-    
-        $responses = Utils::settle($promises)->wait();
-    
-        $articles = [];
-        foreach ($responses as $index => $response) {
-            if ($response['state'] === 'fulfilled') {
+        $articles = \Cache::remember('basketball_news', now()->addDays(2), function () {
+            $client = new Client([
+                'verify' => false,
+            ]);
+
+            // Primer scraping: Obtener solo los enlaces
+            $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
+            $html = (string) $response->getBody();
+
+            $crawler = new Crawler($html);
+
+            // Ajustar el selector para evitar duplicados
+            $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a:first-of-type')->each(function (Crawler $node) {
                 try {
-                    $html = (string) $response['value']->getBody();
-                    $subCrawler = new Crawler($html);
-    
-                    // Extraer datos desde la página del enlace
-                    $title = $subCrawler->filter('div.col-md-12.col-xs-12 h1.single-title')->text();
-                    $author = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(1)->text();
-                    $date = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(2)->text();
-                    $image = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box figure.nota-img amp-img')->attr('src');
-                    $description = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box div.nota p')->each(function (Crawler $pNode) {
-                        return $pNode->text();
-                    });
-    
-                    $articles[] = [
-                        'title' => $title,
-                        'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
-                        'date' => $date,
-                        'image' => $image,
-                        'description' => implode("\n", $description),
-                    ];
+                    return trim($node->attr('href')); // Extraer y normalizar el enlace
                 } catch (\Exception $e) {
-                    $articles[] = [
-                        'title' => 'No title available',
-                        'author' => 'No author available',
-                        'date' => 'No date available',
-                        'image' => 'No image available',
-                        'description' => 'No description available',
-                    ];
+                    return null;
+                }
+            });
+
+            // Filtrar enlaces no válidos y eliminar duplicados
+            $links = array_filter($links);
+            $links = array_unique($links);
+
+            // Segundo scraping: Obtener los datos de cada enlace
+            $promises = [];
+            foreach ($links as $link) {
+                $promises[] = $client->getAsync($link);
+            }
+
+            $responses = Utils::settle($promises)->wait();
+
+            $articles = [];
+            foreach ($responses as $index => $response) {
+                if ($response['state'] === 'fulfilled') {
+                    try {
+                        $html = (string) $response['value']->getBody();
+                        $subCrawler = new Crawler($html);
+
+                        // Extraer datos desde la página del enlace
+                        $title = $subCrawler->filter('div.col-md-12.col-xs-12 h1.single-title')->text();
+                        $author = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(1)->text();
+                        $date = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(2)->text();
+                        $image = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box figure.nota-img amp-img')->attr('src');
+                        $description = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box div.nota p')->each(function (Crawler $pNode) {
+                            return $pNode->text();
+                        });
+
+                        $articles[] = [
+                            'title' => $title,
+                            'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
+                            'date' => $date,
+                            'image' => $image,
+                            'description' => implode("\n", $description),
+                        ];
+                    } catch (\Exception $e) {
+                        $articles[] = [
+                            'title' => 'No title available',
+                            'author' => 'No author available',
+                            'date' => 'No date available',
+                            'image' => 'No image available',
+                            'description' => 'No description available',
+                        ];
+                    }
                 }
             }
-        }
-    
+
+            return $articles;
+        });
+
         return response()->json([
             'basketball_news' => $articles,
         ]);
@@ -520,8 +521,7 @@ class ScrapperController extends Controller
     public function volleyballNews()
     {
         // Usar Cache::remember para almacenar los resultados en caché durante 2 días
-        $articles = (function () {
-         // \Cache::remember('volleyball_news', now()->addDays(2), function () {
+        $articles = \Cache::remember('volleyball_news', now()->addDays(2), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -601,31 +601,38 @@ class ScrapperController extends Controller
             } while ($currentPage);
             // Almacenar los artículos en caché
             return $articles;
-        })();
+        });
     
         return response()->json([
             'volleyball_news' => $articles,
         ]);
     }
 
-
+    //todo chequear si swimming tiene cache remenber
     public function swimmingNews()
     {
-        $articles = \Cache::remember('swimming_news', now()->addDays(2), function () {
+        $articles = (function () {
             $client = new Client([
                 'verify' => false,
             ]);
-    
+
             $response = $client->request('GET', 'https://cdndeportes.com.do/tag/natacion/');
             $html = (string) $response->getBody();
-    
             $crawler = new Crawler($html);
-    
+
             // Extraer los enlaces y subtítulos
-            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) {
+            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) use ($client) {
                 try {
                     $link = $node->filter('h4 a')->attr('href'); // Extraer el enlace
-    
+
+                    // Realizar el segundo scraping
+                    $response = $client->request('GET', $link);
+                    $html = (string) $response->getBody();
+                    $subCrawler = new Crawler($html);
+
+                    // Hacer un dd para inspeccionar el HTML del segundo scraping
+                    dd($html);
+
                     return [
                         'link' => trim($link),
                     ];
@@ -633,13 +640,13 @@ class ScrapperController extends Controller
                     return null;
                 }
             });
-    
+
             // Filtrar resultados no válidos
             $linksAndSubtitles = array_filter($linksAndSubtitles);
-    
+
             return $linksAndSubtitles;
-        });
-    
+        })();
+
         return response()->json([
             'swimming_news' => $articles,
         ]);
