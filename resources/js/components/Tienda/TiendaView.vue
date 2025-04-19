@@ -1,8 +1,8 @@
 <template>
   <div class="tienda-page">
     
-      <!-- Navbar -->
-      <nav class="navbar">
+    <!-- Navbar -->
+    <nav class="navbar">
         <div class="logo-container">
           <a href="/" class="logo-container">
           <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
@@ -26,373 +26,467 @@
                 <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
             </a>
 
-            <a class="Perfil">
+            <a href= "/Perfil" class="Perfil">
                 <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
             </a>
 
-            <a :href=" login ? '/Login' : '/Logout' " class="Logout">
+            <a :href="'/Login'" class="Logout">
                 <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
             </a>
 
         </div>
       </nav>
 
-<!-- Título de la tienda -->
-<h2 class="tienda-title">Bienvenido a nuestra Tienda</h2>
-
     <!-- Barra de búsqueda -->
     <div class="search-container">
-      <input
-        type="text"
-        v-model="busqueda"
-        placeholder="Buscar productos..."
-        @input="filtrarPorBusqueda"
-        class="search-input"
-      />
-    </div>
-
-
-    
-    <!-- Filtros -->
-    <div class="filtros-container">
-  <div class="categorias-horizontal">
-    <!-- Opción "Ver todos" -->
-    <div class="categoria-item">
-      <div
-        class="categoria-header"
-        @click="seleccionarSubcategoria('')"
-      >
-        <h4>Ver todos</h4>
+      <div class="search-wrapper">
+        <input
+          type="text"
+          v-model="busqueda"
+          placeholder="Buscar productos..."
+          @input="filtrarPorBusqueda"
+          class="search-input"
+        />
+        <i class="fas fa-search search-icon"></i>
       </div>
     </div>
 
-    <!-- Categorías principales -->
-    <div
-      v-for="(categoria, index) in categorias"
-      :key="index"
-      class="categoria-item"
-    >
-      <div
-        class="categoria-header"
-        @click="toggleAcordeon(index)"
-        :class="{ active: categoriaActiva === index }"
-      >
-        <h4>{{ categoria.nombre }}</h4>
-        <i class="fas fa-chevron-down"></i>
-      </div>
-      <div
-        class="categoria-opciones"
-        :class="{ active: categoriaActiva === index }"
-      >
-        <div
-          v-for="(opcion, i) in categoria.opciones"
-          :key="i"
-          class="categoria-opcion"
-          @click="seleccionarSubcategoria(opcion.valor)"
+    <!-- Filtros modernos -->
+    <div class="filters-section">
+      <div class="filter-tabs">
+        <button 
+          class="filter-tab"
+          :class="{ active: subcategoriaSeleccionada === '' }"
+          @click="seleccionarSubcategoria('')"
         >
-          <label>{{ opcion.texto }}</label>
+          Todos
+        </button>
+        
+        <div v-for="(categoria, index) in categorias" :key="index" class="filter-dropdown">
+          <button 
+            class="filter-tab"
+            :class="{ active: categoriaActiva === index }"
+            @click="toggleAcordeon(index)"
+          >
+            {{ categoria.nombre }}
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </button>
+          
+          <div class="dropdown-content" :class="{ show: categoriaActiva === index }">
+            <button
+              v-for="(opcion, i) in categoria.opciones"
+              :key="i"
+              class="dropdown-item"
+              @click="seleccionarSubcategoria(opcion.valor)"
+            >
+              {{ opcion.texto }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
-
-
 
     <!-- Productos -->
-    <div class="productos-container">
-      <div
-        v-for="producto in productosFiltrados"
-        :key="producto.id"
-        class="producto-card"
+    <div class="products-grid">
+      <div 
+        v-for="producto in productosFiltrados" 
+        :key="producto.id" 
+        class="product-card"
         @click="abrirPopup(producto)"
       >
-        <div class="producto-imagen-container">
-          <img :src="producto.imagen" alt="Imagen del producto" class="producto-imagen" />
+        <div class="product-badge" v-if="producto.oferta">OFERTA</div>
+        <div class="product-image-container">
+          <img :src="producto.image" :alt="producto.name" class="product-image" />
+          <button class="quick-view-btn" @click.stop="abrirPopup(producto)">
+            Ver Detalles
+          </button>
         </div>
-        <div class="producto-info">
-          <h3 class="producto-nombre">{{ producto.nombre }}</h3>
-          <p class="producto-precio">{{ producto.precio }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pop-up de detalles del producto -->
-    <div v-if="popupVisible" class="popup-overlay" @click="cerrarPopup">
-      <div class="popup-content" @click.stop>
-        <button class="btn-cerrar" @click="cerrarPopup">×</button>
-        <img :src="productoSeleccionado.imagen" alt="Imagen del producto" class="popup-imagen" />
-        <div class="popup-info">
-          <h3 class="popup-nombre">{{ productoSeleccionado.nombre }}</h3>
-          <p class="popup-descripcion">{{ productoSeleccionado.descripcion }}</p>
-          <p class="popup-precio">{{ productoSeleccionado.precio }}</p>
-          <button @click="agregarAlCarrito(productoSeleccionado)" class="btn-comprar">
-            Agregar al carrito
+        <div class="product-info">
+          <span class="product-category">{{ getCategoryName(producto.categoria) }}</span>
+          <h3 class="product-name">{{ producto.name }}</h3>
+          <div class="product-price-container">
+            <span class="product-price">{{ producto.price }} RD$</span>
+            <span class="product-old-price" v-if="producto.oldPrice">{{ producto.oldPrice }} RD$</span>
+          </div>
+          <button 
+            class="add-to-cart-btn"
+            @click.stop="agregarAlCarrito(producto)"
+          >
+            <i class="fas fa-shopping-cart"></i> Añadir
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Carrito de Compras -->
-    <div v-if="carrito.length > 0" class="carrito">
-      <button @click="abrirCarrito" class="btn-carrito">
-        Ver carrito ({{ carrito.length }})
-      </button>
-    </div>
-
-    <!-- Pop-up del carrito -->
-    <div v-if="carritoVisible" class="popup-overlay" @click="cerrarCarrito">
-      <div class="popup-content carrito-popup" @click.stop>
-        <button class="btn-cerrar" @click="cerrarCarrito">×</button>
-        <h2 class="carrito-titulo">Carrito de Compras</h2>
-        <div class="carrito-productos">
-          <div v-for="(item, index) in carrito" :key="index" class="carrito-item">
-            <img :src="item.imagen" alt="Imagen del producto" class="carrito-imagen" />
-            <div class="carrito-info">
-              <h3 class="carrito-nombre">{{ item.nombre }}</h3>
-              <p class="carrito-precio">{{ item.precio }}</p>
+    <!-- Popup de producto -->
+    <div v-if="popupVisible" class="product-modal" @click="cerrarPopup">
+      <div class="modal-content" @click.stop>
+        <button class="close-modal" @click="cerrarPopup">
+          <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="modal-grid">
+          <div class="modal-images">
+            <img :src="productoSeleccionado.image" :alt="productoSeleccionado.name" class="main-image" />
+            <div class="thumbnail-container">
+              <img 
+                v-for="(img, index) in productoSeleccionado.images" 
+                :key="index" 
+                :src="img" 
+                class="thumbnail"
+                @click="changeMainImage(img)"
+              />
             </div>
-            <button @click="eliminarDelCarrito(index)" class="btn-eliminar">Eliminar</button>
+          </div>
+          
+          <div class="modal-details">
+            <div class="product-header">
+              <span class="product-category">{{ getCategoryName(productoSeleccionado.categoria) }}</span>
+              <h2 class="product-title">{{ productoSeleccionado.name }}</h2>
+              <div class="product-rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+                <span class="rating-count">(24 reviews)</span>
+              </div>
+            </div>
+            
+            <div class="price-container">
+              <span class="current-price">{{ productoSeleccionado.price }} RD$</span>
+              <span class="old-price" v-if="productoSeleccionado.oldPrice">{{ productoSeleccionado.oldPrice }} RD$</span>
+              <span class="discount" v-if="productoSeleccionado.oldPrice">
+                {{ calculateDiscount(productoSeleccionado.price, productoSeleccionado.oldPrice) }}% OFF
+              </span>
+            </div>
+            
+            <p class="product-description">{{ productoSeleccionado.description }}</p>
+            
+            <div class="product-actions">
+              <div class="quantity-selector">
+                <button @click="decrementQuantity">-</button>
+                <span>{{ quantity }}</span>
+                <button @click="incrementQuantity">+</button>
+              </div>
+              
+              <button class="add-to-cart" @click="addToCartFromModal">
+                <i class="fas fa-shopping-cart"></i> Añadir al carrito
+              </button>
+            </div>
+            
+            <div class="product-meta">
+              <div class="meta-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Garantía de 1 año</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-truck"></i>
+                <span>Envío gratis en órdenes > 2000 RD$</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="carrito-total">
-          <p>Total: ${{ calcularTotal }}</p>
-        </div>
-        <button @click="finalizarCompra" class="btn-finalizar">Finalizar Compra</button>
       </div>
     </div>
 
-    <!-- Notificación de agregado al carrito -->
-    <div v-if="productoAgregado" class="notificacion">
-      <p>{{ productoAgregado.nombre }} agregado al carrito</p>
+    <!-- Mini carrito -->
+    <div 
+      class="mini-cart-btn"
+      :class="{ 'items-in-cart': carrito.length > 0 }"
+      @click="toggleCart"
+    >
+      <i class="fas fa-shopping-bag"></i>
+      <span class="cart-count">{{ carrito.length }}</span>
     </div>
+
+    <!-- Carrito lateral moderno -->
+    <div class="cart-sidebar" :class="{ active: cartVisible }">
+      <div class="cart-header">
+        <h3>Tu Carrito</h3>
+        <button class="close-cart" @click="toggleCart">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="cart-items" v-if="carrito.length > 0">
+        <div v-for="(item, index) in carrito" :key="index" class="cart-item">
+          <img :src="item.image" :alt="item.name" class="cart-item-image" />
+          
+          <div class="cart-item-details">
+            <h4 class="cart-item-name">{{ item.name }}</h4>
+            <div class="cart-item-price">{{ item.price }} RD$</div>
+            
+            <div class="cart-item-actions">
+              <div class="item-quantity">
+                <button @click="decreaseQuantity(index)">-</button>
+                <span>{{ item.quantity || 1 }}</span>
+                <button @click="increaseQuantity(index)">+</button>
+              </div>
+              
+              <button class="remove-item" @click="eliminarDelCarrito(index)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-cart" v-else>
+        <i class="fas fa-shopping-bag"></i>
+        <p>Tu carrito está vacío</p>
+      </div>
+      
+      <div class="cart-footer" v-if="carrito.length > 0">
+        <div class="cart-totals">
+          <div class="subtotal">
+            <span>Subtotal:</span>
+            <span>{{ calcularSubtotal }} RD$</span>
+          </div>
+          <div class="shipping">
+            <span>Envío:</span>
+            <span>{{ calcularEnvio }} RD$</span>
+          </div>
+          <div class="total">
+            <span>Total:</span>
+            <span>{{ calcularTotal }} RD$</span>
+          </div>
+        </div>
+        
+        <button class="checkout-btn" @click="finalizarCompra">
+          Proceder al pago
+        </button>
+      </div>
+    </div>
+
+    <!-- Notificación flotante -->
+    <transition name="slide-up">
+      <div v-if="productoAgregado" class="notification">
+        <div class="notification-content">
+          <i class="fas fa-check-circle"></i>
+          <span>{{ productoAgregado.name }} añadido al carrito</span>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Overlay para carrito/modal -->
+    <div class="overlay" 
+      :class="{ active: popupVisible || cartVisible }"
+      @click="closeAllModals"
+    ></div>
   </div>
 </template>
 
 
 
-
 <script>
-  export default {
-    name: 'TiendaComponent',
-    data() {
-      return {
-        productos: [
-          {
-            id: 1,
-            nombre: 'Balón de Fútbol Adidas',
-            precio: '30',
-            categoria: 'futbol',
-            imagen: '/imagenes/balon-futbol.jpg',
-            descripcion: 'Balón oficial de la liga profesional, tamaño 5.',
-          },
-          {
-            id: 2,
-            nombre: 'Raqueta de Tenis Wilson',
-            precio: '120',
-            categoria: 'tenis',
-            imagen: '/imagenes/raqueta-tenis.jpg',
-            descripcion: 'Raqueta profesional para tenistas avanzados.',
-          },
-          {
-            id: 3,
-            nombre: 'Zapatillas Nike Running',
-            precio: '90',
-            categoria: 'ropa-hombre',
-            imagen: '/imagenes/zapatillas-running.jpg',
-            descripcion: 'Zapatillas cómodas y duraderas para running.',
-          },
-          {
-            id: 4,
-            nombre: 'Camiseta Deportiva Mujer',
-            precio: '25',
-            categoria: 'ropa-mujer',
-            imagen: '/imagenes/camiseta-mujer.jpg',
-            descripcion: 'Camiseta transpirable para actividades deportivas.',
-          },
-          {
-            id: 5,
-            nombre: 'Proteína en Polvo Whey',
-            precio: '45',
-            categoria: 'proteinas',
-            imagen: '/imagenes/proteina-whey.jpg',
-            descripcion: 'Proteína de suero para recuperación muscular.',
-          },
-          {
-            id: 6,
-            nombre: 'Barras Energéticas Power',
-            precio: '15',
-            categoria: 'barras',
-            imagen: '/imagenes/barras-energeticas.jpg',
-            descripcion: 'Barras energéticas para un impulso rápido.',
-          },
-          {
-            id: 7,
-            nombre: 'Balón de Basketball Spalding',
-            precio: '40',
-            categoria: 'basketball',
-            imagen: '/imagenes/balon-basketball.jpg',
-            descripcion: 'Balón oficial de la NBA, tamaño 7.',
-          },
-          {
-            id: 8,
-            nombre: 'Camiseta Deportiva Hombre',
-            precio: '35',
-            categoria: 'ropa-hombre',
-            imagen: '/imagenes/camiseta-hombre.jpg',
-            descripcion: 'Camiseta deportiva para hombres.',
-          },
-          {
-            id: 9,
-            nombre: 'Camiseta Deportiva Niño',
-            precio: '20',
-            categoria: 'ropa-ninos',
-            imagen: '/imagenes/camiseta-nino.jpg',
-            descripcion: 'Camiseta deportiva para niños.',
-          },
-          {
-            id: 10,
-            nombre: 'Gorra Deportiva Nike',
-            precio: '20',
-            categoria: 'accesorios',
-            imagen: '/imagenes/gorra-deportiva.jpg',
-            descripcion: 'Gorra deportiva ajustable.',
-          },
-        ],
-        categorias: [
-          {
-            nombre: 'Deportes',
-            opciones: [
-              { valor: 'futbol', texto: 'Fútbol' },
-              { valor: 'basketball', texto: 'Baloncesto' },
-              { valor: 'tenis', texto: 'Tenis' },
-            ],
-          },
-          {
-            nombre: 'Ropa',
-            opciones: [
-              { valor: 'ropa-hombre', texto: 'Ropa Hombre' },
-              { valor: 'ropa-mujer', texto: 'Ropa Mujer' },
-              { valor: 'ropa-ninos', texto: 'Ropa Niños' },
-            ],
-          },
-          {
-            nombre: 'Consumibles',
-            opciones: [
-              { valor: 'proteinas', texto: 'Proteínas' },
-              { valor: 'barras', texto: 'Barras energéticas' },
-            ],
-          },
-          {
-            nombre: 'Accesorios',
-            opciones: [
-              { valor: 'accesorios', texto: 'Accesorios' },
-            ],
-          },
-        ],
-        categoriaActiva: null, // Índice de la categoría activa
-        subcategoriaSeleccionada: '', // Subcategoría seleccionada
-        carrito: [],
-        busqueda: '',
-        productoAgregado: null,
-        productosFiltrados: [],
-        popupVisible: false,
-        productoSeleccionado: null,
-        carritoVisible: false,
-      };
+export default {
+  name: 'TiendaComponent',
+  data() {
+    return {
+      productos: [],
+      categorias: [
+        {
+          nombre: 'Deportes',
+          opciones: [
+            { valor: 'futbol', texto: 'Fútbol' },
+            { valor: 'basketball', texto: 'Baloncesto' },
+            { valor: 'tenis', texto: 'Tenis' },
+          ],
+        },
+        {
+          nombre: 'Ropa',
+          opciones: [
+            { valor: 'ropa-hombre', texto: 'Ropa Hombre' },
+            { valor: 'ropa-mujer', texto: 'Ropa Mujer' },
+            { valor: 'ropa-ninos', texto: 'Ropa Niños' },
+          ],
+        },
+        {
+          nombre: 'Suplementos',
+          opciones: [
+            { valor: 'proteinas', texto: 'Proteínas' },
+            { valor: 'barras', texto: 'Barras energéticas' },
+          ],
+        },
+        {
+          nombre: 'Accesorios',
+          opciones: [
+            { valor: 'accesorios', texto: 'Accesorios' },
+          ],
+        },
+      ],
+      categoriaActiva: null,
+      subcategoriaSeleccionada: '',
+      carrito: [],
+      busqueda: '',
+      productoAgregado: null,
+      productosFiltrados: [],
+      popupVisible: false,
+      productoSeleccionado: null,
+      cartVisible: false,
+      quantity: 1,
+      currentImage: ''
+    };
+  },
+  computed: {
+    calcularSubtotal() {
+      return this.carrito.reduce((total, item) => {
+        return total + (parseFloat(item.price) * (item.quantity || 1));
+      }, 0).toFixed(2);
     },
-    
-    created() {
-      this.productosFiltrados = this.productos; 
-      this.getProducts();
+    calcularEnvio() {
+      return this.calcularSubtotal > 2000 ? '0.00' : '150.00';
     },
-
-    computed: {
-      calcularTotal() {
-        return this.carrito.reduce((total, producto) => {
-          return total + parseFloat(producto.precio);
-        }, 0).toFixed(2);
-      },
-    },
-
-    methods: {
-      getProducts() {
-        axios.get('/products')
+    calcularTotal() {
+      return (parseFloat(this.calcularSubtotal) + parseFloat(this.calcularEnvio)).toFixed(2);
+    }
+  },
+  methods: {
+    getProducts() {
+      axios.get('/products')
         .then(response => {
-          this.productos = response.data.products;
-          this.productosFiltrados = this.productos; 
+          this.productos = response.data.products.map(product => {
+            return {
+              ...product,
+              images: product.images || [product.image],
+              oldPrice: product.oldPrice || null,
+              oferta: product.oldPrice ? true : false
+            };
+          });
+          this.productosFiltrados = this.productos;
         })
         .catch(error => {
           console.error('Error al cargar los productos:', error);
         });
-      },
-
-      agregarAlCarrito(producto) {
-        this.carrito.push(producto);
-        this.productoAgregado = producto;
-        setTimeout(() => {
-          this.productoAgregado = null;
-        }, 3000);
-      },
-      eliminarDelCarrito(index) {
-        this.carrito.splice(index, 1);
-      },
-      abrirCarrito() {
-        this.carritoVisible = true;
-      },
-      cerrarCarrito() {
-        this.carritoVisible = false;
-      },
-      finalizarCompra() {
-        alert('Compra finalizada. Total: $' + this.calcularTotal);
-        this.carrito = [];
-        this.carritoVisible = false;
-      },
-      abrirPopup(producto) {
-        this.productoSeleccionado = producto;
-        this.popupVisible = true;
-      },
-      cerrarPopup() {
-        this.popupVisible = false;
-        this.productoSeleccionado = null;
-      },
-      toggleAcordeon(index) {
-      // Si la categoría ya está activa, se cierra
-      if (this.categoriaActiva === index) {
-        this.categoriaActiva = null;
-      } else {
-        // Si no, se abre la categoría seleccionada
-        this.categoriaActiva = index;
-      }
+    },
+    toggleAcordeon(index) {
+      this.categoriaActiva = this.categoriaActiva === index ? null : index;
     },
     seleccionarSubcategoria(subcategoria) {
       this.subcategoriaSeleccionada = subcategoria;
       this.filtrarProductos();
     },
-      filtrarProductos() {
-        let productosFiltrados = this.productos;
+    filtrarProductos() {
+      let productosFiltrados = this.productos;
 
-        // Filtrar por subcategoría
-        if (this.subcategoriaSeleccionada) {
-          productosFiltrados = productosFiltrados.filter(
-            (producto) => producto.categoria === this.subcategoriaSeleccionada
-          );
-        }
+      if (this.subcategoriaSeleccionada) {
+        productosFiltrados = productosFiltrados.filter(
+          producto => producto.categoria === this.subcategoriaSeleccionada
+        );
+      }
 
-        // Filtrar por búsqueda
-        if (this.busqueda) {
-          productosFiltrados = productosFiltrados.filter((producto) =>
-            producto.nombre.toLowerCase().includes(this.busqueda.toLowerCase())
-          );
-        }
+      if (this.busqueda) {
+        const searchTerm = this.busqueda.toLowerCase();
+        productosFiltrados = productosFiltrados.filter(producto =>
+          producto.name.toLowerCase().includes(searchTerm) ||
+          (producto.description && producto.description.toLowerCase().includes(searchTerm))
+        );
+      }
 
-        this.productosFiltrados = productosFiltrados;
-      },
-      filtrarPorBusqueda() {
-        this.filtrarProductos();
-      },
+      this.productosFiltrados = productosFiltrados;
     },
-  };
+    filtrarPorBusqueda() {
+      this.filtrarProductos();
+    },
+    abrirPopup(producto) {
+      this.productoSeleccionado = {
+        ...producto,
+        images: producto.images || [producto.image]
+      };
+      this.currentImage = this.productoSeleccionado.image;
+      this.quantity = 1;
+      this.popupVisible = true;
+    },
+    cerrarPopup() {
+      this.popupVisible = false;
+    },
+    changeMainImage(img) {
+      this.currentImage = img;
+    },
+    agregarAlCarrito(producto) {
+      const existingItem = this.carrito.find(item => item.id === producto.id);
+      
+      if (existingItem) {
+        existingItem.quantity = (existingItem.quantity || 1) + 1;
+      } else {
+        this.carrito.push({
+          ...producto,
+          quantity: 1
+        });
+      }
+      
+      this.showNotification(producto);
+    },
+    addToCartFromModal() {
+      const productToAdd = {
+        ...this.productoSeleccionado,
+        quantity: this.quantity
+      };
+      
+      const existingItem = this.carrito.find(item => item.id === productToAdd.id);
+      
+      if (existingItem) {
+        existingItem.quantity += this.quantity;
+      } else {
+        this.carrito.push(productToAdd);
+      }
+      
+      this.showNotification(productToAdd);
+      this.cerrarPopup();
+    },
+    showNotification(producto) {
+      this.productoAgregado = producto;
+      setTimeout(() => {
+        this.productoAgregado = null;
+      }, 3000);
+    },
+    eliminarDelCarrito(index) {
+      this.carrito.splice(index, 1);
+    },
+    toggleCart() {
+      this.cartVisible = !this.cartVisible;
+    },
+    closeAllModals() {
+      this.popupVisible = false;
+      this.cartVisible = false;
+    },
+    finalizarCompra() {
+      alert(`Compra finalizada. Total: ${this.calcularTotal} RD$`);
+      this.carrito = [];
+      this.cartVisible = false;
+    },
+    incrementQuantity() {
+      this.quantity++;
+    },
+    decrementQuantity() {
+      if (this.quantity > 1) this.quantity--;
+    },
+    increaseQuantity(index) {
+      this.carrito[index].quantity = (this.carrito[index].quantity || 1) + 1;
+    },
+    decreaseQuantity(index) {
+      if (this.carrito[index].quantity > 1) {
+        this.carrito[index].quantity--;
+      } else {
+        this.eliminarDelCarrito(index);
+      }
+    },
+    calculateDiscount(price, oldPrice) {
+      return Math.round(((oldPrice - price) / oldPrice) * 100);
+    },
+    getCategoryName(categoryValue) {
+      for (const category of this.categorias) {
+        const found = category.opciones.find(opt => opt.valor === categoryValue);
+        if (found) return category.nombre;
+      }
+      return 'General';
+    }
+  },
+  mounted() {
+    this.getProducts();
+  }
+};
 </script>
 
 

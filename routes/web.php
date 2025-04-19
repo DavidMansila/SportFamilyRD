@@ -21,6 +21,11 @@ Route::get('/Login', function () {
     return view('Login.signUp');
 });
 
+// Rutas para las vistas
+Route::get('/Directorio', function () {
+    return view('Directorio.DirectorioView');
+});
+
 Route::get('/Noticias', function () {
     return view('Noticias.NoticiasView');
 });
@@ -49,12 +54,12 @@ Route::get('/Publicacion', function () {
     return view('Foro.ForoPublicaciones');
 });
 
-Route::get('/CrearPost', function () {
-    return view('Foro.CrearPost');
-});
-
 Route::get('/Ajustes', function () {
     return view('Ajustes.AjustesView');
+});
+
+Route::get('/Perfil', function () {
+    return view('Ajustes.PerfilView');
 });
 
 

@@ -1,0 +1,442 @@
+   /* General styles */
+   body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  
+/* Navbar */
+.navbar {
+  background: linear-gradient(to right, #000000, #978500);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between; /* Distribuye el espacio entre los elementos */
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo a la izquierda */
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 200px; /* Tamaño del logo */
+  height: 70px;
+}
+
+/* Enlaces en el centro */
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  flex-grow: 1; /* Ocupa el espacio disponible */
+  justify-content: center; /* Centra los enlaces */
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.3s ease-in-out;
+  font-family: Arial, sans-serif;
+}
+
+.nav-link:hover {
+  color: #fbbf24;
+}
+
+/* Imagenes del nav bar */
+
+.Imagenes {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espaciado entre los iconos */
+}
+
+.Imagenes a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Tamaño uniforme */
+  height: 40px;
+  border-radius: 50%; /* Forma circular */
+  background: rgba(255, 255, 255, 0.1); /* Fondo semitransparente */
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.Imagenes a img {
+  width: 24px; /* Tamaño del ícono */
+  height: 24px;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Efecto hover */
+.Imagenes a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+.Imagenes a:hover img {
+  transform: rotate(10deg) scale(1.2);
+}
+
+/* Animación sutil de entrada */
+.Imagenes a::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(0);
+  border-radius: 50%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.Imagenes a:hover::before {
+  transform: scale(1.3);
+  opacity: 0;
+}
+
+
+  
+  .profile-container {
+    background: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    padding: 40px;
+    background: #f7f7f7;
+    color: rgb(0, 0, 0);
+    position: relative;
+  }
+  
+  .avatar-container {
+    position: relative;
+    margin-right: 30px;
+  }
+  
+  .profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+  }
+  
+  .edit-avatar {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: #3498db;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+  }
+  
+  .edit-avatar svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .profile-info {
+    flex: 1;
+  }
+  
+  .profile-name {
+    font-size: 2.2rem;
+    margin: 0 0 5px 0;
+  }
+  
+  .profile-role {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin: 0 0 20px 0;
+  }
+  
+  .profile-stats {
+    display: flex;
+    gap: 30px;
+  }
+  
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  .edit-profile-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(139, 139, 139, 0.2);
+    border: 1px solid rgb(0, 0, 0);
+    color: rgb(0, 0, 0);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .edit-profile-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  .profile-content {
+    padding: 40px;
+  }
+  
+  .profile-section {
+    margin-bottom: 40px;
+  }
+  
+  .profile-section h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .info-item {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .info-label {
+    font-weight: 500;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+  }
+  
+  .info-value {
+    font-size: 1.1rem;
+  }
+  
+  .profile-bio {
+    line-height: 1.6;
+    color: #34495e;
+  }
+  
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .social-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .social-icon img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .social-item input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .remove-social {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .add-social {
+    background: none;
+    border: 1px dashed #3498db;
+    color: #3498db;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .achievements {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .achievement-item {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .achievement-display h3 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+  }
+  
+  .achievement-display p {
+    margin: 0 0 10px 0;
+    color: #34495e;
+  }
+  
+  .achievement-date {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+  }
+  
+  .achievement-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .achievement-edit input,
+  .achievement-edit textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .achievement-edit textarea {
+    min-height: 80px;
+  }
+  
+  .remove-achievement {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  .add-achievement {
+    background: none;
+    border: 1px dashed #3498db;
+    color: #3498db;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+  }
+  
+  .save-btn {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .discard-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  /* Estilos para inputs en modo edición */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+  
+  @media (max-width: 768px) {
+    .profile-header {
+      flex-direction: column;
+      text-align: center;
+      padding: 30px 20px;
+    }
+    
+    .avatar-container {
+      margin-right: 0;
+      margin-bottom: 20px;
+    }
+    
+    .profile-stats {
+      justify-content: center;
+    }
+    
+    .edit-profile-btn {
+      position: static;
+      margin-top: 20px;
+    }
+    
+    .profile-content {
+      padding: 20px;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+  }

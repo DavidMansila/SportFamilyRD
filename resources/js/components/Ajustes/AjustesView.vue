@@ -1,170 +1,267 @@
 <template>
-    <div class="min-h-screen bg-gray-50 flex">
-      <!-- Sidebar -->
-      <div class="sidebar bg-gradient-to-r from-blue-700 to-blue-500 text-white w-64 p-6 flex flex-col justify-between">
-        <div>
-          <div class="logo-section flex items-center gap-3 mb-8">
-            <h1 class="logo-text text-2xl font-extrabold">Ajustes</h1>
-          </div>
-          <div class="menu">
-            <ul>
-              <li class="menu-item" @click="cambiarVista('perfil')">
-                <a href="#" class="menu-link">Perfil</a>
-              </li>
-              <li class="menu-item" @click="cambiarVista('seguridad')">
-                <a href="#" class="menu-link">Seguridad</a>
-              </li>
-              <li class="menu-item" @click="cambiarVista('notificaciones')">
-                <a href="#" class="menu-link">Notificaciones</a>
-              </li>
-              <li class="menu-item" @click="cambiarVista('idioma')">
-                <a href="#" class="menu-link">Idioma</a>
-              </li>
-              <li class="menu-item" @click="cambiarVista('privacidad')">
-                <a href="#" class="menu-link">Privacidad</a>
-              </li>
-              <a href="/" class="menu-link1">SportFamilyRD</a>
-            </ul>
-          </div>
-        </div>
-        <div class="footer text-center mt-8 text-sm">
-          <p>&copy; 2025 SportFamilyRD - Todos los derechos reservados</p>
-        </div>
+  <div class="settings-view">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo-container">
+          <a href="/" class="logo-container">
+          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
+        </a>
       </div>
-  
-      <!-- Main Content -->
-      <div class="content flex-1 p-8 flex justify-center items-start">
-        <div class="settings-card bg-white p-8 rounded-2xl shadow-lg w-full max-w-4xl">
-          <h2 class="page-title text-3xl font-semibold text-gray-800 mb-8">Configuración</h2>
-  
-          <!-- Perfil -->
-          <div v-if="vista === 'perfil'">
-            <form @submit.prevent="guardarPerfil">
-              <div class="form-group mb-6">
-                <label for="email" class="block text-lg font-medium">Email</label>
-                <input v-model="email" type="email" id="email" class="input" placeholder="Email"/>
-              </div>
-              <div class="form-group mb-6">
-                <label for="usuario" class="block text-lg font-medium">Nombre de Usuario</label>
-                <input v-model="usuario" type="text" id="usuario" class="input" placeholder="Nombre de usuario"/>
-              </div>
-              <div class="form-group mb-6">
-                <label class="block text-lg font-medium">Imagen de Perfil</label>
-                <input type="file" @change="subirImagen" class="input"/>
-              </div>
-              <button type="submit" class="btn primary">Guardar Perfil</button>
-            </form>
-          </div>
-  
-          <!-- Seguridad -->
-          <div v-if="vista === 'seguridad'">
-            <form @submit.prevent="guardarSeguridad">
-              <div class="form-group mb-6">
-                <label for="password" class="block text-lg font-medium">Nueva Contraseña</label>
-                <input v-model="password" type="password" id="password" class="input" placeholder="Introduce nueva contraseña"/>
-              </div>
-              <div class="form-group mb-6">
-                <label for="confirm-password" class="block text-lg font-medium">Confirmar Contraseña</label>
-                <input v-model="confirmPassword" type="password" id="confirm-password" class="input" placeholder="Confirma tu contraseña"/>
-              </div>
-              <button type="submit" class="btn primary">Guardar Seguridad</button>
-            </form>
-          </div>
-  
-          <!-- Notificaciones -->
-          <div v-if="vista === 'notificaciones'">
-            <div class="form-group flex justify-between mb-6">
-              <label class="text-lg font-medium">Recibir Notificaciones</label>
-              <input type="checkbox" v-model="notificaciones" class="checkbox"/>
+        <div class="nav-links">
+            <a href="/Noticias" class="nav-link">Noticias</a>
+            <a href="/Calendario" class="nav-link">Calendario</a>
+             <a href="/Tienda" class="nav-link">Tienda</a>
+             <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+             <a href="/Foro" class="nav-link">Foro</a>
+        </div>
+
+        <div class="Imagenes">
+
+            <a class="Carrito">
+                <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
+            </a>
+
+            <a href= "/Ajustes" class="Ajustes">
+                <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
+            </a>
+
+            <a href= "/Perfil" class="Perfil">
+                <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+            </a>
+
+            <a :href=" login ? '/Login' : '/Logout' " class="Logout">
+                <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
+            </a>
+
+        </div>
+      </nav>
+
+    <div class="settings-container">
+      <h1 class="settings-title">Configuración de Cuenta</h1>
+      
+      <div class="settings-tabs">
+        <button 
+          v-for="tab in tabs" 
+          :key="tab.id" 
+          @click="activeTab = tab.id"
+          :class="{ 'active': activeTab === tab.id }"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <div class="settings-content">
+        <!-- Pestaña de Configuración de Cuenta -->
+        <div v-if="activeTab === 'account'" class="tab-content">
+          <div class="form-section">
+            <h3>Información Personal</h3>
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" v-model="user.name" placeholder="Tu nombre completo">
             </div>
-            <div class="form-group flex justify-between mb-6">
-              <label class="text-lg font-medium">Notificaciones por Email</label>
-              <input type="checkbox" v-model="emailNotificaciones" class="checkbox"/>
+            <div class="form-group">
+              <label>Correo Electrónico</label>
+              <input type="email" v-model="user.email" placeholder="tu@email.com">
             </div>
-            <button type="button" @click="guardarNotificaciones" class="btn primary">Guardar Notificaciones</button>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="tel" v-model="user.phone" placeholder="+1 234 567 890">
+            </div>
           </div>
-  
-          <!-- Idioma -->
-          <div v-if="vista === 'idioma'">
-            <form @submit.prevent="guardarIdioma">
-              <div class="form-group mb-6">
-                <label class="block text-lg font-medium">Idioma Preferido</label>
-                <select v-model="idioma" class="input">
-                  <option value="es">Español</option>
-                  <option value="en">Inglés</option>
-                  <option value="fr">Francés</option>
-                </select>
-              </div>
-              <button type="submit" class="btn primary">Guardar Idioma</button>
-            </form>
+
+          <div class="form-section">
+            <h3>Seguridad</h3>
+            <div class="form-group">
+              <label>Contraseña Actual</label>
+              <input type="password" v-model="security.currentPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label>Nueva Contraseña</label>
+              <input type="password" v-model="security.newPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label>Confirmar Contraseña</label>
+              <input type="password" v-model="security.confirmPassword" placeholder="••••••••">
+            </div>
           </div>
-  
-          <!-- Privacidad -->
-          <div v-if="vista === 'privacidad'">
-            <div class="form-group flex items-center gap-2 mb-6">
-              <input type="checkbox" v-model="privacidad" class="checkbox"/>
-              <span>Hacer mi perfil privado</span>
+
+          <button class="save-btn" @click="saveSettings">Guardar Cambios</button>
+        </div>
+
+        <!-- Pestaña de Notificaciones -->
+        <div v-if="activeTab === 'notifications'" class="tab-content">
+          <h3>Preferencias de Notificación</h3>
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <span>Notificaciones por Email</span>
+              <label class="switch">
+                <input type="checkbox" v-model="notifications.email">
+                <span class="slider"></span>
+              </label>
             </div>
-            <div class="form-group flex items-center gap-2 mb-6">
-              <input type="checkbox" v-model="compartirDatos" class="checkbox"/>
-              <span>Permitir compartir mis datos con terceros</span>
+            <div class="toggle-item">
+              <span>Notificaciones Push</span>
+              <label class="switch">
+                <input type="checkbox" v-model="notifications.push">
+                <span class="slider"></span>
+              </label>
             </div>
-            <button type="button" @click="guardarPrivacidad" class="btn primary">Guardar Privacidad</button>
+            <div class="toggle-item">
+              <span>Recordatorios de Entrenamiento</span>
+              <label class="switch">
+                <input type="checkbox" v-model="notifications.reminders">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="notification-frequency">
+            <h4>Frecuencia de Notificaciones</h4>
+            <select v-model="notifications.frequency">
+              <option value="instant">Inmediatas</option>
+              <option value="daily">Resumen Diario</option>
+              <option value="weekly">Resumen Semanal</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Pestaña de Privacidad -->
+        <div v-if="activeTab === 'privacy'" class="tab-content">
+          <h3>Configuración de Privacidad</h3>
+          <div class="privacy-options">
+            <div class="privacy-item">
+              <span>Perfil Público</span>
+              <label class="switch">
+                <input type="checkbox" v-model="privacy.publicProfile">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="privacy-item">
+              <span>Mostrar Estadísticas</span>
+              <label class="switch">
+                <input type="checkbox" v-model="privacy.showStats">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="privacy-item">
+              <span>Permitir Mensajes</span>
+              <label class="switch">
+                <input type="checkbox" v-model="privacy.allowMessages">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="data-section">
+            <h4>Descargar Mis Datos</h4>
+            <p>Solicita un archivo con toda la información que tenemos sobre ti.</p>
+            <button class="data-btn" @click="requestData">Solicitar Datos</button>
+          </div>
+
+          <div class="delete-section">
+            <h4>Eliminar Cuenta</h4>
+            <p>Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.</p>
+            <button class="delete-btn" @click="confirmDeletion">Eliminar Cuenta</button>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'AjustesView',
-    data() {
-      return {
-        vista: 'perfil',
-        nombre: '',
-        usuario: '',
-        password: '',
-        confirmPassword: '',
-        notificaciones: true,
-        emailNotificaciones: false,
-        idioma: 'es',
-        privacidad: false,
-        compartirDatos: false
-      };
-    },
-    methods: {
-      cambiarVista(vista) {
-        this.vista = vista;
+
+    <!-- Modal de Confirmación -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>{{ modalTitle }}</h3>
+        <p>{{ modalMessage }}</p>
+        <div class="modal-actions">
+          <button @click="showModal = false">Cancelar</button>
+          <button @click="confirmAction" class="confirm">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'SettingsView',
+  data() {
+    return {
+      activeTab: 'account',
+      tabs: [
+        { id: 'account', label: 'Cuenta' },
+        { id: 'notifications', label: 'Notificaciones' },
+        { id: 'privacy', label: 'Privacidad' }
+      ],
+      user: {
+        name: '',
+        email: '',
+        phone: '',
+        avatar: ''
       },
-      guardarPerfil() {
-        alert('Perfil guardado');
+      security: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
       },
-      subirImagen(event) {
-        alert('Imagen subida: ' + event.target.files[0].name);
+      notifications: {
+        email: true,
+        push: true,
+        reminders: true,
+        frequency: 'instant'
       },
-      guardarSeguridad() {
-        if (this.password !== this.confirmPassword) {
-          alert('Las contraseñas no coinciden');
-        } else {
-          alert('Seguridad guardada');
-        }
+      privacy: {
+        publicProfile: true,
+        showStats: true,
+        allowMessages: true
       },
-      guardarNotificaciones() {
-        alert('Notificaciones guardadas');
-      },
-      guardarIdioma() {
-        alert('Idioma guardado');
-      },
-      guardarPrivacidad() {
-        alert('Privacidad guardada');
-      }
+      showModal: false,
+      modalTitle: '',
+      modalMessage: '',
+      currentAction: null
     }
-  };
-  </script>
-  
+  },
+  methods: {
+    saveSettings() {
+      // Lógica para guardar ajustes
+      console.log('Configuración guardada:', {
+        user: this.user,
+        security: this.security,
+        notifications: this.notifications,
+        privacy: this.privacy
+      });
+      this.showToast('Tus cambios se han guardado correctamente');
+    },
+    requestData() {
+      this.modalTitle = 'Solicitar Mis Datos';
+      this.modalMessage = '¿Quieres solicitar un archivo con todos tus datos? Esto puede tomar hasta 48 horas.';
+      this.currentAction = 'requestData';
+      this.showModal = true;
+    },
+    confirmDeletion() {
+      this.modalTitle = 'Eliminar Cuenta';
+      this.modalMessage = '¿Estás seguro de que quieres eliminar tu cuenta permanentemente? Esta acción no se puede deshacer.';
+      this.currentAction = 'deleteAccount';
+      this.showModal = true;
+    },
+    confirmAction() {
+      if (this.currentAction === 'deleteAccount') {
+        console.log('Cuenta eliminada');
+        this.showToast('Tu cuenta ha sido eliminada');
+        // Redirigir al inicio
+      } else if (this.currentAction === 'requestData') {
+        console.log('Datos solicitados');
+        this.showToast('Hemos recibido tu solicitud de datos');
+      }
+      this.showModal = false;
+    },
+    showToast(message) {
+      // Implementar lógica de toast/notificación
+      alert(message); // Temporal
+    }
+  }
+}
+</script>
 
-
-  <style scoped>
-  @import '../../../scss/Ajustes/ajustes.scss';
-  </style>
+<style scoped lang="scss">
+@import '../../../scss/Ajustes/ajustes.scss';
+</style>

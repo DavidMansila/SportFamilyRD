@@ -1,10 +1,33 @@
-// Reset CSS
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: Arial, sans-serif; // Fuente global
-  }
+// Definición de colores primarios
+$primary-light: #f8f9fa;
+$primary-dark: #212529;
+
+// Definición de colores secundarios
+$secondary-light: #e9ecef;
+$secondary-dark: #343a40;
+$secondary-text: #495057;
+$secondary-text-light: #6c757d;
+
+// Colores de acento
+$accent: #dc3545; // Rojo
+$accent-secondary: #007bff; // Azul
+
+// Otros colores
+$white: #ffffff;
+$black: #000000;
+$border: #dee2e6;
+
+// Tipografía
+$font-primary: 'Montserrat', sans-serif;
+$font-secondary: 'Open Sans', sans-serif;
+
+// Espaciado (puedes definir variables para márgenes y paddings)
+$spacing-small: 10px;
+$spacing-medium: 20px;
+$spacing-large: 30px;
+
+// Breakpoints para diseño responsive
+$breakpoint-small: 576px;
+$breakpoint-medium: 768px;
+$breakpoint-large: 992px;
+$breakpoint-xl: 1200px;

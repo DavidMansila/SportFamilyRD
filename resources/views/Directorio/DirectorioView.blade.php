@@ -1,5 +1,5 @@
 @extends('Layouts.app')
 
 @section('content')
-  <crearpost-component></crearpost-component>
+  <directorio-component></directorio-component>
 @endsection
