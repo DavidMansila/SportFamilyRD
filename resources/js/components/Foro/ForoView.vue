@@ -1,6 +1,7 @@
 <template>
   <div class="foro-page">
-    <!-- Navbar (se mantiene igual) -->
+
+    <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
@@ -199,6 +200,8 @@
     </div>
   </div>
 </template>
+
+
 
 <script>
 export default {

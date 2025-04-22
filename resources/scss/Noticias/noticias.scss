@@ -229,7 +229,7 @@ body {
 
 /* Colores específicos para cada deporte */
 .noticia-card.futbol .news-category {
-  background-color: #007BFF;
+  background-color: #0059ff;
 }
 
 .noticia-card.baloncesto .news-category {
@@ -242,12 +242,10 @@ body {
 
 .noticia-card.volleyball .news-category {
   background-color: #FFC107;
-  color: #333;
 }
 
 .noticia-card.swimming .news-category {
-  background-color: #FFC107;
-  color: #333;
+  background-color: #00b7ff;
 }
 
 /* Grid de noticias */
@@ -291,6 +289,11 @@ body {
 .noticia-card.volleyball .card-overlay {
   background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
 }
+
+.noticia-card.swimming .card-overlay {
+  background: linear-gradient(135deg, rgba(15, 187, 255, 0.1) 0%, rgba(15, 187, 255, 0.05) 100%);
+}
+
 
 .card-overlay {
   position: absolute;
