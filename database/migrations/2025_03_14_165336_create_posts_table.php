@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up()
     {
+        // Crear la tabla 'posts'
+        // Esta tabla contendrá las publicaciones del foro
+        // todo ponerle user id pa tener el autor y ponerle likes_quantity
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('titulo');
