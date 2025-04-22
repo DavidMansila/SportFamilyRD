@@ -53,6 +53,7 @@
         </button>
       </div>
 
+
       <!-- Estados de carga -->
       <div v-if="isLoading" class="loading-container">
         <div class="spinner"></div>
@@ -64,6 +65,7 @@
         <p class="error-text">{{ errorMessage }}</p>
         <button @click="cargarNoticias" class="retry-btn">Reintentar</button>
       </div>
+
 
       <!-- Lista de noticias -->
       <div v-else>
@@ -100,6 +102,7 @@
         </div>
       </div>
 
+
       <!-- Paginación -->
       <paginatorComponent
         v-model="currentPage"
@@ -109,6 +112,7 @@
       />
     </div>
 
+    
     <!-- Pop-up de noticia -->
     <transition name="fade">
       <div 

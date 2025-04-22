@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
-    <!-- Navbar (manteniendo el original) -->
+
+    <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
@@ -29,6 +30,8 @@
         </a>
       </div>
     </nav>
+
+
 
     <!-- Vista principal del calendario -->
     <div class="calendar-view" :class="{ 'event-view-active': selectedEvent }">
@@ -70,6 +73,8 @@
           </div>
         </div>
       </div>
+
+
 
       <!-- Panel lateral de eventos del día -->
       <div class="events-sidebar">
@@ -118,7 +123,8 @@
       </div>
     </div>
 
-    <!-- Vista detallada del evento (se superpone) -->
+
+    <!-- Vista detallada del evento -->
     <div class="event-detail-view" v-if="selectedEvent" @click.self="closeEventDetail">
       <div class="event-detail-container">
         <button class="close-btn" @click="closeEventDetail">
@@ -189,62 +195,7 @@
       </div>
     </div>
 
-    <!-- Mini carrito flotante -->
-    <div class="mini-cart" :class="{ 'active': cartItems.length > 0 }" @click="toggleCartPopup">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-      </svg>
-      <span class="cart-count">{{ cartItems.reduce((total, item) => total + item.quantity, 0) }}</span>
-    </div>
 
-    <!-- Popup del carrito -->
-    <div class="cart-popup" v-if="showCartPopup">
-      <div class="cart-header">
-        <h3>Tu Carrito</h3>
-        <button class="close-cart" @click="toggleCartPopup">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      
-      <div class="cart-items" v-if="cartItems.length > 0">
-        <div class="cart-item" v-for="(item, index) in cartItems" :key="index">
-          <div class="item-info">
-            <h4>{{ item.name }}</h4>
-            <div class="item-meta">
-              <span>${{ item.price }} x {{ item.quantity }}</span>
-              <span class="item-total">${{ item.price * item.quantity }}</span>
-            </div>
-          </div>
-          <button class="remove-item" @click.stop="removeFromCart(index)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="empty-cart" v-else>
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
-        <p>Tu carrito está vacío</p>
-      </div>
-      
-      <div class="cart-footer" v-if="cartItems.length > 0">
-        <div class="cart-total">
-          <span>Total:</span>
-          <span>${{ cartTotal }}</span>
-        </div>
-        <button class="checkout-btn" @click="checkout">Proceder al pago</button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -490,6 +441,8 @@ export default {
   }
 };
 </script>
+
+
 
 
 <style scoped>

@@ -115,6 +115,8 @@
           </div>
         </div>
 
+
+
         <!-- Paso 2 - Experiencia y certificaciones -->
         <div v-if="pasoActual === 2" class="form-step">
           <h2 class="step-title">Tu Experiencia</h2>
@@ -199,6 +201,8 @@
           </div>
         </div>
 
+
+
         <!-- Paso 3 - Detalles adicionales -->
         <div v-if="pasoActual === 3" class="form-step">
           <h2 class="step-title">Detalles Adicionales</h2>
@@ -276,6 +280,8 @@
       </form>
     </div>
 
+
+
     <!-- Modal de confirmación -->
     <transition name="modal">
       <div v-if="mostrarConfirmacion" class="modal-overlay" @click.self="cerrarModal">
@@ -300,6 +306,8 @@
     </transition>
   </div>
 </template>
+
+
 
 <script>
 export default {

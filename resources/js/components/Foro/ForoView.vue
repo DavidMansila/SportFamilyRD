@@ -31,7 +31,7 @@
       </div>
     </nav>
 
-    <!-- Hero Section con efecto parallax -->
+    <!-- Hero Section -->
     <div class="hero-section">
       <div class="hero-content">
         <h1 class="titulo-foro">Comunidad Deportiva</h1>
@@ -61,7 +61,10 @@
       </div>
     </div>
 
-    <!-- Sección de Posts con diseño de tarjetas modernas -->
+
+
+    
+    <!-- Sección de Posts con diseño de tarjetas -->
     <div class="posts-grid">
 
       <div  v-if=" posts.length === 0">
@@ -125,7 +128,10 @@
     </button>
 
 
-    <!-- Modal moderno para crear post -->
+
+
+
+    <!-- Modal para crear post -->
     <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
       <div class="modal-container">
         <div class="modal-header">
@@ -173,38 +179,31 @@
                 <option value="Lugares">Lugares</option>
               </select>
             </div>
-
-            <div class="form-group">
-              <label for="etiquetas">Etiquetas</label>
-              <input
-                v-model="nuevoPost.etiquetas"
-                id="etiquetas"
-                type="text"
-                placeholder="Ej: fútbol, entrenamiento, nutrición"
-              />
-            </div>
           </div>
 
-          <div class="form-group">
-            <label class="file-upload-label">
-              <input
-                type="file"
-                id="imagen"
-                @change="manejarSubidaImagen"
-                accept="image/*"
-                class="file-upload-input"
-              />
-              <span class="file-upload-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                Subir imagen
-              </span>
-              <span v-if="nuevoPost.imagen" class="file-upload-name">Imagen seleccionada</span>
-            </label>
-          </div>
+   <div class="form-group">
+        <label class="file-upload-label">
+         <input
+            type="file"
+            id="imagen"
+            @change="manejarSubidaImagen"
+            accept="image/*"
+            class="file-upload-input"
+          />
+     <span class="file-upload-btn">
+           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+           <polyline points="17 8 12 3 7 8"></polyline>
+           <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+              Subir imagen
+       </span>
+          <span v-if="nuevoPost.imagen" class="file-upload-name">Imagen seleccionada</span>
+      </label>
+  
+             <!-- Mostrar previsualización de la imagen -->
+             <img v-if="nuevoPost.imagen" :src="nuevoPost.imagen" alt="Previsualización" class="image-preview">
+           </div>
 
           <div class="form-actions">
             <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
@@ -225,17 +224,15 @@ export default {
   name: 'ForoComponent',
   data() {
     return {
-      posts: [
-      ],
-      
-      mostrarModal: false,
-      nuevoPost: {
-        titulo: '',
-        contenido: '',
-        categoria: '',
-        etiquetas: '',
-        imagen: null,
-      }
+    posts: [],
+    mostrarModal: false,
+    nuevoPost: {
+    titulo: '',
+    contenido: '',
+    categoria: '',
+    imagen: '',    // Para la URL de previsualización
+    imagenFile: '', // Para el archivo real a subir
+    }
     };
   },
   
@@ -258,7 +255,6 @@ export default {
         titulo: this.nuevoPost.titulo,
         contenido: this.nuevoPost.contenido,
         categoria: this.nuevoPost.categoria,
-        etiquetas: this.nuevoPost.etiquetas.split(',').map(tag => tag.trim()),
         imagen: this.nuevoPost.imagen,
         fecha: new Date().toLocaleDateString(),
         likes: 0,
@@ -273,17 +269,29 @@ export default {
         titulo: '',
         contenido: '',
         categoria: '',
-        etiquetas: '',
         imagen: null,
       };
     },
 
     manejarSubidaImagen(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.nuevoPost.imagen = URL.createObjectURL(file);
-      }
-    },
+  const file = event.target.files[0];
+  if (file) {
+    // Verificar el tipo de archivo
+    if (!file.type.match('image.*')) {
+      alert('Por favor, selecciona solo imágenes (JPEG, PNG, etc.)');
+      return;
+    }
+    // Verificar el tamaño (ejemplo: máximo 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('La imagen es demasiado grande. Máximo 2MB permitido.');
+      return;
+    }
+    // Asignar el archivo directamente para enviarlo al servidor
+    this.nuevoPost.imagenFile = file;
+    // Crear URL temporal para previsualización
+    this.nuevoPost.imagen = URL.createObjectURL(file);
+  }
+},
 
     getPost(){
       axios.get('/posts')
@@ -294,23 +302,41 @@ export default {
           console.error('Error al obtener los posts:', error);
         });
     },
-    createPost(){
-      axios.post('/posts', this.nuevoPost)
-        .then(response => {
-          this.getPost();
-          this.limpiarFormulario();
-          this.cerrarModal();
-        })
-        .catch(error => {
-          console.error('Error al crear el post:', error);
-        });
-    }
-  },
 
-  mounted() {
-    this.getPost();
+    async createPost() {
+  // Crear FormData para enviar archivos
+  const formData = new FormData();
+  
+  // Agregar todos los datos del post
+  formData.append('titulo', this.nuevoPost.titulo);
+  formData.append('contenido', this.nuevoPost.contenido);
+  formData.append('categoria', this.nuevoPost.categoria);
+  // Agregar la imagen si existe
+  if (this.nuevoPost.imagenFile) {
+    formData.append('imagen', this.nuevoPost.imagenFile);
   }
-};
+  try {
+    const response = await axios.post('/posts', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    this.getPost();
+    this.limpiarFormulario();
+    this.cerrarModal();
+    
+  } catch (error) {
+    console.error('Error al crear el post:', error);
+    alert('Error al crear el post. Por favor, intenta nuevamente.');
+  }
+}
+},
+
+mounted() {
+  this.getPost();
+},
+}
 </script>
 
 

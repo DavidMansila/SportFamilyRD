@@ -1,5 +1,7 @@
 <template>
+  
     <div class="profile-view">
+
        <!-- Navbar -->
        <nav class="navbar">
         <div class="logo-container">
