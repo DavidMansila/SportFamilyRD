@@ -292,8 +292,7 @@ export default {
   },
 
   mounted() {
-    this.getPost();
-    this.usuario = localStorage.getItem('usuario');
+    // this.getPost();
   }
 };
 </script>
