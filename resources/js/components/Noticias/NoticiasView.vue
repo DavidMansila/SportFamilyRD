@@ -200,26 +200,25 @@ export default {
     },
   },
   methods: {
+
     async cargarNoticias() {
       this.isLoading = true;
       this.errorMessage = '';
       try {
-        const [futbol, baloncesto, beisbol, volleyball] = await Promise.all([
+        const [futbol, baloncesto, beisbol, volleyball, swimming] = await Promise.all([
           axios.get('/futbol_news'),
           axios.get('/basketball_news'),
           axios.get('/baseball_news'),
           axios.get('/volleyball_news'),
-         axios.get('/swimming_news')
+          axios.get('/swimming_news')
         ]);
-
         this.noticias = [
           ...futbol.data.futbol_news.map(n => ({ ...n, categoria: 'futbol' })),
           ...baloncesto.data.basketball_news.map(n => ({ ...n, categoria: 'baloncesto' })),
           ...beisbol.data.baseball_news.map(n => ({ ...n, categoria: 'beisbol' })),
           ...volleyball.data.volleyball_news.map(n => ({ ...n, categoria: 'volleyball' })),
-        //  ...natacion.data.swimming_news.map(n => ({ ...n, categoria: 'natacion' })),
+          ...swimming.data.swimming_news.map(n => ({ ...n, categoria: 'swimming' })),
         ];
-
         this.filtrarNoticias();
       } catch (error) {
         console.error('Error al cargar noticias:', error);
@@ -228,50 +227,59 @@ export default {
         this.isLoading = false;
       }
     },
+
     filtrarNoticias() {
       this.noticiasFiltradas = this.deporteSeleccionado === 'todos'
         ? [...this.noticias]
         : this.noticias.filter(noticia => noticia.categoria === this.deporteSeleccionado);
       this.currentPage = 1;
     },
+
     cambiarDeporte(deporte) {
       this.deporteSeleccionado = deporte;
       this.filtrarNoticias();
     },
+
     abrirNoticia(noticia) {
       this.noticiaSeleccionada = noticia;
       document.body.style.overflow = 'hidden';
     },
+
     cerrarNoticia() {
       this.noticiaSeleccionada = null;
       document.body.style.overflow = 'auto';
     },
+
     resetFilters() {
       this.deporteSeleccionado = 'todos';
       this.filtrarNoticias();
     },
+
     truncateText(text, length) {
       return text.length > length ? text.substring(0, length) + '...' : text;
     },
+
     getCategoryName(category) {
       const deporte = this.deportes.find(d => d.value === category);
       return deporte ? deporte.label : 'Noticia';
     },
+
     getInitials(name) {
       return name.split(' ').map(n => n[0]).join('').toUpperCase();
     },
+
     formatDescription(desc) {
       return desc
         .replace(/\n/g, '<br>')
         .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
     }
   },
+  
   mounted() {
     this.cargarNoticias();
   }
 };
 </script>
-
 
 
 

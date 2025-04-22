@@ -55,7 +55,6 @@
         <a
           v-for="category in categories"
           :key="category.name"
-          href="/Noticias"
           class="category-card"
         >
           <div class="card-image">
@@ -64,7 +63,6 @@
           </div>
           <div class="card-content">
             <h3>{{ category.name }}</h3>
-            <button class="card-button">Ver noticias</button>
           </div>
         </a>
       </div>
@@ -96,7 +94,6 @@
           <a
             v-for="thread in threads"
             :key="thread.title"
-            href="/Foro"
             class="thread-card"
           >
             <img :src="thread.image" :alt="thread.title" />
@@ -139,15 +136,15 @@
         <div class="footer-section">
           <h3>Contacto</h3>
           <ul class="contact-info">
-            <li><i class="icon">📧</i> info@sportfamilyrd.com</li>
-            <li><i class="icon">📱</i> (809) 555-0199</li>
-            <li><i class="icon">📍</i> Av. 27 de Febrero, Santo Domingo</li>
+            <li><i class="icon">📧</i> sportfamilyrd@gmail.com </li>
+            <li><i class="icon">📱</i> (849) - 881 - 4028 </li>
+            <!--<li><i class="icon">📍</i> </li>-->
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <p>© 2023 SportFamilyRD. Todos los derechos reservados.</p>
+        <p>© 2025 SportFamilyRD. Todos los derechos reservados.</p>
         <div class="legal-links">
           <a href="/terminos">Términos de Servicio</a>
           <a href="/privacidad">Política de Privacidad</a>
@@ -156,6 +153,8 @@
     </footer>
   </div>
 </template>
+
+
 
 <script>
 export default {
