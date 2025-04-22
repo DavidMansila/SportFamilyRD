@@ -267,6 +267,19 @@ export default {
         this.nuevoPost.imagen = URL.createObjectURL(file);
       }
     },
+    getPost(){
+      axios.get('/posts')
+        .then(response => {
+          this.posts = response.data;
+        })
+        .catch(error => {
+          console.error('Error al obtener los posts:', error);
+        });
+    }
+  },
+  mounted() {
+    this.getPost();
+    //this.usuario = localStorage.getItem('usuario');
   }
 };
 </script>
