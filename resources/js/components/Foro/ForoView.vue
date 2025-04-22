@@ -158,16 +158,6 @@
                 <option value="Lugares">Lugares</option>
               </select>
             </div>
-
-            <div class="form-group">
-              <label for="etiquetas">Etiquetas</label>
-              <input
-                v-model="nuevoPost.etiquetas"
-                id="etiquetas"
-                type="text"
-                placeholder="Ej: fútbol, entrenamiento, nutrición"
-              />
-            </div>
           </div>
 
           <div class="form-group">
@@ -221,7 +211,6 @@ export default {
         titulo: '',
         contenido: '',
         categoria: '',
-        etiquetas: '',
         imagen: null,
       }
     };
@@ -243,7 +232,6 @@ export default {
         titulo: this.nuevoPost.titulo,
         contenido: this.nuevoPost.contenido,
         categoria: this.nuevoPost.categoria,
-        etiquetas: this.nuevoPost.etiquetas.split(',').map(tag => tag.trim()),
         imagen: this.nuevoPost.imagen,
         fecha: new Date().toLocaleDateString(),
         likes: 0,
@@ -257,7 +245,6 @@ export default {
         titulo: '',
         contenido: '',
         categoria: '',
-        etiquetas: '',
         imagen: null,
       };
     },
@@ -278,7 +265,7 @@ export default {
     }
   },
   mounted() {
-    this.getPost();
+    //this.getPost();
     //this.usuario = localStorage.getItem('usuario');
   }
 };
