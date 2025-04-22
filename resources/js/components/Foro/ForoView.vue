@@ -63,9 +63,18 @@
 
     <!-- Sección de Posts con diseño de tarjetas modernas -->
     <div class="posts-grid">
+
+      <div  v-if=" posts.length === 0">
+        <h2 class="no-posts">No hay publicaciones disponibles</h2>
+        <p class="no-posts-subtitle">¡Sé el primero en iniciar una conversación!</p>
+        <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
+        <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
+      </div>  
+
       <div 
+        v-else-if="posts.length > 0"
         v-for="(post, index) in posts" 
-        :key="post.id" 
+        :key="index" 
         class="post-card"
         :style="`--hue: ${index * 60 % 360}`"
       >
@@ -77,7 +86,7 @@
         
           <div class="post-meta">
             <span class="post-author">
-              <img src="/imagenes/avatar-default.png" alt="Autor" class="author-avatar">
+              <!-- <img src="/imagenes/avatar-default.png" alt="Autor" class="author-avatar"> -->
               Usuario{{ post.id }}
             </span>
             <span class="post-date">{{ post.fecha }}</span>
@@ -105,6 +114,7 @@
         </div>
       </div>
     </div>
+
     <!-- todo aqui esta el vif v-if="usuario.tipo == 'Admin'" -->
     <!-- Botón flotante para crear post -->
     <button  @click="abrirModal" class="floating-btn">
@@ -129,7 +139,7 @@
           </button>
         </div>
         
-        <form @submit.prevent="guardarPost" class="modal-form">
+        <form @submit.prevent="createPost()" class="modal-form">
           <div class="form-group">
             <label for="titulo">Título</label>
             <input
@@ -216,13 +226,8 @@ export default {
   data() {
     return {
       posts: [
-        { id: 1, titulo: '¿Quién es tu jugador favorito?', contenido: 'Hablemos de nuestros jugadores favoritos en el fútbol. ¿Quién te inspira más y por qué? Comparte tus opiniones sobre los mejores jugadores del mundo.', fecha: '12/10/2023', likes: 15, comentarios: 8, categoria: 'Deporte' },
-        { id: 2, titulo: 'Consejos para correr más rápido', contenido: '¿Qué ejercicios te ayudan a correr más rápido? He estado entrenando para mejorar mi velocidad y me gustaría conocer tus rutinas y consejos para mejorar el rendimiento.', fecha: '10/10/2023', likes: 22, comentarios: 12, categoria: 'Gym' },
-        { id: 3, titulo: 'Mejores trucos para jugar baloncesto', contenido: 'Comparte tus mejores trucos y técnicas para el baloncesto. Desde tiros hasta defensa, todo lo que pueda ayudar a mejorar el juego es bienvenido en esta discusión.', fecha: '08/10/2023', likes: 30, comentarios: 18, categoria: 'Deporte' },
-        { id: 4, titulo: '¿Qué opinas de la inteligencia artificial en el deporte?', contenido: 'Abre un debate sobre el futuro de la IA en los deportes. ¿Cómo crees que la tecnología cambiará la forma en que entrenamos, competimos y vemos los deportes?', fecha: '05/10/2023', likes: 45, comentarios: 25, categoria: 'Experiencia' },
-        { id: 5, titulo: 'Los mejores gimnasios de la ciudad', contenido: 'Recomienda tus gimnasios favoritos y comparte qué los hace especiales. Equipamiento, entrenadores, ambiente - todo cuenta al elegir el mejor lugar para entrenar.', fecha: '03/10/2023', likes: 18, comentarios: 7, categoria: 'Lugares' },
-        { id: 6, titulo: 'Mi primera maratón - experiencia personal', contenido: 'Comparto mi viaje de preparación y participación en mi primera maratón. Los altibajos, lo que aprendí y cómo me prepararé para la próxima. ¿Alguien más está entrenando para una maratón?', fecha: '01/10/2023', likes: 52, comentarios: 31, categoria: 'Experiencia' },
       ],
+      
       mostrarModal: false,
       nuevoPost: {
         titulo: '',
@@ -283,16 +288,27 @@ export default {
     getPost(){
       axios.get('/posts')
         .then(response => {
-          this.posts = response.data;
+          this.posts = response.data.posts;
         })
         .catch(error => {
           console.error('Error al obtener los posts:', error);
+        });
+    },
+    createPost(){
+      axios.post('/posts', this.nuevoPost)
+        .then(response => {
+          this.getPost();
+          this.limpiarFormulario();
+          this.cerrarModal();
+        })
+        .catch(error => {
+          console.error('Error al crear el post:', error);
         });
     }
   },
 
   mounted() {
-    // this.getPost();
+    this.getPost();
   }
 };
 </script>
