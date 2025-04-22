@@ -11,14 +11,19 @@ return new class extends Migration
      */
     public function up()
     {
-        // Crear la tabla 'posts'
         // Esta tabla contendrá las publicaciones del foro
         // todo ponerle user id pa tener el autor y ponerle likes_quantity
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('titulo');
             $table->text('contenido');
-            $table->timestamps(); // Crea created_at y updated_at
+            $table->unsignedBigInteger('user_id'); 
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->integer('likes_quantity')->default(0); 
+            $table->string('imagen')->nullable();
+            $table->string('video')->nullable();
+            $table->string('categoria')->nullable();
+            $table->timestamps(); 
         });
     }
 
