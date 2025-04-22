@@ -74,6 +74,7 @@
         </div>
         <div class="post-header">
           <h3 class="post-titulo">{{ post.titulo }}</h3>
+        
           <div class="post-meta">
             <span class="post-author">
               <img src="/imagenes/avatar-default.png" alt="Autor" class="author-avatar">
@@ -82,7 +83,9 @@
             <span class="post-date">{{ post.fecha }}</span>
           </div>
         </div>
+
         <p class="post-contenido">{{ post.contenido.substring(0, 150) }}...</p>
+        
         <div class="post-footer">
           <div class="post-stats">
             <span class="post-likes">
@@ -102,20 +105,22 @@
         </div>
       </div>
     </div>
-
+    <!-- todo aqui esta el vif v-if="usuario.tipo == 'Admin'" -->
     <!-- Botón flotante para crear post -->
-    <button @click="abrirModal" class="floating-btn">
+    <button  @click="abrirModal" class="floating-btn">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12"></line>
       </svg>
     </button>
 
+
     <!-- Modal moderno para crear post -->
     <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
       <div class="modal-container">
         <div class="modal-header">
           <h2>Crear nuevo post</h2>
+          
           <button @click="cerrarModal" class="modal-close-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -204,6 +209,8 @@
 
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'ForoComponent',
   data() {
@@ -226,16 +233,19 @@ export default {
       }
     };
   },
+  
   methods: {
     abrirModal() {
       this.mostrarModal = true;
       document.body.style.overflow = 'hidden';
     },
+
     cerrarModal() {
       this.mostrarModal = false;
       this.limpiarFormulario();
       document.body.style.overflow = 'auto';
     },
+
     guardarPost() {
       const nuevoId = Math.max(...this.posts.map(p => p.id)) + 1;
       const nuevoPost = {
@@ -252,6 +262,7 @@ export default {
       this.posts.unshift(nuevoPost);
       this.cerrarModal();
     },
+
     limpiarFormulario() {
       this.nuevoPost = {
         titulo: '',
@@ -261,12 +272,28 @@ export default {
         imagen: null,
       };
     },
+
     manejarSubidaImagen(event) {
       const file = event.target.files[0];
       if (file) {
         this.nuevoPost.imagen = URL.createObjectURL(file);
       }
     },
+
+    getPost(){
+      axios.get('/posts')
+        .then(response => {
+          this.posts = response.data;
+        })
+        .catch(error => {
+          console.error('Error al obtener los posts:', error);
+        });
+    }
+  },
+
+  mounted() {
+    this.getPost();
+    this.usuario = localStorage.getItem('usuario');
   }
 };
 </script>

@@ -3,49 +3,87 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\Reply;
-use App\Models\Comment;
 use Illuminate\Http\Request;
 
-class PostController extends Controller
+class ForoController extends Controller
 {
     public function index()
     {
-        return Post::with('comments.replies')->get();
+        try {
+            $posts = Post::with('comments')->get();
+
+            return response()->json([
+                'message' => 'Posts recibidos exitosamente',
+                'posts' => $posts,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener los posts',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    
     }
 
     public function store(Request $request)
     {
-        $post = Post::create($request->all());
-        return response()->json($post, 201);
+        try {
+            $post = Post::create($request->all());
+
+            return response()->json([
+                'message' => 'Post creado exitosamente',
+                'posts' => $post,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener los posts',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
-    public function show($id)
+    public function update(Request $request, $id)
     {
-        return Post::with('comments.replies')->findOrFail($id);
+        try {
+            $post = Post::findOrFail($id);
+            $post->update($request->all());
+
+            return response()->json([
+                'message' => 'Post actualizado exitosamente',
+                'post' => $post,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar el post',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $post = Post::findOrFail($id);
+            $post->delete();
+
+            return response()->json([
+                'message' => 'Post eliminado exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al eliminar el post',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
 
 
-class CommentController extends Controller
-{
-    public function store(Request $request)
-    {
-        $comment = Comment::create($request->all());
-        return response()->json($comment, 201);
-    }
-}
 
-
-
-class ReplyController extends Controller
-{
-    public function store(Request $request)
-    {
-        $reply = Reply::create($request->all());
-        return response()->json($reply, 201);
-    }
-}
 
 
 

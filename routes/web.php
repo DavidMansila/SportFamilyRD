@@ -4,10 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ForoController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ReplyController;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
 
@@ -74,6 +72,9 @@ Route::resource('/news', NewsController::class);
 //productos
 Route::resource('/products', ProductController::class);
 
+//Foro
+Route::resource('/posts', ForoController::class);
+
 
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
@@ -88,10 +89,6 @@ Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
 Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
 
 
-//todo chequear esto
-Route::apiResource('posts', PostController::class);
-Route::apiResource('comments', CommentController::class);
-Route::apiResource('replies', ReplyController::class);
 
 
 
