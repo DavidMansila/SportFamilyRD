@@ -1,6 +1,6 @@
 <template>
   <div class="foro-page">
-
+    
     <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
