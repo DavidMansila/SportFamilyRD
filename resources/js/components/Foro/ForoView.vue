@@ -181,29 +181,33 @@
             </div>
           </div>
 
-   <div class="form-group">
-        <label class="file-upload-label">
-         <input
-            type="file"
-            id="imagen"
-            @change="manejarSubidaImagen"
-            accept="image/*"
-            class="file-upload-input"
-          />
-     <span class="file-upload-btn">
-           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+          <div class="form-group">
+  <label class="file-upload-label">
+    <input
+      type="file"
+      id="imagen"
+      @change="handleFileSelect"
+      accept="image/*"
+      class="file-upload-input"
+         />
+         <span class="file-upload-btn">
+         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
            <polyline points="17 8 12 3 7 8"></polyline>
            <line x1="12" y1="3" x2="12" y2="15"></line>
-        </svg>
-              Subir imagen
-       </span>
-          <span v-if="nuevoPost.imagen" class="file-upload-name">Imagen seleccionada</span>
-      </label>
-  
-             <!-- Mostrar previsualización de la imagen -->
-             <img v-if="nuevoPost.imagen" :src="nuevoPost.imagen" alt="Previsualización" class="image-preview">
-           </div>
+         </svg>
+           Subir imagen
+           </span>
+             <span v-if="nuevoPost.imagenFile" class="file-upload-name">
+               {{ nuevoPost.imagenFile.name }}
+             </span>
+         </label>
+          <!-- Mostrar previsualización de la imagen -->
+              <img v-if="imagenMiniatura" :src="imagenMiniatura" alt="Previsualización" class="image-preview">
+         </div>
+
+
 
           <div class="form-actions">
             <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
@@ -224,15 +228,15 @@ export default {
   name: 'ForoComponent',
   data() {
     return {
-    posts: [],
-    mostrarModal: false,
-    nuevoPost: {
-    titulo: '',
-    contenido: '',
-    categoria: '',
-    imagen: '',    // Para la URL de previsualización
-    imagenFile: '', // Para el archivo real a subir
-    }
+      posts: [],
+      mostrarModal: false,
+      nuevoPost: {
+        titulo: '',
+        contenido: '',
+        categoria: '',
+        imagenFile: null,  // Para el archivo de imagen
+      },
+      imagenMiniatura: null // Para la previsualización
     };
   },
   
@@ -269,29 +273,45 @@ export default {
         titulo: '',
         contenido: '',
         categoria: '',
-        imagen: null,
+        imagenFile: null
       };
+      this.imagenMiniatura = null;
     },
 
-    manejarSubidaImagen(event) {
-  const file = event.target.files[0];
-  if (file) {
-    // Verificar el tipo de archivo
-    if (!file.type.match('image.*')) {
-      alert('Por favor, selecciona solo imágenes (JPEG, PNG, etc.)');
-      return;
-    }
-    // Verificar el tamaño (ejemplo: máximo 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      alert('La imagen es demasiado grande. Máximo 2MB permitido.');
-      return;
-    }
-    // Asignar el archivo directamente para enviarlo al servidor
-    this.nuevoPost.imagenFile = file;
-    // Crear URL temporal para previsualización
-    this.nuevoPost.imagen = URL.createObjectURL(file);
-  }
-},
+    handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      // Validar tipo de archivo
+      if (!file.type.match('image.*')) {
+        alert('Por favor, selecciona solo imágenes (JPEG, PNG, etc.)');
+        return;
+      }
+      
+      // Validar tamaño (ejemplo: máximo 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('La imagen es demasiado grande. Máximo 2MB permitido.');
+        return;
+      }
+      
+      // Asignar el archivo para enviarlo al servidor
+      this.nuevoPost.imagenFile = file;
+      
+      // Crear URL temporal para previsualización
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.imagenMiniatura = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+
+        loadImg(file){
+            let reader = new FileReader();
+            reader.onload = (e) =>{
+                this.imagenMiniatura = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        },
 
     getPost(){
       axios.get('/posts')
@@ -304,33 +324,31 @@ export default {
     },
 
     async createPost() {
-  // Crear FormData para enviar archivos
-  const formData = new FormData();
-  
-  // Agregar todos los datos del post
-  formData.append('titulo', this.nuevoPost.titulo);
-  formData.append('contenido', this.nuevoPost.contenido);
-  formData.append('categoria', this.nuevoPost.categoria);
-  // Agregar la imagen si existe
-  if (this.nuevoPost.imagenFile) {
-    formData.append('imagen', this.nuevoPost.imagenFile);
-  }
-  try {
-    const response = await axios.post('/posts', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+      const formData = new FormData();
+      formData.append('titulo', this.nuevoPost.titulo);
+      formData.append('contenido', this.nuevoPost.contenido);
+      formData.append('categoria', this.nuevoPost.categoria);
+      
+      if (this.nuevoPost.imagenFile) {
+        formData.append('imagen', this.nuevoPost.imagenFile);
       }
-    });
-    
-    this.getPost();
-    this.limpiarFormulario();
-    this.cerrarModal();
-    
-  } catch (error) {
-    console.error('Error al crear el post:', error);
-    alert('Error al crear el post. Por favor, intenta nuevamente.');
-  }
-}
+
+      try {
+        const response = await axios.post('/posts', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        this.getPost();
+        this.limpiarFormulario();
+        this.cerrarModal();
+        
+      } catch (error) {
+        console.error('Error al crear el post:', error);
+        alert('Error al crear el post. Por favor, intenta nuevamente.');
+      }
+    },
 },
 
 mounted() {
