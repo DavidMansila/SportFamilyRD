@@ -9,7 +9,7 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id','titulo', 'contenido', 'user_id', 'likes_quantity'];
+    protected $fillable = ['id','titulo', 'contenido', 'imagen',  'user_id', 'likes_quantity'];
 
     public function comments()
     {
@@ -22,7 +22,7 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['post_id', 'texto'];
+    protected $fillable = ['post_id', 'texto', 'fecha'];
 
     public function post()
     {
@@ -40,7 +40,7 @@ class Reply extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['comment_id', 'texto'];
+    protected $fillable = ['comment_id', 'texto', 'fecha' ];
 
     public function comment()
     {

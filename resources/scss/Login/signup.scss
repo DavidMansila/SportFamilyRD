@@ -1,4 +1,32 @@
+/* Variables de color y tipografía */
+$primary-color: #000000;
+$secondary-color: #ff3149;
+$light-color: #ffffff;
+$dark-color: #333333;
+$gray-light: #f5f5f5;
+$gray-medium: #e0e0e0;
+$gray-dark: #c3c2c2;
+$font-main: 'Montserrat', sans-serif;
+$transition-speed: 0.3s;
+$breakpoint-tablet: 768px;
+$breakpoint-mobile: 480px;
 
+/* Mixins útiles */
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin box-shadow {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+@mixin gradient-bg {
+  background: linear-gradient(135deg, $primary-color, $secondary-color);
+}
+
+/* Estilos base */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,163 +34,333 @@
 }
 
 body {
-  background: linear-gradient(135deg, #000000, #ff3149);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Montserrat', sans-serif;
+  @include gradient-bg;
+  font-family: $font-main;
   min-height: 100vh;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
+  @include flex-center;
+  padding: 2rem;
+  overflow-x: hidden;
+  color: $dark-color;
+  
+  @media (max-width: $breakpoint-tablet) {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.5rem;
+  }
 }
 
-
 h1 {
-  font-weight: bold;
+  font-weight: 700;
   margin: 0;
+  font-size: 2rem;
+  color: $primary-color;
+  
+  @media (max-width: $breakpoint-mobile) {
+    font-size: 1.5rem;
+  }
 }
 
 h2 {
   text-align: center;
+  margin-bottom: 1rem;
 }
 
 p {
-  font-size: 14px;
-  font-weight: 100;
-  line-height: 20px;
-  letter-spacing: 0.5px;
-  margin: 20px 0 30px;
-}
-
-span {
-  font-size: 12px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+  color: rgba($dark-color, 0.8);
 }
 
 a {
-  color: #333;
-  font-size: 14px;
+  color: $primary-color;
+  font-size: 0.875rem;
   text-decoration: none;
-  margin: 15px 0;
+  transition: color $transition-speed;
+
+  &:hover {
+    color: $secondary-color;
+  }
 }
 
+/* Botones */
 button {
-  border-radius: 20px;
-  border: 1px solid #000000;
-  background-color: #000000;
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 12px 45px;
+  border-radius: 2rem;
+  border: 2px solid $primary-color;
+  background-color: $primary-color;
+  color: $light-color;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.75rem 2.5rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  transition: transform 80ms ease-in, background-color 0.3s ease;
+  transition: all $transition-speed;
   cursor: pointer;
+  outline: none;
+  margin: 0.5rem 0;
+
+  &:hover {
+    background-color: $secondary-color;
+    border-color: $secondary-color;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  &.ghost {
+    background-color: transparent;
+    border-color: $light-color;
+    color: $light-color;
+
+    &:hover {
+      background-color: rgba($light-color, 0.1);
+    }
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.6rem 1.8rem;
+    font-size: 0.65rem;
+  }
 }
 
-button:hover {
-  background-color: #ff3149;
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
-button.ghost {
-  background-color: transparent;
-  border-color: #ffffff;
-}
-
+/* Formularios */
 form {
-  background-color: #c3c2c2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: $light-color;
+  @include flex-center;
   flex-direction: column;
-  padding: 0 50px;
+  padding: 2rem;
   height: 100%;
   text-align: center;
-  border-radius: 10px;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  border-radius: 1rem;
+  @include box-shadow;
+  width: 100%;
+  
+  @media (max-width: $breakpoint-tablet) {
+    padding: 1.5rem;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 1rem;
+  }
 }
 
 input {
-  background-color: #eee;
+  background-color: $gray-light;
   border: none;
-  padding: 12px 15px;
-  margin: 8px 0;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
   width: 100%;
-  border-radius: 5px;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all $transition-speed;
+  border: 2px solid transparent;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    background-color: $light-color;
+    @include box-shadow;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.6rem 0.8rem;
+  }
 }
 
+/* Logo */
 .logo-main {
-  width: 300px;
+  width: 12rem;
   height: auto;
-  transition: transform 0.3s ease-in-out;
-  margin: 20px;
-  position: relative;
-  z-index: 1000;
+  transition: transform $transition-speed;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  @media (max-width: $breakpoint-tablet) {
+    width: 10rem;
+    margin-bottom: 1rem;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    width: 8rem;
+  }
 }
 
-.container {
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  max-width: 900px;
-  min-height: 600px;
+/* Contenedor principal */
+.container-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: auto;
-  z-index: 1; /* Asegura que el contenedor esté por encima del fondo */
+  min-height: 100vh;
+  width: 100%;
+  padding: 2rem;
+  position: relative;
+  
+  @media (max-width: $breakpoint-tablet) {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.5rem;
+  }
 }
 
+.container {
+  background-color: $light-color;
+  border-radius: 1rem;
+  @include box-shadow;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 60rem;
+  min-height: 38rem;
+  display: flex;
+  margin: auto;
+  z-index: 1;
+  
+  @media (max-width: $breakpoint-tablet) {
+    flex-direction: column;
+    min-height: auto;
+    max-height: 100vh;
+    border-radius: 0.5rem;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    border-radius: 0;
+  }
+  
+  @media (min-width: 1600px) {
+    max-width: 70rem;
+    min-height: 45rem;
+  }
+}
+
+/* Contenedores de formulario */
 .form-container {
   position: absolute;
   top: 0;
   height: 100%;
   transition: all 0.6s ease-in-out;
   width: 50%;
+  padding: 2rem;
+  @include flex-center;
+  
+  @media (max-width: $breakpoint-tablet) {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 50vh;
+    padding: 1.5rem;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 1rem;
+    min-height: 55vh;
+  }
 }
 
 .sign-in-container {
   left: 0;
   z-index: 2;
-}
-
-.container.right-panel-active .sign-in-container {
-  transform: translateX(100%);
+  
+  @media (max-width: $breakpoint-tablet) {
+    left: auto;
+  }
 }
 
 .sign-up-container {
   left: 0;
   opacity: 0;
   z-index: 1;
+  
+  @media (max-width: $breakpoint-tablet) {
+    left: auto;
+    display: none;
+  }
 }
 
-.container.right-panel-active .sign-up-container {
-  transform: translateX(100%);
-  opacity: 1;
-  z-index: 5;
-  animation: show 0.6s;
+/* Efectos de transición */
+.container.right-panel-active {
+  .sign-in-container {
+    transform: translateX(100%);
+    
+    @media (max-width: $breakpoint-tablet) {
+      transform: none;
+      display: none;
+    }
+  }
+
+  .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: show 0.6s;
+    
+    @media (max-width: $breakpoint-tablet) {
+      transform: none;
+      display: flex;
+    }
+  }
+
+  .overlay-container {
+    transform: translateX(-100%);
+    
+    @media (max-width: $breakpoint-tablet) {
+      transform: translateY(-100%);
+    }
+  }
+
+  .overlay {
+    transform: translateX(50%);
+    
+    @media (max-width: $breakpoint-tablet) {
+      transform: translateY(50%);
+    }
+  }
+
+  .overlay-left {
+    transform: translateX(0);
+    
+    @media (max-width: $breakpoint-tablet) {
+      transform: translateY(0);
+    }
+  }
+
+  .overlay-right {
+    transform: translateX(20%);
+    
+    @media (max-width: $breakpoint-tablet) {
+      transform: translateY(20%);
+    }
+  }
 }
 
 @keyframes show {
-  0%,
-  49.99% {
+  0%, 49.99% {
     opacity: 0;
     z-index: 1;
   }
-  50%,
-  100% {
+  50%, 100% {
     opacity: 1;
     z-index: 5;
   }
 }
 
+/* Overlay */
 .overlay-container {
   position: absolute;
   top: 0;
@@ -172,102 +370,192 @@ input {
   overflow: hidden;
   transition: transform 0.6s ease-in-out;
   z-index: 100;
-}
-
-.container.right-panel-active .overlay-container {
-  transform: translateX(-100%);
+  
+  @media (max-width: $breakpoint-tablet) {
+    position: relative;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    order: -1;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    height: 180px;
+  }
 }
 
 .overlay {
-  background: linear-gradient(to right, #000000, #000000);
-  color: #ffffff;
+  @include gradient-bg;
+  color: $light-color;
   position: relative;
   left: -100%;
   height: 100%;
   width: 200%;
   transform: translateX(0);
   transition: transform 0.6s ease-in-out;
-}
-
-.container.right-panel-active .overlay {
-  transform: translateX(50%);
+  
+  @media (max-width: $breakpoint-tablet) {
+    left: 0;
+    width: 100%;
+    height: 200%;
+  }
 }
 
 .overlay-panel {
   position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   flex-direction: column;
-  padding: 0 40px;
+  padding: 2rem;
   text-align: center;
   top: 0;
   height: 100%;
   width: 50%;
   transform: translateX(0);
   transition: transform 0.6s ease-in-out;
+
+  h1 {
+    color: $light-color;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: rgba($light-color, 0.8);
+    margin-bottom: 2rem;
+    max-width: 80%;
+  }
+  
+  @media (max-width: $breakpoint-tablet) {
+    width: 100%;
+    padding: 1.5rem;
+    
+    p {
+      max-width: 100%;
+    }
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 1rem;
+  }
 }
 
 .overlay-left {
   transform: translateX(-20%);
-}
-
-.container.right-panel-active .overlay-left {
-  transform: translateX(0);
+  
+  @media (max-width: $breakpoint-tablet) {
+    transform: translateY(-20%);
+  }
 }
 
 .overlay-right {
   right: 0;
   transform: translateX(0);
+  
+  @media (max-width: $breakpoint-tablet) {
+    transform: translateY(0);
+  }
 }
 
-.container.right-panel-active .overlay-right {
-  transform: translateX(20%);
-}
-
+/* Social buttons */
 .social-container {
-  margin: 20px 0;
+  margin: 1.5rem 0;
+  display: flex;
+  gap: 0.75rem;
+
+  a {
+    border: 1px solid $light-color;
+    border-radius: 50%;
+    @include flex-center;
+    margin: 0;
+    height: 2.5rem;
+    width: 2.5rem;
+    color: $light-color;
+    transition: all $transition-speed;
+
+    &:hover {
+      background-color: rgba($light-color, 0.2);
+      transform: translateY(-2px);
+    }
+
+    i {
+      font-size: 1rem;
+    }
+    
+    @media (max-width: $breakpoint-mobile) {
+      height: 2.2rem;
+      width: 2.2rem;
+    }
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    margin: 1rem 0;
+  }
 }
 
-.social-container a {
-  border: 1px solid #ffffff;
-  border-radius: 50%;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0 5px;
-  height: 40px;
-  width: 40px;
-  color: #ffffff;
-  transition: background-color 0.3s ease;
+/* Efectos adicionales */
+.container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba($light-color, 0.1) 0%, transparent 70%);
+  z-index: -1;
+  animation: rotate 20s linear infinite;
+  
+  @media (max-width: $breakpoint-tablet) {
+    display: none;
+  }
 }
 
-.social-container a:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-@media (max-width: 768px) {
+/* Ajustes especiales para pantallas pequeñas en altura */
+@media screen and (max-height: 700px) and (min-width: $breakpoint-tablet) {
   .container {
-    width: 100%;
-    max-width: none;
-    min-height: 100vh;
-    border-radius: 0;
+    min-height: 95vh;
+    max-height: 95vh;
   }
-
+  
   .form-container {
-    width: 100%;
-    padding: 20px;
+    overflow-y: auto;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
   }
-
-  .overlay-panel {
-    padding: 20px;
-  }
-
-  .overlay {
-    width: 100%;
-  }
-
+  
   .logo-main {
-    width: 150px;
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    margin: 0.5rem 0;
+  }
+}
+
+/* Ajustes para zoom extremo */
+@media screen and (max-width: 400px), screen and (max-height: 500px) {
+  .container-wrapper {
+    padding: 0;
+  }
+  
+  .form-container {
+    min-height: 60vh;
+    justify-content: flex-start;
+    padding-top: 1rem;
+  }
+  
+  .overlay-container {
+    height: 150px;
+  }
+  
+  button {
+    padding: 0.5rem 1.5rem;
   }
 }

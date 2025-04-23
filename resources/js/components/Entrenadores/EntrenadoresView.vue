@@ -1,6 +1,8 @@
 <template>
+  
   <div class="entrenadores-page">
     
+
      <!-- Navbar -->
      <nav class="navbar">
         <div class="logo-container">
@@ -37,6 +39,8 @@
         </div>
       </nav>
 
+
+
     <!-- Hero Section -->
     <div class="hero-section">
       <div class="hero-overlay"></div>
@@ -45,6 +49,9 @@
         <p class="hero-subtitle">Entrenadores certificados para llevar tu rendimiento al siguiente nivel</p>
       </div>
     </div>
+
+
+
 
     <!-- Sección CTA -->
     <div class="cta-container">
@@ -61,6 +68,9 @@
         </a>
       </div>
     </div>
+
+
+
 
     <!-- Filtros y Búsqueda -->
     <div class="controls-section">
@@ -82,6 +92,9 @@
         </button>
       </div>
     </div>
+
+
+
 
     <!-- Lista de Entrenadores -->
     <div class="entrenadores-container">
@@ -120,6 +133,9 @@
         </div>
       </transition-group>
     </div>
+
+
+
 
     <!-- Modal de Perfil -->
     <transition name="modal">
@@ -191,6 +207,8 @@
   </div>
 
 
+
+
   <!-- Burbuja de Mensajes Flotante -->
 <div class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
   <div class="message-icon">
@@ -237,6 +255,8 @@
 
 
 </template>
+
+
 
 
 

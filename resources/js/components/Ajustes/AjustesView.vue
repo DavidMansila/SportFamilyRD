@@ -1,5 +1,8 @@
 <template>
+  
   <div class="settings-view">
+
+
     <!-- Navbar -->
     <nav class="navbar">
         <div class="logo-container">
@@ -88,6 +91,8 @@
           <button class="save-btn" @click="saveSettings">Guardar Cambios</button>
         </div>
 
+
+
         <!-- Pestaña de Notificaciones -->
         <div v-if="activeTab === 'notifications'" class="tab-content">
           <h3>Preferencias de Notificación</h3>
@@ -124,6 +129,8 @@
             </select>
           </div>
         </div>
+
+
 
         <!-- Pestaña de Privacidad -->
         <div v-if="activeTab === 'privacy'" class="tab-content">
@@ -166,6 +173,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- Modal de Confirmación -->
     <div v-if="showModal" class="modal-overlay">
@@ -261,6 +269,9 @@ export default {
   }
 }
 </script>
+
+
+
 
 <style scoped lang="scss">
 @import '../../../scss/Ajustes/ajustes.scss';
