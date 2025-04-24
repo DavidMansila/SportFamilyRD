@@ -2,6 +2,7 @@
   <div class="container" ref="container">
     <div class="form-container sign-up-container">
       <form >
+        
         <!-- @submit.prevent="submitForm" -->
         <h1>Create Account</h1>
         <div class="social-container">
@@ -15,7 +16,7 @@
         <input type="password" v-model="registerForm.password_confirmation" placeholder="Confirmar contraseña" required />
         <button type="button" :disabled="isSubmitting" @click="submitForm()">Sign Up</button>
       </form>
-    </div>
+    </div>  
 
     <div class="form-container sign-in-container">
       <form @submit.prevent="submitLoginForm">

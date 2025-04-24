@@ -10,6 +10,10 @@ $font-main: 'Montserrat', sans-serif;
 $transition-speed: 0.3s;
 $breakpoint-tablet: 768px;
 $breakpoint-mobile: 480px;
+$breakpoint-large: 1200px;
+$breakpoint-tv: 1600px;
+
+
 
 /* Mixins útiles */
 @mixin flex-center {
@@ -26,7 +30,29 @@ $breakpoint-mobile: 480px;
   background: linear-gradient(135deg, $primary-color, $secondary-color);
 }
 
-/* Estilos base */
+
+
+/* Estilos base responsive */
+:root {
+  font-size: 16px;
+  
+  @media (max-width: $breakpoint-tablet) {
+    font-size: 15px;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    font-size: 14px;
+  }
+  
+  @media (min-width: $breakpoint-large) {
+    font-size: 17px;
+  }
+  
+  @media (min-width: $breakpoint-tv) {
+    font-size: 20px;
+  }
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -38,34 +64,43 @@ body {
   font-family: $font-main;
   min-height: 100vh;
   @include flex-center;
-  padding: 2rem;
-  overflow-x: hidden;
+  padding: 1rem;
   color: $dark-color;
   
-  @media (max-width: $breakpoint-tablet) {
-    padding: 1rem;
-    align-items: flex-start;
+  @media (min-width: $breakpoint-tablet) {
+    padding: 2rem;
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    padding: 0.5rem;
+  @media (min-width: $breakpoint-large) {
+    padding: 3rem;
   }
 }
 
+
+
+/* Tipografía responsive */
 h1 {
   font-weight: 700;
   margin: 0;
-  font-size: 2rem;
-  color: $primary-color;
+  font-size: 1.75rem;
   
-  @media (max-width: $breakpoint-mobile) {
-    font-size: 1.5rem;
+  @media (min-width: $breakpoint-tablet) {
+    font-size: 2rem;
+  }
+  
+  @media (min-width: $breakpoint-large) {
+    font-size: 2.25rem;
   }
 }
 
 h2 {
   text-align: center;
   margin-bottom: 1rem;
+  font-size: 1.5rem;
+  
+  @media (min-width: $breakpoint-tablet) {
+    font-size: 1.75rem;
+  }
 }
 
 p {
@@ -73,6 +108,10 @@ p {
   line-height: 1.6;
   margin: 1rem 0;
   color: rgba($dark-color, 0.8);
+  
+  @media (min-width: $breakpoint-tablet) {
+    font-size: 1rem;
+  }
 }
 
 a {
@@ -84,9 +123,15 @@ a {
   &:hover {
     color: $secondary-color;
   }
+  
+  @media (min-width: $breakpoint-tablet) {
+    font-size: 1rem;
+  }
 }
 
-/* Botones */
+
+
+/* Botones responsive */
 button {
   border-radius: 2rem;
   border: 2px solid $primary-color;
@@ -94,13 +139,13 @@ button {
   color: $light-color;
   font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.75rem 2.5rem;
+  padding: 0.75rem 2rem;
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: all $transition-speed;
   cursor: pointer;
-  outline: none;
   margin: 0.5rem 0;
+  min-width: 120px;
 
   &:hover {
     background-color: $secondary-color;
@@ -127,30 +172,36 @@ button {
     }
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    padding: 0.6rem 1.8rem;
-    font-size: 0.65rem;
+  @media (min-width: $breakpoint-tablet) {
+    font-size: 0.875rem;
+    padding: 0.875rem 2.5rem;
+  }
+  
+  @media (min-width: $breakpoint-large) {
+    padding: 1rem 3rem;
   }
 }
 
-/* Formularios */
+
+
+/* Formularios responsive */
 form {
   background-color: $light-color;
   @include flex-center;
   flex-direction: column;
-  padding: 2rem;
+  padding: 1.5rem;
   height: 100%;
   text-align: center;
   border-radius: 1rem;
   @include box-shadow;
   width: 100%;
   
-  @media (max-width: $breakpoint-tablet) {
-    padding: 1.5rem;
+  @media (min-width: $breakpoint-tablet) {
+    padding: 2rem;
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    padding: 1rem;
+  @media (min-width: $breakpoint-large) {
+    padding: 3rem;
   }
 }
 
@@ -172,14 +223,17 @@ input {
     @include box-shadow;
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    padding: 0.6rem 0.8rem;
+  @media (min-width: $breakpoint-tablet) {
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
   }
 }
 
-/* Logo */
+
+
+/* Logo responsive */
 .logo-main {
-  width: 12rem;
+  width: 10rem;
   height: auto;
   transition: transform $transition-speed;
   margin-bottom: 1.5rem;
@@ -189,36 +243,35 @@ input {
     transform: scale(1.05);
   }
   
-  @media (max-width: $breakpoint-tablet) {
-    width: 10rem;
-    margin-bottom: 1rem;
+  @media (min-width: $breakpoint-tablet) {
+    width: 12rem;
+    margin-bottom: 2rem;
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    width: 8rem;
+  @media (min-width: $breakpoint-large) {
+    width: 14rem;
   }
 }
 
-/* Contenedor principal */
+
+
+/* Contenedor principal responsive */
 .container-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   width: 100%;
-  padding: 2rem;
-  position: relative;
+  min-height: 100vh;
+  padding: 1rem;
   
-  @media (max-width: $breakpoint-tablet) {
-    padding: 1rem;
-    align-items: flex-start;
-  }
-  
-  @media (max-width: $breakpoint-mobile) {
-    padding: 0.5rem;
+  @media (min-width: $breakpoint-tablet) {
+    padding: 2rem;
   }
 }
 
+
+
+/* Contenedor principal */
 .container {
   background-color: $light-color;
   border-radius: 1rem;
@@ -227,29 +280,49 @@ input {
   overflow: hidden;
   width: 100%;
   max-width: 60rem;
-  min-height: 38rem;
+  min-height: 35rem;
   display: flex;
-  margin: auto;
-  z-index: 1;
+  margin: auto; /* Asegura centrado horizontal */
   
   @media (max-width: $breakpoint-tablet) {
     flex-direction: column;
     min-height: auto;
-    max-height: 100vh;
-    border-radius: 0.5rem;
+    max-height: 90vh; /* Cambiado de 100vh para evitar overflow */
+    margin-top: auto;
+    margin-bottom: auto;
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    border-radius: 0;
-  }
-  
-  @media (min-width: 1600px) {
+  @media (min-width: $breakpoint-large) {
     max-width: 70rem;
+    min-height: 40rem;
+  }
+  
+  @media (min-width: $breakpoint-tv) {
+    max-width: 80rem;
     min-height: 45rem;
   }
 }
 
-/* Contenedores de formulario */
+
+/* Centrado en dispositivos móviles */
+@media (max-width: $breakpoint-tablet) {
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .container-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+
+
+/* Contenedores de formulario responsive */
 .form-container {
   position: absolute;
   top: 0;
@@ -267,19 +340,14 @@ input {
     padding: 1.5rem;
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    padding: 1rem;
-    min-height: 55vh;
+  @media (min-width: $breakpoint-large) {
+    padding: 3rem;
   }
 }
 
 .sign-in-container {
   left: 0;
   z-index: 2;
-  
-  @media (max-width: $breakpoint-tablet) {
-    left: auto;
-  }
 }
 
 .sign-up-container {
@@ -288,12 +356,13 @@ input {
   z-index: 1;
   
   @media (max-width: $breakpoint-tablet) {
-    left: auto;
     display: none;
   }
 }
 
-/* Efectos de transición */
+
+
+/* Efectos de transición responsive */
 .container.right-panel-active {
   .sign-in-container {
     transform: translateX(100%);
@@ -360,7 +429,9 @@ input {
   }
 }
 
-/* Overlay */
+
+
+/* Overlay responsive */
 .overlay-container {
   position: absolute;
   top: 0;
@@ -379,8 +450,8 @@ input {
     order: -1;
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    height: 180px;
+  @media (min-width: $breakpoint-large) {
+    height: 100%;
   }
 }
 
@@ -433,8 +504,8 @@ input {
     }
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    padding: 1rem;
+  @media (min-width: $breakpoint-large) {
+    padding: 3rem;
   }
 }
 
@@ -455,17 +526,19 @@ input {
   }
 }
 
-/* Social buttons */
+
+
+/* Social buttons responsive */
 .social-container {
   margin: 1.5rem 0;
   display: flex;
   gap: 0.75rem;
+  justify-content: center;
 
   a {
     border: 1px solid $light-color;
     border-radius: 50%;
     @include flex-center;
-    margin: 0;
     height: 2.5rem;
     width: 2.5rem;
     color: $light-color;
@@ -480,16 +553,22 @@ input {
       font-size: 1rem;
     }
     
-    @media (max-width: $breakpoint-mobile) {
-      height: 2.2rem;
-      width: 2.2rem;
+    @media (min-width: $breakpoint-tablet) {
+      height: 3rem;
+      width: 3rem;
+      
+      i {
+        font-size: 1.25rem;
+      }
     }
   }
   
-  @media (max-width: $breakpoint-mobile) {
-    margin: 1rem 0;
+  @media (min-width: $breakpoint-large) {
+    margin: 2rem 0;
   }
 }
+
+
 
 /* Efectos adicionales */
 .container::before {
@@ -517,7 +596,9 @@ input {
   }
 }
 
-/* Ajustes especiales para pantallas pequeñas en altura */
+
+
+/* Ajustes para pantallas pequeñas en altura */
 @media screen and (max-height: 700px) and (min-width: $breakpoint-tablet) {
   .container {
     min-height: 95vh;
@@ -529,33 +610,17 @@ input {
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
   }
-  
-  .logo-main {
-    margin-bottom: 0.5rem;
-  }
-  
-  p {
-    margin: 0.5rem 0;
-  }
 }
 
-/* Ajustes para zoom extremo */
-@media screen and (max-width: 400px), screen and (max-height: 500px) {
+
+
+/* Ajustes para iOS */
+@supports (-webkit-touch-callout: none) {
+  body {
+    min-height: -webkit-fill-available;
+  }
+  
   .container-wrapper {
-    padding: 0;
-  }
-  
-  .form-container {
-    min-height: 60vh;
-    justify-content: flex-start;
-    padding-top: 1rem;
-  }
-  
-  .overlay-container {
-    height: 150px;
-  }
-  
-  button {
-    padding: 0.5rem 1.5rem;
+    min-height: -webkit-fill-available;
   }
 }

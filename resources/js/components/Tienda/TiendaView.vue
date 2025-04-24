@@ -1,6 +1,7 @@
 <template>
   <div class="tienda-page">
     
+    
     <!-- Navbar -->
     <nav class="navbar">
         <div class="logo-container">
@@ -37,6 +38,8 @@
         </div>
       </nav>
 
+
+
     <!-- Barra de búsqueda -->
     <div class="search-container">
       <div class="search-wrapper">
@@ -50,6 +53,8 @@
         <i class="fas fa-search search-icon"></i>
       </div>
     </div>
+
+
 
     <!-- Filtros modernos -->
     <div class="filters-section">
@@ -86,6 +91,8 @@
       </div>
     </div>
 
+
+
     <!-- Productos -->
     <div class="products-grid">
       <div 
@@ -117,6 +124,8 @@
         </div>
       </div>
     </div>
+
+
 
     <!-- Popup de producto -->
     <div v-if="popupVisible" class="product-modal" @click="cerrarPopup">
@@ -190,90 +199,13 @@
       </div>
     </div>
 
-    <!-- Mini carrito -->
-    <div 
-      class="mini-cart-btn"
-      :class="{ 'items-in-cart': carrito.length > 0 }"
-      @click="toggleCart"
-    >
-      <i class="fas fa-shopping-bag"></i>
-      <span class="cart-count">{{ carrito.length }}</span>
-    </div>
 
-    <!-- Carrito lateral moderno -->
-    <div class="cart-sidebar" :class="{ active: cartVisible }">
-      <div class="cart-header">
-        <h3>Tu Carrito</h3>
-        <button class="close-cart" @click="toggleCart">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="cart-items" v-if="carrito.length > 0">
-        <div v-for="(item, index) in carrito" :key="index" class="cart-item">
-          <img :src="item.image" :alt="item.name" class="cart-item-image" />
-          
-          <div class="cart-item-details">
-            <h4 class="cart-item-name">{{ item.name }}</h4>
-            <div class="cart-item-price">{{ item.price }} RD$</div>
-            
-            <div class="cart-item-actions">
-              <div class="item-quantity">
-                <button @click="decreaseQuantity(index)">-</button>
-                <span>{{ item.quantity || 1 }}</span>
-                <button @click="increaseQuantity(index)">+</button>
-              </div>
-              
-              <button class="remove-item" @click="eliminarDelCarrito(index)">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="empty-cart" v-else>
-        <i class="fas fa-shopping-bag"></i>
-        <p>Tu carrito está vacío</p>
-      </div>
-      
-      <div class="cart-footer" v-if="carrito.length > 0">
-        <div class="cart-totals">
-          <div class="subtotal">
-            <span>Subtotal:</span>
-            <span>{{ calcularSubtotal }} RD$</span>
-          </div>
-          <div class="shipping">
-            <span>Envío:</span>
-            <span>{{ calcularEnvio }} RD$</span>
-          </div>
-          <div class="total">
-            <span>Total:</span>
-            <span>{{ calcularTotal }} RD$</span>
-          </div>
-        </div>
-        
-        <button class="checkout-btn" @click="finalizarCompra">
-          Proceder al pago
-        </button>
-      </div>
-    </div>
 
-    <!-- Notificación flotante -->
-    <transition name="slide-up">
-      <div v-if="productoAgregado" class="notification">
-        <div class="notification-content">
-          <i class="fas fa-check-circle"></i>
-          <span>{{ productoAgregado.name }} añadido al carrito</span>
-        </div>
-      </div>
-    </transition>
 
-    <!-- Overlay para carrito/modal -->
-    <div class="overlay" 
-      :class="{ active: popupVisible || cartVisible }"
-      @click="closeAllModals"
-    ></div>
+
+
+
+
   </div>
 </template>
 

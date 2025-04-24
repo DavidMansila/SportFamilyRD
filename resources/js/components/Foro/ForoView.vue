@@ -31,6 +31,7 @@
       </div>
     </nav>
 
+
     <!-- Hero Section -->
     <div class="hero-section">
       <div class="hero-content">
@@ -62,14 +63,13 @@
     </div>
 
 
-
     
     <!-- Sección de Posts con diseño de tarjetas -->
     <div class="posts-grid">
 
       <div  v-if=" posts.length === 0">
         <h2 class="no-posts">No hay publicaciones disponibles</h2>
-        <p class="no-posts-subtitle">¡Sé el primero en iniciar una conversación!</p>
+        <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicacione!</p>
         <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
         <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
       </div>  
@@ -92,10 +92,14 @@
               <!-- <img src="/imagenes/avatar-default.png" alt="Autor" class="author-avatar"> -->
               Usuario{{ post.id }}
             </span>
-            <span class="post-date">{{ post.fecha }}</span>
+            <span class="post-date">{{ post.created_at }}</span>
           </div>
         </div>
 
+        <div class="post-imagen">
+          <img :src="post.file" alt="Imagen del post" class="post-image">
+        </div>
+        
         <p class="post-contenido">{{ post.contenido.substring(0, 150) }}...</p>
         
         <div class="post-footer">
@@ -182,8 +186,8 @@
           </div>
 
 
-          <div class="form-group">
-  <label class="file-upload-label">
+    <div class="form-group">
+    <label class="file-upload-label">
     <input
       type="file"
       id="imagen"
@@ -259,7 +263,7 @@ export default {
         titulo: this.nuevoPost.titulo,
         contenido: this.nuevoPost.contenido,
         categoria: this.nuevoPost.categoria,
-        imagen: this.nuevoPost.imagen,
+        imagen: this.nuevoPost.imagenFile,
         fecha: new Date().toLocaleDateString(),
         likes: 0,
         comentarios: 0,

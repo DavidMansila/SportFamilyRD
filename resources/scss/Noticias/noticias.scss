@@ -17,6 +17,7 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+
 /* Logo a la izquierda */
 .logo-container {
   display: flex;
@@ -27,6 +28,7 @@ body {
   width: 200px; /* Tamaño del logo */
   height: 70px;
 }
+
 
 /* Enlaces en el centro */
 .nav-links {
@@ -47,6 +49,7 @@ body {
 .nav-link:hover {
   color: #fbbf24;
 }
+
 
 /* Imagenes del nav bar */
 
@@ -75,6 +78,7 @@ body {
   transition: transform 0.3s ease-in-out;
 }
 
+
 /* Efecto hover */
 .Imagenes a:hover {
   background: rgba(255, 255, 255, 0.2);
@@ -85,6 +89,7 @@ body {
 .Imagenes a:hover img {
   transform: rotate(10deg) scale(1.2);
 }
+
 
 /* Animación sutil de entrada */
 .Imagenes a::before {
@@ -142,6 +147,8 @@ body {
   color: #666;
   font-weight: 400;
 }
+
+
 
 /* Filtros */
 .filtro-deportes {
@@ -221,10 +228,12 @@ body {
 
 
 
+
 /* Efecto hover para los iconos */
 .filtro-btn:hover .deporte-icon {
   transform: scale(1.2);
 }
+
 
 
 /* Colores específicos para cada deporte */
@@ -247,6 +256,9 @@ body {
 .noticia-card.swimming .news-category {
   background-color: #00b7ff;
 }
+
+
+
 
 /* Grid de noticias */
 .news-grid {
@@ -348,6 +360,8 @@ body {
 }
 
 
+
+
 /* Mejoras en la descripción de noticias */
 .noticia-excerpt {
   font-size: 1rem;
@@ -403,7 +417,10 @@ body {
   transform: translateX(3px);
 }
 
-/* Popup mejorado */
+
+
+
+/* Popup */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s;
 }
@@ -621,6 +638,9 @@ body {
 }
 
 
+
+
+
 /* Títulos */
 .noticia-title {
   font-size: 1.3rem;
@@ -674,6 +694,8 @@ body {
 }
 
 
+
+
 /* Estados de carga */
 .loading-container {
   display: flex;
@@ -703,6 +725,9 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+
+
 
 /* Mensaje de error */
 .error-container {
@@ -755,6 +780,9 @@ body {
   transform: translateY(-2px);
 }
 
+
+
+
 /* Sin noticias */
 .no-news {
   text-align: center;
@@ -780,60 +808,405 @@ body {
 
 
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ------------------- RESPONSIVE DE NOTICIAS PARA TODOS LOS DISPOSITIVOS ------------------ */
+
+/* ------------------- RESPONSIVE DE NOTICIAS PARA TODOS LOS DISPOSITIVOS ------------------ */
+
+/* Pantallas grandes (TVs, monitores 4K) - 1920px+ */
+@media (min-width: 1920px) {
+  .navbar {
+    padding: 1.5rem 2rem;
+  }
+  
+  .hero-banner {
+    height: 90vh;
+  }
+}
+
+/* Laptops y pantallas medianas - 1440px-1599px */
+@media (max-width: 1599px) and (min-width: 1440px) {
+  .navbar {
+    padding: 1.2rem 1.5rem;
+  }
+  
+  .nav-links {
+    gap: 1.8rem;
+  }
+  
+  .logo {
+    width: 190px;
+    height: 65px;
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+  }
+  
+  /* Noticias */
+  .news-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+/* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
+@media (max-width: 1439px) and (min-width: 1200px) {
+  .navbar {
+    padding: 1rem 1.2rem;
+  }
+  
+  .nav-links {
+    gap: 1.5rem;
+  }
+  
+  .logo {
+    width: 180px;
+    height: 60px;
+  }
+  
+  /* Noticias */
+  .popup-content {
+    max-width: 900px;
+  }
+}
+
+/* Tablets grandes - 1024px-1199px */
+@media (max-width: 1199px) and (min-width: 1024px) {
+  .navbar {
+    padding: 1rem;
+  }
+  
+  .nav-links {
+    gap: 1.2rem;
+  }
+  
+  .logo {
+    width: 170px;
+    height: 55px;
+  }
+  
+  .hero-banner {
+    height: 70vh;
+  }
+  
+  .hero-title {
+    font-size: 2.8rem;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  
+  /* Noticias */
+  .news-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Tablets en vertical - 768px-1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  .logo-container {
+    margin-bottom: 1rem;
+  }
+  
+  .nav-links {
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .logo {
+    width: 180px;
+    height: 60px;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .hero-cta {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Noticias */
+  .news-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .page-title {
+    font-size: 2.2rem;
+  }
+  
+  .popup-content {
+    max-width: 700px;
+  }
+  
+  .popup-image-container {
+    height: 300px;
+  }
+  
+  .popup-titulo {
+    font-size: 1.6rem;
+  }
+}
+
+/* Teléfonos grandes - 576px-767px */
+@media (max-width: 767px) and (min-width: 576px) {
+  .navbar {
+    padding: 0.8rem 1rem;
+  }
+  
+  .nav-links {
+    gap: 0.8rem;
+  }
+  
+  .logo {
+    width: 170px;
+    height: 55px;
+  }
+  
+  .hero-banner {
+    height: 60vh;
+    min-height: 400px;
+  }
+  
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .product-carousel {
+    gap: 15px;
+  }
+  
+  .product-card {
+    min-width: 240px;
+  }
+  
+  /* Noticias */
   .news-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .noticia-card {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .filtro-deportes {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  
+  .popup-content {
+    max-width: 90%;
+  }
+  
+  .popup-image-container {
+    height: 250px;
+  }
+}
+
+/* Teléfonos medianos - 481px-575px */
+@media (max-width: 575px) and (min-width: 481px) {
+  .navbar {
+    padding: 0.8rem;
+  }
+  
+  .logo {
+    width: 160px;
+    height: 50px;
+  }
+  
+  .nav-links {
+    gap: 0.7rem;
+  }
+  
+  .nav-link {
+    font-size: 0.9rem;
+  }
+  
+  .Imagenes a {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  /* Noticias */
+  .page-title {
+    font-size: 1.8rem;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+  }
+  
+  .noticia-image {
+    height: 180px;
+  }
+  
+  .noticia-title {
+    font-size: 1.1rem;
+  }
+  
+  .popup-titulo {
+    font-size: 1.4rem;
+  }
+}
+
+/* Teléfonos pequeños - 320px-480px */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.8rem;
+  }
+  
+  .logo {
+    width: 160px;
+    height: 60px;
+  }
+  
+  .nav-links {
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    font-size: 0.9rem;
+  }
+  
+  .Imagenes a {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .cta-button, .community-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+  
+  /* Noticias */
+  .page-title {
+    font-size: 1.6rem;
+    margin-bottom: 5px;
+  }
+  
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .filtro-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .noticia-image {
+    height: 160px;
+  }
+  
+  .noticia-title {
+    font-size: 1rem;
   }
   
   .popup-content {
     max-height: 95vh;
   }
   
-  .popup-header {
-    padding: 25px 20px 15px;
+  .popup-titulo {
+    font-size: 1.2rem;
+  }
+}
+
+/* Teléfonos muy pequeños - hasta 320px */
+@media (max-width: 320px) {
+  .navbar {
+    padding: 0.6rem;
   }
   
-  .popup-titulo {
+  .logo {
+    width: 140px;
+    height: 40px;
+  }
+  
+  .nav-links {
+    gap: 0.5rem;
+  }
+  
+  .nav-link {
+    font-size: 0.8rem;
+  }
+  
+  .Imagenes a {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .hero-title {
+    font-size: 1.6rem;
+  }
+  
+  .product-card {
+    min-width: 200px;
+  }
+  
+  .section-title {
     font-size: 1.5rem;
   }
   
-  .popup-image-container {
-    height: 250px;
-  }
-  
-  .popup-body {
-    padding: 20px;
-  }
-}
-
-@media (max-width: 480px) {
+  /* Noticias */
   .page-title {
-    font-size: 2rem;
+    font-size: 1.4rem;
   }
   
   .filtro-deportes {
-    gap: 8px;
+    gap: 5px;
   }
   
   .filtro-btn {
-    padding: 8px 15px;
-    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
+  
+  .noticia-image {
+    height: 140px;
+  }
+  
+  .popup-header {
+    padding: 15px 10px 10px;
   }
   
   .popup-titulo {
-    font-size: 1.3rem;
-  }
-  
-  .popup-author-date {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .popup-actions {
-    flex-direction: column;
+    font-size: 1.1rem;
   }
 }
-
-
