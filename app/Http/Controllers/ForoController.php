@@ -29,8 +29,14 @@ class ForoController extends Controller
     public function store(Request $request)
     {
         try {
+             dd($request->all());
             $post = Post::create($request->all());
 
+            if(isset($request['image']) && $request['image']){
+                $imageName = Post::addImages($request['image'], $Post->id, "posts");
+                Post::where('id', $Post->id)->update(['image' => $imageName]);
+            }
+            
             return response()->json([
                 'message' => 'Post creado exitosamente',
                 'posts' => $post,

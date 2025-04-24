@@ -338,11 +338,8 @@ export default {
       }
 
       try {
-        const response = await axios.post('/posts', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        let header = { headers: { 'content-type': 'multipart/form-data' } };
+        axios.post('/posts', formData, header);
         
         this.getPost();
         this.limpiarFormulario();

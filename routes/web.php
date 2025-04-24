@@ -73,8 +73,7 @@ Route::resource('/news', NewsController::class);
 Route::resource('/products', ProductController::class);
 
 //Foro
-Route::resource('/posts', ForoController::class);
-
+Route::resource('posts', ForoController::class);
 
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
