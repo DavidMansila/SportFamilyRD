@@ -182,6 +182,7 @@ export default {
 }
 </script>
 
+
 <style scoped>
 @import '../../../scss/Home/home.scss';
 </style>
