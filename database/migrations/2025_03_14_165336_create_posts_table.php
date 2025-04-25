@@ -17,12 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('titulo');
             $table->text('contenido');
-            $table->unsignedBigInteger('user_id'); 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('likes_quantity')->default(0); 
-            $table->string('imagen')->nullable();
-            $table->string('video')->nullable();
-            $table->string('categoria')->nullable();
             $table->timestamps(); 
         });
     }
