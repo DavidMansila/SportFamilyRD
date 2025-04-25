@@ -1,14 +1,20 @@
 <template>
+
   <div class="container" ref="container">
     <div class="form-container sign-up-container">
       <form >
-        
         <!-- @submit.prevent="submitForm" -->
         <h1>Create Account</h1>
         <div class="social-container">
-          <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-          <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-          <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com" target="_blank" class="social">
+                <img src="imagenes/SocialMedia-Instagram.png" alt="Instagram" width="40">
+            </a>
+            <a href="https://www.facebook.com" target="_blank" class="social">
+                   <img src="imagenes/SocialMedia-Facebook.png" alt="Facebook" width="40">
+             </a>
+             <a href="https://x.com" target="_blank" class="social">
+                   <img src="imagenes/SocialMedia-X.png" alt="Twitter" width="40">
+             </a>
         </div>
         <input type="text" v-model="registerForm.name" placeholder="Nombre" required />
         <input type="email" v-model="registerForm.email" placeholder="Correo" required />
@@ -19,18 +25,26 @@
     </div>  
 
     <div class="form-container sign-in-container">
-      <form @submit.prevent="submitLoginForm">
-        <h1>Sign in</h1>
-        <div class="social-container">
-          <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-          <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-          <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+    <form @submit.prevent="submitLoginForm">
+    <h1>Sign in</h1>
+    <div class="social-container">
+            <a href="https://www.instagram.com" target="_blank" class="social">
+                <img src="imagenes/SocialMedia-Instagram.png" alt="Instagram" width="40">
+            </a>
+            <a href="https://www.facebook.com" target="_blank" class="social">
+                   <img src="imagenes/SocialMedia-Facebook.png" alt="Facebook" width="40">
+             </a>
+             <a href="https://x.com" target="_blank" class="social">
+                   <img src="imagenes/SocialMedia-X.png" alt="Twitter" width="40">
+             </a>
         </div>
         <input type="email" v-model="loginForm.email" placeholder="Correo" required />
         <input type="password" v-model="loginForm.password" placeholder="Contraseña" required />
         <button type="submit" :disabled="isSubmitting">Sign In</button>
       </form>
     </div>
+    
+
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
@@ -53,6 +67,8 @@
     </div>
   </div>
 </template>
+
+
 
 <script>
 import axios from 'axios';

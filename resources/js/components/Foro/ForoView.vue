@@ -69,7 +69,7 @@
 
       <div  v-if=" posts.length === 0">
         <h2 class="no-posts">No hay publicaciones disponibles</h2>
-        <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicacione!</p>
+        <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicacion!</p>
         <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
         <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
       </div>  
@@ -204,7 +204,7 @@
            Subir imagen
            </span>
              <span v-if="nuevoPost.imagenFile" class="file-upload-name">
-               {{ nuevoPost.imagenFile.name }}
+               {{ nuevoPost.imagenFile }}
              </span>
          </label>
           <!-- Mostrar previsualización de la imagen -->

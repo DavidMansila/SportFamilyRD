@@ -253,6 +253,95 @@
   border-color: #6a11cb;
 }
 
+
+
+/* No Posts */
+
+.no-posts {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
+}
+
+.no-posts-subtitle {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 500px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+.no-posts-btn {
+  display: block;
+  margin: 0 auto;
+  background-color: #000;
+  color: white;
+  border: none;
+  padding: 0.9rem 2.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.no-posts-btn:hover {
+  background-color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.no-posts-image {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 3rem auto 0;
+  opacity: 0.9;
+  filter: grayscale(20%);
+  transition: transform 0.5s ease;
+}
+
+.no-posts-image:hover {
+  transform: scale(1.03);
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+/* Contenedor principal para centrar todo */
+div[v-if="posts.length === 0"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  padding: 2rem;
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
+
+
+
+
 /* Grid de posts */
 .posts-grid {
   max-width: 1200px;

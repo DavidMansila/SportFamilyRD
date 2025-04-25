@@ -39,7 +39,7 @@
 
       <!-- Header con imagen representativa -->
       <header class="app-header">
-        <img src="/imagenes/republicadominicana.png" alt="Deportes Dominicana" class="header-image">
+        <img src="imagenes/directoriofondo.jpg" alt="Deportes Dominicana" class="header-image">
         <div class="header-content">
           <h1>Deportes en República Dominicana</h1>
           <p>Descubre los deportes autóctonos y populares de nuestro país</p>

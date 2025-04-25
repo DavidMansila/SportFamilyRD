@@ -299,5 +299,5 @@
 
 
     <style scoped lang="scss">
-        @import '../../../scss/Ajustes/perfil.scss';
+        @forward '/resources/scss/Ajustes/perfil' as per-*;
     </style>
