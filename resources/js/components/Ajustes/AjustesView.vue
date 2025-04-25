@@ -274,5 +274,5 @@ export default {
 
 
 <style scoped lang="scss">
-@import '../../../scss/Ajustes/ajustes.scss';
+@forward '/resources/scss/Ajustes/ajustes' as ajs-*;
 </style>
