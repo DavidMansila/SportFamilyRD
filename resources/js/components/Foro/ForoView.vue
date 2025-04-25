@@ -1,4 +1,5 @@
 <template>
+
   <div class="foro-page">
 
     <!-- Navbar -->
@@ -31,7 +32,6 @@
       </div>
     </nav>
 
-
     <!-- Hero Section -->
     <div class="hero-section">
       <div class="hero-content">
@@ -45,8 +45,14 @@
     <!-- Filtros y búsqueda -->
     <div class="filtros-container">
       <div class="search-bar">
-        <input type="text" placeholder="Buscar en el foro..." class="search-input">
-        <button class="search-btn">
+        <input 
+          type="text" 
+          v-model="terminoBusqueda"
+          @input="filtrarPosts"
+          placeholder="Buscar en el foro..." 
+          class="search-input"
+        >
+        <button class="search-btn" @click="filtrarPosts">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -54,29 +60,56 @@
         </button>
       </div>
       <div class="filtros-categorias">
-        <button class="filtro-btn active">Todos</button>
-        <button class="filtro-btn">Deporte</button>
-        <button class="filtro-btn">Gym</button>
-        <button class="filtro-btn">Experiencia</button>
-        <button class="filtro-btn">Lugares</button>
+        <button 
+          @click="cambiarCategoria('')" 
+          :class="{ active: categoriaSeleccionada === '' }" 
+          class="filtro-btn"
+        >
+          Todos
+        </button>
+        <button 
+          @click="cambiarCategoria('Deporte')" 
+          :class="{ active: categoriaSeleccionada === 'Deporte' }" 
+          class="filtro-btn"
+        >
+          Deporte
+        </button>
+        <button 
+          @click="cambiarCategoria('Gym')" 
+          :class="{ active: categoriaSeleccionada === 'Gym' }" 
+          class="filtro-btn"
+        >
+          Gym
+        </button>
+        <button 
+          @click="cambiarCategoria('Experiencia')" 
+          :class="{ active: categoriaSeleccionada === 'Experiencia' }" 
+          class="filtro-btn"
+        >
+          Experiencia
+        </button>
+        <button 
+          @click="cambiarCategoria('Lugares')" 
+          :class="{ active: categoriaSeleccionada === 'Lugares' }" 
+          class="filtro-btn"
+        >
+          Lugares
+        </button>
       </div>
     </div>
 
-
-    
     <!-- Sección de Posts con diseño de tarjetas -->
     <div class="posts-grid">
-
-      <div  v-if=" posts.length === 0">
+      <div v-if="postsFiltrados.length === 0">
         <h2 class="no-posts">No hay publicaciones disponibles</h2>
-        <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicacion!</p>
+        <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicación!</p>
         <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
         <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
       </div>  
 
       <div 
-        v-else-if="posts.length > 0"
-        v-for="(post, index) in posts" 
+        v-else
+        v-for="(post, index) in postsFiltrados" 
         :key="index" 
         class="post-card"
         :style="`--hue: ${index * 60 % 360}`"
@@ -89,16 +122,21 @@
         
           <div class="post-meta">
             <span class="post-author">
-              <!-- <img src="/imagenes/avatar-default.png" alt="Autor" class="author-avatar"> -->
               Usuario{{ post.id }}
             </span>
-            <span class="post-date">{{ post.created_at }}</span>
+            <span class="post-date">{{ formatDate(post.created_at) }}</span>
           </div>
         </div>
 
         <div class="post-imagen">
-          <img :src="post.imagen" alt="Imagen del post" class="post-image">
-        </div>
+          <img 
+            :src="post.imagen" 
+            alt="Imagen del post" 
+            class="post-image" 
+            @load="onImageLoad"
+            :class="{ loaded: imageLoaded }"
+          />  
+        </div>      
         
         <p class="post-contenido">{{ post.contenido.substring(0, 150) }}...</p>
         
@@ -122,18 +160,13 @@
       </div>
     </div>
 
-    <!-- todo aqui esta el vif v-if="usuario.tipo == 'Admin'" -->
     <!-- Botón flotante para crear post -->
-    <button  @click="abrirModal" class="floating-btn">
+    <button @click="abrirModal" class="floating-btn">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12"></line>
       </svg>
     </button>
-
-
-
-
 
     <!-- Modal para crear post -->
     <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
@@ -185,33 +218,29 @@
             </div>
           </div>
 
-
-    <div class="form-group">
-    <label class="file-upload-label">
-    <input
-      type="file"
-      id="imagen"
-      @change="handleFileSelect"
-      accept="image/*"
-      class="file-upload-input"
-         />
-         <span class="file-upload-btn">
-         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-           <polyline points="17 8 12 3 7 8"></polyline>
-           <line x1="12" y1="3" x2="12" y2="15"></line>
-         </svg>
-           Subir imagen
-           </span>
-             <span v-if="nuevoPost.imagenFile" class="file-upload-name">
-               {{ nuevoPost.imagenFile }}
-             </span>
-         </label>
-          <!-- Mostrar previsualización de la imagen -->
-              <img v-if="imagenMiniatura" :src="imagenMiniatura" alt="Previsualización" class="image-preview">
-         </div>
-
-
+          <div class="form-group">
+            <label class="file-upload-label">
+              <input
+                type="file"
+                id="imagen"
+                @change="handleFileSelect"
+                accept="image/*"
+                class="file-upload-input"
+              />
+              <span class="file-upload-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Subir imagen
+              </span>
+              <span v-if="nuevoPost.imagenFile" class="file-upload-name">
+                {{ nuevoPost.imagenFile.name }}
+              </span>
+            </label>
+            <img v-if="imagenMiniatura" :src="imagenMiniatura" alt="Previsualización" class="image-preview">
+          </div>
 
           <div class="form-actions">
             <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
@@ -233,14 +262,18 @@ export default {
   data() {
     return {
       posts: [],
+      postsFiltrados: [],
+      categoriaSeleccionada: '',
+      terminoBusqueda: '',
       mostrarModal: false,
       nuevoPost: {
         titulo: '',
         contenido: '',
         categoria: '',
-        imagenFile: null,  // Para el archivo de imagen
+        imagenFile: null,
       },
-      imagenMiniatura: null // Para la previsualización
+      imagenMiniatura: null,
+      imageLoaded: false
     };
   },
   
@@ -254,6 +287,29 @@ export default {
       this.mostrarModal = false;
       this.limpiarFormulario();
       document.body.style.overflow = 'auto';
+    },
+
+    cambiarCategoria(categoria) {
+      this.categoriaSeleccionada = categoria;
+      this.filtrarPosts();
+    },
+
+    filtrarPosts() {
+      // Primero filtramos por categoria
+      let postsFiltrados = this.categoriaSeleccionada 
+        ? this.posts.filter(post => post.categoria === this.categoriaSeleccionada)
+        : [...this.posts];
+
+      // Luego filtramos por termino de busqueda si existe
+      if (this.terminoBusqueda) {
+        const termino = this.terminoBusqueda.toLowerCase();
+        postsFiltrados = postsFiltrados.filter(post => 
+          post.titulo.toLowerCase().includes(termino) || 
+          post.contenido.toLowerCase().includes(termino) ||
+          (post.categoria && post.categoria.toLowerCase().includes(termino))
+        );
+      }
+      this.postsFiltrados = postsFiltrados;
     },
 
     guardarPost() {
@@ -286,22 +342,18 @@ export default {
       const file = event.target.files[0];
       if (!file) return;
       
-      // Validar tipo de archivo
       if (!file.type.match('image.*')) {
         alert('Por favor, selecciona solo imágenes (JPEG, PNG, etc.)');
         return;
       }
       
-      // Validar tamaño (ejemplo: máximo 2MB)
       if (file.size > 2 * 1024 * 1024) {
         alert('La imagen es demasiado grande. Máximo 2MB permitido.');
         return;
       }
       
-      // Asignar el archivo para enviarlo al servidor
       this.nuevoPost.imagenFile = file;
       
-      // Crear URL temporal para previsualización
       const reader = new FileReader();
       reader.onload = (e) => {
         this.imagenMiniatura = e.target.result;
@@ -309,19 +361,23 @@ export default {
       reader.readAsDataURL(file);
     },
 
-        loadImg(file){
-            let reader = new FileReader();
-            reader.onload = (e) =>{
-                this.imagenMiniatura = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        },
+    loadImg(file) {
+      let reader = new FileReader();
+      reader.onload = (e) => {
+        this.imagenMiniatura = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
 
-    getPost(){
-      // axios.get('/foro/example')
+    onImageLoad() {
+      this.imageLoaded = true;
+    },
+
+    getPost() {
       axios.get('/post')
         .then(response => {
           this.posts = response.data.posts;
+          this.postsFiltrados = [...this.posts];
         })
         .catch(error => {
           console.error('Error al obtener los posts:', error);
@@ -340,9 +396,11 @@ export default {
 
       try {
         let header = { headers: { 'content-type': 'multipart/form-data' } };
-        axios.post('/post', formData, header);
-        
-        this.getPost();
+        await axios.post('/post', formData, header);
+
+        setTimeout(() => {
+          this.getPost();
+        }, 2000);
         this.limpiarFormulario();
         this.cerrarModal();
         
@@ -351,15 +409,22 @@ export default {
         alert('Error al crear el post. Por favor, intenta nuevamente.');
       }
     },
-},
 
-mounted() {
-  this.getPost();
-},
+    formatDate(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('es-ES', options);
+    },
+  },
+
+  mounted() {
+    this.getPost();
+  },
 }
 </script>
-
-
 
 <style scoped>
 @import '../../../scss/Foro/foro.scss';

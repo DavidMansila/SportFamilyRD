@@ -191,7 +191,7 @@ export default {
         { value: 'futbol', label: 'Fútbol' },
         { value: 'baloncesto', label: 'Baloncesto' },
         { value: 'beisbol', label: 'Béisbol' },
-        { value: 'volleyball', label: 'Voleibol' },
+        { value: 'volleyball', label: 'Volleyball' },
         { value: 'swimming', label: 'Natacion' },
       ],
     };
