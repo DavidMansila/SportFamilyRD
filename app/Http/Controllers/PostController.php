@@ -5,12 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
-class ForoController extends Controller
+class PostController extends Controller
 {
     public function index()
     {
         try {
-            $posts = Post::with('comments')->get();
+            // $posts = Post::with('comments')->get();
+            $posts = Post::with('comments')->get()->map(function ($post) {
+                $post->imagen = url('storage/posts/' . $post->id . '/' . $post->imagen);
+                return $post;
+            });
+            return response()->json([
+                'message' => 'Posts recibidos exitosamente',
+                'posts' => $posts,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener los posts',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    
+    }
+    public function exampleFunction()
+    {
+        try {
+            // $posts = Post::with('comments')->get();
+            $posts = Post::all();
 
             return response()->json([
                 'message' => 'Posts recibidos exitosamente',
@@ -29,12 +51,12 @@ class ForoController extends Controller
     public function store(Request $request)
     {
         try {
-             dd($request->all());
+            //  dd($request->all());
             $post = Post::create($request->all());
 
-            if(isset($request['image']) && $request['image']){
-                $imageName = Post::addImages($request['image'], $Post->id, "posts");
-                Post::where('id', $Post->id)->update(['image' => $imageName]);
+            if(isset($request['imagen']) && $request['imagen']){
+                $imageName = Post::addImages($request['imagen'], $post->id);
+                Post::where('id', $post->id)->update(['imagen' => $imageName]);
             }
             
             return response()->json([
@@ -87,17 +109,3 @@ class ForoController extends Controller
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

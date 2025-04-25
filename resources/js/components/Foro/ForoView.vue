@@ -97,7 +97,7 @@
         </div>
 
         <div class="post-imagen">
-          <img :src="post.file" alt="Imagen del post" class="post-image">
+          <img :src="post.imagen" alt="Imagen del post" class="post-image">
         </div>
         
         <p class="post-contenido">{{ post.contenido.substring(0, 150) }}...</p>
@@ -318,7 +318,8 @@ export default {
         },
 
     getPost(){
-      axios.get('/posts')
+      // axios.get('/foro/example')
+      axios.get('/post')
         .then(response => {
           this.posts = response.data.posts;
         })
@@ -339,7 +340,7 @@ export default {
 
       try {
         let header = { headers: { 'content-type': 'multipart/form-data' } };
-        axios.post('/posts', formData, header);
+        axios.post('/post', formData, header);
         
         this.getPost();
         this.limpiarFormulario();

@@ -4,7 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ForoController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -73,7 +73,8 @@ Route::resource('/news', NewsController::class);
 Route::resource('/products', ProductController::class);
 
 //Foro
-Route::resource('posts', ForoController::class);
+Route::get('/foro/example', [PostController::class, 'exampleFunction']);
+Route::resource('/post', PostController::class);
 
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);

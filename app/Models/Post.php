@@ -10,18 +10,17 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id','titulo', 'contenido', 'imagen',  'user_id', 'likes_quantity','video','categoria'];
+    protected $fillable = ['id','titulo', 'contenido', 'user_id', 'likes_quantity',  'imagen', 'video','categoria'];
 
     public function comments()
     {
         return $this->hasMany(Comment::class);
     }
    
-    public static function addImages($image, $id, $path)
+    public static function addImages($image, $id)
     {
         // Get the path to store the images
-       
-        $path = "/$path/$id";
+        $path = "/posts/$id";
         $files = Storage::disk('public')->files($path);
        
         foreach ($files as $file) {
