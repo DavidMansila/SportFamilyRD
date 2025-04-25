@@ -115,6 +115,8 @@
   min-height: 100vh;
 }
 
+
+
 /* Hero Section */
 .hero-section {
   position: relative;
@@ -180,6 +182,10 @@
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
+
+
+
+
 
 /* Filtros y búsqueda */
 .filtros-container {
@@ -252,6 +258,8 @@
   color: white;
   border-color: #6a11cb;
 }
+
+
 
 
 
@@ -340,9 +348,8 @@ div[v-if="posts.length === 0"] {
 
 
 
+/* POST */
 
-
-/* Grid de posts */
 .posts-grid {
   max-width: 1200px;
   margin: 0 auto;
@@ -492,6 +499,77 @@ div[v-if="posts.length === 0"] {
   color: white;
 }
 
+
+/* POST IMAGEN SUBIDA */
+
+.post-imagen {
+  width: 100%;
+  height: 220px; /* Altura fija para uniformidad */
+  overflow: hidden;
+  position: relative;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Asegura que la imagen cubra el espacio sin distorsión */
+  object-position: center; /* Centra la imagen */
+  transition: transform 0.5s ease, filter 0.3s ease;
+}
+
+.post-card:hover .post-image {
+  transform: scale(1.05); /* Efecto de zoom suave al hover */
+  filter: brightness(1.02); /* Ligero aumento de brillo */
+}
+
+/* Estilos para mantener relación de aspecto y calidad */
+.post-image {
+  image-rendering: -webkit-optimize-contrast; /* Mejor renderizado en WebKit */
+  image-rendering: crisp-edges; /* Bordes más definidos */
+  backface-visibility: hidden; /* Evita artefactos visuales en transformaciones */
+}
+
+/* Efecto de carga progresiva */
+.post-image {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+
+/* Estilos responsivos para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+  .post-imagen {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-imagen {
+    height: 150px;
+  }
+}
+
+/* Efecto overlay para hover */
+.post-imagen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.03);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.post-card:hover .post-imagen::after {
+  opacity: 1;
+}
+
+
+
 /* Botón flotante */
 .floating-btn {
   position: fixed;
@@ -517,7 +595,11 @@ div[v-if="posts.length === 0"] {
   transform: scale(1.1);
 }
 
+
+
+
 /* Modal */
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -694,8 +776,6 @@ div[v-if="posts.length === 0"] {
   background-color: #6a11cb;
   border-color: #6a11cb;
 }
-
-
 
 
 
