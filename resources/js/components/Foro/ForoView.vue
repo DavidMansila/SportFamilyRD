@@ -98,14 +98,19 @@
       </div>
     </div>
 
+    
+
     <!-- Sección de Posts con diseño de tarjetas -->
     <div class="posts-grid">
       <div v-if="postsFiltrados.length === 0">
+        <div class="no-posts">
         <h2 class="no-posts">No hay publicaciones disponibles</h2>
         <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicación!</p>
         <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
         <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
+        </div>
       </div>  
+
 
       <div 
         v-else
@@ -155,10 +160,205 @@
               {{ post.comentarios }}
             </span>
           </div>
-          <a href="/Publicacion" class="btn-leer">Ver discusión</a>
+
+          <button @click="abrirPopout(post)" class="btn-leer">Ver discusión</button>
+
+
+
+          
+<!-- Popout para ver publicación completa -->
+<div v-if="postSeleccionado" class="post-popout-overlay" @click.self="cerrarPopout">
+  <div class="post-popout-container">
+    <!-- Contenedor principal -->
+    <div class="post-popout-content">
+      <!-- Sección de imagen -->
+      <div class="post-popout-media">
+        <div class="image-container">
+          <img :src="postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
+        </div>
+        <div class="post-interactions">
+          <button @click="toggleLike" class="interaction-btn like-btn" :class="{ liked: postSeleccionado.isLiked }">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span>{{ postSeleccionado.likes }}</span>
+          </button>
+          <button @click="focusComentario" class="interaction-btn comment-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/>
+            </svg>
+            <span>{{ postSeleccionado.comentarios }}</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Sección de contenido -->
+      <div class="post-popout-details">
+        <!-- Cabecera -->
+        <div class="post-popout-header">
+          <div class="post-author-info">
+            <div class="author-avatar-wrapper">
+              <!-- <img src="/imagenes/avatar-default.png" alt="Autor" class="author-avatar"> -->
+              <span class="author-online-dot"></span>
+            </div>
+            <div>
+              <h3 class="author-name">Usuario{{ postSeleccionado.id }}</h3>
+              <span class="post-category-badge" :style="{backgroundColor: categoryColor(postSeleccionado.categoria)}">
+                {{ postSeleccionado.categoria || 'General' }}
+              </span>
+            </div>
+          </div>
+          <button @click="cerrarPopout" class="close-popout-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Contenido del post -->
+        <div class="post-popout-body">
+          <h2 class="post-popout-title">{{ postSeleccionado.titulo }}</h2>
+          <p class="post-popout-text">{{ postSeleccionado.contenido }}</p>
+          <div class="post-meta-info">
+            <span class="post-date">{{ formatDate(postSeleccionado.created_at) }}</span>
+            <span class="post-visibility">Público</span>
+          </div>
+        </div>
+        
+        <!-- Sección de comentarios -->
+        <div class="post-comments-section">
+          <h4 class="comments-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/>
+            </svg>
+            Conversación ({{ totalComentarios }})
+          </h4>
+          
+          <div class="comments-container" ref="commentsContainer">
+            <!-- Comentarios principales -->
+            <div v-for="(comentario, index) in comentarios" :key="comentario.id" class="comment-item">
+              <div class="comment-avatar-wrapper">
+                <!-- <img src="/imagenes/avatar-default.png" alt="Usuario" class="comment-avatar"> -->
+              </div>
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-author">Usuario{{ comentario.userId }}</span>
+                  <span class="comment-time">{{ formatRelativeTime(comentario.fecha) }}</span>
+                  <button 
+                    v-if="comentario.respuestas && comentario.respuestas.length > 0"
+                    @click="toggleCommentExpansion(comentario.id)"
+                    class="toggle-replies-btn"
+                  >
+                    {{ comentariosExpandidos.includes(comentario.id) ? 'Ocultar respuestas' : 'Ver respuestas' }}
+                  </button>
+                </div>
+                <p class="comment-text">{{ comentario.texto }}</p>
+                <div class="comment-actions">
+                  <button @click="likeComentario(comentario.id)" class="comment-action like-comment" :class="{ liked: comentario.isLiked }">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span>{{ comentario.likes }}</span>
+                  </button>
+                  <button @click="toggleReply(comentario.id)" class="comment-action reply-comment">
+                    {{ comentarioRespondiendo === comentario.id ? 'Cancelar' : 'Responder' }}
+                  </button>
+                </div>
+                
+                <!-- Formulario de respuesta -->
+                <div v-if="comentarioRespondiendo === comentario.id" class="reply-form">
+                  <div class="add-comment-form replying">
+                    <div class="replying-to">
+                      Respondiendo a <strong>@Usuario{{ comentario.userId }}</strong>
+                    </div>
+                    <form @submit.prevent="agregarRespuesta(comentario)" class="comment-form">
+                      <input
+                        v-model="nuevoComentario"
+                        ref="comentarioInput"
+                        type="text"
+                        placeholder="Escribe tu respuesta..."
+                        class="comment-input"
+                      >
+                      <button 
+                        type="submit" 
+                        :disabled="!nuevoComentario.trim()" 
+                        class="submit-comment-btn"
+                        :class="{ disabled: !nuevoComentario.trim() }"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+                
+                <!-- Respuestas -->
+                <div v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0" 
+                     class="comment-replies">
+                  <div v-for="(respuesta, i) in comentario.respuestas" :key="respuesta.id" class="comment-item reply-item">
+                    <div class="comment-avatar-wrapper">
+                      <!-- <img src="/imagenes/avatar-default.png" alt="Usuario" class="comment-avatar"> -->
+                    </div>
+                    <div class="comment-content">
+                      <div class="comment-header">
+                        <span class="comment-author">Usuario{{ respuesta.userId }}</span>
+                        <span class="comment-time">{{ formatRelativeTime(respuesta.fecha) }}</span>
+                      </div>
+                      <p class="comment-text">{{ respuesta.texto }}</p>
+                      <div class="comment-actions">
+                        <button @click="likeComentario(respuesta.id)" class="comment-action like-comment" :class="{ liked: respuesta.isLiked }">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                          </svg>
+                          <span>{{ respuesta.likes }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Formulario de comentario principal -->
+          <div class="add-comment-form">
+            <form @submit.prevent="agregarComentario" class="comment-form">
+              <input
+                v-model="nuevoComentario"
+                ref="comentarioInput"
+                type="text"
+                placeholder="Escribe un comentario..."
+                class="comment-input"
+              >
+              <button 
+                type="submit" 
+                :disabled="!nuevoComentario.trim()" 
+                class="submit-comment-btn"
+                :class="{ disabled: !nuevoComentario.trim() }"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
 
     <!-- Botón flotante para crear post -->
     <button @click="abrirModal" class="floating-btn">
@@ -273,11 +473,20 @@ export default {
         imagenFile: null,
       },
       imagenMiniatura: null,
-      imageLoaded: false
-    };
+      imageLoaded: false,
+
+
+      postSeleccionado: null,
+      comentarios: [],
+      comentariosExpandidos: [],
+      comentarioRespondiendo: null,
+      nuevoComentario: '',
+      totalComentarios: 0
+    }
   },
-  
+
   methods: {
+
     abrirModal() {
       this.mostrarModal = true;
       document.body.style.overflow = 'hidden';
@@ -337,6 +546,17 @@ export default {
       };
       this.imagenMiniatura = null;
     },
+    
+    categoryColor(categoria) {
+    const colors = {
+      'Deporte': '#FF4757',
+      'Gym': '#2ED573',
+      'Experiencia': '#1E90FF',
+      'Lugares': '#FFA502',
+      'General': '#A4B0BE'
+    };
+    return colors[categoria] || colors['General'];
+  },
 
     handleFileSelect(event) {
       const file = event.target.files[0];
@@ -418,6 +638,170 @@ export default {
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       return date.toLocaleDateString('es-ES', options);
     },
+
+
+
+
+
+
+    abrirPopout(post) {
+    this.postSeleccionado = { ...post, isLiked: false };
+    document.body.style.overflow = 'hidden';
+    // Aquí podrías cargar los comentarios desde tu API
+    // this.cargarComentarios(post.id);
+  },
+  
+
+
+    cerrarPopout() {
+      this.postSeleccionado = null;
+      this.comentarios = [];
+      this.comentariosExpandidos = [];
+      this.comentarioRespondiendo = null;
+      this.nuevoComentario = '';
+    },
+    
+    toggleLike() {
+      if (this.postSeleccionado.isLiked) {
+        this.postSeleccionado.likes--;
+      } else {
+        this.postSeleccionado.likes++;
+      }
+      this.postSeleccionado.isLiked = !this.postSeleccionado.isLiked;
+    },
+    
+    focusComentario() {
+      this.$refs.comentarioInput.focus();
+      this.$refs.commentsContainer.scrollTo({
+        top: this.$refs.commentsContainer.scrollHeight,
+        behavior: 'smooth'
+      });
+    },
+    
+    toggleCommentExpansion(commentId) {
+      const index = this.comentariosExpandidos.indexOf(commentId);
+      if (index === -1) {
+        this.comentariosExpandidos.push(commentId);
+      } else {
+        this.comentariosExpandidos.splice(index, 1);
+      }
+    },
+    
+    toggleReply(commentId) {
+      if (this.comentarioRespondiendo === commentId) {
+        this.comentarioRespondiendo = null;
+      } else {
+        this.comentarioRespondiendo = commentId;
+        this.$nextTick(() => {
+          this.$refs.comentarioInput.focus();
+        });
+      }
+    },
+    
+    agregarComentario() {
+      if (!this.nuevoComentario.trim()) return;
+      
+      const newComment = {
+        id: Date.now(),
+        userId: Math.floor(Math.random() * 1000),
+        texto: this.nuevoComentario,
+        fecha: new Date(),
+        likes: 0,
+        isLiked: false,
+        respuestas: []
+      };
+      
+      this.comentarios.push(newComment);
+      this.totalComentarios++;
+      this.nuevoComentario = '';
+      
+      this.$nextTick(() => {
+        this.$refs.commentsContainer.scrollTo({
+          top: this.$refs.commentsContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      });
+    },
+    
+    agregarRespuesta(comentarioPadre) {
+      if (!this.nuevoComentario.trim()) return;
+      
+      const newReply = {
+        id: Date.now(),
+        userId: Math.floor(Math.random() * 1000),
+        texto: this.nuevoComentario,
+        fecha: new Date(),
+        likes: 0,
+        isLiked: false
+      };
+      
+      if (!comentarioPadre.respuestas) {
+        comentarioPadre.respuestas = [];
+      }
+      
+      comentarioPadre.respuestas.push(newReply);
+      this.totalComentarios++;
+      this.nuevoComentario = '';
+      this.comentarioRespondiendo = null;
+      
+      // Expandir comentario padre si no está expandido
+      if (!this.comentariosExpandidos.includes(comentarioPadre.id)) {
+        this.comentariosExpandidos.push(comentarioPadre.id);
+      }
+    },
+    
+    likeComentario(commentId) {
+      const comment = this.findCommentById(commentId);
+      if (comment) {
+        if (comment.isLiked) {
+          comment.likes--;
+        } else {
+          comment.likes++;
+        }
+        comment.isLiked = !comment.isLiked;
+      }
+    },
+    
+    findCommentById(id) {
+      // Buscar en comentarios principales
+      for (const comment of this.comentarios) {
+        if (comment.id === id) return comment;
+        
+        // Buscar en respuestas
+        if (comment.respuestas) {
+          for (const reply of comment.respuestas) {
+            if (reply.id === id) return reply;
+          }
+        }
+      }
+      return null;
+    },
+    
+    categoryColor(categoria) {
+      const colors = {
+        'General': '#6c757d',
+        'Tecnología': '#17a2b8',
+        'Deportes': '#28a745',
+        'Entretenimiento': '#ffc107',
+        'Noticias': '#dc3545'
+      };
+      return colors[categoria] || colors['General'];
+    },
+    
+    formatDate(date) {
+      return new Date(date).toLocaleDateString();
+    },
+    
+    formatRelativeTime(date) {
+      const now = new Date();
+      const diff = now - new Date(date);
+      const minutes = Math.floor(diff / 60000);
+      
+      if (minutes < 1) return 'Ahora mismo';
+      if (minutes < 60) return `Hace ${minutes} min`;
+      if (minutes < 1440) return `Hace ${Math.floor(minutes / 60)} h`;
+      return `Hace ${Math.floor(minutes / 1440)} d`;
+    }
   },
 
   mounted() {

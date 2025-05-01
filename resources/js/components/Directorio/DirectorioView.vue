@@ -82,13 +82,14 @@
           class="sport-card"
           @click="selectSport(sport)"
         >
-          <div class="sport-image">
+        <div class="sport-image">
             <img :src="sport.image" :alt="sport.name">
           </div>
           <div class="sport-info">
             <h3>{{ sport.name }}</h3>
+            <span class="region-tag">{{ sport.region }}</span>
             <div class="sport-meta">
-              <span class="region-tag">{{ sport.region }}</span>
+              
               <span class="popularity">{{ sport.popularity }}</span>
             </div>
             <p class="short-description">{{ sport.shortDescription }}</p>
@@ -688,7 +689,7 @@ const sports = ref([
   region: 'San Juan de la Maguana',
   type: 'Individual',
   popularity: 'Tradicional',
-  image: 'https://www.viajard.com/wp-content/uploads/2012/09/tradicion-dominicana-palo-ensebado-2.jpg',
+  image: 'https://deblogsyjuegos.wordpress.com/wp-content/uploads/2015/10/10999718_1071777816183272_8268205380560369201_o.jpg?w=1536&h=1500&crop=1',
   shortDescription: 'Juego tradicional de destreza física',
   description: 'Competencia donde participantes escalan un poste engrasado para alcanzar premios en la cima. Muy popular en fiestas patronales como las de San Juan Bautista.',
   requirements: [
@@ -717,7 +718,7 @@ const sports = ref([
   region: 'Santiago, San Cristóbal, Higüey',
   type: 'Individual',
   popularity: 'Tradicional',
-  image: 'https://ayuntamientoguananico.gob.do/wp-content/uploads/2023/03/324018142_2432669810233549_8258680233206987391_n.jpg',
+  image: 'http://e00-elmundo.uecdn.es/assets/multimedia/imagenes/2017/02/24/14879512766963.jpg',
   shortDescription: 'Deporte tradicional controvertido',
   description: 'Aunque polémico, es parte de la cultura rural dominicana. Las peleas de gallos se realizan en coliseos especializados llamados "galleras".',
   requirements: [
