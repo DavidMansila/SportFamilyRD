@@ -458,9 +458,6 @@
       </form>
       
 
-
-
-
         <!-- Vista previa externa -->
      <div v-if="mostrarModal && imagenMiniatura" class="external-preview">
         <img :src="imagenMiniatura" alt="Previsualización" class="preview-image">
@@ -522,10 +519,12 @@ export default {
 
   methods: {
 
+
     abrirModal() {
       this.mostrarModal = true;
       document.body.style.overflow = 'hidden';
     },
+
 
     cerrarModal() {
       this.mostrarModal = false;
@@ -537,6 +536,7 @@ export default {
       this.categoriaSeleccionada = categoria;
       this.filtrarPosts();
     },
+
 
     filtrarPosts() {
       // Primero filtramos por categoria
@@ -556,6 +556,7 @@ export default {
       this.postsFiltrados = postsFiltrados;
     },
 
+
     guardarPost() {
       const nuevoId = Math.max(...this.posts.map(p => p.id)) + 1;
       const nuevoPost = {
@@ -572,6 +573,7 @@ export default {
       this.cerrarModal();
     },
 
+
     limpiarFormulario() {
       this.nuevoPost = {
         titulo: '',
@@ -582,6 +584,7 @@ export default {
       this.imagenMiniatura = null;
     },
     
+
     handleFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -605,6 +608,7 @@ export default {
       reader.readAsDataURL(file);
     },
 
+
     loadImg(file) {
       let reader = new FileReader();
       reader.onload = (e) => {
@@ -613,9 +617,11 @@ export default {
       reader.readAsDataURL(file);
     },
 
+
     onImageLoad() {
       this.imageLoaded = true;
     },
+
 
     getPost() {
       axios.get('/post')
@@ -628,6 +634,7 @@ export default {
         });
     },
 
+    
     async createPost() {
       const formData = new FormData();
       formData.append('titulo', this.nuevoPost.titulo);
@@ -653,6 +660,7 @@ export default {
         alert('Error al crear el post. Por favor, intenta nuevamente.');
       }
     },
+
 
     abrirPopout(post) {
       // Guardar posición del scroll antes de abrir el popout
@@ -688,6 +696,7 @@ export default {
       window.scrollTo(this.scrollPosition);
     },
     
+
     toggleLike() {
       if (this.postSeleccionado.isLiked) {
         this.postSeleccionado.likes--;
@@ -697,6 +706,7 @@ export default {
       this.postSeleccionado.isLiked = !this.postSeleccionado.isLiked;
     },
     
+
     focusComentario() {
       this.$nextTick(() => {
         this.$refs.comentarioInput.focus();
@@ -704,6 +714,7 @@ export default {
       });
     },
     
+
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.commentsContainer;
@@ -713,6 +724,7 @@ export default {
       });
     },
     
+
     toggleCommentExpansion(commentId) {
       const index = this.comentariosExpandidos.indexOf(commentId);
       if (index === -1) {
@@ -727,6 +739,7 @@ export default {
       });
     },
     
+
     toggleReply(commentId) {
       if (this.comentarioRespondiendo === commentId) {
         this.cancelarRespuesta();
@@ -739,11 +752,13 @@ export default {
       }
     },
     
+
     cancelarRespuesta() {
       this.comentarioRespondiendo = null;
       this.nuevoComentario = '';
     },
     
+
     agregarComentario() {
       if (!this.nuevoComentario.trim()) return;
       
@@ -764,6 +779,7 @@ export default {
       this.scrollToBottom();
     },
     
+
     agregarRespuesta(comentarioPadre) {
       if (!this.nuevoComentario.trim()) return;
       
@@ -792,6 +808,7 @@ export default {
       
       this.scrollToBottom();
     },
+
     
     likeComentario(commentId) {
       const comment = this.findCommentById(commentId);
@@ -805,6 +822,7 @@ export default {
       }
     },
     
+
     findCommentById(id) {
       // Buscar en comentarios principales
       for (const comment of this.comentarios) {
@@ -820,6 +838,8 @@ export default {
       return null;
     },
     
+
+
     categoryColor(categoria) {
       const colors = {
         'General': '#6c757d',
@@ -830,6 +850,7 @@ export default {
       };
       return colors[categoria] || colors['General'];
     },
+
     
     formatDate(date) {
       if (!date) return '';
@@ -843,6 +864,7 @@ export default {
       });
     },
     
+
     formatRelativeTime(date) {
       const now = new Date();
       const diff = now - new Date(date);
@@ -856,12 +878,12 @@ export default {
     
 
     
-    addComment() {
-      axios.post('/post/create-comment', {
-        post_id: this.postSeleccionado.id,
-        texto: this.nuevoComentario
-      })
-    },
+    // addComment() {
+    //   axios.post('/post/create-comment', {
+    //     post_id: this.postSeleccionado.id,
+    //     texto: this.nuevoComentario
+    //   })
+    // },
   },
 
 
