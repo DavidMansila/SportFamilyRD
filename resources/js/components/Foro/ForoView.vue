@@ -350,89 +350,103 @@
       </svg>
     </button>
 
-    <!-- Modal para crear post -->
     <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h2>Crear nuevo post</h2>
-          
-          <button @click="cerrarModal" class="modal-close-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2>Crear nuevo post</h2>
+      <button @click="cerrarModal" class="modal-close-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-content-wrapper">
+      <form @submit.prevent="createPost()" class="modal-form">
+        <div class="form-group">
+          <label for="titulo">Título</label>
+          <input
+            v-model="nuevoPost.titulo"
+            id="titulo"
+            type="text"
+            placeholder="¿De qué quieres hablar?"
+            required
+          />
         </div>
-        
-        <form @submit.prevent="createPost()" class="modal-form">
+
+        <div class="form-group">
+          <label for="contenido">Contenido</label>
+          <textarea
+            v-model="nuevoPost.contenido"
+            id="contenido"
+            placeholder="Comparte tus ideas, preguntas o experiencias..."
+            rows="5"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-row">
           <div class="form-group">
-            <label for="titulo">Título</label>
+            <label for="categoria">Categoría</label>
+            <select v-model="nuevoPost.categoria" id="categoria" required>
+              <option value="">Selecciona una categoría</option>
+              <option value="Deporte">Deporte</option>
+              <option value="Gym">Gym</option>
+              <option value="Experiencia">Experiencia</option>
+              <option value="Lugares">Lugares</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="file-upload-label">
             <input
-              v-model="nuevoPost.titulo"
-              id="titulo"
-              type="text"
-              placeholder="¿De qué quieres hablar?"
-              required
+              type="file"
+              id="imagen"
+              @change="handleFileSelect"
+              accept="image/*"
+              class="file-upload-input"
             />
-          </div>
+            <span class="file-upload-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Subir imagen
+            </span>
+            <span v-if="nuevoPost.imagenFile" class="file-upload-name">
+              {{ nuevoPost.imagenFile.name }}
+            </span>
+          </label>
+        </div>
 
-          <div class="form-group">
-            <label for="contenido">Contenido</label>
-            <textarea
-              v-model="nuevoPost.contenido"
-              id="contenido"
-              placeholder="Comparte tus ideas, preguntas o experiencias..."
-              rows="5"
-              required
-            ></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="categoria">Categoría</label>
-              <select v-model="nuevoPost.categoria" id="categoria" required>
-                <option value="">Selecciona una categoría</option>
-                <option value="Deporte">Deporte</option>
-                <option value="Gym">Gym</option>
-                <option value="Experiencia">Experiencia</option>
-                <option value="Lugares">Lugares</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="file-upload-label">
-              <input
-                type="file"
-                id="imagen"
-                @change="handleFileSelect"
-                accept="image/*"
-                class="file-upload-input"
-              />
-              <span class="file-upload-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                Subir imagen
-              </span>
-              <span v-if="nuevoPost.imagenFile" class="file-upload-name">
-                {{ nuevoPost.imagenFile.name }}
-              </span>
-            </label>
-            <img v-if="imagenMiniatura" :src="imagenMiniatura" alt="Previsualización" class="image-preview">
-          </div>
-
-          <div class="form-actions">
-            <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Publicar</button>
-          </div>
-        </form>
+        <div class="form-actions">
+          <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Publicar</button>
+        </div>
+      </form>
+      
+        <!-- Vista previa externa -->
+      <div v-if="mostrarModal && imagenMiniatura" class="external-preview">
+        <img :src="imagenMiniatura" alt="Previsualización" class="preview-image">
       </div>
+
+
+
     </div>
   </div>
+</div>
+
+
+
+  </div>
 </template>
+
+
+
+
 
 <script>
 import axios from 'axios';
@@ -476,6 +490,7 @@ export default {
   },
 
   methods: {
+
     abrirModal() {
       this.mostrarModal = true;
       document.body.style.overflow = 'hidden';
@@ -661,6 +676,7 @@ export default {
       }, 0);
     },
     
+    
     cerrarPopout() {
       this.postSeleccionado = null;
       this.comentarios = [];
@@ -675,7 +691,7 @@ export default {
       document.body.style.width = '';
       
       // Restaurar posición del scroll
-      window.scrollTo(0, this.scrollPosition);
+      window.scrollTo(this.scrollPosition);
     },
     
     toggleLike() {
@@ -853,753 +869,8 @@ export default {
 
 
 
+
+
 <style scoped>
 @import '../../../scss/Foro/foro.scss';
-
-/* Transición para el popout */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-
-/* Clase para bloquear scroll cuando el popout está abierto */
-.no-scroll {
-  overflow: hidden;
-  height: 100vh;
-}
-
-/* Estilos mejorados para el popout */
-.post-popout-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.post-popout-container {
-  background-color: white;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 900px;
-  max-height: 90vh;
-  display: flex;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.post-popout-content {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-
-.post-popout-media {
-  flex: 1;
-  max-width: 50%;
-  position: relative;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.post-popout-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.post-interactions {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.interaction-btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 24px;
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  color: #333;
-  font-size: 14px;
-}
-
-.interaction-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.interaction-btn svg {
-  width: 18px;
-  height: 18px;
-  transition: all 0.3s ease;
-}
-
-.like-btn.liked {
-  color: #ff4757;
-}
-
-.like-btn.liked svg {
-  fill: #ff4757;
-}
-
-.comment-btn:hover {
-  color: #3498db;
-}
-
-.post-popout-details {
-  flex: 1;
-  max-width: 50%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.post-popout-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.post-author-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.author-avatar-wrapper {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-}
-
-.author-avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.author-online-dot {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 10px;
-  height: 10px;
-  background-color: #4cd137;
-  border-radius: 50%;
-  border: 2px solid white;
-}
-
-.author-name {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-}
-
-.post-category-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  color: white;
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-.close-popout-btn {
-  background: rgba(0, 0, 0, 0.05);
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.close-popout-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  transform: rotate(90deg);
-}
-
-.close-popout-btn.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.close-popout-btn svg {
-  width: 20px;
-  height: 20px;
-  color: #666;
-}
-
-.post-popout-body {
-  padding: 20px;
-  flex-grow: 1;
-  overflow-y: auto;
-  background: rgba(245, 245, 245, 0.5);
-}
-
-.post-popout-title {
-  margin: 0 0 15px 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #222;
-  line-height: 1.3;
-}
-
-.post-popout-text {
-  margin: 0 0 20px 0;
-  line-height: 1.6;
-  color: #444;
-  font-size: 15px;
-}
-
-.post-meta-info {
-  display: flex;
-  gap: 15px;
-  font-size: 13px;
-  color: #777;
-}
-
-.post-comments-section {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  flex-shrink: 0;
-  background: white;
-}
-
-.comments-title {
-  margin: 0 0 15px 0;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #333;
-}
-
-.comments-title svg {
-  width: 18px;
-  height: 18px;
-  color: #666;
-}
-
-.comments-container {
-  max-height: 300px;
-  overflow-y: auto;
-  margin-bottom: 15px;
-  padding-right: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: #ddd transparent;
-}
-
-.comments-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.comments-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.comments-container::-webkit-scrollbar-thumb {
-  background-color: #ddd;
-  border-radius: 6px;
-}
-
-.comment-item {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 15px;
-}
-
-.comment-avatar-wrapper {
-  flex-shrink: 0;
-}
-
-.comment-avatar-placeholder {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.comment-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.comment-content {
-  flex-grow: 1;
-}
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 5px;
-  flex-wrap: wrap;
-}
-
-.comment-author {
-  font-weight: 600;
-  font-size: 14px;
-  color: #333;
-}
-
-.comment-time {
-  font-size: 12px;
-  color: #888;
-}
-
-.toggle-replies-btn {
-  background: none;
-  border: none;
-  color: #3498db;
-  font-size: 12px;
-  cursor: pointer;
-  padding: 0;
-  margin-left: auto;
-}
-
-.comment-text {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #444;
-}
-
-.comment-actions {
-  display: flex;
-  gap: 15px;
-  margin-top: 8px;
-}
-
-.comment-action {
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #666;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.2s ease;
-}
-
-.comment-action:hover {
-  color: #333;
-}
-
-.comment-action.liked {
-  color: #ff4757;
-}
-
-.comment-action.liked svg {
-  fill: #ff4757;
-}
-
-.comment-action svg {
-  width: 14px;
-  height: 14px;
-}
-
-.reply-item {
-  margin-left: 20px;
-  margin-top: 10px;
-  padding-left: 10px;
-  border-left: 2px solid #eee;
-}
-
-.replying-to {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.cancel-reply-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-}
-
-.cancel-reply-btn svg {
-  width: 14px;
-  height: 14px;
-  color: #999;
-}
-
-.cancel-reply-btn:hover svg {
-  color: #666;
-}
-
-.comment-form {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.comment-input {
-  flex-grow: 1;
-  border: 1px solid #ddd;
-  border-radius: 24px;
-  padding: 12px 16px;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.3s ease;
-  background: rgba(245, 245, 245, 0.7);
-}
-
-.comment-input:focus {
-  border-color: #3498db;
-  background: white;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-.submit-comment-btn {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.submit-comment-btn:hover {
-  background-color: #2980b9;
-  transform: translateY(-1px);
-}
-
-.submit-comment-btn.disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.submit-comment-btn svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Estilos responsivos */
-@media (max-width: 768px) {
-  .post-popout-container {
-    flex-direction: column;
-    max-height: 90vh;
-    width: 95%;
-  }
-  
-  .post-popout-media,
-  .post-popout-details {
-    max-width: 100%;
-  }
-  
-  .post-popout-media {
-    max-height: 300px;
-    min-height: 200px;
-  }
-  
-  .post-popout-details {
-    max-height: calc(90vh - 300px);
-  }
-  
-  .comments-container {
-    max-height: 200px;
-  }
-}
-
-/* Botón flotante moderno */
-.floating-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  z-index: 100;
-}
-
-.floating-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.floating-btn svg {
-  width: 24px;
-  height: 24px;
-  stroke-width: 2.5;
-}
-
-/* Estilos para el modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-.modal-container {
-  background-color: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 600px;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  animation: modalEnter 0.3s ease;
-}
-
-@keyframes modalEnter {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.modal-header {
-  padding: 20px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 22px;
-  color: #333;
-}
-
-.modal-close-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-}
-
-.modal-close-btn:hover {
-  background-color: #f5f5f5;
-}
-
-.modal-close-btn svg {
-  width: 20px;
-  height: 20px;
-  color: #666;
-}
-
-.modal-form {
-  padding: 20px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-.form-group textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-.file-upload-label {
-  display: block;
-}
-
-.file-upload-input {
-  display: none;
-}
-
-.file-upload-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background-color: #f5f5f5;
-  border: 1px dashed #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.file-upload-btn:hover {
-  background-color: #eee;
-  border-color: #999;
-}
-
-.file-upload-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
-.file-upload-name {
-  display: inline-block;
-  margin-left: 10px;
-  font-size: 14px;
-  color: #666;
-}
-
-.image-preview {
-  max-width: 100%;
-  max-height: 200px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid #eee;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-secondary {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
-}
-
-.btn-secondary:hover {
-  background-color: #e0e0e0;
-}
-
-.btn-primary {
-  background-color: #3498db;
-  color: white;
-  border: 1px solid #2980b9;
-}
-
-.btn-primary:hover {
-  background-color: #2980b9;
-}
-
-
 </style>
