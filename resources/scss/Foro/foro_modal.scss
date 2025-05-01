@@ -1,0 +1,553 @@
+
+/* ------------------- MODAL ------------------ */
+
+
+:root {
+    /* Colores */
+    --primary: #4361ee;
+    --primary-light: #4895ef;
+    --secondary: #f8f9fa;
+    --text-dark: #212529;
+    --text-medium: #495057;
+    --text-light: #6c757d;
+    --border: #e9ecef;
+    --error: #dc3545;
+    --success: #28a745;
+    
+    /* Tamaños */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    
+    /* Sombras */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    
+    /* Transiciones */
+    --transition: all 0.3s ease;
+    --transition-fast: all 0.2s ease;
+  }
+  
+  
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .modal-container {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 900px; /* Más ancho para acomodar ambas columnas */
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .modal-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+  }
+  
+  .modal-close-btn:hover {
+    background-color: var(--secondary);
+    color: var(--primary);
+  }
+  
+  /* Contenedor principal con las dos columnas */
+  .modal-content-wrapper {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  /* Formulario (columna izquierda) */
+  .modal-form {
+    padding: 24px;
+    flex: 1;
+    overflow-y: auto;
+    min-width: 0; /* Para evitar problemas de overflow */
+  }
+  
+  /* Preview de imagen (columna derecha) */
+  .image-preview-container {
+    width: 350px;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    background-color: #f9fafb;
+    overflow: hidden;
+  }
+  
+  .image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 20px;
+    background-color: white;
+    flex-grow: 1;
+  }
+  
+  /* Grupos de formulario */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    transition: var(--transition);
+    background-color: white;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+  }
+  
+  .form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  
+  /* Subida de archivos */
+  .file-upload-label {
+    display: block;
+  }
+  
+  .file-upload-input {
+    display: none;
+  }
+  
+  .file-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background-color: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.95rem;
+  }
+  
+  .file-upload-btn:hover {
+    background-color: #e9ecef;
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  
+  .file-upload-name {
+    margin-left: 10px;
+    font-size: 0.9rem;
+    color: var(--text-medium);
+  }
+  
+  /* Acciones del formulario */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.95rem;
+  }
+  
+  .btn-secondary {
+    background-color: white;
+    border: 1px solid var(--border);
+    color: var(--text-medium);
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--secondary);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary);
+    border: 1px solid var(--primary);
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .modal-container {
+      max-width: 95%;
+    }
+    
+    .modal-content-wrapper {
+      flex-direction: column;
+    }
+    
+    .image-preview-container {
+      width: 100%;
+      border-left: none;
+      border-top: 1px solid var(--border);
+      height: 300px;
+    }
+    
+    .modal-form {
+      padding: 20px;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .btn {
+      width: 100%;
+    }
+  }
+  
+  /* Animaciones */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  
+  /* Contenedor principal que organiza modal y preview */
+  .modal-preview-wrapper {
+    position: relative;
+  }
+  
+  /* Modal existente (sin cambios en su estructura interna) */
+  .modal-overlay {
+    position: fixed;
+    /* ... (mantener todos los estilos actuales del modal) ... */
+  }
+  
+  /* Vista previa externa */
+  .external-preview {
+    position: fixed;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    width: 350px;
+    max-height: 80vh;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1001; /* Un nivel por encima del modal */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideInRight 0.3s ease-out;
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateY(-50%) translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+  
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 20px;
+    max-height: calc(80vh - 60px); /* Restamos el alto del header */
+  }
+  
+  /* Responsive: en pantallas pequeñas la preview va debajo */
+  @media (max-width: 1200px) {
+    .external-preview {
+      position: fixed;
+      top: auto;
+      bottom: 20px;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 500px;
+      max-height: 30vh;
+    }
+    
+    .preview-image {
+      max-height: calc(30vh - 60px);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .external-preview {
+      display: none; /* Ocultamos en móviles muy pequeños */
+    }
+  }
+  
+  
+  
+  /* Estilos para el modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .modal-container {
+    background-color: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: modalEnter 0.3s ease;
+  }
+  
+  @keyframes modalEnter {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #333;
+  }
+  
+  .modal-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+  
+  .modal-close-btn:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .modal-close-btn svg {
+    width: 20px;
+    height: 20px;
+    color: #666;
+  }
+  
+  .modal-form {
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  }
+  
+  .form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  
+  .file-upload-label {
+    display: block;
+  }
+  
+  .file-upload-input {
+    display: none;
+  }
+  
+  .file-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background-color: #f5f5f5;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .file-upload-btn:hover {
+    background-color: #eee;
+    border-color: #999;
+  }
+  
+  .file-upload-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .file-upload-name {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .image-preview {
+    max-width: 100%;
+    max-height: 200px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .btn-primary {
+    background-color: #3498db;
+    color: white;
+    border: 1px solid #2980b9;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2980b9;
+  }
+  
