@@ -283,13 +283,19 @@ export default {
     this.cargarNoticias();
   }
 };
+
 </script>
 
 
 
 
 <style scoped>
+
 @import '../../../scss/Noticias/noticias.scss';
+
+@import '../../../scss/Noticias/noticias_navbar.scss';
+
+
 </style>
 
 

@@ -31,6 +31,8 @@
       </div>
     </nav>
 
+
+
     <!-- Hero Section -->
     <div class="hero-section">
       <div class="hero-content">
@@ -40,6 +42,9 @@
       </div>
       <div class="hero-overlay"></div>
     </div>
+
+
+
 
     <!-- Filtros y búsqueda -->
     <div class="filtros-container">
@@ -96,6 +101,10 @@
         </button>
       </div>
     </div>
+
+
+
+
 
     <!-- Sección de Posts con diseño de tarjetas -->
     <div class="posts-grid">
@@ -165,6 +174,9 @@
 
 
 
+
+
+
     <!-- Popout para ver publicación completa -->
     <transition name="fade">
       <div v-if="postSeleccionado" class="post-popout-overlay" @click.self="cerrarPopout">
@@ -192,6 +204,8 @@
               </div>
             </div>
             
+
+
             <!-- Sección de contenido -->
             <div class="post-popout-details">
               <!-- Cabecera -->
@@ -213,6 +227,8 @@
                   </svg>
                 </button>
               </div>
+
+
               
               <!-- Contenido del post -->
               <div class="post-popout-body">
@@ -224,6 +240,8 @@
                 </div>
               </div>
               
+
+
               <!-- Sección de comentarios -->
               <div class="post-comments-section">
                 <h4 class="comments-title">
@@ -234,6 +252,10 @@
                 </h4>
                 
                 <div class="comments-container" ref="commentsContainer">
+
+
+
+
                   <!-- Comentarios principales -->
                   <div v-for="(comentario, index) in comentarios" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
@@ -265,6 +287,9 @@
                           {{ comentarioRespondiendo === comentario.id ? 'Cancelar' : 'Responder' }}
                         </button>
                       </div>
+
+
+
                       
                       <!-- Respuestas -->
                       <div v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0" 
@@ -295,6 +320,10 @@
                     </div>
                   </div>
                 </div>
+
+
+
+
                 
                 <!-- Formulario de comentario principal o respuesta -->
                 <div class="add-comment-form">
@@ -428,12 +457,14 @@
         </div>
       </form>
       
+
+
+
+
         <!-- Vista previa externa -->
-      <div v-if="mostrarModal && imagenMiniatura" class="external-preview">
+     <div v-if="mostrarModal && imagenMiniatura" class="external-preview">
         <img :src="imagenMiniatura" alt="Previsualización" class="preview-image">
-      </div>
-
-
+    </div>
 
     </div>
   </div>
@@ -635,45 +666,8 @@ export default {
       
       this.postSeleccionado = { ...post, isLiked: false };
       
-      // Simular carga de comentarios
-      this.cargarComentariosSimulados();
-    },
-    
-    cargarComentariosSimulados() {
-      // Datos simulados para comentarios
-      this.comentarios = [
-        {
-          id: 1,
-          userId: 123,
-          texto: "¡Excelente publicación! Me encanta este tema deportivo.",
-          fecha: new Date(Date.now() - 3600000), // 1 hora atrás
-          likes: 5,
-          isLiked: false,
-          respuestas: [
-            {
-              id: 101,
-              userId: 456,
-              texto: "Totalmente de acuerdo contigo, es un tema muy interesante.",
-              fecha: new Date(Date.now() - 1800000), // 30 minutos atrás
-              likes: 2,
-              isLiked: false
-            }
-          ]
-        },
-        {
-          id: 2,
-          userId: 789,
-          texto: "¿Alguien sabe dónde puedo encontrar más información sobre esto?",
-          fecha: new Date(Date.now() - 7200000), // 2 horas atrás
-          likes: 3,
-          isLiked: true,
-          respuestas: []
-        }
-      ];
-      
-      this.totalComentarios = this.comentarios.reduce((total, comentario) => {
-        return total + 1 + (comentario.respuestas ? comentario.respuestas.length : 0);
-      }, 0);
+      // Carga de comentarios
+      //this.comentarios.post_id();
     },
     
     
@@ -858,8 +852,19 @@ export default {
       if (minutes < 60) return `Hace ${minutes} min`;
       if (minutes < 1440) return `Hace ${Math.floor(minutes / 60)} h`;
       return `Hace ${Math.floor(minutes / 1440)} d`;
-    }
+    },
+    
+
+    
+    addComment() {
+      axios.post('/post/create-comment', {
+        post_id: this.postSeleccionado.id,
+        texto: this.nuevoComentario
+      })
+    },
   },
+
+
 
   mounted() {
     this.getPost();
@@ -872,5 +877,19 @@ export default {
 
 
 <style scoped>
+
 @import '../../../scss/Foro/foro.scss';
+
+@import '../../../scss/Foro/foro_filtro_y_busqueda.scss';
+
+@import '../../../scss/Foro/foro_post.scss';
+
+@import '../../../scss/Foro/foro_pop_out_post.scss';
+
+@import '../../../scss/Foro/foro_modal.scss';
+
+@import '../../../scss/Foro/foro_responsive.scss';
+
+@import '../../../scss/Foro/foro_navbar.scss';
+
 </style>
