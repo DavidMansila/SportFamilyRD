@@ -74,6 +74,10 @@ Route::resource('/products', ProductController::class);
 
 //Foro
 Route::get('/foro/example', [PostController::class, 'exampleFunction']);
+//destroyComment, updateComment createComment
+Route::post('/post/create-comment', [PostController::class, 'createComment']);
+Route::put('/post/update-comment', [PostController::class, 'updateComment']);
+Route::delete('/post/delete-comment', [PostController::class, 'destroyComment']);
 Route::resource('/post', PostController::class);
 
 // Rutas de autenticación

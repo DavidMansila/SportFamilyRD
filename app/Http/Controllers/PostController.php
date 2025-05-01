@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
@@ -104,6 +105,63 @@ class PostController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al eliminar el post',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function createComment(Request $request, $postId)
+    {
+        try {
+            $post = Post::findOrFail($postId);
+
+            $comment = $post->comments()->create($request->all());
+
+            return response()->json([
+                'message' => 'Comentario creado exitosamente',
+                'comment' => $comment,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear el comentario',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateComment(Request $request, $commentId)
+    {
+        try {
+            $comment = Comment::findOrFail($commentId);
+            $comment->update($request->all());
+
+            return response()->json([
+                'message' => 'Comentario actualizado exitosamente',
+                'comment' => $comment,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar el comentario',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroyComment($commentId)
+    {
+        try {
+            $comment = Comment::findOrFail($commentId);
+            $comment->delete();
+
+            return response()->json([
+                'message' => 'Comentario eliminado exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al eliminar el comentario',
                 'error' => $e->getMessage(),
             ], 500);
         }
