@@ -362,6 +362,30 @@
               </div>
             </div>
           </div>
+          
+          <!-- Formulario de comentario principal -->
+          <div class="add-comment-form">
+            <form @submit.prevent="addComment" class="comment-form">
+              <input
+                v-model="nuevoComentario"
+                ref="comentarioInput"
+                type="text"
+                placeholder="Escribe un comentario..."
+                class="comment-input"
+              >
+              <button 
+                type="submit" 
+                :disabled="!nuevoComentario.trim()" 
+                class="submit-comment-btn"
+                :class="{ disabled: !nuevoComentario.trim() }"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+              </button>
+            </form>
+            
+          </div>
         </div>
       </div>
     </transition>
