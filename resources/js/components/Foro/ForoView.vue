@@ -166,14 +166,16 @@
 
 
           
-          <!-- Popout para ver publicación completa -->
+<!-- Popout para ver publicación completa -->
 <div v-if="postSeleccionado" class="post-popout-overlay" @click.self="cerrarPopout">
   <div class="post-popout-container">
     <!-- Contenedor principal -->
     <div class="post-popout-content">
       <!-- Sección de imagen -->
       <div class="post-popout-media">
-        <img :src="postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
+        <div class="image-container">
+          <img :src="postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
+        </div>
         <div class="post-interactions">
           <button @click="toggleLike" class="interaction-btn like-btn" :class="{ liked: postSeleccionado.isLiked }">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -196,7 +198,7 @@
         <div class="post-popout-header">
           <div class="post-author-info">
             <div class="author-avatar-wrapper">
-              <img src="/imagenes/avatar-default.png" alt="Autor" class="author-avatar">
+              <!-- <img src="/imagenes/avatar-default.png" alt="Autor" class="author-avatar"> -->
               <span class="author-online-dot"></span>
             </div>
             <div>
@@ -229,38 +231,74 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/>
             </svg>
-            Conversación ({{ comentarios.length }})
+            Conversación ({{ totalComentarios }})
           </h4>
           
-          <div class="comments-container">
+          <div class="comments-container" ref="commentsContainer">
             <!-- Comentarios principales -->
-            <div v-for="(comentario, index) in comentarios" :key="index" class="comment-item">
+            <div v-for="(comentario, index) in comentarios" :key="comentario.id" class="comment-item">
               <div class="comment-avatar-wrapper">
-                <img src="/imagenes/avatar-default.png" alt="Usuario" class="comment-avatar">
+                <!-- <img src="/imagenes/avatar-default.png" alt="Usuario" class="comment-avatar"> -->
               </div>
               <div class="comment-content">
                 <div class="comment-header">
                   <span class="comment-author">Usuario{{ comentario.userId }}</span>
                   <span class="comment-time">{{ formatRelativeTime(comentario.fecha) }}</span>
+                  <button 
+                    v-if="comentario.respuestas && comentario.respuestas.length > 0"
+                    @click="toggleCommentExpansion(comentario.id)"
+                    class="toggle-replies-btn"
+                  >
+                    {{ comentariosExpandidos.includes(comentario.id) ? 'Ocultar respuestas' : 'Ver respuestas' }}
+                  </button>
                 </div>
                 <p class="comment-text">{{ comentario.texto }}</p>
                 <div class="comment-actions">
-                  <button @click="likeComentario(comentario.id)" class="comment-action like-comment">
+                  <button @click="likeComentario(comentario.id)" class="comment-action like-comment" :class="{ liked: comentario.isLiked }">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                     <span>{{ comentario.likes }}</span>
                   </button>
-                  <button @click="responderAComentario(comentario)" class="comment-action reply-comment">
-                    Responder
+                  <button @click="toggleReply(comentario.id)" class="comment-action reply-comment">
+                    {{ comentarioRespondiendo === comentario.id ? 'Cancelar' : 'Responder' }}
                   </button>
                 </div>
                 
+                <!-- Formulario de respuesta -->
+                <div v-if="comentarioRespondiendo === comentario.id" class="reply-form">
+                  <div class="add-comment-form replying">
+                    <div class="replying-to">
+                      Respondiendo a <strong>@Usuario{{ comentario.userId }}</strong>
+                    </div>
+                    <form @submit.prevent="agregarRespuesta(comentario)" class="comment-form">
+                      <input
+                        v-model="nuevoComentario"
+                        ref="comentarioInput"
+                        type="text"
+                        placeholder="Escribe tu respuesta..."
+                        class="comment-input"
+                      >
+                      <button 
+                        type="submit" 
+                        :disabled="!nuevoComentario.trim()" 
+                        class="submit-comment-btn"
+                        :class="{ disabled: !nuevoComentario.trim() }"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+                
                 <!-- Respuestas -->
-                <div v-if="comentario.respuestas && comentario.respuestas.length" class="comment-replies">
-                  <div v-for="(respuesta, i) in comentario.respuestas" :key="i" class="comment-item reply-item">
+                <div v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0" 
+                     class="comment-replies">
+                  <div v-for="(respuesta, i) in comentario.respuestas" :key="respuesta.id" class="comment-item reply-item">
                     <div class="comment-avatar-wrapper">
-                      <img src="/imagenes/avatar-default.png" alt="Usuario" class="comment-avatar">
+                      <!-- <img src="/imagenes/avatar-default.png" alt="Usuario" class="comment-avatar"> -->
                     </div>
                     <div class="comment-content">
                       <div class="comment-header">
@@ -269,7 +307,7 @@
                       </div>
                       <p class="comment-text">{{ respuesta.texto }}</p>
                       <div class="comment-actions">
-                        <button @click="likeComentario(respuesta.id)" class="comment-action like-comment">
+                        <button @click="likeComentario(respuesta.id)" class="comment-action like-comment" :class="{ liked: respuesta.isLiked }">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                           </svg>
@@ -283,16 +321,8 @@
             </div>
           </div>
           
-          <!-- Formulario de comentario -->
-          <div class="add-comment-form" :class="{ 'replying': comentarioRespondiendo }">
-            <div v-if="comentarioRespondiendo" class="replying-to">
-              Respondiendo a <strong>@Usuario{{ comentarioRespondiendo.userId }}</strong>
-              <button @click="cancelarRespuesta" class="cancel-reply">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-              </button>
-            </div>
+          <!-- Formulario de comentario principal -->
+          <div class="add-comment-form">
             <form @submit.prevent="agregarComentario" class="comment-form">
               <input
                 v-model="nuevoComentario"
@@ -318,6 +348,8 @@
     </div>
   </div>
 </div>
+
+
         </div>
       </div>
     </div>
@@ -442,39 +474,19 @@ export default {
       },
       imagenMiniatura: null,
       imageLoaded: false,
+
+
       postSeleccionado: null,
-      comentarios: [
-      {
-        id: 1,
-        userId: 123,
-        texto: "¡Qué gran publicación! Me encanta este contenido deportivo.",
-        fecha: "2023-05-15T10:30:00",
-        likes: 5,
-        respuestas: [
-          {
-            id: 11,
-            userId: 456,
-            texto: "Totalmente de acuerdo contigo, el deporte es vida!",
-            fecha: "2023-05-15T11:45:00",
-            likes: 2
-          }
-        ]
-      },
-      {
-        id: 2,
-        userId: 789,
-        texto: "¿Dónde puedo encontrar más información sobre esto?",
-        fecha: "2023-05-16T09:15:00",
-        likes: 3,
-        respuestas: []
-      }
-    ],
-    nuevoComentario: '',
-    comentarioRespondiendo: null
-    
-  };
-},
+      comentarios: [],
+      comentariosExpandidos: [],
+      comentarioRespondiendo: null,
+      nuevoComentario: '',
+      totalComentarios: 0
+    }
+  },
+
   methods: {
+
     abrirModal() {
       this.mostrarModal = true;
       document.body.style.overflow = 'hidden';
@@ -641,131 +653,155 @@ export default {
   
 
 
-
-  cerrarPopout() {
-    this.postSeleccionado = null;
-    this.comentarioRespondiendo = null;
-    document.body.style.overflow = 'auto';
-  },
-  
-
-
-
-  toggleLike() {
-    if (this.postSeleccionado.isLiked) {
-      this.postSeleccionado.likes--;
-    } else {
-      this.postSeleccionado.likes++;
-    }
-    this.postSeleccionado.isLiked = !this.postSeleccionado.isLiked;
-    // Aquí podrías llamar a tu API para actualizar el like
-  },
-  
-
-
-
-  focusComentario() {
-    this.$refs.comentarioInput.focus();
-  },
-  
-
-
-
-  responderAComentario(comentario) {
-    this.comentarioRespondiendo = comentario;
-    this.nuevoComentario = `@${comentario.userId} `;
-    this.focusComentario();
-  },
-
-
-  
-  agregarComentario() {
-    if (!this.nuevoComentario.trim()) return;
+    cerrarPopout() {
+      this.postSeleccionado = null;
+      this.comentarios = [];
+      this.comentariosExpandidos = [];
+      this.comentarioRespondiendo = null;
+      this.nuevoComentario = '';
+    },
     
-    const nuevoComentarioObj = {
-      id: Date.now(),
-      userId: 1, // ID del usuario actual
-      texto: this.nuevoComentario,
-      fecha: new Date().toISOString(),
-      likes: 0,
-      respuestas: []
-    };
-    
-    if (this.comentarioRespondiendo) {
-      // Es una respuesta a otro comentario
-      const comentarioPadre = this.comentarios.find(c => c.id === this.comentarioRespondiendo.id);
-      if (comentarioPadre) {
-        comentarioPadre.respuestas.push(nuevoComentarioObj);
+    toggleLike() {
+      if (this.postSeleccionado.isLiked) {
+        this.postSeleccionado.likes--;
+      } else {
+        this.postSeleccionado.likes++;
       }
-    } else {
-      // Es un comentario nuevo
-      this.comentarios.push(nuevoComentarioObj);
-    }
+      this.postSeleccionado.isLiked = !this.postSeleccionado.isLiked;
+    },
     
-    this.nuevoComentario = '';
-    this.comentarioRespondiendo = null;
+    focusComentario() {
+      this.$refs.comentarioInput.focus();
+      this.$refs.commentsContainer.scrollTo({
+        top: this.$refs.commentsContainer.scrollHeight,
+        behavior: 'smooth'
+      });
+    },
     
-    // Aquí podrías llamar a tu API para guardar el comentario
-  },
-  
-
-
-
-
-  likeComentario(comentarioId) {
-    // Buscar comentario en todos los niveles
-    const comentario = this.buscarComentario(comentarioId);
-    if (comentario) {
-      comentario.likes++;
-      // Aquí podrías llamar a tu API para actualizar el like
-    }
-  },
-
-
-
-  
-  buscarComentario(id) {
-    // Busca en comentarios principales
-    for (const comentario of this.comentarios) {
-      if (comentario.id === id) return comentario;
+    toggleCommentExpansion(commentId) {
+      const index = this.comentariosExpandidos.indexOf(commentId);
+      if (index === -1) {
+        this.comentariosExpandidos.push(commentId);
+      } else {
+        this.comentariosExpandidos.splice(index, 1);
+      }
+    },
+    
+    toggleReply(commentId) {
+      if (this.comentarioRespondiendo === commentId) {
+        this.comentarioRespondiendo = null;
+      } else {
+        this.comentarioRespondiendo = commentId;
+        this.$nextTick(() => {
+          this.$refs.comentarioInput.focus();
+        });
+      }
+    },
+    
+    agregarComentario() {
+      if (!this.nuevoComentario.trim()) return;
       
-      // Busca en respuestas
-      for (const respuesta of comentario.respuestas) {
-        if (respuesta.id === id) return respuesta;
+      const newComment = {
+        id: Date.now(),
+        userId: Math.floor(Math.random() * 1000),
+        texto: this.nuevoComentario,
+        fecha: new Date(),
+        likes: 0,
+        isLiked: false,
+        respuestas: []
+      };
+      
+      this.comentarios.push(newComment);
+      this.totalComentarios++;
+      this.nuevoComentario = '';
+      
+      this.$nextTick(() => {
+        this.$refs.commentsContainer.scrollTo({
+          top: this.$refs.commentsContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      });
+    },
+    
+    agregarRespuesta(comentarioPadre) {
+      if (!this.nuevoComentario.trim()) return;
+      
+      const newReply = {
+        id: Date.now(),
+        userId: Math.floor(Math.random() * 1000),
+        texto: this.nuevoComentario,
+        fecha: new Date(),
+        likes: 0,
+        isLiked: false
+      };
+      
+      if (!comentarioPadre.respuestas) {
+        comentarioPadre.respuestas = [];
       }
-    }
-    return null;
-  },
-  
-
-
-
-  
-  formatRelativeTime(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
+      
+      comentarioPadre.respuestas.push(newReply);
+      this.totalComentarios++;
+      this.nuevoComentario = '';
+      this.comentarioRespondiendo = null;
+      
+      // Expandir comentario padre si no está expandido
+      if (!this.comentariosExpandidos.includes(comentarioPadre.id)) {
+        this.comentariosExpandidos.push(comentarioPadre.id);
+      }
+    },
     
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
+    likeComentario(commentId) {
+      const comment = this.findCommentById(commentId);
+      if (comment) {
+        if (comment.isLiked) {
+          comment.likes--;
+        } else {
+          comment.likes++;
+        }
+        comment.isLiked = !comment.isLiked;
+      }
+    },
     
-    if (diffInSeconds < 60) return 'Hace unos segundos';
-    if (diffInSeconds < 3600) {
-      const mins = Math.floor(diffInSeconds / 60);
-      return `Hace ${mins} minuto${mins > 1 ? 's' : ''}`;
-    }
-    if (diffInSeconds < 86400) {
-      const hours = Math.floor(diffInSeconds / 3600);
-      return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
-    }
-    if (diffInSeconds < 604800) {
-      const days = Math.floor(diffInSeconds / 86400);
-      return `Hace ${days} día${days > 1 ? 's' : ''}`;
-    }
+    findCommentById(id) {
+      // Buscar en comentarios principales
+      for (const comment of this.comentarios) {
+        if (comment.id === id) return comment;
+        
+        // Buscar en respuestas
+        if (comment.respuestas) {
+          for (const reply of comment.respuestas) {
+            if (reply.id === id) return reply;
+          }
+        }
+      }
+      return null;
+    },
     
-    return date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
-  }
-
+    categoryColor(categoria) {
+      const colors = {
+        'General': '#6c757d',
+        'Tecnología': '#17a2b8',
+        'Deportes': '#28a745',
+        'Entretenimiento': '#ffc107',
+        'Noticias': '#dc3545'
+      };
+      return colors[categoria] || colors['General'];
+    },
+    
+    formatDate(date) {
+      return new Date(date).toLocaleDateString();
+    },
+    
+    formatRelativeTime(date) {
+      const now = new Date();
+      const diff = now - new Date(date);
+      const minutes = Math.floor(diff / 60000);
+      
+      if (minutes < 1) return 'Ahora mismo';
+      if (minutes < 60) return `Hace ${minutes} min`;
+      if (minutes < 1440) return `Hace ${Math.floor(minutes / 60)} h`;
+      return `Hace ${Math.floor(minutes / 1440)} d`;
+    }
   },
 
   mounted() {
