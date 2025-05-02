@@ -1,0 +1,234 @@
+
+/* ------------------- RESPONSIVE DESIGN ------------------ */
+
+
+/* Pantallas grandes (TVs, monitores 4K) - 1920px+ */
+
+@media (min-width: 1920px) {
+    .navbar {
+      padding: 1.5rem 2rem;
+    }
+    .settings-container {
+      max-width: 1400px;
+      padding: 3rem;
+    }
+  }
+  
+  
+  
+  /* Laptops y pantallas medianas - 1440px-1599px */
+  
+  @media (max-width: 1599px) and (min-width: 1440px) {
+    .navbar {
+      padding: 1.2rem 1.5rem;
+    }
+    .nav-links {
+      gap: 1.8rem;
+    }
+    .logo {
+      width: 190px;
+      height: 65px;
+    }
+  }
+  
+  
+  
+  /* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
+  
+  @media (max-width: 1439px) and (min-width: 1200px) {
+    .navbar {
+      padding: 1rem 1.2rem;
+    }
+    .nav-links {
+      gap: 1.5rem;
+    }
+    .logo {
+      width: 180px;
+      height: 60px;
+    }
+  }
+  
+  
+  
+  /* Tablets grandes - 1024px-1199px */
+  
+  @media (max-width: 1199px) and (min-width: 1024px) {
+    .navbar {
+      padding: 1rem;
+    }
+    .nav-links {
+      gap: 1.2rem;
+    }
+    .logo {
+      width: 170px;
+      height: 55px;
+    }
+    .settings-container {
+      padding: 1.5rem;
+    }
+  }
+  
+  
+  
+  /* Tablets en vertical - 768px-1023px */
+  
+  @media (max-width: 1023px) and (min-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      padding: 1rem;
+    }
+    .logo-container {
+      margin-bottom: 1rem;
+    }
+    .nav-links {
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .logo {
+      width: 180px;
+      height: 60px;
+    }
+    .settings-tabs {
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+    .settings-tabs button {
+      white-space: nowrap;
+    }
+  }
+  
+  
+  
+  /* Teléfonos grandes - 576px-767px */
+  
+  @media (max-width: 767px) and (min-width: 576px) {
+    .navbar {
+      padding: 0.8rem 1rem;
+    }
+    .nav-links {
+      gap: 0.8rem;
+    }
+    .logo {
+      width: 170px;
+      height: 55px;
+    }
+    .settings-container {
+      padding: 1.5rem 1rem;
+    }
+    .toggle-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  }
+  
+  
+  
+  /* Teléfonos medianos - 481px-575px */
+  
+  @media (max-width: 575px) and (min-width: 481px) {
+    .navbar {
+      padding: 0.8rem;
+    }
+    .logo {
+      width: 160px;
+      height: 50px;
+    }
+    .nav-links {
+      gap: 0.7rem;
+    }
+    .nav-link {
+      font-size: 0.9rem;
+    }
+    .Imagenes a {
+      width: 35px;
+      height: 35px;
+    }
+    .settings-title {
+      font-size: 2rem;
+    }
+  }
+  
+  
+  
+  /* Teléfonos pequeños - 320px-480px */
+  
+  @media (max-width: 480px) {
+    .navbar {
+      padding: 0.8rem;
+    }
+    .logo {
+      width: 160px;
+      height: 60px;
+    }
+    .nav-links {
+      gap: 1rem;
+    }
+    .nav-link {
+      font-size: 0.9rem;
+    }
+    .Imagenes a {
+      width: 35px;
+      height: 35px;
+    }
+    .settings-container {
+      padding: 1rem;
+    }
+    .settings-title {
+      font-size: 1.8rem;
+    }
+    .modal-actions {
+      flex-direction: column;
+    }
+    .modal-actions button {
+      width: 100%;
+    }
+  }
+  
+  
+  
+  /* Teléfonos muy pequeños - hasta 320px */
+  
+  @media (max-width: 320px) {
+    .navbar {
+      padding: 0.6rem;
+    }
+    .logo {
+      width: 140px;
+      height: 40px;
+    }
+    .nav-links {
+      gap: 0.5rem;
+    }
+    .nav-link {
+      font-size: 0.8rem;
+    }
+    .Imagenes a {
+      width: 30px;
+      height: 30px;
+    }
+    .settings-title {
+      font-size: 1.6rem;
+    }
+  }
+
+
+
+   /* Responsive */
+   @media (max-width: 640px) {
+    .tab-content {
+      padding: 1rem;
+    }
+    
+    .privacy-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .data-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }

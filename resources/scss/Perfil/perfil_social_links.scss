@@ -1,0 +1,94 @@
+
+  /* Social links */
+  
+  .social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .social-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .social-item:hover {
+    background: #f1f5f9;
+  }
+  
+  .social-icon {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .social-icon img {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .social-item input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    transition: all 0.3s ease;
+  }
+  
+  .social-item input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  }
+  
+  .remove-social {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .remove-social:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+  }
+  
+  .add-social {
+    background: none;
+    border: 1px dashed #3498db;
+    color: #3498db;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .add-social:hover {
+    background: rgba(52, 152, 219, 0.05);
+    border-style: solid;
+  }
+  

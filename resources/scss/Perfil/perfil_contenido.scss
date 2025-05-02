@@ -1,0 +1,67 @@
+
+  /* Contenido de perfil */
+  
+  .profile-content {
+    padding: 50px;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 40px;
+  }
+  
+  .profile-section {
+    margin-bottom: 50px;
+  }
+  
+  .profile-section h2 {
+    font-size: 1.6rem;
+    color: #2d3748;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #edf2f7;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .profile-section h2 svg {
+    color: #718096;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+  }
+  
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .info-item:hover {
+    background: #f1f5f9;
+    transform: translateY(-3px);
+  }
+  
+  .info-label {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  
+  .info-value {
+    font-size: 1.15rem;
+    color: #1a202c;
+    font-weight: 500;
+  }
+  
+  .profile-bio {
+    line-height: 1.7;
+    color: #4a5568;
+    font-size: 1.05rem;
+  }
