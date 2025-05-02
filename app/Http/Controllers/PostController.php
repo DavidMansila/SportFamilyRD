@@ -110,12 +110,10 @@ class PostController extends Controller
         }
     }
 
-    public function createComment(Request $request, $postId)
+    public function createComment(Request $request)
     {
         try {
-            $post = Post::findOrFail($postId);
-
-            $comment = $post->comments()->create($request->all());
+            $comment = Comment::create($request->all());
 
             return response()->json([
                 'message' => 'Comentario creado exitosamente',

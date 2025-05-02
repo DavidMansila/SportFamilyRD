@@ -193,13 +193,13 @@
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
-                  <span>{{ postSeleccionado.likes }}</span>
+                  <span>{{ postSeleccionado.likes_quantity }}</span>
                 </button>
                 <button @click="focusComentario" class="interaction-btn comment-btn">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/>
                   </svg>
-                  <span>{{ postSeleccionado.comentarios }}</span>
+                  <span>{{ postSeleccionado.comments.length }}</span>
                 </button>
               </div>
             </div>
@@ -248,7 +248,7 @@
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/>
                   </svg>
-                  Conversación ({{ totalComentarios }})
+                  Conversación ({{ postSeleccionado.comments.length }})
                 </h4>
                 
                 <div class="comments-container" ref="commentsContainer">
@@ -257,7 +257,7 @@
 
 
                   <!-- Comentarios principales -->
-                  <div v-for="(comentario, index) in posts.comments" :key="comentario.id" class="comment-item">
+                  <div v-for="(comentario, index) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
                       <div class="comment-avatar-placeholder">
                         <span>U{{ comentario.userId % 100 }}</span>
@@ -292,7 +292,7 @@
 
                       
                       <!-- Respuestas -->
-                      <div v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0" 
+                      <!-- <div v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0" 
                           class="comment-replies">
                         <div v-for="(respuesta, i) in comentario.respuestas" :key="respuesta.id" class="comment-item reply-item">
                           <div class="comment-avatar-wrapper">
@@ -316,7 +316,7 @@
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                 </div>
@@ -336,7 +336,7 @@
                       </svg>
                     </button>
                   </div>
-                  <form @submit.prevent="comentarioRespondiendo ? agregarRespuesta(comentarioRespondiendoo) : agregarComentario()" class="comment-form">
+                  <form @submit.prevent=" addComment()" class="comment-form">
                     <input
                       v-model="nuevoComentario"
                       ref="comentarioInput"
@@ -483,17 +483,24 @@ export default {
   name: 'ForoComponent',
   data() {
     return {
+
       posts: [],
+
       postsFiltrados: [],
+
       categoriaSeleccionada: '',
+
       terminoBusqueda: '',
+
       mostrarModal: false,
+
       nuevoPost: {
         titulo: '',
         contenido: '',
         categoria: '',
         imagenFile: null,
       },
+
       imagenMiniatura: null,
       imageLoaded: false,
 
@@ -501,19 +508,9 @@ export default {
       scrollPosition: 0,
       inputFocused: false,
       
-      comentarios: [],
-      comentariosExpandidos: [],
-      comentarioRespondiendo: null,
-      comentarioRespondiendoo: null,
-      nuevoComentario: '',
-      totalComentarios: 0
-    }
-  },
 
-  computed: {
-    comentarioRespondiendoo() {
-      if (!this.comentarioRespondiendo) return null;
-      return this.comentarios.find(c => c.id === this.comentarioRespondiendo) || null;
+      nuevoComentario: '',
+
     }
   },
 
@@ -636,6 +633,7 @@ export default {
 
     
     async createPost() {
+      
       const formData = new FormData();
       formData.append('titulo', this.nuevoPost.titulo);
       formData.append('contenido', this.nuevoPost.contenido);
@@ -662,6 +660,9 @@ export default {
     },
 
 
+
+
+
     abrirPopout(post) {
       // Guardar posición del scroll antes de abrir el popout
       this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
@@ -672,12 +673,14 @@ export default {
       document.body.style.top = `-${this.scrollPosition}px`;
       document.body.style.width = '100%';
       
-      this.postSeleccionado = { ...post, isLiked: false };
+      this.postSeleccionado = { ...post, isLiked: false};
       
-      // Carga de comentarios
-      //this.comentarios.post_id();
     },
     
+
+
+
+
     
     cerrarPopout() {
       this.postSeleccionado = null;
@@ -697,6 +700,9 @@ export default {
     },
     
 
+
+
+
     toggleLike() {
       if (this.postSeleccionado.isLiked) {
         this.postSeleccionado.likes--;
@@ -707,6 +713,9 @@ export default {
     },
     
 
+
+
+
     focusComentario() {
       this.$nextTick(() => {
         this.$refs.comentarioInput.focus();
@@ -714,6 +723,9 @@ export default {
       });
     },
     
+
+
+
 
     scrollToBottom() {
       this.$nextTick(() => {
@@ -759,57 +771,40 @@ export default {
     },
     
 
-    agregarComentario() {
-      if (!this.nuevoComentario.trim()) return;
-      
-      const newComment = {
-        id: Date.now(),
-        userId: Math.floor(Math.random() * 1000),
-        texto: this.nuevoComentario,
-        fecha: new Date(),
-        likes: 0,
-        isLiked: false,
-        respuestas: []
-      };
-      
-      this.comentarios.push(newComment);
-      this.totalComentarios++;
-      this.nuevoComentario = '';
-      
-      this.scrollToBottom();
-    },
-    
 
-    agregarRespuesta(comentarioPadre) {
-      if (!this.nuevoComentario.trim()) return;
-      
-      const newReply = {
-        id: Date.now(),
-        userId: Math.floor(Math.random() * 1000),
-        texto: this.nuevoComentario,
-        fecha: new Date(),
-        likes: 0,
-        isLiked: false
-      };
-      
-      if (!comentarioPadre.respuestas) {
-        comentarioPadre.respuestas = [];
-      }
-      
-      comentarioPadre.respuestas.push(newReply);
-      this.totalComentarios++;
-      this.nuevoComentario = '';
-      this.comentarioRespondiendo = null;
-      
-      // Expandir comentario padre si no está expandido
-      if (!this.comentariosExpandidos.includes(comentarioPadre.id)) {
-        this.comentariosExpandidos.push(comentarioPadre.id);
-      }
-      
-      this.scrollToBottom();
+    addComment() {
+      axios.post('/post/create-comment', {
+        post_id: this.postSeleccionado.id,
+        texto: this.nuevoComentario
+      })
+      .then(response => {
+        this.nuevoComentario = '';
+        this.scrollToBottom();
+        setTimeout(() => {
+          this.getPost();
+
+          const postEncontrado = this.posts.find (post => post.id === this.postSeleccionado.id);
+          
+          console.log('postSeleccionado', this.postSeleccionado);
+          console.log('post', this.posts);
+
+          if (postEncontrado) {
+            this.postSeleccionado = { ...postEncontrado };
+            console.log('Post encontrado:', this.postEncontrado);
+          }
+        }, 2000);
+      })
+      .catch(error => {
+        console.error('Error al agregar comentario:', error);
+      });
     },
 
+
+
+
+
     
+
     likeComentario(commentId) {
       const comment = this.findCommentById(commentId);
       if (comment) {
@@ -875,15 +870,9 @@ export default {
       if (minutes < 1440) return `Hace ${Math.floor(minutes / 60)} h`;
       return `Hace ${Math.floor(minutes / 1440)} d`;
     },
-    
 
-    
-    // addComment() {
-    //   axios.post('/post/create-comment', {
-    //     post_id: this.postSeleccionado.id,
-    //     texto: this.nuevoComentario
-    //   })
-    // },
+
+
   },
 
 
