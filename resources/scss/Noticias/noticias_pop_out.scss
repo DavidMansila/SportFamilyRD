@@ -1,0 +1,273 @@
+
+/* Popout */
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.3s;
+  }
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
+  
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    padding: 20px;
+  }
+  
+  .popup-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: popupFadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  @keyframes popupFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .btn-cerrar {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+  
+  .btn-cerrar:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-cerrar svg {
+    width: 20px;
+    height: 20px;
+    color: #555;
+  }
+  
+  .popup-header {
+    padding: 30px 30px 20px;
+    position: relative;
+  }
+  
+  .popup-category {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 15px;
+  }
+  
+  .popup-category.futbol {
+    background: #007bff;
+  }
+  
+  .popup-category.baloncesto {
+    background: #dc3545;
+  }
+  
+  .popup-category.beisbol {
+    background: #28a745;
+  }
+  
+  .popup-category.volleyball {
+    background: #ffc107;
+    color: #333;
+  }
+  
+  .popup-titulo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #222;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+  
+  .popup-author-date {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .author-avatar {
+    width: 50px;
+    height: 50px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  
+  .author-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .popup-author {
+    font-weight: 600;
+    color: #444;
+  }
+  
+  .popup-date {
+    font-size: 0.9rem;
+    color: #777;
+  }
+  
+  .popup-image-container {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+  }
+  
+  .popup-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .popup-body {
+    padding: 30px;
+  }
+  
+  /* Popup */
+  .popup-descripcion {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: #444;
+    margin-bottom: 2rem;
+    text-align: justify;
+    hyphens: auto;
+  }
+  
+  .popup-descripcion p {
+    margin-bottom: 1.5rem;
+    text-indent: 1.5em;
+  }
+  
+  .popup-descripcion p:first-child {
+    text-indent: 0;
+  }
+  
+  .popup-descripcion ul, 
+  .popup-descripcion ol {
+    margin: 1.5rem 0;
+    padding-left: 2.5rem;
+  }
+  
+  .popup-descripcion li {
+    margin-bottom: 0.75rem;
+    line-height: 1.7;
+  }
+  
+  .popup-descripcion blockquote {
+    border-left: 3px solid #007bff;
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #555;
+    background: rgba(0, 123, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 0 8px 8px 0;
+  }
+  
+  .popup-descripcion a {
+    color: #007bff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: all 0.2s ease;
+  }
+  
+  .popup-descripcion a:hover {
+    color: #0056b3;
+    text-decoration-thickness: 2px;
+  }
+  
+  
+  
+  
+  
+  /* Títulos */
+  .noticia-title {
+    font-size: 1.3rem;
+    color: #222;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  
+  .popup-titulo {
+    font-size: 2rem;
+    line-height: 1.3;
+    margin-bottom: 1.5rem;
+  }
+  
+  .popup-actions {
+    display: flex;
+    gap: 15px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+  }
+  
+  .popup-share, .popup-save {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+  
+  .popup-share {
+    background: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+  }
+  
+  .popup-share:hover {
+    background: rgba(0, 123, 255, 0.2);
+  }
+  
+  .popup-save {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+  }
+  
+  .popup-save:hover {
+    background: rgba(40, 167, 69, 0.2);
+  }

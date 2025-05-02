@@ -295,6 +295,15 @@ export default {
 
 @import '../../../scss/Noticias/noticias_navbar.scss';
 
+@import '../../../scss/Noticias/noticias_filtros.scss';
+
+@import '../../../scss/Noticias/noticias_deportes.scss';
+
+@import '../../../scss/Noticias/noticias_grid.scss';
+
+@import '../../../scss/Noticias/noticias_pop_out.scss';
+
+@import '../../../scss/Noticias/noticias_responsive.scss';
 
 </style>
 

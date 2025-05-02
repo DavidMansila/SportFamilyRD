@@ -1,0 +1,85 @@
+/* Sección comunidad */
+.community-section {
+    padding: 80px 20px;
+    background-color: #f8fafc;
+  }
+  
+  .community-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .community-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #2d3748;
+  }
+  
+  .community-content p {
+    font-size: 1.2rem;
+    color: #718096;
+    margin-bottom: 40px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .thread-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+  }
+  
+  .thread-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+  
+  .thread-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .thread-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .thread-details {
+    padding: 20px;
+  }
+  
+  .thread-details h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #2d3748;
+  }
+  
+  .thread-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #718096;
+    font-size: 0.9rem;
+  }
+  
+  .community-button {
+    background-color: #ff3149;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .community-button:hover {
+    background-color: #e0263d;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 49, 73, 0.3);
+  }
