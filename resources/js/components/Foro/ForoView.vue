@@ -56,6 +56,7 @@
           placeholder="Buscar en el foro..." 
           class="search-input"
         >
+
         <button class="search-btn" @click="filtrarPosts">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
@@ -122,9 +123,9 @@
         v-for="(post, index) in postsFiltrados" 
         :key="index" 
         class="post-card"
-        :style="{'--hue': `${index * 60 % 360}`}"
+        :style="`--hue: ${index * 60 % 360}`"
       >
-        <div class="post-categoria" :style="{ backgroundColor: `hsl(${index * 60 % 360}, 70%, 50%)` }"></div>
+        <div class="post-categoria" :style="{backgroundColor: `hsl(${index * 60 % 360}, 70%, 50%)`}">
           {{ post.categoria || 'General' }}
         </div>
         <div class="post-header">
@@ -170,10 +171,6 @@
         </div>
       </div>
     </div>
-
-
-
-
 
 
 
@@ -362,33 +359,13 @@
               </div>
             </div>
           </div>
-          
-          <!-- Formulario de comentario principal -->
-          <div class="add-comment-form">
-            <form @submit.prevent="addComment" class="comment-form">
-              <input
-                v-model="nuevoComentario"
-                ref="comentarioInput"
-                type="text"
-                placeholder="Escribe un comentario..."
-                class="comment-input"
-              >
-              <button 
-                type="submit" 
-                :disabled="!nuevoComentario.trim()" 
-                class="submit-comment-btn"
-                :class="{ disabled: !nuevoComentario.trim() }"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-              </button>
-            </form>
-            
-          </div>
         </div>
       </div>
     </transition>
+
+
+
+
 
 
     <!-- Botón flotante para crear post -->
@@ -400,93 +377,96 @@
     </button>
 
     <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h2>Crear nuevo post</h2>
-          <button @click="cerrarModal" class="modal-close-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-      </div>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2>Crear nuevo post</h2>
+      <button @click="cerrarModal" class="modal-close-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
     
-      <div class="modal-content-wrapper">
-        <form @submit.prevent="createPost()" class="modal-form">
+    <div class="modal-content-wrapper">
+      <form @submit.prevent="createPost()" class="modal-form">
+        <div class="form-group">
+          <label for="titulo">Título</label>
+          <input
+            v-model="nuevoPost.titulo"
+            id="titulo"
+            type="text"
+            placeholder="¿De qué quieres hablar?"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contenido">Contenido</label>
+          <textarea
+            v-model="nuevoPost.contenido"
+            id="contenido"
+            placeholder="Comparte tus ideas, preguntas o experiencias..."
+            rows="5"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-row">
           <div class="form-group">
-            <label for="titulo">Título</label>
+            <label for="categoria">Categoría</label>
+            <select v-model="nuevoPost.categoria" id="categoria" required>
+              <option value="">Selecciona una categoría</option>
+              <option value="Deporte">Deporte</option>
+              <option value="Gym">Gym</option>
+              <option value="Experiencia">Experiencia</option>
+              <option value="Lugares">Lugares</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="file-upload-label">
             <input
-              v-model="nuevoPost.titulo"
-              id="titulo"
-              type="text"
-              placeholder="¿De qué quieres hablar?"
-              required
+              type="file"
+              id="imagen"
+              @change="handleFileSelect"
+              accept="image/*"
+              class="file-upload-input"
             />
-          </div>
+            <span class="file-upload-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Subir imagen
+            </span>
+            <span v-if="nuevoPost.imagenFile" class="file-upload-name">
+              {{ nuevoPost.imagenFile.name }}
+            </span>
+          </label>
+        </div>
 
-          <div class="form-group">
-            <label for="contenido">Contenido</label>
-            <textarea
-              v-model="nuevoPost.contenido"
-              id="contenido"
-              placeholder="Comparte tus ideas, preguntas o experiencias..."
-              rows="5"
-              required
-            ></textarea>
-          </div>
+        <div class="form-actions">
+          <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Publicar</button>
+        </div>
+      </form>
+      
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="categoria">Categoría</label>
-              <select v-model="nuevoPost.categoria" id="categoria" required>
-                <option value="">Selecciona una categoría</option>
-                <option value="Deporte">Deporte</option>
-                <option value="Gym">Gym</option>
-                <option value="Experiencia">Experiencia</option>
-                <option value="Lugares">Lugares</option>
-              </select>
-            </div>
-          </div>
+        <!-- Vista previa externa -->
+     <div v-if="mostrarModal && imagenMiniatura" class="external-preview">
+        <img :src="imagenMiniatura" alt="Previsualización" class="preview-image">
+    </div>
 
-          <div class="form-group">
-            <label class="file-upload-label">
-              <input
-                type="file"
-                id="imagen"
-                @change="handleFileSelect"
-                accept="image/*"
-                class="file-upload-input"
-              />
-              <span class="file-upload-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                Subir imagen
-              </span>
-              <span v-if="nuevoPost.imagenFile" class="file-upload-name">
-                {{ nuevoPost.imagenFile.name }}
-              </span>
-            </label>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Publicar</button>
-          </div>
-        </form>
-        
-
-          <!-- Vista previa externa -->
-      <div v-if="mostrarModal && imagenMiniatura" class="external-preview">
-          <img :src="imagenMiniatura" alt="Previsualización" class="preview-image">
-      </div>
-
-      </div>
     </div>
   </div>
+</div>
 
+
+
+  </div>
 </template>
 
 
