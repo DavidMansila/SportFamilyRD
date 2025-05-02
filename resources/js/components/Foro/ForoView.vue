@@ -317,6 +317,8 @@
                           </div>
                         </div>
                       </div> -->
+
+                      
                     </div>
                   </div>
                 </div>
@@ -621,7 +623,7 @@ export default {
 
 
     getPost() {
-      axios.get('/post')
+      return axios.get('/post')
         .then(response => {
           this.posts = response.data.posts;
           this.postsFiltrados = [...this.posts];
@@ -661,8 +663,6 @@ export default {
 
 
 
-
-
     abrirPopout(post) {
       // Guardar posición del scroll antes de abrir el popout
       this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
@@ -677,8 +677,6 @@ export default {
       
     },
     
-
-
 
 
     
@@ -701,8 +699,6 @@ export default {
     
 
 
-
-
     toggleLike() {
       if (this.postSeleccionado.isLiked) {
         this.postSeleccionado.likes--;
@@ -714,8 +710,6 @@ export default {
     
 
 
-
-
     focusComentario() {
       this.$nextTick(() => {
         this.$refs.comentarioInput.focus();
@@ -723,8 +717,6 @@ export default {
       });
     },
     
-
-
 
 
     scrollToBottom() {
@@ -780,19 +772,18 @@ export default {
       .then(response => {
         this.nuevoComentario = '';
         this.scrollToBottom();
-        setTimeout(() => {
-          this.getPost();
-
-          const postEncontrado = this.posts.find (post => post.id === this.postSeleccionado.id);
-          
-          console.log('postSeleccionado', this.postSeleccionado);
-          console.log('post', this.posts);
-
+       
+        this.getPost()
+        .then(() => {
+          const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
           if (postEncontrado) {
             this.postSeleccionado = { ...postEncontrado };
-            console.log('Post encontrado:', this.postEncontrado);
           }
-        }, 2000);
+        })
+        .catch(error => {
+          console.error('Error al actualizar los posts:', error);
+        });
+          
       })
       .catch(error => {
         console.error('Error al agregar comentario:', error);
