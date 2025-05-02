@@ -623,7 +623,7 @@ export default {
 
 
     getPost() {
-      axios.get('/post')
+      return axios.get('/post')
         .then(response => {
           this.posts = response.data.posts;
           this.postsFiltrados = [...this.posts];
@@ -772,19 +772,18 @@ export default {
       .then(response => {
         this.nuevoComentario = '';
         this.scrollToBottom();
-        setTimeout(() => {
-          this.getPost();
-
-          const postEncontrado = this.posts.find (post => post.id === this.postSeleccionado.id);
-          
-          console.log('postSeleccionado', this.postSeleccionado);
-          console.log('post', this.posts);
-
+       
+        this.getPost()
+        .then(() => {
+          const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
           if (postEncontrado) {
             this.postSeleccionado = { ...postEncontrado };
-            console.log('Post encontrado:', this.postEncontrado);
           }
-        }, 2000);
+        })
+        .catch(error => {
+          console.error('Error al actualizar los posts:', error);
+        });
+          
       })
       .catch(error => {
         console.error('Error al agregar comentario:', error);
