@@ -1,8 +1,6 @@
-
-
 /* Navbar */
 .navbar {
-    background: linear-gradient(to right, #000000, #6a11cb);
+    background: linear-gradient(to right, #000000, #008599);
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between; /* Distribuye el espacio entre los elementos */
@@ -41,6 +39,7 @@
   .nav-link:hover {
     color: #fbbf24;
   }
+  
   
   /* Imagenes del nav bar */
   
@@ -96,3 +95,4 @@
     transform: scale(1.3);
     opacity: 0;
   }
+  

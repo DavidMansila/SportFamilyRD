@@ -500,29 +500,3 @@
     height: 18px;
   }
   
-  /* Estilos responsivos */
-  @media (max-width: 768px) {
-    .post-popout-container {
-      flex-direction: column;
-      max-height: 90vh;
-      width: 95%;
-    }
-    
-    .post-popout-media,
-    .post-popout-details {
-      max-width: 100%;
-    }
-    
-    .post-popout-media {
-      max-height: 300px;
-      min-height: 200px;
-    }
-    
-    .post-popout-details {
-      max-height: calc(90vh - 300px);
-    }
-    
-    .comments-container {
-      max-height: 200px;
-    }
-  }

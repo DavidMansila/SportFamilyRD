@@ -424,5 +424,17 @@ export default {
 
 
 <style scoped>
-  @import '../../../scss/Tienda/tienda.scss';
+
+@import '../../../scss/Tienda/tienda.scss';
+
+@import '../../../scss/Tienda/tienda_filtros_y_busqueda.scss';
+
+@import '../../../scss/Tienda/tienda_grid.scss';
+
+@import '../../../scss/Tienda/tienda_modal.scss';
+
+@import '../../../scss/Tienda/tienda_navbar.scss';
+
+@import '../../../scss/Tienda/tienda_responsive.scss';
+
 </style>

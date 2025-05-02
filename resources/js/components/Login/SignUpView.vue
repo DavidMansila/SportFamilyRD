@@ -155,5 +155,7 @@ export default {
 
 
 <style scoped >
+
 @import '../../../scss/Login/signup.scss';
+
 </style>
