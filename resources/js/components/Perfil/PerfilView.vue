@@ -298,6 +298,18 @@
   
 
 
-    <style scoped lang="scss">
-        @forward '/resources/scss/Perfil/perfil' as per-*;
-    </style>
+<style scoped>
+
+@import '/resources/scss/Perfil/perfil.scss';
+
+@import '/resources/scss/Perfil/perfil_navbar.scss';
+
+@import '/resources/scss/Perfil/perfil_contenido.scss';
+
+@import '/resources/scss/Perfil/perfil_social_links.scss';
+
+@import '/resources/scss/Perfil/perfil_logros.scss';
+
+@import '/resources/scss/Perfil/perfil_responsive.scss';
+
+</style>

@@ -1,0 +1,76 @@
+
+/* Elementos del Form */
+
+.form-section {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .form-section:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+  }
+  
+  .form-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  
+  .form-section h3 svg {
+    color: #718096;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+    color: #4a5568;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  }
+  
+  .save-btn {
+    background: linear-gradient(to right, #3498db, #2980b9);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+  }

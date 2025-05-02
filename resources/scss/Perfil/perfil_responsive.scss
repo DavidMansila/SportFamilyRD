@@ -1,0 +1,317 @@
+
+  /* ------------------- PERFIL RESPONSIVE ------------------ */
+  
+  .profile-container {
+    background: white;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2rem auto;
+    max-width: 1200px;
+  }
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    padding: 50px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    position: relative;
+  }
+  
+  .avatar-container {
+    position: relative;
+    margin-right: 40px;
+  }
+  
+  .profile-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .edit-avatar {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: #3498db;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+  }
+  
+  .profile-info {
+    flex: 1;
+  }
+  
+  .profile-name {
+    font-size: 2.5rem;
+    margin: 0 0 8px 0;
+    color: #1a202c;
+  }
+  
+  .profile-role {
+    font-size: 1.3rem;
+    color: #4a5568;
+    margin: 0 0 25px 0;
+  }
+  
+  .profile-stats {
+    display: flex;
+    gap: 40px;
+  }
+  
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2d3748;
+  }
+  
+  .stat-label {
+    font-size: 1rem;
+    color: #718096;
+  }
+  
+  .edit-profile-btn {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e2e8f0;
+    color: #2d3748;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .profile-content {
+    padding: 50px;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 40px;
+  }
+  
+  
+  
+  /* Pantallas grandes (TVs, monitores 4K) - 1920px+ */
+  @media (min-width: 1920px) {
+    .navbar {
+      padding: 1.5rem 2rem;
+    }
+    .profile-container {
+      max-width: 1400px;
+    }
+    .profile-avatar {
+      width: 200px;
+      height: 200px;
+    }
+  }
+  
+  
+  
+  /* Laptops y pantallas medianas - 1440px-1599px */
+  @media (max-width: 1599px) and (min-width: 1440px) {
+    .navbar {
+      padding: 1.2rem 1.5rem;
+    }
+    .nav-links {
+      gap: 1.8rem;
+    }
+    .logo {
+      width: 190px;
+      height: 65px;
+    }
+    .profile-avatar {
+      width: 160px;
+      height: 160px;
+    }
+  }
+  
+  
+  
+  /* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
+  @media (max-width: 1439px) and (min-width: 1200px) {
+    .navbar {
+      padding: 1rem 1.2rem;
+    }
+    .nav-links {
+      gap: 1.5rem;
+    }
+    .logo {
+      width: 180px;
+      height: 60px;
+    }
+    .profile-content {
+      grid-template-columns: 1fr 280px;
+    }
+  }
+  
+  
+  
+  /* Tablets grandes - 1024px-1199px */
+  @media (max-width: 1199px) and (min-width: 1024px) {
+    .navbar {
+      padding: 1rem;
+    }
+    .nav-links {
+      gap: 1.2rem;
+    }
+    .logo {
+      width: 170px;
+      height: 55px;
+    }
+    .profile-avatar {
+      width: 140px;
+      height: 140px;
+    }
+  }
+  
+  
+  
+  /* Tablets en vertical - 768px-1023px */
+  @media (max-width: 1023px) and (min-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      padding: 1rem;
+    }
+    .logo-container {
+      margin-bottom: 1rem;
+    }
+    .nav-links {
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .logo {
+      width: 180px;
+      height: 60px;
+    }
+    .profile-header {
+      flex-direction: column;
+      text-align: center;
+    }
+    .avatar-container {
+      margin-right: 0;
+      margin-bottom: 25px;
+    }
+    .profile-content {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  
+  
+  /* Teléfonos grandes - 576px-767px */
+  @media (max-width: 767px) and (min-width: 576px) {
+    .navbar {
+      padding: 0.8rem 1rem;
+    }
+    .nav-links {
+      gap: 0.8rem;
+    }
+    .logo {
+      width: 170px;
+      height: 55px;
+    }
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+    }
+  }
+  
+  
+  
+  /* Teléfonos medianos - 481px-575px */
+  @media (max-width: 575px) and (min-width: 481px) {
+    .navbar {
+      padding: 0.8rem;
+    }
+    .logo {
+      width: 160px;
+      height: 50px;
+    }
+    .nav-links {
+      gap: 0.7rem;
+    }
+    .nav-link {
+      font-size: 0.9rem;
+    }
+    .Imagenes a {
+      width: 35px;
+      height: 35px;
+    }
+    .profile-header {
+      padding: 30px;
+    }
+  }
+  
+  
+  
+  /* Teléfonos pequeños - 320px-480px */
+  @media (max-width: 480px) {
+    .navbar {
+      padding: 0.8rem;
+    }
+    .logo {
+      width: 160px;
+      height: 60px;
+    }
+    .nav-links {
+      gap: 1rem;
+    }
+    .nav-link {
+      font-size: 0.9rem;
+    }
+    .Imagenes a {
+      width: 35px;
+      height: 35px;
+    }
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+    }
+    .profile-content {
+      padding: 25px;
+    }
+  }
+  
+  
+  
+  /* Teléfonos muy pequeños - hasta 320px */
+  @media (max-width: 320px) {
+    .navbar {
+      padding: 0.6rem;
+    }
+    .logo {
+      width: 140px;
+      height: 40px;
+    }
+    .nav-links {
+      gap: 0.5rem;
+    }
+    .nav-link {
+      font-size: 0.8rem;
+    }
+    .Imagenes a {
+      width: 30px;
+      height: 30px;
+    }
+    .profile-header {
+      padding: 20px;
+    }
+  }

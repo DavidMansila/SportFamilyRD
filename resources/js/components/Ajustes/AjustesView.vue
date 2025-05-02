@@ -132,45 +132,77 @@
 
 
 
-        <!-- Pestaña de Privacidad -->
-        <div v-if="activeTab === 'privacy'" class="tab-content">
-          <h3>Configuración de Privacidad</h3>
-          <div class="privacy-options">
-            <div class="privacy-item">
-              <span>Perfil Público</span>
-              <label class="switch">
-                <input type="checkbox" v-model="privacy.publicProfile">
-                <span class="slider"></span>
-              </label>
-            </div>
-            <div class="privacy-item">
-              <span>Mostrar Estadísticas</span>
-              <label class="switch">
-                <input type="checkbox" v-model="privacy.showStats">
-                <span class="slider"></span>
-              </label>
-            </div>
-            <div class="privacy-item">
-              <span>Permitir Mensajes</span>
-              <label class="switch">
-                <input type="checkbox" v-model="privacy.allowMessages">
-                <span class="slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="data-section">
-            <h4>Descargar Mis Datos</h4>
-            <p>Solicita un archivo con toda la información que tenemos sobre ti.</p>
-            <button class="data-btn" @click="requestData">Solicitar Datos</button>
-          </div>
-
-          <div class="delete-section">
-            <h4>Eliminar Cuenta</h4>
-            <p>Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.</p>
-            <button class="delete-btn" @click="confirmDeletion">Eliminar Cuenta</button>
-          </div>
+        <div v-if="activeTab === 'privacy'" class="tab-content" role="tabpanel" aria-labelledby="privacy-tab">
+  <h2 class="privacy-heading">Configuración de Privacidad</h2>
+  
+  <section class="privacy-section">
+    <h3 class="section-title">Preferencias de visibilidad</h3>
+    <div class="privacy-options">
+      <div class="privacy-item" v-for="option in privacyOptions" :key="option.id">
+        <div class="option-label">
+          <span>{{ option.label }}</span>
+          <span class="option-description" v-if="option.description">{{ option.description }}</span>
         </div>
+        <label class="switch">
+          <input 
+            type="checkbox" 
+            v-model="privacy[option.model]" 
+            :aria-label="`${option.label} - actualmente ${privacy[option.model] ? 'activado' : 'desactivado'}`"
+          >
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <section class="data-section" aria-labelledby="data-heading">
+    <h3 id="data-heading" class="section-title">Gestión de datos</h3>
+    <div class="data-content">
+      <div class="data-option">
+        <h4>Descargar mis datos</h4>
+        <p>Solicita un archivo con toda la información que tenemos sobre ti en formato JSON o CSV.</p>
+        <div class="data-actions">
+          <button class="btn btn-secondary" @click="requestData" aria-describedby="data-description">
+            Solicitar Datos
+          </button>
+          <select v-model="dataFormat" class="format-select" aria-label="Formato de descarga">
+            <option value="json">JSON</option>
+            <option value="csv">CSV</option>
+          </select>
+        </div>
+        <p id="data-description" class="info-text">Recibirás un email con el enlace de descarga en 24-48 horas.</p>
+      </div>
+
+      <div class="data-option danger-zone">
+        <h4>Eliminar cuenta</h4>
+        <p>Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.</p>
+        <button 
+          class="btn btn-danger" 
+          @click="confirmDeletion"
+          aria-describedby="delete-warning"
+        >
+          Eliminar Cuenta
+        </button>
+        <p id="delete-warning" class="warning-text">
+          <i class="icon-warning"></i> Advertencia: Esta acción eliminará todos tus datos de forma permanente.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de confirmación para eliminación -->
+  <div v-if="showDeleteModal" class="modal-overlay">
+    <div class="modal-content" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+      <h3 id="modal-title">Confirmar eliminación</h3>
+      <p>¿Estás seguro de que quieres eliminar tu cuenta permanentemente?</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" @click="showDeleteModal = false">Cancelar</button>
+        <button class="btn btn-danger" @click="deleteAccount">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
       </div>
     </div>
 
@@ -187,47 +219,88 @@
       </div>
     </div>
   </div>
+
 </template>
+
+
+
+
 
 <script>
 export default {
   name: 'SettingsView',
+
   data() {
+
     return {
+
       activeTab: 'account',
+
       tabs: [
         { id: 'account', label: 'Cuenta' },
         { id: 'notifications', label: 'Notificaciones' },
         { id: 'privacy', label: 'Privacidad' }
       ],
+
       user: {
         name: '',
         email: '',
         phone: '',
         avatar: ''
       },
+
       security: {
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       },
+
       notifications: {
         email: true,
         push: true,
         reminders: true,
         frequency: 'instant'
       },
+      
       privacy: {
         publicProfile: true,
         showStats: true,
         allowMessages: true
       },
+
       showModal: false,
       modalTitle: '',
       modalMessage: '',
-      currentAction: null
+      currentAction: null,
+
+
+      privacyOptions: [
+      {
+        id: 'public-profile',
+        label: 'Perfil Público',
+        description: 'Hace que tu perfil sea visible para todos los usuarios',
+        model: 'publicProfile'
+      },
+      {
+        id: 'show-stats',
+        label: 'Mostrar Estadísticas',
+        description: 'Comparte tus estadísticas de actividad públicamente',
+        model: 'showStats'
+      },
+      {
+        id: 'allow-messages',
+        label: 'Permitir Mensajes',
+        description: 'Permite que otros usuarios te envíen mensajes directos',
+        model: 'allowMessages'
+      }
+    ],
+
+    dataFormat: 'json',
+    showDeleteModal: false
+
     }
   },
+
   methods: {
     saveSettings() {
       // Lógica para guardar ajustes
@@ -265,7 +338,16 @@ export default {
     showToast(message) {
       // Implementar lógica de toast/notificación
       alert(message); // Temporal
-    }
+    },
+
+
+    confirmDeletion() {
+    this.showDeleteModal = true;
+  },
+  deleteAccount() {
+    // Lógica para eliminar cuenta
+    this.showDeleteModal = false;
+  },
   }
 }
 </script>
@@ -273,6 +355,18 @@ export default {
 
 
 
-<style scoped lang="scss">
-@forward '/resources/scss/Ajustes/ajustes' as ajs-*;
+<style scoped>
+
+@import '/resources/scss/Ajustes/ajustes.scss';
+
+@import '/resources/scss/Ajustes/ajustes_navbar.scss';
+
+@import '/resources/scss/Ajustes/ajustes_forom.scss';
+
+@import '/resources/scss/Ajustes/ajustes_modal.scss';
+
+@import '/resources/scss/Ajustes/ajustes_privacidad.scss';
+
+@import '/resources/scss/Ajustes/ajustes_responsive.scss';
+
 </style>
