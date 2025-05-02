@@ -535,8 +535,21 @@ export default {
 
 
 
+
 <style scoped>
-  @import '../../../scss/Entrenadores/entrenadores.scss';
+
+@import '../../../scss/Entrenadores/entrenadores.scss';
+
+@import '../../../scss/Entrenadores/entrenadores_grid.scss';
+
+@import '../../../scss/Entrenadores/entrenadores_mensajes.scss';
+
+@import '../../../scss/Entrenadores/entrenadores_modal.scss';
+
+@import '../../../scss/Entrenadores/entrenadores_navbar.scss';
+
+@import '../../../scss/Entrenadores/entrenadores_responsive.scss';
+
 </style>
 
 

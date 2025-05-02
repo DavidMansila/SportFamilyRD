@@ -16,7 +16,7 @@ import EntrenadoresView from './components/Entrenadores/EntrenadoresView.vue';
 import SolicitudView from './components/Entrenadores/SolicitudView.vue';
 import ForoView from './components/Foro/ForoView.vue';
 import AjustesView from './components/Ajustes/AjustesView.vue';
-import PerfilView from './components/Ajustes/PerfilView.vue';
+import PerfilView from './components/Perfil/PerfilView.vue';
 //import CarritoView from './components/Carrito/CarritoView.vue';
 
 //paginate

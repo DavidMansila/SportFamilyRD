@@ -54,7 +54,7 @@ Route::get('/Ajustes', function () {
 });
 
 Route::get('/Perfil', function () {
-    return view('Ajustes.PerfilView');
+    return view('Perfil.PerfilView');
 });
 
 

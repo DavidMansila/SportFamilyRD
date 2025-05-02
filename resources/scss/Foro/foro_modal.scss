@@ -250,37 +250,6 @@
     border-color: var(--primary-light);
   }
   
-  /* Responsive */
-  @media (max-width: 768px) {
-    .modal-container {
-      max-width: 95%;
-    }
-    
-    .modal-content-wrapper {
-      flex-direction: column;
-    }
-    
-    .image-preview-container {
-      width: 100%;
-      border-left: none;
-      border-top: 1px solid var(--border);
-      height: 300px;
-    }
-    
-    .modal-form {
-      padding: 20px;
-    }
-    
-    .form-actions {
-      flex-direction: column;
-      gap: 8px;
-    }
-    
-    .btn {
-      width: 100%;
-    }
-  }
-  
   /* Animaciones */
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -335,32 +304,6 @@
     padding: 20px;
     max-height: calc(80vh - 60px); /* Restamos el alto del header */
   }
-  
-  /* Responsive: en pantallas pequeñas la preview va debajo */
-  @media (max-width: 1200px) {
-    .external-preview {
-      position: fixed;
-      top: auto;
-      bottom: 20px;
-      left: 50%;
-      right: auto;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 500px;
-      max-height: 30vh;
-    }
-    
-    .preview-image {
-      max-height: calc(30vh - 60px);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .external-preview {
-      display: none; /* Ocultamos en móviles muy pequeños */
-    }
-  }
-  
   
   
   /* Estilos para el modal */
