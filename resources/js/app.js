@@ -15,7 +15,6 @@ import TiendaView from './components/Tienda/TiendaView.vue';
 import EntrenadoresView from './components/Entrenadores/EntrenadoresView.vue';
 import SolicitudView from './components/Entrenadores/SolicitudView.vue';
 import ForoView from './components/Foro/ForoView.vue';
-import ForoPublicaciones from './components/Foro/ForoPublicaciones.vue';
 import AjustesView from './components/Ajustes/AjustesView.vue';
 import PerfilView from './components/Ajustes/PerfilView.vue';
 //import CarritoView from './components/Carrito/CarritoView.vue';
@@ -62,7 +61,6 @@ app.component('solicitud-component', SolicitudView);
 
 
 app.component('foro-component', ForoView);
-app.component('publicacion-component', ForoPublicaciones);
 
 app.component('ajustes-component', AjustesView);
 app.component('perfil-component', PerfilView);

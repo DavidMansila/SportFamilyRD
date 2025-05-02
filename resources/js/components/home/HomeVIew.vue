@@ -163,7 +163,7 @@ export default {
       categories: [
         { name: "Fútbol", image: "/imagenes/football.jpg" },
         { name: "Baloncesto", image: "/imagenes/basketball.jpg" },
-        { name: "Béisbol", image: "/imagenes/baseball.jpg" },
+        { name: "Béisbol", image: "/imagenes/DirectorioDeDeportes/baseball.jpg" },
         { name: "Voleibol", image: "/imagenes/voleyball.jpg" }
       ],
       products: [
@@ -183,6 +183,21 @@ export default {
 </script>
 
 
+
+
+
 <style scoped>
+
 @import '../../../scss/Home/home.scss';
+
+@import '../../../scss/Home/home_footer.scss';
+
+@import '../../../scss/Home/home_navbar.scss';
+
+@import '../../../scss/Home/home_productos.scss';
+
+@import '../../../scss/Home/home_comunidad.scss';
+
+@import '../../../scss/Home/home_responsive.scss';
+
 </style>
