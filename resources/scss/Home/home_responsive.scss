@@ -278,3 +278,19 @@
       font-size: 1.5rem;
     }
   }
+
+
+  @media (max-width: 768px) {
+    .footer-content {
+      grid-template-columns: 1fr;
+    }
+    
+    .footer-bottom {
+      flex-direction: column;
+    }
+    
+    .legal-links {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }

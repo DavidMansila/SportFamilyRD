@@ -317,6 +317,8 @@
                           </div>
                         </div>
                       </div> -->
+
+                      
                     </div>
                   </div>
                 </div>
@@ -661,8 +663,6 @@ export default {
 
 
 
-
-
     abrirPopout(post) {
       // Guardar posición del scroll antes de abrir el popout
       this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
@@ -677,8 +677,6 @@ export default {
       
     },
     
-
-
 
 
     
@@ -701,8 +699,6 @@ export default {
     
 
 
-
-
     toggleLike() {
       if (this.postSeleccionado.isLiked) {
         this.postSeleccionado.likes--;
@@ -714,8 +710,6 @@ export default {
     
 
 
-
-
     focusComentario() {
       this.$nextTick(() => {
         this.$refs.comentarioInput.focus();
@@ -723,8 +717,6 @@ export default {
       });
     },
     
-
-
 
 
     scrollToBottom() {
