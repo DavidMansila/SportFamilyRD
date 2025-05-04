@@ -32,6 +32,7 @@
     </nav>
 
 
+    
 
     <!-- Hero Section -->
     <div class="hero-section">
@@ -266,7 +267,7 @@
                     <div class="comment-content">
                       <div class="comment-header">
                         <span class="comment-author">Usuario{{ comentario.userId }}</span>
-                        <span class="comment-time">{{ formatRelativeTime(comentario.fecha) }}</span>
+                        <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button 
                           v-if="comentario.respuestas && comentario.respuestas.length > 0"
                           @click="toggleCommentExpansion(comentario.id)"
@@ -531,10 +532,14 @@ export default {
       document.body.style.overflow = 'auto';
     },
 
+
+  
     cambiarCategoria(categoria) {
       this.categoriaSeleccionada = categoria;
       this.filtrarPosts();
     },
+
+
 
 
     filtrarPosts() {
@@ -556,6 +561,8 @@ export default {
     },
 
 
+
+
     guardarPost() {
       const nuevoId = Math.max(...this.posts.map(p => p.id)) + 1;
       const nuevoPost = {
@@ -573,6 +580,8 @@ export default {
     },
 
 
+
+
     limpiarFormulario() {
       this.nuevoPost = {
         titulo: '',
@@ -583,6 +592,8 @@ export default {
       this.imagenMiniatura = null;
     },
     
+
+
 
     handleFileSelect(event) {
       const file = event.target.files[0];
@@ -632,8 +643,8 @@ export default {
           console.error('Error al obtener los posts:', error);
         });
     },
-
     
+
     async createPost() {
       
       const formData = new FormData();
@@ -649,9 +660,6 @@ export default {
         let header = { headers: { 'content-type': 'multipart/form-data' } };
         await axios.post('/post', formData, header);
 
-        setTimeout(() => {
-          this.getPost();
-        }, 2000);
         this.limpiarFormulario();
         this.cerrarModal();
         
@@ -660,6 +668,8 @@ export default {
         alert('Error al crear el post. Por favor, intenta nuevamente.');
       }
     },
+
+
 
 
 
@@ -681,10 +691,8 @@ export default {
 
     
     cerrarPopout() {
+
       this.postSeleccionado = null;
-      this.comentarios = [];
-      this.comentariosExpandidos = [];
-      this.comentarioRespondiendo = null;
       this.nuevoComentario = '';
       
       // Restaurar scroll del body
@@ -694,7 +702,7 @@ export default {
       document.body.style.width = '';
       
       // Restaurar posición del scroll
-      window.scrollTo(this.scrollPosition);
+      window.scrollToBottom(this.scrollPosition);
     },
     
 
@@ -809,6 +817,8 @@ export default {
     },
     
 
+
+
     findCommentById(id) {
       // Buscar en comentarios principales
       for (const comment of this.comentarios) {
@@ -826,6 +836,8 @@ export default {
     
 
 
+
+
     categoryColor(categoria) {
       const colors = {
         'General': '#6c757d',
@@ -838,6 +850,8 @@ export default {
     },
 
     
+
+
     formatDate(date) {
       if (!date) return '';
       const d = new Date(date);
@@ -849,6 +863,8 @@ export default {
         minute: '2-digit'
       });
     },
+    
+
     
 
     formatRelativeTime(date) {

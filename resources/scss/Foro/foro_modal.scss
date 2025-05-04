@@ -1,7 +1,4 @@
 
-/* ------------------- MODAL ------------------ */
-
-
 :root {
     /* Colores */
     --primary: #4361ee;
@@ -30,7 +27,10 @@
   }
   
   
-  
+
+/* ------------------- MODAL ------------------ */
+
+
   * {
     box-sizing: border-box;
   }
@@ -56,7 +56,7 @@
     background-color: white;
     border-radius: var(--radius-lg);
     width: 100%;
-    max-width: 900px; /* Más ancho para acomodar ambas columnas */
+    max-width: 900px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
@@ -118,24 +118,10 @@
     min-width: 0; /* Para evitar problemas de overflow */
   }
   
-  /* Preview de imagen (columna derecha) */
-  .image-preview-container {
-    width: 350px;
-    border-left: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    background-color: #f9fafb;
-    overflow: hidden;
-  }
-  
-  .image-preview {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 20px;
-    background-color: white;
-    flex-grow: 1;
-  }
+
+
+
+
   
   /* Grupos de formulario */
   .form-group {
@@ -209,104 +195,7 @@
     font-size: 0.9rem;
     color: var(--text-medium);
   }
-  
-  /* Acciones del formulario */
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
-  
-  .btn {
-    padding: 10px 20px;
-    border-radius: var(--radius-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-    font-size: 0.95rem;
-  }
-  
-  .btn-secondary {
-    background-color: white;
-    border: 1px solid var(--border);
-    color: var(--text-medium);
-  }
-  
-  .btn-secondary:hover {
-    background-color: var(--secondary);
-  }
-  
-  .btn-primary {
-    background-color: var(--primary);
-    border: 1px solid var(--primary);
-    color: white;
-  }
-  
-  .btn-primary:hover {
-    background-color: var(--primary-light);
-    border-color: var(--primary-light);
-  }
-  
-  /* Animaciones */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  
-  /* Contenedor principal que organiza modal y preview */
-  .modal-preview-wrapper {
-    position: relative;
-  }
-  
-  /* Modal existente (sin cambios en su estructura interna) */
-  .modal-overlay {
-    position: fixed;
-    /* ... (mantener todos los estilos actuales del modal) ... */
-  }
-  
-  /* Vista previa externa */
-  .external-preview {
-    position: fixed;
-    top: 50%;
-    right: 30px;
-    transform: translateY(-50%);
-    width: 350px;
-    max-height: 80vh;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    z-index: 1001; /* Un nivel por encima del modal */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: slideInRight 0.3s ease-out;
-  }
-  
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateY(-50%) translateX(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(-50%) translateX(0);
-    }
-  }
-  
-  .preview-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 20px;
-    max-height: calc(80vh - 60px); /* Restamos el alto del header */
-  }
-  
-  
-  /* Estilos para el modal */
+    /* Estilos para el modal */
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -329,17 +218,6 @@
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     animation: modalEnter 0.3s ease;
-  }
-  
-  @keyframes modalEnter {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
   }
   
   .modal-header {
@@ -450,22 +328,33 @@
     font-size: 14px;
     color: #666;
   }
-  
-  .image-preview {
-    max-width: 100%;
-    max-height: 200px;
-    margin-top: 10px;
-    border-radius: 8px;
-    border: 1px solid #eee;
-  }
-  
+
+
+
+
+
+  /* Acciones del formulario */
   .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
   }
   
+  
+
+
+
+
+
+
+
+
+  /* BOTONES */
+
+
   .btn {
     padding: 10px 20px;
     border-radius: 8px;
@@ -494,3 +383,92 @@
     background-color: #2980b9;
   }
   
+  
+
+  
+  
+
+
+  
+
+
+
+  /* IMAGEN PREVIEW */
+
+
+  /* Contenedor principal que organiza modal y preview */
+  .modal-preview-wrapper {
+    position: relative;
+  }
+  
+
+
+  /* Vista previa externa */
+  .external-preview {
+    position: fixed;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    width: 350px;
+    max-height: 80vh;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1001; /* Un nivel por encima del modal */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 20px;
+    max-height: calc(80vh - 60px); /* Restamos el alto del header */
+  }
+
+
+
+
+
+
+
+  /* Animaciones */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateY(-50%) translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+  
+
+  @keyframes modalEnter {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+
+
+
+
+
+
