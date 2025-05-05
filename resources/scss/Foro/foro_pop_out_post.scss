@@ -1,5 +1,6 @@
 /* ------------------- POP OUT POST ------------------ */
 
+
 /* Transición para el popout */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -8,11 +9,16 @@
   opacity: 0;
 }
 
+
+
 /* Clase para bloquear scroll cuando el popout está abierto */
 .no-scroll {
   overflow: hidden;
   height: 100vh;
 }
+
+
+
 
 /* Estilos para el popout */
 .post-popout-overlay {
@@ -49,6 +55,9 @@
   height: 100%;
 }
 
+
+
+
 /* Sección de la imagen (fija) */
 .post-popout-media {
   flex: 1;
@@ -75,6 +84,10 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+
+
+
 
 /* Botones de interacción (fijos debajo de la imagen) */
 .post-interactions {
@@ -124,6 +137,11 @@
 .comment-btn:hover {
   color: #3498db;
 }
+
+
+
+
+
 
 /* Sección de detalles (con scroll) */
 .post-popout-details {
@@ -225,6 +243,10 @@
   height: 20px;
   color: #666;
 }
+
+
+
+
 
 /* Contenido del post (con scroll) */
 .post-popout-body {

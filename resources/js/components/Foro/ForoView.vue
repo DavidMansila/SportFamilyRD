@@ -109,13 +109,16 @@
 
     <!-- Sección de Posts con diseño de tarjetas -->
     <div class="posts-grid">
+      
       <div v-if="postsFiltrados.length === 0">
+
         <div class="no-posts">
           <h2 class="no-posts">No hay publicaciones disponibles</h2>
           <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicación!</p>
           <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
           <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
         </div>
+
       </div>  
 
       <div 
@@ -771,6 +774,8 @@ export default {
     },
     
 
+    
+
 
     addComment() {
       axios.post('/post/create-comment', {
@@ -797,8 +802,6 @@ export default {
         console.error('Error al agregar comentario:', error);
       });
     },
-
-
 
 
 
