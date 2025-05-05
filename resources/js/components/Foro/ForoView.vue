@@ -909,8 +909,6 @@ export default {
 
 @import '../../../scss/Foro/foro_modal.scss';
 
-@import '../../../scss/Foro/foro_responsive.scss';
-
 @import '../../../scss/Foro/foro_navbar.scss';
 
 </style>
