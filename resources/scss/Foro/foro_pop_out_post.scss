@@ -1,5 +1,4 @@
-/* ------------------- POP OUT POST ------------------ */
-
+/* ------------------- POP OUT POST RESPONSIVO ------------------ */
 
 /* Transición para el popout */
 .fade-enter-active, .fade-leave-active {
@@ -9,18 +8,13 @@
   opacity: 0;
 }
 
-
-
 /* Clase para bloquear scroll cuando el popout está abierto */
 .no-scroll {
   overflow: hidden;
   height: 100vh;
 }
 
-
-
-
-/* Estilos para el popout */
+/* Estilos base para el popout */
 .post-popout-overlay {
   position: fixed;
   top: 0;
@@ -32,7 +26,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
 }
 
 .post-popout-container {
@@ -42,6 +36,7 @@
   max-width: 900px;
   max-height: 90vh;
   display: flex;
+  flex-direction: column;
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -51,30 +46,186 @@
 
 .post-popout-content {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
+  overflow: auto;
 }
 
+/* ------------------- DISPOSITIVOS PEQUEÑOS (Móviles) ------------------ */
+@media (max-width: 767px) {
+  .post-popout-container {
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+  
+  .post-popout-content {
+    flex-direction: column;
+  }
+  
+  /* Sección de la imagen en móviles */
+  .post-popout-media {
+    max-width: 100% !important;
+    flex: none;
+    height: auto;
+    max-height: 40vh;
+  }
+  
+  .image-container {
+    padding: 10px;
+  }
+  
+  /* Sección de detalles en móviles */
+  .post-popout-details {
+    max-width: 100% !important;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .post-popout-header {
+    padding: 15px;
+    position: static;
+  }
+  
+  .post-popout-body {
+    padding: 15px;
+  }
+  
+  .post-popout-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .post-popout-text {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  /* Comentarios en móviles */
+  .post-comments-section {
+    padding: 15px;
+  }
+  
+  .comments-container {
+    max-height: 150px;
+  }
+  
+  .comment-form-container {
+    padding: 10px 15px;
+  }
+  
+  .comment-input {
+    padding: 10px 14px;
+  }
+  
+  .submit-comment-btn {
+    width: 38px;
+    height: 38px;
+  }
+  
+  /* Interacciones en móviles */
+  .post-interactions {
+    padding: 10px 15px;
+    gap: 10px;
+  }
+  
+  .interaction-btn {
+    padding: 8px 15px;
+    font-size: 13px;
+  }
+}
 
+/* ------------------- DISPOSITIVOS MEDIANOS (Tablets) ------------------ */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .post-popout-container {
+    max-width: 90vw;
+  }
+  
+  .post-popout-content {
+    flex-direction: row;
+  }
+  
+  .post-popout-media {
+    max-width: 50%;
+    flex: 1;
+  }
+  
+  .post-popout-details {
+    max-width: 50%;
+    flex: 1;
+  }
+  
+  /* Ajustes específicos para tablets */
+  .post-popout-title {
+    font-size: 20px;
+  }
+  
+  .post-popout-text {
+    font-size: 14px;
+  }
+  
+  .comments-container {
+    max-height: 180px;
+  }
+}
 
+/* ------------------- DISPOSITIVOS GRANDES (Desktop) ------------------ */
+@media (min-width: 1024px) {
+  .post-popout-content {
+    flex-direction: row;
+  }
+  
+  .post-popout-media {
+    max-width: 50%;
+    flex: 1;
+  }
+  
+  .post-popout-details {
+    max-width: 50%;
+    flex: 1;
+  }
+}
 
-/* Sección de la imagen (fija) */
+/* ------------------- ORIENTACIÓN HORIZONTAL EN MÓVILES ------------------ */
+@media (max-width: 767px) and (orientation: landscape) {
+  .post-popout-container {
+    max-height: 85vh;
+    flex-direction: row;
+  }
+  
+  .post-popout-media {
+    max-height: 85vh;
+    max-width: 50% !important;
+  }
+  
+  .post-popout-details {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  
+  .comments-container {
+    max-height: 120px;
+  }
+}
+
+/* ------------------- ESTILOS COMUNES PARA TODOS LOS DISPOSITIVOS ------------------ */
+
+/* Sección de la imagen */
 .post-popout-media {
-  flex: 1;
-  max-width: 50%;
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
   position: relative;
+  overflow: hidden;
 }
 
 .image-container {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   overflow: hidden;
+  flex: 1;
 }
 
 .post-popout-image {
@@ -85,11 +236,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-
-
-
-
-/* Botones de interacción (fijos debajo de la imagen) */
+/* Botones de interacción */
 .post-interactions {
   padding: 15px 20px;
   background: white;
@@ -97,6 +244,7 @@
   display: flex;
   justify-content: center;
   gap: 20px;
+  flex-shrink: 0;
 }
 
 .interaction-btn {
@@ -138,21 +286,14 @@
   color: #3498db;
 }
 
-
-
-
-
-
-/* Sección de detalles (con scroll) */
+/* Sección de detalles */
 .post-popout-details {
-  flex: 1;
-  max-width: 50%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* Header fijo */
+/* Header */
 .post-popout-header {
   position: sticky;
   top: 0;
@@ -244,11 +385,7 @@
   color: #666;
 }
 
-
-
-
-
-/* Contenido del post (con scroll) */
+/* Contenido del post */
 .post-popout-body {
   padding: 20px;
   overflow-y: auto;
@@ -277,7 +414,7 @@
   color: #777;
 }
 
-/* Sección de comentarios (con scroll) */
+/* Sección de comentarios */
 .post-comments-section {
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding: 20px;
@@ -417,7 +554,7 @@
   height: 14px;
 }
 
-/* Formulario de comentarios (fijo en la parte inferior) */
+/* Formulario de comentarios */
 .comment-form-container {
   position: sticky;
   bottom: 0;
@@ -473,4 +610,71 @@
 .submit-comment-btn svg {
   width: 18px;
   height: 18px;
+}
+
+/* ------------------- AJUSTES ESPECIALES PARA PANTALLAS MUY PEQUEÑAS ------------------ */
+@media (max-width: 400px) {
+  .post-popout-container {
+    max-height: 98vh;
+    border-radius: 8px;
+  }
+  
+  .post-popout-header {
+    padding: 12px;
+  }
+  
+  .author-avatar-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .author-name {
+    font-size: 14px;
+  }
+  
+  .post-popout-title {
+    font-size: 16px;
+  }
+  
+  .post-popout-text {
+    font-size: 13px;
+  }
+  
+  .interaction-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .comments-title {
+    font-size: 16px;
+  }
+  
+  .comment-input {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .submit-comment-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ------------------- AJUSTES PARA PANTALLAS MUY GRANDES ------------------ */
+@media (min-width: 1600px) {
+  .post-popout-container {
+    max-width: 1200px;
+  }
+  
+  .post-popout-title {
+    font-size: 24px;
+  }
+  
+  .post-popout-text {
+    font-size: 16px;
+  }
+  
+  .comments-container {
+    max-height: 250px;
+  }
 }
