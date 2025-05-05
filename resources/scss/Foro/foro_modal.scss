@@ -42,31 +42,35 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.8); /* Más oscuro para mejor contraste */
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px); /* Más blur */
     padding: 20px;
-    animation: fadeIn 0.3s ease-out;
-  }
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Animación más suave */
+}
+
   
-  .modal-container {
-    background-color: white;
-    border-radius: var(--radius-lg);
-    width: 100%;
-    max-width: 900px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-  }
-  
-  .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border);
+.modal-container {
+  background-color: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Sombra más pronunciada */
+  animation: modalEnter 0.3s ease;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Borde sutil para profundidad */
+  transform-origin: center center;
+  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Nueva animación de escala */
+}
+
+
+
+.modal-header {
+    padding: 22px 28px; /* Más padding */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Borde más sutil */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -75,49 +79,81 @@
     background: white;
     z-index: 10;
     flex-shrink: 0;
-  }
-  
-  .modal-header h2 {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra sutil para el header */
+}
+
+.modal-header h2 {
     margin: 0;
     color: var(--text-dark);
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-  
-  .modal-close-btn {
+    font-size: 1.6rem; /* Un poco más grande */
+    font-weight: 650; /* Más grueso */
+    letter-spacing: -0.5px; /* Mejor kerning */
+}
+
+.modal-close-btn {
     background: none;
     border: none;
     cursor: pointer;
     color: var(--text-light);
-    width: 36px;
-    height: 36px;
+    width: 40px; /* Un poco más grande */
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition);
-  }
-  
-  .modal-close-btn:hover {
-    background-color: var(--secondary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transición más suave */
+}
+
+.modal-close-btn:hover {
+    background-color: rgba(67, 97, 238, 0.1); /* Color primario con transparencia */
     color: var(--primary);
-  }
-  
-  /* Contenedor principal con las dos columnas */
-  .modal-content-wrapper {
+    transform: rotate(90deg); /* Efecto de giro */
+}
+
+.modal-content-wrapper {
     display: flex;
     flex: 1;
     overflow: hidden;
-  }
-  
-  /* Formulario (columna izquierda) */
-  .modal-form {
-    padding: 24px;
+}
+
+.modal-form {
+    padding: 28px; /* Más espacio interno */
     flex: 1;
     overflow-y: auto;
-    min-width: 0; /* Para evitar problemas de overflow */
-  }
-  
+    min-width: 0;
+    scrollbar-width: thin; /* Scrollbar más delgada */
+    scrollbar-color: var(--primary-light) var(--secondary);
+}
+
+.modal-form::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-form::-webkit-scrollbar-track {
+    background: var(--secondary);
+}
+
+.modal-form::-webkit-scrollbar-thumb {
+    background-color: var(--primary-light);
+    border-radius: 3px;
+}
+
+/* Nuevas animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { 
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
 
 
 
@@ -140,12 +176,11 @@
   .form-group textarea,
   .form-group select {
     width: 100%;
-    padding: 12px 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 1rem;
-    transition: var(--transition);
-    background-color: white;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
   }
   
   .form-group input:focus,
@@ -162,172 +197,48 @@
     line-height: 1.5;
   }
   
-  /* Subida de archivos */
-  .file-upload-label {
-    display: block;
-  }
+
+
   
-  .file-upload-input {
-    display: none;
-  }
+
+/* Subida de archivos */
+.file-upload-label {
+  display: block;
+}
+
+.file-upload-input {
+  display: none;
+}
+
+.file-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #f5f5f5;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-upload-btn:hover {
+  background-color: #eee;
+  border-color: #999;
+}
+
+.file-upload-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.file-upload-name {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 14px;
+  color: #666;
+}
   
-  .file-upload-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background-color: var(--secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: var(--transition);
-    font-size: 0.95rem;
-  }
-  
-  .file-upload-btn:hover {
-    background-color: #e9ecef;
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-  
-  .file-upload-name {
-    margin-left: 10px;
-    font-size: 0.9rem;
-    color: var(--text-medium);
-  }
-    /* Estilos para el modal */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-  
-  .modal-container {
-    background-color: white;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 600px;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    animation: modalEnter 0.3s ease;
-  }
-  
-  .modal-header {
-    padding: 20px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .modal-header h2 {
-    margin: 0;
-    font-size: 22px;
-    color: #333;
-  }
-  
-  .modal-close-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: background-color 0.2s ease;
-  }
-  
-  .modal-close-btn:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .modal-close-btn svg {
-    width: 20px;
-    height: 20px;
-    color: #666;
-  }
-  
-  .modal-form {
-    padding: 20px;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #555;
-  }
-  
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-  }
-  
-  .form-group input:focus,
-  .form-group textarea:focus,
-  .form-group select:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-  }
-  
-  .form-group textarea {
-    min-height: 120px;
-    resize: vertical;
-  }
-  
-  .file-upload-label {
-    display: block;
-  }
-  
-  .file-upload-input {
-    display: none;
-  }
-  
-  .file-upload-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background-color: #f5f5f5;
-    border: 1px dashed #ccc;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .file-upload-btn:hover {
-    background-color: #eee;
-    border-color: #999;
-  }
-  
-  .file-upload-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .file-upload-name {
-    display: inline-block;
-    margin-left: 10px;
-    font-size: 14px;
-    color: #666;
-  }
 
 
 
@@ -347,41 +258,89 @@
 
 
 
-
-
-
-
-
   /* BOTONES */
 
-
   .btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 8px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-secondary {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent; /* Borde transparente por defecto */
+}
+
+/* Efectos comunes a ambos botones */
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Botón Secundario (manteniendo colores originales) */
+.btn-secondary {
     background-color: #f5f5f5;
     color: #333;
     border: 1px solid #ddd;
-  }
-  
-  .btn-secondary:hover {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.btn-secondary:hover {
     background-color: #e0e0e0;
-  }
-  
-  .btn-primary {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+/* Botón Primario (manteniendo colores originales) */
+.btn-primary {
     background-color: #3498db;
     color: white;
     border: 1px solid #2980b9;
-  }
-  
-  .btn-primary:hover {
+    box-shadow: 0 2px 4px rgba(41, 128, 185, 0.3);
+}
+
+.btn-primary:hover {
     background-color: #2980b9;
-  }
+    box-shadow: 0 4px 8px rgba(41, 128, 185, 0.4);
+}
+
+/* Efecto de pulso al hacer clic */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+.btn:active {
+    animation: pulse 0.2s ease;
+}
+
+/* Estado disabled */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Tamaños alternativos */
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+}
+
+.btn-lg {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+}
   
   
 
@@ -395,39 +354,109 @@
 
   /* IMAGEN PREVIEW */
 
+/* Contenedor principal mejorado */
+.modal-preview-wrapper {
+  position: relative;
+  transition: all 0.3s ease;
+}
 
-  /* Contenedor principal que organiza modal y preview */
-  .modal-preview-wrapper {
-    position: relative;
+/* Vista previa externa mejorada */
+.external-preview {
+  position: fixed;
+  top: 50%;
+  right: 30px;
+  transform: translateY(-50%);
+  width: 380px; /* Un poco más ancho */
+  max-height: 85vh; /* Más altura disponible */
+  background-color: white;
+  border-radius: 14px; /* Bordes más redondeados */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideInRight 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); /* Animación más dinámica */
+  border: 1px solid rgba(0, 0, 0, 0.05); /* Borde sutil */
+  transition: all 0.3s ease;
+}
+
+/* Header de la vista previa */
+.preview-header {
+  padding: 16px 24px;
+  background-color: #f9fafb;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Contenido de la vista previa */
+.preview-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa; /* Fondo gris claro */
+  padding: 20px;
+  overflow: auto;
+}
+
+/* Imagen de vista previa mejorada */
+.preview-image {
+  max-width: 100%;
+  max-height: calc(85vh - 110px); /* Ajuste por header y padding */
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  transition: transform 0.3s ease;
+}
+
+.preview-image:hover {
+  transform: scale(1.02); /* Efecto sutil al hover */
+}
+
+/* Botón de cerrar para vista previa */
+.preview-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.preview-close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-dark);
+}
+
+/* Animaciones mejoradas */
+@keyframes slideInRight {
+  from {
+      opacity: 0;
+      transform: translateY(-50%) translateX(40px);
   }
-  
-
-
-  /* Vista previa externa */
-  .external-preview {
-    position: fixed;
-    top: 50%;
-    right: 30px;
-    transform: translateY(-50%);
-    width: 350px;
-    max-height: 80vh;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    z-index: 1001; /* Un nivel por encima del modal */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: slideInRight 0.3s ease-out;
+  to {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
   }
+}
 
-  .preview-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 20px;
-    max-height: calc(80vh - 60px); /* Restamos el alto del header */
-  }
+/* Efecto de carga */
+.preview-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
 
 
 
@@ -468,7 +497,178 @@
 
 
 
+/* ------------------- RESPONSIVE ------------------ */
 
+/* Pantallas muy grandes (más de 1600px) */
+@media (min-width: 1600px) {
+  .modal-container {
+    max-width: 700px;
+  }
+  
+  .external-preview {
+    width: 420px;
+  }
+}
 
+/* Tablets en horizontal y pantallas pequeñas (entre 768px y 1024px) */
+@media (max-width: 1024px) {
+  .modal-container {
+    max-width: 90%;
+  }
+  
+  .external-preview {
+    width: 320px;
+    right: 20px;
+  }
+}
 
+/* Tablets en vertical y móviles grandes (entre 600px y 768px) */
+@media (max-width: 768px) {
+  .modal-header {
+    padding: 18px 22px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.4rem;
+  }
+  
+  .modal-form {
+    padding: 22px;
+  }
+  
+  .external-preview {
+    width: 280px;
+    right: 15px;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
 
+/* Móviles medianos y pequeños (hasta 600px) */
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 10px;
+    backdrop-filter: blur(8px);
+  }
+  
+  .modal-container {
+    max-width: 100%;
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    padding: 16px 20px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .modal-form {
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 10px;
+  }
+  
+  .external-preview {
+    display: none; /* Ocultamos la vista previa en móviles */
+  }
+  
+  .file-upload-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Móviles muy pequeños (hasta 400px) */
+@media (max-width: 400px) {
+  .modal-header {
+    padding: 14px 16px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .modal-form {
+    padding: 16px;
+  }
+  
+  .form-actions {
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Orientación horizontal en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-overlay {
+    align-items: flex-start;
+    padding-top: 20px;
+    overflow-y: auto;
+  }
+  
+  .modal-container {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .external-preview {
+    display: none;
+  }
+}
+
+/* Pantallas con altura reducida */
+@media (max-height: 600px) {
+  .modal-container {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .preview-image {
+    max-height: 60vh;
+  }
+}
+
+/* Ajustes para dispositivos con ancho muy pequeño */
+@media (max-width: 350px) {
+  .modal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .modal-close-btn {
+    align-self: flex-end;
+    margin-top: -10px;
+  }
+}
+
+/* Ajustes para inputs en iOS */
+@supports (-webkit-touch-callout: none) {
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    font-size: 16px; /* Evita el zoom automático en iOS */
+  }
+}
