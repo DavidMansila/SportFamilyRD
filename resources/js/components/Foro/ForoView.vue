@@ -1,6 +1,8 @@
 <template>
   <div class="foro-page" :class="{ 'no-scroll': postSeleccionado }">
 
+
+
     <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
@@ -32,7 +34,7 @@
     </nav>
 
 
-    
+
 
     <!-- Hero Section -->
     <div class="hero-section">
@@ -106,19 +108,15 @@
 
 
 
-
-    <!-- Sección de Posts con diseño de tarjetas -->
+    <!-- Sección de Posts -->
     <div class="posts-grid">
-      
       <div v-if="postsFiltrados.length === 0">
-
         <div class="no-posts">
           <h2 class="no-posts">No hay publicaciones disponibles</h2>
           <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicación!</p>
           <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
           <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
         </div>
-
       </div>  
 
       <div 
@@ -133,11 +131,8 @@
         </div>
         <div class="post-header">
           <h3 class="post-titulo">{{ post.titulo }}</h3>
-        
           <div class="post-meta">
-            <span class="post-author">
-              Usuario{{ post.id }}
-            </span>
+            <span class="post-author">Usuario{{ post.id }}</span>
             <span class="post-date">{{ formatDate(post.created_at) }}</span>
           </div>
         </div>
@@ -154,29 +149,30 @@
         
         <p class="post-contenido">{{ post.contenido.substring(0, 150) }}...</p>
         
-        <div class="post-footer">
-          <div class="post-stats">
-            <span class="post-likes">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-              </svg>
-              {{ post.likes_quantity }}
-            </span>
-            <span class="post-comments">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-              {{ post.comments.length }}
-            </span>
+          <div class="post-footer">
+            <div class="post-stats">
+              <span class="post-likes" @click.stop="toggleLike(post)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                    :stroke="post.isLiked ? 'currentColor' : 'currentColor'"
+                    :fill="post.isLiked ? 'currentColor' : 'none'" 
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                </svg>
+                {{ post.likes_quantity }}
+              </span>
+              <span class="post-comments" @click.stop="abrirPopoutYFocalizarComentario(post)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                {{ post.comments.length }}
+              </span>
+            </div>
+            <button @click.stop="abrirPopout(post)" class="btn-leer">Ver discusión</button>
           </div>
 
-          <button @click="abrirPopout(post)" class="btn-leer">Ver discusión</button>
-        </div>
       </div>
     </div>
-
-
-
 
 
 
@@ -185,7 +181,6 @@
     <transition name="fade">
       <div v-if="postSeleccionado" class="post-popout-overlay" @click.self="cerrarPopout">
         <div class="post-popout-container">
-          <!-- Contenedor principal -->
           <div class="post-popout-content">
             <!-- Sección de imagen -->
             <div class="post-popout-media">
@@ -207,7 +202,9 @@
                 </button>
               </div>
             </div>
-            
+
+
+
 
 
             <!-- Sección de contenido -->
@@ -225,6 +222,20 @@
                     </span>
                   </div>
                 </div>
+                <div class="post-actions" v-if="isPostAuthor(postSeleccionado)">
+                  <button @click="editarPost" class="edit-post-btn" title="Editar post">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button @click="confirmarEliminarPost" class="delete-post-btn" title="Eliminar post">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
                 <button @click="cerrarPopout" class="close-popout-btn" :class="{ 'hidden': inputFocused }">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -233,7 +244,6 @@
               </div>
 
 
-              
               <!-- Contenido del post -->
               <div class="post-popout-body">
                 <h2 class="post-popout-title">{{ postSeleccionado.titulo }}</h2>
@@ -243,7 +253,6 @@
                   <span class="post-visibility">Público</span>
                 </div>
               </div>
-              
 
 
               <!-- Sección de comentarios -->
@@ -256,9 +265,6 @@
                 </h4>
                 
                 <div class="comments-container" ref="commentsContainer">
-
-
-
 
                   <!-- Comentarios principales -->
                   <div v-for="(comentario, index) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
@@ -290,39 +296,105 @@
                         <button @click="toggleReply(comentario.id)" class="comment-action reply-comment">
                           {{ comentarioRespondiendo === comentario.id ? 'Cancelar' : 'Responder' }}
                         </button>
+                        <button 
+                          v-if="isCommentAuthor(comentario)"
+                          @click="editarComentario(comentario)" 
+                          class="comment-action edit-comment"
+                          title="Editar comentario"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                        </button>
+                        <button 
+                          v-if="isCommentAuthor(comentario)"
+                          @click="eliminarComentario(comentario.id)" 
+                          class="comment-action delete-comment"
+                          title="Eliminar comentario"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
                       </div>
 
 
 
-                      
+
                       <!-- Respuestas -->
-                      <!-- <div v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0" 
-                          class="comment-replies">
-                        <div v-for="(respuesta, i) in comentario.respuestas" :key="respuesta.id" class="comment-item reply-item">
-                          <div class="comment-avatar-wrapper">
-                            <div class="comment-avatar-placeholder">
-                              <span>U{{ respuesta.userId % 100 }}</span>
+                      <div v-if="comentariosExpandidos.includes(comentario.id)" class="comment-replies">
+                        <!-- Cargador mientras se obtienen las respuestas -->
+                        <div v-if="!comentario.respuestas" class="loading-replies">
+                          Cargando respuestas...
+                        </div>
+
+                        <!-- Mostrar respuestas si existen -->
+                        <div v-else-if="comentario.respuestas.length > 0">
+                          <div v-for="(respuesta, i) in comentario.respuestas" :key="respuesta.id" class="comment-item reply-item">
+                            <div class="comment-avatar-wrapper">
+                              <div class="comment-avatar-placeholder">
+                                <span>U{{ respuesta.userId % 100 }}</span>
+                              </div>
                             </div>
-                          </div>
-                          <div class="comment-content">
-                            <div class="comment-header">
-                              <span class="comment-author">Usuario{{ respuesta.userId }}</span>
-                              <span class="comment-time">{{ formatRelativeTime(respuesta.fecha) }}</span>
-                            </div>
-                            <p class="comment-text">{{ respuesta.texto }}</p>
-                            <div class="comment-actions">
-                              <button @click="likeComentario(respuesta.id)" class="comment-action like-comment" :class="{ liked: respuesta.isLiked }">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                </svg>
-                                <span>{{ respuesta.likes }}</span>
-                              </button>
+                            <div class="comment-content">
+                              <div class="comment-header">
+                                <span class="comment-author">Usuario{{ respuesta.userId }}</span>
+                                <span class="comment-time">{{ formatRelativeTime(respuesta.created_at) }}</span>
+                              </div>
+                              <p class="comment-text">{{ respuesta.texto }}</p>
+                              <div class="comment-actions">
+                                <button @click="likeComentario(respuesta.id)" class="comment-action like-comment" :class="{ liked: respuesta.isLiked }">
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                  </svg>
+                                  <span>{{ respuesta.likes }}</span>
+                                </button>
+                                <button @click="toggleReply(respuesta.id)" class="comment-action reply-comment">
+                                  {{ comentarioRespondiendo === respuesta.id ? 'Cancelar' : 'Responder' }}
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div> -->
+                
+                        <!-- Mensaje si no hay respuestas -->
+                        <div v-else class="no-replies">
+                          No hay respuestas aún. ¡Sé el primero en responder!
+                        </div>
+                        
 
-                      
+                        <!-- Formulario para responder a comentario específico -->
+                        <div v-if="comentarioRespondiendo === comentario.id" class="reply-form-container">
+                          <div class="replying-to">
+                            Respondiendo a <strong>@Usuario{{ getCommentAuthor(comentarioRespondiendo) }}</strong>
+                            <button @click="cancelarRespuesta" class="cancel-reply-btn">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                            </button>
+                          </div>
+                          <form @submit.prevent="submitReply" class="reply-form">
+                            <input
+                              v-model="nuevoComentario"
+                              type="text"
+                              placeholder="Escribe tu respuesta..."
+                              class="reply-input"
+                              ref="replyInput"
+                            >
+                            <button 
+                              type="submit" 
+                              :disabled="!nuevoComentario.trim()" 
+                              class="submit-reply-btn"
+                              :class="{ disabled: !nuevoComentario.trim() }"
+                            >
+                              {{ editandoComentario ? 'Actualizar' : 'Enviar' }}
+                            </button>
+                          </form>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -330,11 +402,10 @@
 
 
 
-                
                 <!-- Formulario de comentario principal o respuesta -->
                 <div class="add-comment-form">
-                  <div v-if="comentarioRespondiendo" class="replying-to">
-                    Respondiendo a <strong>@Usuario{{ comentarioRespondiendoo.userId }}</strong>
+                  <div v-if="comentarioRespondiendo && !editandoComentario" class="replying-to">
+                    Respondiendo a <strong>@Usuario{{ getCommentAuthor(comentarioRespondiendo) }}</strong>
                     <button @click="cancelarRespuesta" class="cancel-reply-btn">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -342,16 +413,25 @@
                       </svg>
                     </button>
                   </div>
-                  <form @submit.prevent=" addComment()" class="comment-form">
+                  <div v-if="editandoComentario" class="replying-to">
+                    Editando comentario
+                    <button @click="cancelarEdicionComentario" class="cancel-reply-btn">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                  <form @submit.prevent="addComment" class="comment-form">
                     <input
                       v-model="nuevoComentario"
                       ref="comentarioInput"
                       type="text"
-                      :placeholder="comentarioRespondiendo ? 'Escribe tu respuesta...' : 'Escribe un comentario...'"
+                      :placeholder="editandoComentario ? 'Edita tu comentario...' : comentarioRespondiendo ? 'Escribe tu respuesta...' : 'Escribe un comentario...'"
                       class="comment-input"
                       @focus="inputFocused = true"
                       @blur="inputFocused = false"
-                      @keydown.esc="cancelarRespuesta"
+                      @keydown.esc="editandoComentario ? cancelarEdicionComentario() : cancelarRespuesta()"
                     >
                     <button 
                       type="submit" 
@@ -375,8 +455,6 @@
 
 
 
-
-
     <!-- Botón flotante para crear post -->
     <button @click="abrirModal" class="floating-btn">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -385,99 +463,108 @@
       </svg>
     </button>
 
+
+
+    <!-- Modal para crear/editar post -->
     <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
-  <div class="modal-container">
-    <div class="modal-header">
-      <h2>Crear nuevo post</h2>
-      <button @click="cerrarModal" class="modal-close-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-    
-    <div class="modal-content-wrapper">
-      <form @submit.prevent="createPost()" class="modal-form">
-        <div class="form-group">
-          <label for="titulo">Título</label>
-          <input
-            v-model="nuevoPost.titulo"
-            id="titulo"
-            type="text"
-            placeholder="¿De qué quieres hablar?"
-            required
-          />
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>{{ modoEdicion ? 'Editar post' : 'Crear nuevo post' }}</h2>
+          <button @click="cerrarModal" class="modal-close-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
+        
+        <div class="modal-content-wrapper">
+          <form @submit.prevent="submitPost" class="modal-form">
+            <div class="form-group">
+              <label for="titulo">Título</label>
+              <input
+                v-model="nuevoPost.titulo"
+                id="titulo"
+                type="text"
+                placeholder="¿De qué quieres hablar?"
+                required
+              />
+            </div>
 
-        <div class="form-group">
-          <label for="contenido">Contenido</label>
-          <textarea
-            v-model="nuevoPost.contenido"
-            id="contenido"
-            placeholder="Comparte tus ideas, preguntas o experiencias..."
-            rows="5"
-            required
-          ></textarea>
-        </div>
+            <div class="form-group">
+              <label for="contenido">Contenido</label>
+              <textarea
+                v-model="nuevoPost.contenido"
+                id="contenido"
+                placeholder="Comparte tus ideas, preguntas o experiencias..."
+                rows="5"
+                required
+              ></textarea>
+            </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="categoria">Categoría</label>
-            <select v-model="nuevoPost.categoria" id="categoria" required>
-              <option value="">Selecciona una categoría</option>
-              <option value="Deporte">Deporte</option>
-              <option value="Gym">Gym</option>
-              <option value="Experiencia">Experiencia</option>
-              <option value="Lugares">Lugares</option>
-            </select>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="categoria">Categoría</label>
+                <select v-model="nuevoPost.categoria" id="categoria" required>
+                  <option value="">Selecciona una categoría</option>
+                  <option value="Deporte">Deporte</option>
+                  <option value="Gym">Gym</option>
+                  <option value="Experiencia">Experiencia</option>
+                  <option value="Lugares">Lugares</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="file-upload-label">
+                <input
+                  type="file"
+                  id="imagen"
+                  @change="handleFileSelect"
+                  accept="image/*"
+                  class="file-upload-input"
+                />
+                <span class="file-upload-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  Subir imagen
+                </span>
+                <span v-if="nuevoPost.imagenFile" class="file-upload-name">
+                  {{ nuevoPost.imagenFile.name }}
+                </span>
+                <span v-else-if="modoEdicion && postSeleccionado?.imagen" class="file-upload-name">
+                  Imagen actual: {{ postSeleccionado.imagen.split('/').pop() }}
+                </span>
+              </label>
+              <button 
+                v-if="modoEdicion && postSeleccionado?.imagen" 
+                @click.prevent="eliminarImagen" 
+                class="btn-eliminar-imagen"
+              >
+                Eliminar imagen
+              </button>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
+              <button type="submit" class="btn btn-primary">
+                {{ modoEdicion ? 'Actualizar post' : 'Publicar post' }}
+              </button>
+            </div>
+          </form>
+
+          <!-- Vista previa externa -->
+          <div v-if="mostrarModal && (imagenMiniatura || (modoEdicion && postSeleccionado?.imagen))" class="external-preview">
+            <img :src="imagenMiniatura || postSeleccionado.imagen" alt="Previsualización" class="preview-image">
           </div>
         </div>
-
-        <div class="form-group">
-          <label class="file-upload-label">
-            <input
-              type="file"
-              id="imagen"
-              @change="handleFileSelect"
-              accept="image/*"
-              class="file-upload-input"
-            />
-            <span class="file-upload-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-              Subir imagen
-            </span>
-            <span v-if="nuevoPost.imagenFile" class="file-upload-name">
-              {{ nuevoPost.imagenFile.name }}
-            </span>
-          </label>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Publicar</button>
-        </div>
-      </form>
-      
-
-        <!-- Vista previa externa -->
-     <div v-if="mostrarModal && imagenMiniatura" class="external-preview">
-        <img :src="imagenMiniatura" alt="Previsualización" class="preview-image">
+      </div>
     </div>
-
-    </div>
-  </div>
-</div>
-
-
-
   </div>
 </template>
-
 
 
 
@@ -505,6 +592,7 @@ export default {
         contenido: '',
         categoria: '',
         imagenFile: null,
+        id: null
       },
 
       imagenMiniatura: null,
@@ -512,22 +600,31 @@ export default {
 
       postSeleccionado: null,
       scrollPosition: 0,
+
       inputFocused: false,
-      
 
       nuevoComentario: '',
 
-    }
+      modoEdicion: false,
+
+      comentariosExpandidos: [],
+      comentarioRespondiendo: null,
+      editandoComentario: null
+
+    };
   },
+
+
 
   methods: {
 
 
+
+    // METODOS DE USUARIO
     abrirModal() {
       this.mostrarModal = true;
       document.body.style.overflow = 'hidden';
     },
-
 
     cerrarModal() {
       this.mostrarModal = false;
@@ -535,80 +632,96 @@ export default {
       document.body.style.overflow = 'auto';
     },
 
-
-  
-    cambiarCategoria(categoria) {
-      this.categoriaSeleccionada = categoria;
-      this.filtrarPosts();
-    },
-
-
-
-
-    filtrarPosts() {
-      // Primero filtramos por categoria
-      let postsFiltrados = this.categoriaSeleccionada 
-        ? this.posts.filter(post => post.categoria === this.categoriaSeleccionada)
-        : [...this.posts];
-
-      // Luego filtramos por termino de busqueda si existe
-      if (this.terminoBusqueda) {
-        const termino = this.terminoBusqueda.toLowerCase();
-        postsFiltrados = postsFiltrados.filter(post => 
-          post.titulo.toLowerCase().includes(termino) || 
-          post.contenido.toLowerCase().includes(termino) ||
-          (post.categoria && post.categoria.toLowerCase().includes(termino))
-        );
-      }
-      this.postsFiltrados = postsFiltrados;
-    },
-
-
-
-
-    guardarPost() {
-      const nuevoId = Math.max(...this.posts.map(p => p.id)) + 1;
-      const nuevoPost = {
-        id: nuevoId,
-        titulo: this.nuevoPost.titulo,
-        contenido: this.nuevoPost.contenido,
-        categoria: this.nuevoPost.categoria,
-        imagen: this.nuevoPost.imagenFile,
-        fecha: new Date().toLocaleDateString(),
-        likes: 0,
-        comentarios: 0,
-      };
-      this.posts.unshift(nuevoPost);
-      this.cerrarModal();
-    },
-
-
-
-
     limpiarFormulario() {
       this.nuevoPost = {
         titulo: '',
         contenido: '',
         categoria: '',
-        imagenFile: null
+        imagenFile: null,
+        id: null
       };
       this.imagenMiniatura = null;
+      this.modoEdicion = false;
     },
-    
 
 
+
+
+
+
+    // METODOS PARA POST
+    async submitPost() {
+      const formData = new FormData();
+      formData.append('titulo', this.nuevoPost.titulo);
+      formData.append('contenido', this.nuevoPost.contenido);
+      formData.append('categoria', this.nuevoPost.categoria);
+      
+      if (this.nuevoPost.imagenFile) {
+        formData.append('imagen', this.nuevoPost.imagenFile);
+      } else if (this.modoEdicion && !this.imagenMiniatura && this.postSeleccionado?.imagen) {
+        // Indica que se debe eliminar la imagen existente
+        formData.append('eliminar_imagen', 'true');
+      }
+
+      try {
+        const config = { 
+          headers: { 'content-type': 'multipart/form-data' } 
+        };
+        
+        if (this.modoEdicion && this.nuevoPost.id) {
+          formData.append('_method', 'PUT');
+          await axios.post(`/post/${this.nuevoPost.id}`, formData, config);
+          this.$toast.success('Post actualizado correctamente');
+        } else {
+          await axios.post('/post', formData, config);
+          this.$toast.success('Post creado correctamente');
+        }
+
+        this.limpiarFormulario();
+        this.cerrarModal();
+        await this.getPost();
+        
+        // Si estamos editando desde el popout, actualizamos el post seleccionado
+        if (this.postSeleccionado && this.modoEdicion) {
+          const postActualizado = this.posts.find(p => p.id === this.postSeleccionado.id);
+          if (postActualizado) {
+            this.postSeleccionado = { ...postActualizado };
+          }
+        }
+      } catch (error) {
+        console.error('Error al guardar el post:', error);
+        this.$toast.error(`Error al ${this.modoEdicion ? 'actualizar' : 'crear'} el post`);
+      }
+    },
+
+    eliminarImagen() {
+      this.nuevoPost.imagenFile = null;
+      this.imagenMiniatura = null;
+      this.$toast.info('Imagen marcada para eliminación');
+    },
+
+    async getPost() {
+      try {
+        const response = await axios.get('/post');
+        this.posts = response.data.posts;
+        this.postsFiltrados = [...this.posts];
+      } catch (error) {
+        console.error('Error al obtener los posts:', error);
+        this.$toast.error('Error al cargar los posts');
+      }
+    },
 
     handleFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
       
       if (!file.type.match('image.*')) {
-        alert('Por favor, selecciona solo imágenes (JPEG, PNG, etc.)');
+        this.$toast.error('Por favor, selecciona solo imágenes (JPEG, PNG, etc.)');
         return;
       }
       
       if (file.size > 2 * 1024 * 1024) {
-        alert('La imagen es demasiado grande. Máximo 2MB permitido.');
+        this.$toast.error('La imagen es demasiado grande. Máximo 2MB permitido.');
         return;
       }
       
@@ -622,224 +735,73 @@ export default {
     },
 
 
-    loadImg(file) {
-      let reader = new FileReader();
-      reader.onload = (e) => {
-        this.imagenMiniatura = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    },
 
-
-    onImageLoad() {
-      this.imageLoaded = true;
-    },
-
-
-    getPost() {
-      return axios.get('/post')
-        .then(response => {
-          this.posts = response.data.posts;
-          this.postsFiltrados = [...this.posts];
-        })
-        .catch(error => {
-          console.error('Error al obtener los posts:', error);
-        });
-    },
+    toggleLike(post) {
+    // Guarda el estado actual antes de cambiarlo
+    const wasLiked = post.isLiked;
+    const oldLikes = post.likes_quantity;
     
-
-    async createPost() {
-      
-      const formData = new FormData();
-      formData.append('titulo', this.nuevoPost.titulo);
-      formData.append('contenido', this.nuevoPost.contenido);
-      formData.append('categoria', this.nuevoPost.categoria);
-      
-      if (this.nuevoPost.imagenFile) {
-        formData.append('imagen', this.nuevoPost.imagenFile);
-      }
-
-      try {
-        let header = { headers: { 'content-type': 'multipart/form-data' } };
-        await axios.post('/post', formData, header);
-
-        this.limpiarFormulario();
-        this.cerrarModal();
-        
-      } catch (error) {
-        console.error('Error al crear el post:', error);
-        alert('Error al crear el post. Por favor, intenta nuevamente.');
-      }
-    },
-
-
-
-
-
-    abrirPopout(post) {
-      // Guardar posición del scroll antes de abrir el popout
-      this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-      
-      // Bloquear scroll del body
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${this.scrollPosition}px`;
-      document.body.style.width = '100%';
-      
-      this.postSeleccionado = { ...post, isLiked: false};
-      
-    },
+    // Cambia el estado visual inmediatamente
+    post.isLiked = !wasLiked;
+    post.likes_quantity = wasLiked ? oldLikes - 1 : oldLikes + 1;
     
-
-
-    
-    cerrarPopout() {
-
-      this.postSeleccionado = null;
-      this.nuevoComentario = '';
-      
-      // Restaurar scroll del body
-      document.body.style.overflow = 'auto';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      
-      // Restaurar posición del scroll
-      window.scrollToBottom(this.scrollPosition);
-    },
-    
-
-
-    toggleLike() {
-      if (this.postSeleccionado.isLiked) {
-        this.postSeleccionado.likes--;
-      } else {
-        this.postSeleccionado.likes++;
-      }
-      this.postSeleccionado.isLiked = !this.postSeleccionado.isLiked;
-    },
-    
-
-
-    focusComentario() {
-      this.$nextTick(() => {
-        this.$refs.comentarioInput.focus();
-        this.scrollToBottom();
-      });
-    },
-    
-
-
-    scrollToBottom() {
-      this.$nextTick(() => {
-        const container = this.$refs.commentsContainer;
-        if (container) {
-          container.scrollTop = container.scrollHeight;
-        }
-      });
-    },
-    
-
-    toggleCommentExpansion(commentId) {
-      const index = this.comentariosExpandidos.indexOf(commentId);
-      if (index === -1) {
-        this.comentariosExpandidos.push(commentId);
-      } else {
-        this.comentariosExpandidos.splice(index, 1);
-      }
-      
-      // Forzar re-render para asegurar que el scroll se actualice
-      this.$nextTick(() => {
-        this.scrollToBottom();
-      });
-    },
-    
-
-    toggleReply(commentId) {
-      if (this.comentarioRespondiendo === commentId) {
-        this.cancelarRespuesta();
-      } else {
-        this.comentarioRespondiendo = commentId;
-        this.$nextTick(() => {
-          this.$refs.comentarioInput.focus();
-          this.scrollToBottom();
-        });
-      }
-    },
-    
-
-    cancelarRespuesta() {
-      this.comentarioRespondiendo = null;
-      this.nuevoComentario = '';
-    },
-    
-
-    
-
-
-    addComment() {
-      axios.post('/post/create-comment', {
-        post_id: this.postSeleccionado.id,
-        texto: this.nuevoComentario
-      })
-      .then(response => {
-        this.nuevoComentario = '';
-        this.scrollToBottom();
-       
-        this.getPost()
-        .then(() => {
-          const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
-          if (postEncontrado) {
-            this.postSeleccionado = { ...postEncontrado };
-          }
-        })
-        .catch(error => {
-          console.error('Error al actualizar los posts:', error);
-        });
-          
+    // Llama a la API
+    axios.post(`/post/${post.id}/likes_quantity`, {
+        isLiked: post.isLiked
       })
       .catch(error => {
-        console.error('Error al agregar comentario:', error);
+        console.error('Error al dar like:', error);
+        // Si hay error, revierte los cambios visuales
+        post.isLiked = wasLiked;
+        post.likes_quantity = oldLikes;
       });
-    },
+  },
 
 
-
-    
-
-    likeComentario(commentId) {
-      const comment = this.findCommentById(commentId);
-      if (comment) {
-        if (comment.isLiked) {
-          comment.likes--;
-        } else {
-          comment.likes++;
-        }
-        comment.isLiked = !comment.isLiked;
-      }
-    },
-    
-
-
-
-    findCommentById(id) {
-      // Buscar en comentarios principales
-      for (const comment of this.comentarios) {
-        if (comment.id === id) return comment;
-        
-        // Buscar en respuestas
-        if (comment.respuestas) {
-          for (const reply of comment.respuestas) {
-            if (reply.id === id) return reply;
+  abrirPopoutYFocalizarComentario(post) {
+    this.abrirPopout(post);
+    this.$nextTick(() => {
+      // Espera a que el popout esté renderizado
+      setTimeout(() => {
+        const input = this.$refs.comentarioInput;
+        if (input) {
+          input.focus();
+          // Desplázate al área de comentarios
+          const container = this.$refs.commentsContainer;
+          if (container) {
+            container.scrollTop = container.scrollHeight;
           }
         }
+      }, 300);
+    });
+  },
+
+
+
+
+
+
+    // METODOS PARA FILTRADO Y BUSQUEDA
+    filtrarPosts() {
+      let postsFiltrados = this.categoriaSeleccionada 
+        ? this.posts.filter(post => post.categoria === this.categoriaSeleccionada)
+        : [...this.posts];
+
+      if (this.terminoBusqueda) {
+        const termino = this.terminoBusqueda.toLowerCase();
+        postsFiltrados = postsFiltrados.filter(post => 
+          post.titulo.toLowerCase().includes(termino) || 
+          post.contenido.toLowerCase().includes(termino) ||
+          (post.categoria && post.categoria.toLowerCase().includes(termino))
+        );
       }
-      return null;
+      this.postsFiltrados = postsFiltrados;
     },
-    
 
-
-
+    cambiarCategoria(categoria) {
+      this.categoriaSeleccionada = categoria;
+      this.filtrarPosts();
+    },
 
     categoryColor(categoria) {
       const colors = {
@@ -852,9 +814,324 @@ export default {
       return colors[categoria] || colors['General'];
     },
 
+
+
+
+
+
+    // METODOS PARA EL POPOUT DEL POST
+    abrirPopout(post) {
+      this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${this.scrollPosition}px`;
+      document.body.style.width = '100%';
+      
+      this.postSeleccionado = { ...post, isLiked: false };
+    },
     
+    cerrarPopout() {
+      this.postSeleccionado = null;
+      this.nuevoComentario = '';
+      this.comentarioRespondiendo = null;
+      this.editandoComentario = null;
+      
+      document.body.style.overflow = 'auto';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      
+      window.scrollTo(0, this.scrollPosition);
+    },
+
+    toggleLike() {
+      if (this.postSeleccionado.isLiked) {
+        this.postSeleccionado.likes_quantity--;
+      } else {
+        this.postSeleccionado.likes_quantity++;
+      }
+      this.postSeleccionado.isLiked = !this.postSeleccionado.isLiked;
+      
+      // Aquí deberías hacer la llamada API para actualizar el like
+      axios.post(`/post/${this.postSeleccionado.id}/likes_quantity`, {
+        isLiked: this.postSeleccionado.isLiked
+      });
+    },
 
 
+
+
+
+
+    // METODOS PARA COMENTARIOS
+    addComment() {
+        axios.post('/post/create-comment', {
+          post_id: this.postSeleccionado.id,
+          texto: this.nuevoComentario
+        })
+        .then(response => {
+          this.nuevoComentario = '';
+          this.scrollToBottom();
+          
+          // Actualizar los posts y luego el post seleccionado
+          this.getPost()
+          .then(() => {
+            // Encontrar el post actualizado en la lista
+            const postActualizado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
+            
+            if (postActualizado) {
+              // Mantener el estado actual de isLiked y otros estados locales
+              const wasLiked = this.postSeleccionado.isLiked;
+              this.postSeleccionado = { ...postActualizado };
+              this.postSeleccionado.isLiked = wasLiked;
+              
+              // Forzar la actualización de la UI si es necesario
+              this.$forceUpdate();
+            }
+          })
+          .catch(error => {
+            console.error('Error al actualizar los posts:', error);
+          });
+        })
+        .catch(error => {
+          console.error('Error al agregar comentario:', error);
+          
+          this.$nextTick(() => {
+            if (this.$refs.comentarioInput) {
+              this.$refs.comentarioInput.focus();
+            }
+          });
+        });
+      },
+
+
+      async getReply(commentId) {
+      try {
+        const response = await axios.get(`/post/get-reply/${commentId}`);
+        if (this.postSeleccionado) {
+          const comment = this.postSeleccionado.comments.find(c => c.id === commentId);
+          if (comment) {
+            comment.respuestas = response.data.replies;
+            
+            if (!this.comentariosExpandidos.includes(commentId)) {
+              this.comentariosExpandidos.push(commentId);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error al obtener respuestas:', error);
+        this.$toast.error('Error al cargar las respuestas');
+      }
+    },
+
+    async submitReply() {
+      try {
+        if (this.editandoComentario) {
+          await axios.put(`/post/comment/${this.editandoComentario.id}`, {
+            texto: this.nuevoComentario
+          });
+          this.$toast.success('Respuesta actualizada');
+        } else {
+          await axios.post('/post/create-reply', {
+            comment_id: this.comentarioRespondiendo,
+            texto: this.nuevoComentario
+          });
+          this.$toast.success('Respuesta enviada');
+        }
+
+        this.nuevoComentario = '';
+        this.comentarioRespondiendo = null;
+        this.editandoComentario = null;
+        
+        // Actualizar los comentarios
+        await this.actualizarComentarios();
+      } catch (error) {
+        console.error('Error al guardar respuesta:', error);
+        this.$toast.error('Error al guardar la respuesta');
+      }
+    },
+
+    async actualizarComentarios() {
+      try {
+        const response = await axios.get(`/post/${this.postSeleccionado.id}`);
+        this.postSeleccionado.comments = response.data.post.comments;
+        this.scrollToBottom();
+      } catch (error) {
+        console.error('Error al actualizar comentarios:', error);
+      }
+    },
+
+    toggleCommentExpansion(commentId) {
+      const comment = this.postSeleccionado.comments.find(c => c.id === commentId);
+      
+      if (!this.comentariosExpandidos.includes(commentId)) {
+        this.comentariosExpandidos.push(commentId);
+        if (!comment.respuestas) {
+          this.getReply(commentId);
+        }
+      } else {
+        const index = this.comentariosExpandidos.indexOf(commentId);
+        this.comentariosExpandidos.splice(index, 1);
+      }
+    },
+
+
+
+
+
+
+    // METODOS PARA EDITAR Y ELIMINAR 
+    isPostAuthor(post) {
+      // Implementa según tu sistema de autenticación
+      // Ejemplo: return post.userId === this.$store.state.user.id;
+      return true; // Cambiar según tu lógica
+    },
+
+    isCommentAuthor(comment) {
+      // Implementa según tu sistema de autenticación
+      // Ejemplo: return comment.userId === this.$store.state.user.id;
+      return true; // Cambiar según tu lógica
+    },
+
+    editarPost() {
+      this.nuevoPost = {
+        id: this.postSeleccionado.id,
+        titulo: this.postSeleccionado.titulo,
+        contenido: this.postSeleccionado.contenido,
+        categoria: this.postSeleccionado.categoria,
+        imagenFile: null
+      };
+      
+      if (this.postSeleccionado.imagen) {
+        this.imagenMiniatura = this.postSeleccionado.imagen;
+      }
+      
+      this.modoEdicion = true;
+      this.mostrarModal = true;
+      this.cerrarPopout();
+    },
+
+    async confirmarEliminarPost() {
+      if (confirm('¿Estás seguro de que quieres eliminar este post?')) {
+        try {
+          await axios.delete(`/post/${this.postSeleccionado.id}`);
+          this.cerrarPopout();
+          await this.getPost();
+          this.$toast.success('Post eliminado correctamente');
+        } catch (error) {
+          console.error('Error al eliminar el post:', error);
+          this.$toast.error('Error al eliminar el post');
+        }
+      }
+    },
+
+    editarComentario(comentario) {
+      this.nuevoComentario = comentario.texto;
+      this.editandoComentario = { id: comentario.id };
+      this.comentarioRespondiendo = null;
+      this.$nextTick(() => {
+        this.$refs.comentarioInput.focus();
+      });
+    },
+
+    async eliminarComentario(commentId) {
+      if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+        try {
+          await axios.delete(`/post/${post_id}/comment/${comments.id}`);
+          await this.actualizarComentarios();
+          this.$toast.success('Comentario eliminado');
+        } catch (error) {
+          console.error('Error al eliminar comentario:', error);
+          this.$toast.error('Error al eliminar el comentario');
+        }
+      }
+    },
+
+
+
+
+
+
+
+    // METODOS DE INTERACCION
+    toggleReply(commentId) {
+      if (this.comentarioRespondiendo === commentId) {
+        this.cancelarRespuesta();
+      } else {
+        this.comentarioRespondiendo = commentId;
+        this.editandoComentario = null;
+        this.$nextTick(() => {
+          this.$refs.comentarioInput.focus();
+          this.scrollToBottom();
+        });
+      }
+    },
+
+    cancelarRespuesta() {
+      this.comentarioRespondiendo = null;
+      this.nuevoComentario = '';
+    },
+
+    cancelarEdicionComentario() {
+      this.editandoComentario = null;
+      this.nuevoComentario = '';
+    },
+
+    focusComentario() {
+      this.$nextTick(() => {
+        this.$refs.comentarioInput.focus();
+        this.scrollToBottom();
+      });
+    },
+    
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const container = this.$refs.commentsContainer;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
+    },
+
+    likeComentario(commentId) {
+      const comment = this.findCommentById(commentId);
+      if (comment) {
+        comment.isLiked = !comment.isLiked;
+        comment.likes += comment.isLiked ? 1 : -1;
+        
+        // Aquí deberías hacer la llamada API para actualizar el like
+
+        //AGREGAR LIKES_QUANTITY A LOS COMENTARIOS BASE DE DATOS 
+
+        axios.post(`/post/comment/${commentId}/like_quantity`);
+      }
+    },
+    
+    findCommentById(id) {
+      // Buscar en comentarios principales
+      for (const comment of this.postSeleccionado.comments) {
+        if (comment.id === id) return comment;
+        
+        // Buscar en respuestas
+        if (comment.respuestas) {
+          for (const reply of comment.respuestas) {
+            if (reply.id === id) return reply;
+          }
+        }
+      }
+      return null;
+    },
+
+    getCommentAuthor(commentId) {
+      const comment = this.postSeleccionado.comments.find(c => c.id === commentId) ||
+                    this.postSeleccionado.comments.flatMap(c => c.respuestas || []).find(r => r.id === commentId);
+      return comment ? comment.userId : '';
+    },
+
+
+
+
+    // METODOS UTILITARIOS
     formatDate(date) {
       if (!date) return '';
       const d = new Date(date);
@@ -867,9 +1144,6 @@ export default {
       });
     },
     
-
-    
-
     formatRelativeTime(date) {
       const now = new Date();
       const diff = now - new Date(date);
@@ -881,17 +1155,23 @@ export default {
       return `Hace ${Math.floor(minutes / 1440)} d`;
     },
 
-
-
+    onImageLoad() {
+      this.imageLoaded = true;
+    }
   },
+
+
 
 
 
   mounted() {
     this.getPost();
+    document.title = 'Foro';
   }
 }
 </script>
+
+
 
 
 

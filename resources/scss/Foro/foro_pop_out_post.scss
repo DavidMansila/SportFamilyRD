@@ -612,6 +612,99 @@
   height: 18px;
 }
 
+
+
+
+
+
+
+/* Respuestas a comentarios */
+.comment-replies {
+  margin-left: 40px;
+  padding-left: 15px;
+  border-left: 2px solid #eee;
+  margin-top: 10px;
+  
+  .reply-item {
+    margin-top: 15px;
+  }
+  
+  .loading-replies, .no-replies {
+    color: #666;
+    font-size: 0.9em;
+    padding: 10px 0;
+  }
+}
+
+.reply-form-container {
+  margin-top: 15px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  
+  .replying-to {
+    font-size: 0.8em;
+    color: #555;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    
+    .cancel-reply-btn {
+      margin-left: 10px;
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      padding: 2px;
+      
+      &:hover {
+        color: #666;
+      }
+    }
+  }
+  
+  .reply-form {
+    display: flex;
+    
+    .reply-input {
+      flex-grow: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      outline: none;
+      
+      &:focus {
+        border-color: #4a90e2;
+      }
+    }
+    
+    .submit-reply-btn {
+      margin-left: 10px;
+      padding: 8px 15px;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      
+      &.disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
 /* ------------------- AJUSTES ESPECIALES PARA PANTALLAS MUY PEQUEÑAS ------------------ */
 @media (max-width: 400px) {
   .post-popout-container {
@@ -678,3 +771,219 @@
     max-height: 250px;
   }
 }
+
+
+
+
+
+
+
+
+/* Estilos para los botones de editar/eliminar post */
+.post-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+  
+  .edit-post-btn {
+    color: #4a90e2;
+    
+    &:hover {
+      background: #e7f1fd;
+    }
+  }
+  
+  .delete-post-btn {
+    color: #e74c3c;
+    
+    &:hover {
+      background: #fde8e8;
+    }
+  }
+}
+
+/* Estilos para los botones de editar/eliminar comentario */
+.comment-actions {
+  .edit-comment {
+    color: #4a90e2;
+    
+    &:hover {
+      color: #3a7bc8;
+    }
+  }
+  
+  .delete-comment {
+    color: #e74c3c;
+    
+    &:hover {
+      color: #d63b2b;
+    }
+  }
+}
+
+/* Estilo para el botón de eliminar imagen */
+.btn-eliminar-imagen {
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: #f8f9fa;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #dc3545;
+    color: white;
+  }
+}
+
+
+
+/* Estilo para el indicador de "Respondiendo a..." */
+.replying-to {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #555;
+  width: fit-content;
+}
+
+/* Estilo para el texto de "Editando comentario" */
+.replying-to {
+  /* Comparte estilos con el de responder */
+  background-color: #e3f2fd; /* Azul claro para diferenciar edición */
+}
+
+/* Estilo para el botón de cancelar (la X) */
+.cancel-reply-btn {
+  margin-left: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.cancel-reply-btn:hover {
+  color: #ff4444; /* Rojo al hover */
+}
+
+.cancel-reply-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Estilo para el formulario de respuesta */
+.reply-form-container {
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 3px solid #4285f4;
+}
+
+/* Estilo para el input de respuesta/edición */
+.reply-input,
+.comment-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.reply-input:focus,
+.comment-input:focus {
+  border-color: #4285f4;
+}
+
+/* Estilo para el botón de enviar respuesta/edición */
+.submit-reply-btn,
+.submit-comment-btn {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.submit-reply-btn:hover:not(.disabled),
+.submit-comment-btn:hover:not(.disabled) {
+  background-color: #3367d6;
+}
+
+.submit-reply-btn.disabled,
+.submit-comment-btn.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Estilo específico para el botón de enviar comentario (icono) */
+.submit-comment-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.submit-comment-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Contenedor del formulario de comentario */
+.comment-form {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+}
+
+/* Estilo para el formulario de edición */
+.edit-comment-form {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
