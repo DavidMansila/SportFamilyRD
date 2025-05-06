@@ -438,7 +438,10 @@ export default {
       this.cartItems = [];
       this.showCartPopup = false;
     }
-  }
+  },
+  mounted() {
+    document.title = 'Calendario';
+  },
 };
 </script>
 

@@ -292,6 +292,9 @@
         this.user = JSON.parse(JSON.stringify(this.originalUserData));
         this.editMode = false;
       }
+    },
+    mounted() {
+      document.title = 'Perfil';
     }
   }
   </script>

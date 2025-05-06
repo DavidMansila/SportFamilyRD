@@ -281,6 +281,7 @@ export default {
   
   mounted() {
     this.cargarNoticias();
+    document.title = 'Noticias';
   }
 };
 

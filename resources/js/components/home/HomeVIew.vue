@@ -178,7 +178,14 @@ export default {
         { title: "Levantamiento de pesas", image: "/imagenes/pesas.jpg" }
       ]
     }
-  }
+  },
+
+  mounted() {
+
+    
+    document.title = 'SportFamilyRD';
+
+  },
 }
 </script>
 

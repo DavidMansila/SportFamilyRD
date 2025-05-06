@@ -528,8 +528,11 @@ export default {
        // Navegar a la página completa de mensajes
        this.$router.push('/Mensajes');
     }
+  },
+  mounted() {
+    document.title = 'Entrenadores';
   }
-}
+};
 </script>
 
 

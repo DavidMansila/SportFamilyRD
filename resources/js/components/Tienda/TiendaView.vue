@@ -417,6 +417,7 @@ export default {
   },
   mounted() {
     this.getProducts();
+    document.title = 'Tienda';
   }
 };
 </script>

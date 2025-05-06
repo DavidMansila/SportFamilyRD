@@ -348,7 +348,10 @@ export default {
     // Lógica para eliminar cuenta
     this.showDeleteModal = false;
   },
-  }
+  },
+  mounted() {
+    document.title = 'Ajustes';
+}
 }
 </script>
 

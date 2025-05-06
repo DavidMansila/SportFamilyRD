@@ -672,3 +672,23 @@
     font-size: 16px; /* Evita el zoom automático en iOS */
   }
 }
+
+
+
+
+.modal-header {
+  position: relative;
+  
+  h2 {
+    margin: 0;
+    
+    &:after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: black;
+      margin-top: 8px;
+    }
+  }
+}

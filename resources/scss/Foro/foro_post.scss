@@ -37,6 +37,19 @@
     .post-image {
       transform: scale(1.03);
     }
+
+    .post-categoria {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .post-stats {
+      color: #4a5568;
+    }
+
+    .post-titulo {
+      color: #6a11cb;
+    }
   }
 }
 
@@ -52,6 +65,7 @@
   background-color: hsl(var(--hue), 80%, 60%);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 2;
+  transition: all 0.3s ease;
 }
 
 .post-header {
@@ -65,10 +79,6 @@
   color: #1a202c;
   line-height: 1.4;
   transition: color 0.3s ease;
-  
-  .post-card:hover & {
-    color: #6a11cb;
-  }
 }
 
 .post-meta {
@@ -78,17 +88,6 @@
   font-size: 0.85rem;
   color: #718096;
   margin-bottom: 1.2rem;
-}
-
-.author-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  margin-right: 0.6rem;
-  vertical-align: middle;
-  object-fit: cover;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .post-contenido {
@@ -115,13 +114,20 @@
   font-size: 0.9rem;
   color: #718096;
   
-  svg {
-    vertical-align: middle;
-    margin-right: 0.4rem;
-    width: 16px;
-    height: 16px;
-    stroke-width: 2.5;
-    transition: stroke 0.3s ease;
+  span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      opacity: 0.8;
+      
+      svg {
+        transform: scale(1.1);
+      }
+    }
   }
   
   .post-likes:hover svg {
@@ -131,9 +137,15 @@
   .post-comments:hover svg {
     stroke: #3182ce;
   }
+  
+  svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5;
+    transition: all 0.3s ease;
+  }
 }
 
-/* Estilos para la imagen del post */
 .post-imagen {
   width: 100%;
   height: 240px;
@@ -163,7 +175,6 @@
   background-size: 200% 100%;
 }
 
-/* Botón "Leer más" mejorado */
 .btn-leer {
   background-color: transparent;
   color: #6a11cb;
@@ -196,20 +207,47 @@
   }
 }
 
-/* Animación de carga */
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Efecto hover para la tarjeta completa */
-.post-card:hover {
-  .post-categoria {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+/* POST ACTIONS */
+.post-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  padding-right: 10px;
+  
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    &:hover {
+      transform: scale(1.1);
+    }
   }
   
-  .post-stats {
-    color: #4a5568;
+  .edit-post-btn {
+    color: #4a90e2;
+    
+    &:hover {
+      background: #e7f1fd;
+    }
+  }
+  
+  .delete-post-btn {
+    color: #e74c3c;
+    
+    &:hover {
+      background: #fde8e8;
+    }
   }
 }

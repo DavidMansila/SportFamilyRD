@@ -394,7 +394,7 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(to right, #ffffff, #7b00ff);
   color: var(--white);
   border: none;
   display: flex;
