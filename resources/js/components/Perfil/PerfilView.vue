@@ -2,41 +2,56 @@
   
     <div class="profile-view">
 
-       <!-- Navbar -->
-       <nav class="navbar">
-        <div class="logo-container">
-          <a href="/" class="logo-container">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="logo-container">
+        <a href="/" class="logo-container">
           <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
       </div>
-        <div class="nav-links">
-            <a href="/Noticias" class="nav-link">Noticias</a>
-            <a href="/Calendario" class="nav-link">Calendario</a>
-             <a href="/Tienda" class="nav-link">Tienda</a>
-             <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-             <a href="/Foro" class="nav-link">Foro</a>
-        </div>
 
-        <div class="Imagenes">
+      <div class="nav-links">
 
-            <a class="Carrito">
-                <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
-            </a>
+           <!-- Secciones para lo usuarios y no usuarios -->
+           <a href="/Noticias" class="nav-link">Noticias</a>
+           <a href="/Calendario" class="nav-link">Calendario</a>
+           <a href="/Tienda" class="nav-link">Tienda</a>
+           <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+           <a href="/Foro" class="nav-link">Foro</a>
 
-            <a href= "/Ajustes" class="Ajustes">
-                <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
-            </a>
+          <!-- Secciones para entrenadores -->
+           <a v-if = "userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
 
-            <a href= "/Perfil" class="Perfil">
-                <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
-            </a>
+          <!-- Secciones para entrenadores -->
+          <a v-if = "userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
 
-            <a :href=" login ? '/Login' : '/Logout' " class="Logout">
-                <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
-            </a>
 
-        </div>
-      </nav>
+      </div>
+
+      <div class="Imagenes">
+
+        <a href="#" class="Carrito">
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
+        </a>
+
+        <a href= "/Ajustes" class="Ajustes">
+          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
+        </a>
+
+        <a href= "/Perfil" class="Perfil">
+          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+        </a>
+
+        <a :href=" login ? '/Login' : '/Logout' " class="Logout">
+          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
+        </a>
+
+      </div>
+    </nav>
+
+
+    
   
       <div class="profile-container">
         <!-- Header del Perfil -->

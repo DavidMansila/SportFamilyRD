@@ -3,6 +3,7 @@
 
 
 
+
     <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
@@ -10,26 +11,43 @@
           <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
       </div>
+
       <div class="nav-links">
-        <a href="/Noticias" class="nav-link">Noticias</a>
-        <a href="/Calendario" class="nav-link">Calendario</a>
-        <a href="/Tienda" class="nav-link">Tienda</a>
-        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-        <a href="/Foro" class="nav-link">Foro</a>
+
+           <!-- Secciones para lo usuarios y no usuarios -->
+           <a href="/Noticias" class="nav-link">Noticias</a>
+           <a href="/Calendario" class="nav-link">Calendario</a>
+           <a href="/Tienda" class="nav-link">Tienda</a>
+           <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+           <a href="/Foro" class="nav-link">Foro</a>
+
+          <!-- Secciones para entrenadores -->
+           <a v-if = "userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
+
+          <!-- Secciones para entrenadores -->
+          <a v-if = "userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
+
+
       </div>
+
       <div class="Imagenes">
-        <a class="Carrito">
+
+        <a href="#" class="Carrito">
           <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
         </a>
+
         <a href= "/Ajustes" class="Ajustes">
           <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
         </a>
+
         <a href= "/Perfil" class="Perfil">
           <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
         </a>
-        <a :href="'/Login'" class="Logout">
+
+        <a :href=" login ? '/Login' : '/Logout' " class="Logout">
           <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
         </a>
+
       </div>
     </nav>
 
@@ -110,14 +128,18 @@
 
     <!-- Sección de Posts -->
     <div class="posts-grid">
-      <div v-if="postsFiltrados.length === 0">
-        <div class="no-posts">
-          <h2 class="no-posts">No hay publicaciones disponibles</h2>
-          <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicación!</p>
-          <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
-          <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
+      <div v-if="postsFiltrados.length === 0" class="no-posts-container">
+    <div class="no-posts-content">
+        <h2 class="no-posts">No hay publicaciones disponibles</h2>
+        <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicación!</p>
+        <button @click="abrirModal" class="no-posts-btn">
+          <span>Crear nuevo post</span>
+        </button>
+        <div class="no-posts-image-container">
+          <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image no-posts-image-float">
         </div>
-      </div>  
+      </div>
+    </div> 
 
       <div 
         v-else

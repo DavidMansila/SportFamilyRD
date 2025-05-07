@@ -1,18 +1,30 @@
 <template>
   <div class="home-container">
 
+    <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
           <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
       </div>
+
       <div class="nav-links">
+
+           <!-- Secciones para lo usuarios y no usuarios -->
            <a href="/Noticias" class="nav-link">Noticias</a>
            <a href="/Calendario" class="nav-link">Calendario</a>
            <a href="/Tienda" class="nav-link">Tienda</a>
            <a href="/Entrenadores" class="nav-link">Entrenadores</a>
            <a href="/Foro" class="nav-link">Foro</a>
+
+          <!-- Secciones para entrenadores -->
+           <a v-if = "userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
+
+          <!-- Secciones para entrenadores -->
+          <a v-if = "userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
+
+
       </div>
 
       <div class="Imagenes">

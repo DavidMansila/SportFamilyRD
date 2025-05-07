@@ -9,30 +9,49 @@
           <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
         </a>
       </div>
+
       <div class="nav-links">
-        <a href="/Noticias" class="nav-link">Noticias</a>
-        <a href="/Calendario" class="nav-link">Calendario</a>
-        <a href="/Tienda" class="nav-link">Tienda</a>
-        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-        <a href="/Foro" class="nav-link">Foro</a>
+
+           <!-- Secciones para lo usuarios y no usuarios -->
+           <a href="/Noticias" class="nav-link">Noticias</a>
+           <a href="/Calendario" class="nav-link">Calendario</a>
+           <a href="/Tienda" class="nav-link">Tienda</a>
+           <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+           <a href="/Foro" class="nav-link">Foro</a>
+
+          <!-- Secciones para entrenadores -->
+           <a v-if = "userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
+
+          <!-- Secciones para entrenadores -->
+          <a v-if = "userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
+
+
       </div>
 
       <div class="Imagenes">
-        <a class="Carrito">
+
+        <a href="#" class="Carrito">
           <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
         </a>
-        <a href="/Ajustes" class="Ajustes">
+
+        <a href= "/Ajustes" class="Ajustes">
           <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
         </a>
+
         <a href= "/Perfil" class="Perfil">
-                <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
         </a>
-        <a :href="'/Login'" class="Logout">
+
+        <a :href=" login ? '/Login' : '/Logout' " class="Logout">
           <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
         </a>
+
       </div>
     </nav>
 
+
+
+    
     <!-- Contenido principal -->
     <div class="container">
       <div class="header-section">
@@ -88,7 +107,7 @@
                 <p class="noticia-excerpt">{{ truncateText(noticia.description, 120) }}</p>
                 <div class="noticia-meta">
                   <span class="author-name">{{ noticia.author }}</span>
-                  <span class="noticia-date">{{ noticia.date }}</span>
+                  <span class="noticia-date">{{ formatDateForDisplay(noticia.parsedDate) }}</span>
                 </div>
               </div>
               <button class="read-more">Leer más <span class="arrow">→</span></button>
@@ -206,31 +225,66 @@ export default {
   methods: {
 
     async cargarNoticias() {
-      this.isLoading = true;
-      this.errorMessage = '';
-      try {
-        const [futbol, baloncesto, beisbol, volleyball, swimming] = await Promise.all([
-          axios.get('/futbol_news'),
-          axios.get('/basketball_news'),
-          axios.get('/baseball_news'),
-          axios.get('/volleyball_news'),
-          axios.get('/swimming_news')
-        ]);
-        this.noticias = [
-          ...futbol.data.futbol_news.map(n => ({ ...n, categoria: 'futbol' })),
-          ...baloncesto.data.basketball_news.map(n => ({ ...n, categoria: 'baloncesto' })),
-          ...beisbol.data.baseball_news.map(n => ({ ...n, categoria: 'beisbol' })),
-          ...volleyball.data.volleyball_news.map(n => ({ ...n, categoria: 'volleyball' })),
-          ...swimming.data.swimming_news.map(n => ({ ...n, categoria: 'swimming' })),
-        ];
-        this.filtrarNoticias();
-      } catch (error) {
-        console.error('Error al cargar noticias:', error);
-        this.errorMessage = 'Error al cargar noticias. Por favor, inténtalo de nuevo más tarde.';
-      } finally {
-        this.isLoading = false;
-      }
-    },
+          this.isLoading = true;
+          this.errorMessage = '';
+          try {
+            const [futbol, baloncesto, beisbol, volleyball, swimming] = await Promise.all([
+              axios.get('/futbol_news'),
+              axios.get('/basketball_news'),
+              axios.get('/baseball_news'),
+              axios.get('/volleyball_news'),
+              axios.get('/swimming_news')
+            ]);
+            
+            // Procesar cada categoría con debug
+            const processCategory = (news, category) => {
+              return news.map(n => {
+                const parsedDate = this.parseDate(n.date, category);
+                console.log(`Original: ${n.date}, Parsed: ${parsedDate}, Category: ${category}`);
+                return {
+                  ...n,
+                  categoria: category,
+                  parsedDate: parsedDate
+                };
+              });
+            };
+            
+            this.noticias = [
+              ...processCategory(futbol.data.futbol_news, 'futbol'),
+              ...processCategory(baloncesto.data.basketball_news, 'baloncesto'),
+              ...processCategory(beisbol.data.baseball_news, 'beisbol'),
+              ...processCategory(volleyball.data.volleyball_news, 'volleyball'),
+              ...processCategory(swimming.data.swimming_news, 'swimming'),
+            ];
+            
+            // Debug antes de ordenar
+            console.log("Noticias antes de ordenar:", this.noticias.map(n => ({
+              title: n.title,
+              originalDate: n.date,
+              parsedDate: n.parsedDate,
+              formatted: this.formatDateForDisplay(n.parsedDate)
+            })));
+            
+            // Ordenar por fecha (más reciente primero)
+            this.noticias.sort((a, b) => b.parsedDate - a.parsedDate);
+            
+            // Debug después de ordenar
+            console.log("Noticias después de ordenar:", this.noticias.map(n => ({
+              title: n.title,
+              formattedDate: this.formatDateForDisplay(n.parsedDate)
+            })));
+            
+            this.filtrarNoticias();
+          } catch (error) {
+            console.error('Error al cargar noticias:', error);
+            this.errorMessage = 'Error al cargar noticias. Por favor, inténtalo de nuevo más tarde.';
+          } finally {
+            this.isLoading = false;
+          }
+        },
+
+
+
 
     filtrarNoticias() {
       this.noticiasFiltradas = this.deporteSeleccionado === 'todos'
@@ -276,9 +330,108 @@ export default {
       return desc
         .replace(/\n/g, '<br>')
         .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+    },
+
+
+    parseDate(dateStr, category) {
+    if (!dateStr) return new Date(0); // Fecha mínima si no hay fecha
+    
+    // Limpiar la cadena de fecha
+    dateStr = dateStr.trim();
+    
+    try {
+      switch(category) {
+        case 'futbol': // "7 de enero de 2025"
+          const partsFutbol = dateStr.split(' de ');
+          if (partsFutbol.length !== 3) return new Date(0);
+          const dayFutbol = parseInt(partsFutbol[0]);
+          const monthFutbol = this.getMonthNumber(partsFutbol[1]);
+          const yearFutbol = parseInt(partsFutbol[2]);
+          if (isNaN(dayFutbol)) return new Date(0);
+          return new Date(yearFutbol, monthFutbol, dayFutbol);
+          
+        case 'baloncesto': // "domingo 04 mayo, 2025"
+          const partsBaloncesto = dateStr.split(' ');
+          if (partsBaloncesto.length < 4) return new Date(0);
+          const dayBaloncesto = parseInt(partsBaloncesto[1]);
+          const monthBaloncesto = this.getMonthNumber(partsBaloncesto[2].replace(',', ''));
+          const yearBaloncesto = parseInt(partsBaloncesto[3]);
+          if (isNaN(dayBaloncesto)) return new Date(0);
+          return new Date(yearBaloncesto, monthBaloncesto, dayBaloncesto);
+          
+        case 'beisbol': // "06/05/2025   ·   01:31 PM"
+          const [datePart] = dateStr.split('·').map(s => s.trim());
+          const datePartsBeisbol = datePart.split('/');
+          if (datePartsBeisbol.length !== 3) return new Date(0);
+          const dayBeisbol = parseInt(datePartsBeisbol[0]);
+          const monthBeisbol = parseInt(datePartsBeisbol[1]) - 1;
+          const yearBeisbol = parseInt(datePartsBeisbol[2]);
+          if (isNaN(dayBeisbol) || isNaN(monthBeisbol)) return new Date(0);
+          return new Date(yearBeisbol, monthBeisbol, dayBeisbol);
+          
+        case 'volleyball': // "May 5, 2025"
+          const partsVolleyball = dateStr.split(' ');
+          if (partsVolleyball.length < 3) return new Date(0);
+          const monthVolleyball = this.getMonthNumber(partsVolleyball[0]);
+          const dayVolleyball = parseInt(partsVolleyball[1].replace(',', ''));
+          const yearVolleyball = parseInt(partsVolleyball[2]);
+          if (isNaN(dayVolleyball)) return new Date(0);
+          return new Date(yearVolleyball, monthVolleyball, dayVolleyball);
+          
+        case 'swimming': // "agosto 22, 2024"
+          const partsSwimming = dateStr.split(' ');
+          if (partsSwimming.length < 3) return new Date(0);
+          const monthSwimming = this.getMonthNumber(partsSwimming[0]);
+          const daySwimming = parseInt(partsSwimming[1].replace(',', ''));
+          const yearSwimming = parseInt(partsSwimming[2]);
+          if (isNaN(daySwimming)) return new Date(0);
+          return new Date(yearSwimming, monthSwimming, daySwimming);
+          
+        default:
+          return new Date(dateStr) || new Date(0);
+      }
+    } catch (e) {
+      console.error(`Error parsing date (${category}): "${dateStr}"`, e);
+      return new Date(0);
     }
   },
   
+  getMonthNumber(monthName) {
+    if (!monthName) return 0;
+    
+    const months = {
+      'enero': 0, 'january': 0, 'jan': 0,
+      'febrero': 1, 'february': 1, 'feb': 1,
+      'marzo': 2, 'march': 2, 'mar': 2,
+      'abril': 3, 'april': 3, 'apr': 3,
+      'mayo': 4, 'may': 4,
+      'junio': 5, 'june': 5, 'jun': 5,
+      'julio': 6, 'july': 6, 'jul': 6,
+      'agosto': 7, 'august': 7, 'aug': 7,
+      'septiembre': 8, 'september': 8, 'sep': 8, 'setiembre': 8,
+      'octubre': 9, 'october': 9, 'oct': 9,
+      'noviembre': 10, 'november': 10, 'nov': 10,
+      'diciembre': 11, 'december': 11, 'dec': 11
+    };
+    
+    const normalizedMonth = monthName.toLowerCase().replace(',', '').trim();
+    return months[normalizedMonth] ?? 0;
+  },
+
+  formatDateForDisplay(dateObj) {
+    if (!dateObj || !(dateObj instanceof Date)) return 'Fecha desconocida';
+    
+    // Verificar si la fecha es válida
+    if (isNaN(dateObj.getTime())) return 'Fecha inválida';
+    
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return dateObj.toLocaleDateString('es-ES', options);
+  },
+
+
+
+
+  },
   mounted() {
     this.cargarNoticias();
     document.title = 'Noticias';
