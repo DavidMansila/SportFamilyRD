@@ -35,32 +35,6 @@ class Post extends Model
 }
 
 
-class Comment extends Model
-{
-    use HasFactory;
-
-    protected $fillable = ['post_id', 'texto', 'fecha'];
-
-    public function post()
-    {
-        return $this->belongsTo(Post::class);
-    }
-
-    public function replies()
-    {
-        return $this->hasMany(Reply::class);
-    }
-}
 
 
-class Reply extends Model
-{
-    use HasFactory;
 
-    protected $fillable = ['comment_id', 'texto', 'fecha' ];
-
-    public function comment()
-    {
-        return $this->belongsTo(Comment::class);
-    }
-}

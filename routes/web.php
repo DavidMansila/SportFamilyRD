@@ -72,6 +72,8 @@ Route::resource('/products', ProductController::class);
 
 //Foro
 Route::get('/foro/example', [PostController::class, 'exampleFunction']);
+Route::get('/post/get-reply', [PostController::class, 'getReply']);
+Route::post('/post/create-reply', [PostController::class, 'createReply']);
 //destroyComment, updateComment createComment
 Route::post('/post/create-comment', [PostController::class, 'createComment']);
 Route::put('/post/update-comment', [PostController::class, 'updateComment']);
