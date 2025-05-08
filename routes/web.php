@@ -70,15 +70,18 @@ Route::resource('/news', NewsController::class);
 Route::resource('/products', ProductController::class);
 
 
-//Foro
-Route::get('/foro/example', [PostController::class, 'exampleFunction']);
-//destroyComment, updateComment createComment
-Route::post('/post/create-comment', [PostController::class, 'createComment']);
-Route::put('/post/update-comment', [PostController::class, 'updateComment']);
-Route::delete('/post/delete-comment', [PostController::class, 'destroyComment']);
+//posts
 Route::resource('/post', PostController::class);
+//comentarios
+Route::post('/post/create-comment', [PostController::class, 'createComment']);
+Route::put('/post/update-comment/{commentId}', [PostController::class, 'updateComment']);
+Route::delete('/post/delete-comment/{commentId}', [PostController::class, 'destroyComment']);
 
-
+//respuestas
+Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
+Route::post('/post/create-reply/{commentId}', [PostController::class, 'createReply']);
+Route::post('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
+Route::post('/post/destroy-reply/{replyId}', [PostController::class, 'destroyReply']);
 
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);

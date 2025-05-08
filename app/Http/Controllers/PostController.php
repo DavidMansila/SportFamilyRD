@@ -29,25 +29,6 @@ class PostController extends Controller
         }
     
     }
-    public function exampleFunction()
-    {
-        try {
-            // $posts = Post::with('comments')->get();
-            $posts = Post::all();
-
-            return response()->json([
-                'message' => 'Posts recibidos exitosamente',
-                'posts' => $posts,
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al obtener los posts',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    
-    }
 
     public function store(Request $request)
     {
@@ -164,4 +145,80 @@ class PostController extends Controller
             ], 500);
         }
     }
+
+    public function getReply($commentId)
+    {
+        try {
+            $comment = Comment::with('replies')->findOrFail($commentId);
+
+            return response()->json([
+                'message' => 'Respuestas obtenidas exitosamente',
+                'replies' => $comment->replies,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener las respuestas',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function createReply(Request $request, $commentId)
+    {
+        try {
+            $comment = Comment::findOrFail($commentId);
+
+            $reply = $comment->replies()->create($request->all());
+
+            return response()->json([
+                'message' => 'Respuesta creada exitosamente',
+                'reply' => $reply,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear la respuesta',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateReply(Request $request, $replyId)
+    {
+        try {
+            $reply = Comment::findOrFail($replyId);
+            $reply->update($request->all());
+
+            return response()->json([
+                'message' => 'Respuesta actualizada exitosamente',
+                'reply' => $reply,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar la respuesta',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroyReply($replyId)
+    {
+        try {
+            $reply = Comment::findOrFail($replyId);
+            $reply->delete();
+
+            return response()->json([
+                'message' => 'Respuesta eliminada exitosamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al eliminar la respuesta',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
