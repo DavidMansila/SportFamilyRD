@@ -29,25 +29,6 @@ class PostController extends Controller
         }
     
     }
-    public function exampleFunction()
-    {
-        try {
-            // $posts = Post::with('comments')->get();
-            $posts = Post::all();
-
-            return response()->json([
-                'message' => 'Posts recibidos exitosamente',
-                'posts' => $posts,
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al obtener los posts',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    
-    }
 
     public function store(Request $request)
     {

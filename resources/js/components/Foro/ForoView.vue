@@ -946,16 +946,16 @@ export default {
       }
     },
 
+
     async submitReply() {
       try {
         if (this.editandoComentario) {
-          await axios.put(`/post/comment/${this.editandoComentario.id}`, {
+          await axios.put(`/post/update-comment/${this.editandoComentario.id}`, {
             texto: this.nuevoComentario
           });
           this.$toast.success('Respuesta actualizada');
         } else {
-          await axios.post('/post/create-reply', {
-            comment_id: this.comentarioRespondiendo,
+          await axios.post(`/post/create-reply/${this.comentarioRespondiendo}`, {
             texto: this.nuevoComentario
           });
           this.$toast.success('Respuesta enviada');
