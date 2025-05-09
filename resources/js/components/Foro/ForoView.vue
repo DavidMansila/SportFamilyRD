@@ -752,9 +752,6 @@ export default {
       reader.readAsDataURL(file);
     },
 
-    
-
-
 
 
     // METODOS PARA COMENTARIOS
@@ -819,10 +816,6 @@ export default {
         alert(`Error al guardar: ${error.response?.data?.message || error.message}`);
       }
     },
-
-
-
-
 
 
 
@@ -936,7 +929,7 @@ abrirEditarModal(post) {
     this.modoEdicion = true;
     this.mostrarModal = true;
     this.nuevoPost = {
-      id: post.id, // Asegurar que se incluye el ID
+      id: post.id,
       titulo: post.titulo,
       contenido: post.contenido,
       categoria: post.categoria,
@@ -975,11 +968,11 @@ async guardarComentarioEditado() {
     if (this.editandoComentario.isReply) {
       // Es una respuesta
       endpoint = `/post/update-reply/${this.editandoComentario.id}`;
-      method = 'post'; // Según tus rutas usas POST para update-reply
+      method = 'post'; // POST para update-reply
     } else {
       // Es un comentario principal
       endpoint = `/post/update-comment/${this.editandoComentario.id}`;
-      method = 'put'; // Según tus rutas usas PUT para update-comment
+      method = 'put'; // PUT para update-comment
     }
 
     const response = await axios[method](endpoint, {
@@ -1021,11 +1014,11 @@ async eliminarComentario(comentario) {
       if (comentario.parent_id) {
         // Es una respuesta
         endpoint = `/post/destroy-reply/${comentario.id}`;
-        method = 'post'; // Según tus rutas usas POST para destroy-reply
+        method = 'post'; // POST para destroy-reply
       } else {
         // Es un comentario principal
         endpoint = `/post/delete-comment/${comentario.id}`;
-        method = 'delete'; // Según tus rutas usas DELETE para delete-comment
+        method = 'delete'; // DELETE para delete-comment
       }
 
       const response = await axios[method](endpoint, {
