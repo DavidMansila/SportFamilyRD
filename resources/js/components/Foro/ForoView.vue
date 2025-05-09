@@ -80,6 +80,7 @@
           </svg>
         </button>
       </div>
+      
       <div class="filtros-categorias">
         <button 
           @click="cambiarCategoria('')" 
@@ -139,14 +140,14 @@
 
       <div 
         v-else
-        v-for="(post, index) in postsFiltrados" 
+        v-for="(post, index) in postsPaginados" 
         :key="index" 
         class="post-card"
         :style="`--hue: ${index * 60 % 360}`"
       >
-        <div class="post-categoria" :style="{backgroundColor: `hsl(${index * 60 % 360}, 70%, 50%)`}">
-          {{ post.categoria || 'General' }}
-        </div>
+      <div class="post-categoria" :style="{backgroundColor: categoryColor(post.categoria)}">
+        {{ post.categoria || 'General' }}
+      </div>
         <div class="post-header">
           <h3 class="post-titulo">{{ post.titulo }}</h3>
         
@@ -173,12 +174,15 @@
         <div class="post-footer">
           <div class="post-stats">
             <span class="post-likes">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-              </svg>
-              {{ post.likes_quantity }}
-            </span>
-            <span class="post-comments">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                    :stroke="post.isLiked ? 'currentColor' : 'currentColor'"
+                    :fill="post.isLiked ? 'currentColor' : 'none'" 
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                </svg>
+                {{ post.likes_quantity }}
+              </span>
+            <span class="post-comments" @click.stop="abrirPopoutYFocalizarComentario(post)">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
@@ -203,13 +207,32 @@
         <div class="post-popout-container">
           <!-- Contenedor principal -->
           <div class="post-popout-content">
+
+
             <!-- Sección de imagen -->
             <div class="post-popout-media">
+
+              <!-- Sección de body -->
+              <div class="post-popout-body">
+                <h2 class="post-popout-title">{{ postSeleccionado.titulo }}</h2>
+              </div>
+
               <div class="image-container">
                 <img :src="postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
               </div>
+
+
+              <div class="post-popout-body">
+                <p class="post-popout-text">{{ postSeleccionado.contenido }}</p>
+                <div class="post-meta-info">
+                  <span class="post-date">{{ formatDate(postSeleccionado.created_at) }}</span>
+                  <span class="post-visibility">Público</span>
+                </div>
+              </div>
+
+
               <div class="post-interactions">
-                <button @click="toggleLike" class="interaction-btn like-btn" :class="{ liked: postSeleccionado.isLiked }">
+                <button @click="likePost" class="interaction-btn like-btn" :class="{ liked: postSeleccionado.isLiked }">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
@@ -241,6 +264,24 @@
                     </span>
                   </div>
                 </div>
+
+                <!-- EDITAR Y ELIMINAR POST | HAY QUE PONER QUE SI EL ID DEL USUARIO COINCIDE CON EL ID DEL USUARIO DEL POST PUES PUEDE EDITAR Y ELIMINAR DICHO POST-->
+                <div class="post-actions" v-if="isPostAuthor(postSeleccionado)">
+                  <button @click="abrirEditarModal(postSeleccionado)" class="edit-post-btn" title="Editar post">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button @click="confirmarEliminarPost" class="delete-post-btn" title="Eliminar post">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+
+
                 <button @click="cerrarPopout" class="close-popout-btn" :class="{ 'hidden': inputFocused }">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -251,17 +292,6 @@
 
               
               <!-- Contenido del post -->
-              <div class="post-popout-body">
-                <h2 class="post-popout-title">{{ postSeleccionado.titulo }}</h2>
-                <p class="post-popout-text">{{ postSeleccionado.contenido }}</p>
-                <div class="post-meta-info">
-                  <span class="post-date">{{ formatDate(postSeleccionado.created_at) }}</span>
-                  <span class="post-visibility">Público</span>
-                </div>
-              </div>
-              
-
-
               <!-- Sección de comentarios -->
               <div class="post-comments-section">
                 <h4 class="comments-title">
@@ -272,20 +302,16 @@
                 </h4>
                 
                 <div class="comments-container" ref="commentsContainer">
-
-
-
-
                   <!-- Comentarios principales -->
                   <div v-for="(comentario) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
                       <div class="comment-avatar-placeholder">
-                        <span>U{{ comentario.userId % 100 }}</span>
+                        <span>U{{ comentario.userId }}</span>
                       </div>
                     </div>
                     <div class="comment-content">
                       <div class="comment-header">
-                        <span class="comment-author">Usuario{{ comentario.user?.id || comentario.userId || 'Anónimo' }}</span>
+                        <span class="comment-author"> {{ comentario.user?.id || comentario.userId || '' }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button 
                           v-if="comentario.respuestas && comentario.respuestas.length > 0"
@@ -319,7 +345,7 @@
                      class="comment-item reply-item">
                   <div class="comment-avatar-wrapper">
                     <div class="comment-avatar-placeholder">
-                      <span>Usuario{{ respuesta.user?.id || respuesta.userId || 'Anónimo' }}</span>
+                      <span>{{ respuesta.user?.id || respuesta.userId || '' }}</span>
                     </div>
                   </div>
                   <div class="comment-content">
@@ -405,95 +431,115 @@
       </svg>
     </button>
 
-    <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
-  <div class="modal-container">
-    <div class="modal-header">
-      <h2>Crear nuevo post</h2>
-      <button @click="cerrarModal" class="modal-close-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
+
     
-    <div class="modal-content-wrapper">
-      <form @submit.prevent="createPost()" class="modal-form">
-        <div class="form-group">
-          <label for="titulo">Título</label>
-          <input
-            v-model="nuevoPost.titulo"
-            id="titulo"
-            type="text"
-            placeholder="¿De qué quieres hablar?"
-            required
-          />
+        <!-- Modal para crear/editar post -->
+        <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>{{ modoEdicion ? 'Editar post' : 'Crear nuevo post' }}</h2>
+          <button @click="cerrarModal" class="modal-close-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
+        
+        <div class="modal-content-wrapper">
+          <form @submit.prevent="submitPost" class="modal-form">
+            <div class="form-group">
+              <label for="titulo">Título</label>
+              <input
+                v-model="nuevoPost.titulo"
+                id="titulo"
+                type="text"
+                placeholder="¿De qué quieres hablar?"
+                required
+              />
+            </div>
 
-        <div class="form-group">
-          <label for="contenido">Contenido</label>
-          <textarea
-            v-model="nuevoPost.contenido"
-            id="contenido"
-            placeholder="Comparte tus ideas, preguntas o experiencias..."
-            rows="5"
-            required
-          ></textarea>
-        </div>
+            <div class="form-group">
+              <label for="contenido">Contenido</label>
+              <textarea
+                v-model="nuevoPost.contenido"
+                id="contenido"
+                placeholder="Comparte tus ideas, preguntas o experiencias..."
+                rows="5"
+                required
+              ></textarea>
+            </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="categoria">Categoría</label>
-            <select v-model="nuevoPost.categoria" id="categoria" required>
-              <option value="">Selecciona una categoría</option>
-              <option value="Deporte">Deporte</option>
-              <option value="Gym">Gym</option>
-              <option value="Experiencia">Experiencia</option>
-              <option value="Lugares">Lugares</option>
-            </select>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="categoria">Categoría</label>
+                <select v-model="nuevoPost.categoria" id="categoria" required>
+                  <option value="">Selecciona una categoría</option>
+                  <option value="Deporte">Deporte</option>
+                  <option value="Gym">Gym</option>
+                  <option value="Experiencia">Experiencia</option>
+                  <option value="Lugares">Lugares</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="file-upload-label">
+                <input
+                  type="file"
+                  id="imagen"
+                  @change="handleFileSelect"
+                  accept="image/*"
+                  class="file-upload-input"
+                />
+                <span class="file-upload-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  Subir imagen
+                </span>
+                <span v-if="nuevoPost.imagenFile" class="file-upload-name">
+                  {{ nuevoPost.imagenFile.name }}
+                </span>
+                <span v-else-if="modoEdicion && postSeleccionado?.imagen" class="file-upload-name">
+                  Imagen actual: {{ postSeleccionado.imagen.split('/').pop() }}
+                </span>
+              </label>
+              <button 
+                v-if="modoEdicion && postSeleccionado?.imagen" 
+                @click.prevent="eliminarImagen" 
+                class="btn-eliminar-imagen"
+              >
+                Eliminar imagen
+              </button>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
+              <button type="submit" class="btn btn-primary">
+                {{ modoEdicion ? 'Actualizar post' : 'Publicar post' }}
+              </button>
+            </div>
+          </form>
+
+          <!-- Vista previa externa -->
+          <div v-if="mostrarModal && (imagenMiniatura || (modoEdicion && postSeleccionado?.imagen))" class="external-preview">
+            <img :src="imagenMiniatura || postSeleccionado.imagen" alt="Previsualización" class="preview-image">
           </div>
         </div>
-
-        <div class="form-group">
-          <label class="file-upload-label">
-            <input
-              type="file"
-              id="imagen"
-              @change="handleFileSelect"
-              accept="image/*"
-              class="file-upload-input"
-            />
-            <span class="file-upload-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-              Subir imagen
-            </span>
-            <span v-if="nuevoPost.imagenFile" class="file-upload-name">
-              {{ nuevoPost.imagenFile.name }}
-            </span>
-          </label>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" @click="cerrarModal" class="btn btn-secondary">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Publicar</button>
-        </div>
-      </form>
-      
-
-        <!-- Vista previa externa -->
-     <div v-if="mostrarModal && imagenMiniatura" class="external-preview">
-        <img :src="imagenMiniatura" alt="Previsualización" class="preview-image">
+      </div>
     </div>
 
-    </div>
-  </div>
-</div>
-
-
+            <!-- Paginación -->
+            <paginatorComponent
+        v-model="currentPage"
+        :total-items="postsFiltrados.length"
+        :items-per-page="itemsPerPage"
+        :max-pages-shown="5"
+        @page-changed="handlePageChange"
+      />
 
   </div>
 </template>
@@ -502,13 +548,20 @@
 
 
 <script>
-
 import axios from 'axios';
+import paginatorComponent from '@/components/paginatorComponent.vue';
 
 export default {
   name: 'ForoComponent',
+  components: {
+    paginatorComponent,
+  },
   data() {
     return {
+      currentPage: 1,
+      itemsPerPage: 9,
+
+
       posts: [],
       postsFiltrados: [],
       categoriaSeleccionada: '',
@@ -526,10 +579,27 @@ export default {
       inputFocused: false,
       nuevoComentario: '',
       comentariosExpandidos: [],
-      comentarioRespondiendo: null
+      comentarioRespondiendo: null,
+
+
+      modoEdicion: false,
+      editandoComentario: null
     };
   },
 
+  computed: {
+    
+  postsPaginados() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.postsFiltrados.slice(start, end);
+
+  },
+
+  totalPages() {
+    return Math.ceil(this.postsFiltrados.length / this.itemsPerPage);
+  }
+},
 
   methods: {
     // Métodos de UI
@@ -543,6 +613,18 @@ export default {
       this.nuevoPost = { titulo: '', contenido: '', categoria: '', imagenFile: null };
       this.imagenMiniatura = null;
       document.body.style.overflow = 'auto';
+    },
+
+    
+    handlePageChange(newPage) {
+      this.currentPage = newPage;
+
+      this.$nextTick(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
     },
 
 
@@ -589,6 +671,24 @@ export default {
       });
     },
 
+    abrirPopoutYFocalizarComentario(post) {
+    this.abrirPopout(post);
+    this.$nextTick(() => {
+      // Espera a que el popout esté renderizado
+      setTimeout(() => {
+        const input = this.$refs.comentarioInput;
+        if (input) {
+          input.focus();
+          // Desplázate al área de comentarios
+          const container = this.$refs.commentsContainer;
+          if (container) {
+            container.scrollTop = container.scrollHeight;
+          }
+        }
+      }, 300);
+    });
+  },
+
 
 
 
@@ -619,21 +719,21 @@ export default {
     async getPost() {
       try {
         const response = await axios.get('/post');
-        // Ordenar posts por fecha descendente
+        // Ordenar posts por fecha descendente (se mantiene igual)
         this.posts = response.data.posts.sort((a, b) => {
           return new Date(b.created_at) - new Date(a.created_at);
         }).map(post => ({
           ...post,
           comments: post.comments
-          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Orden descendente
-          .map(comment => ({
-          ...comment,
-            // Ordenar respuestas por fecha descendente
-            respuestas: comment.replies ? comment.replies.sort((a, b) => 
-          new Date(a.created_at) - new Date(b.created_at))
-            : [],
-            user: { id: comment.user_id }
-          }))
+            // Orden descendente para comentarios principales (se mantiene)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .map(comment => ({
+              ...comment,
+              // CORRECCIÓN: Ordenar respuestas por fecha descendente (se cambia el orden)
+              respuestas: (comment.replies || []).sort((a, b) => 
+                new Date(b.created_at) - new Date(a.created_at)), // Cambiado a b - a
+              user: { id: comment.user_id }
+            }))
         }));
         this.postsFiltrados = [...this.posts];
       } catch (error) {
@@ -658,7 +758,8 @@ export default {
 
 
 
-    // Métodos para Comentarios
+    // METODOS PARA COMENTARIOS
+
     async addComment() {
       if (!this.nuevoComentario.trim()) return;
 
@@ -728,10 +829,11 @@ export default {
 
 
 
-    // Métodos para Likes
-    async toggleLike() {
+    // METODOS PARA LIKES
+
+    async likePost() {
       try {
-        const response = await axios.post(`/post/${this.postSeleccionado.id}/likes_quantity`);
+        const response = await axios.post(`/post/{post}/likes_quantity${this.postSeleccionado.id}`);
         this.postSeleccionado.likes_quantity = response.data.likes_quantity;
         this.postSeleccionado.isLiked = !this.postSeleccionado.isLiked;
       } catch (error) {
@@ -742,7 +844,7 @@ export default {
     async likeComentario(commentId) {
       try {
         const comment = this.findCommentById(commentId);
-        const response = await axios.post(`/post/comment/${commentId}/like_quantity`);
+        const response = await axios.post(`/post/{comment}/likes_quantity${commentId}`);
         comment.likes = response.data.likes_quantity;
         comment.isLiked = !comment.isLiked;
       } catch (error) {
@@ -757,13 +859,218 @@ export default {
 
 
 
+      // METODOS PARA EDITAR Y ELIMINAR EN POST
+
+      isPostAuthor(post) {
+      // Implementa según tu sistema de autenticación
+      // Ejemplo: return post.userId === this.$store.state.user.id;
+      return true; // Cambiar según tu lógica
+    },
+
+    isCommentAuthor(comment) {
+      // Implementa según tu sistema de autenticación
+      // Ejemplo: return comment.userId === this.$store.state.user.id;
+      return true; // Cambiar según tu lógica
+    },
+
+async editarPost() {
+  try {
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    formData.append('titulo', this.nuevoPost.titulo);
+    formData.append('contenido', this.nuevoPost.contenido);
+    formData.append('categoria', this.nuevoPost.categoria);
+    
+    if (this.nuevoPost.imagenFile) {
+      formData.append('imagen', this.nuevoPost.imagenFile);
+    }
+
+    const response = await axios.post(`/post/${this.nuevoPost.id}`, formData);
+    
+    // Actualizar lista de posts
+    const index = this.posts.findIndex(p => p.id === response.data.post.id);
+    this.posts.splice(index, 1, response.data.post);
+    
+    // Cerrar modal y popup
+    this.cerrarModal();
+    this.postSeleccionado = null; // Cierra el popup
+    this.$nextTick(() => {
+      this.postsFiltrados = [...this.posts]; // Actualizar posts filtrados
+    });
+
+  } catch (error) {
+    console.error('Error:', error.response?.data);
+    alert(error.response?.data?.message || 'Error al editar');
+  }
+},
 
 
+    async confirmarEliminarPost() {
+  if (confirm('¿Estás seguro de eliminar este post?')) {
+    try {
+      const postId = this.postSeleccionado.id;
+      
+      const response = await axios.delete(`/post/${postId}`);
+      
+      if (response.status === 200) {
+        // Eliminar de los arrays principales
+        this.posts = this.posts.filter(p => p.id !== postId);
+        this.postsFiltrados = this.postsFiltrados.filter(p => p.id !== postId);
+        
+        // Cerrar el popup
+        this.cerrarPopout();
+        
+        // Forzar actualización del paginador
+        this.currentPage = Math.min(this.currentPage, Math.ceil(this.postsFiltrados.length / this.itemsPerPage));
+      }
+    } catch (error) {
+      console.error('Error eliminando post:', error.response?.data || error.message);
+      alert('No se pudo eliminar el post');
+    }
+  }
+},
+
+
+abrirEditarModal(post) {
+    this.modoEdicion = true;
+    this.mostrarModal = true;
+    this.nuevoPost = {
+      id: post.id, // Asegurar que se incluye el ID
+      titulo: post.titulo,
+      contenido: post.contenido,
+      categoria: post.categoria,
+      imagenFile: null
+    };
+    this.imagenMiniatura = post.imagen;
+  },
+
+
+
+
+  
+
+        // METODOS PARA EDITAR Y ELIMINAR EN COMENTARIOS
+
+
+async editarComentario(comentario) {
+  this.nuevoComentario = comentario.texto;
+  this.editandoComentario = { 
+    id: comentario.id,
+    isReply: !!comentario.parent_id // Para saber si es una respuesta
+  };
+  this.comentarioRespondiendo = null;
+  this.$nextTick(() => {
+    this.$refs.comentarioInput?.focus();
+  });
+},
+
+
+async guardarComentarioEditado() {
+  if (!this.nuevoComentario.trim() || !this.editandoComentario) return;
+
+  try {
+    let endpoint, method;
+    
+    if (this.editandoComentario.isReply) {
+      // Es una respuesta
+      endpoint = `/post/update-reply/${this.editandoComentario.id}`;
+      method = 'post'; // Según tus rutas usas POST para update-reply
+    } else {
+      // Es un comentario principal
+      endpoint = `/post/update-comment/${this.editandoComentario.id}`;
+      method = 'put'; // Según tus rutas usas PUT para update-comment
+    }
+
+    const response = await axios[method](endpoint, {
+      texto: this.nuevoComentario
+    }, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (response.data.success) {
+      await this.getPost();
+      
+      // Actualizar el post seleccionado si estamos viendo uno
+      if (this.postSeleccionado) {
+        const updatedPost = this.posts.find(p => p.id === this.postSeleccionado.id);
+        if (updatedPost) {
+          this.postSeleccionado = { ...updatedPost };
+        }
+      }
+      
+      this.nuevoComentario = '';
+      this.editandoComentario = null;
+      this.$toast.success('Comentario actualizado');
+    }
+  } catch (error) {
+    console.error('Error al editar comentario:', error);
+    this.$toast.error(error.response?.data?.message || 'Error al editar el comentario');
+  }
+},
+
+
+
+async eliminarComentario(comentario) {
+  if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+    try {
+      let endpoint, method;
+      
+      if (comentario.parent_id) {
+        // Es una respuesta
+        endpoint = `/post/destroy-reply/${comentario.id}`;
+        method = 'post'; // Según tus rutas usas POST para destroy-reply
+      } else {
+        // Es un comentario principal
+        endpoint = `/post/delete-comment/${comentario.id}`;
+        method = 'delete'; // Según tus rutas usas DELETE para delete-comment
+      }
+
+      const response = await axios[method](endpoint, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.data.success) {
+        await this.getPost();
+        
+        // Actualizar el post seleccionado si estamos viendo uno
+        if (this.postSeleccionado) {
+          const updatedPost = this.posts.find(p => p.id === this.postSeleccionado.id);
+          if (updatedPost) {
+            this.postSeleccionado = { ...updatedPost };
+          }
+        }
+        
+        this.$toast.success('Comentario eliminado');
+      }
+    } catch (error) {
+      console.error('Error al eliminar comentario:', error);
+      this.$toast.error(error.response?.data?.message || 'Error al eliminar el comentario');
+    }
+  }
+},
+
+async submitPost() {
+    if (this.modoEdicion) {
+      await this.editarPost();
+    } else {
+      await this.createPost();
+    }
+  },
     
     
-    // Métodos auxiliares
+
+
+
+
+
+    // METODOS AUXILIARES
+
     filtrarPosts() {
-      this.postsFiltrados = this.posts.filter(post => {
+      const filtered = this.posts.filter(post => {
         const matchesCategory = this.categoriaSeleccionada 
           ? post.categoria === this.categoriaSeleccionada 
           : true;
@@ -775,7 +1082,13 @@ export default {
 
         return matchesCategory && matchesSearch;
       });
+      
+      // Resetear a la primera página cuando se filtran resultados
+      this.currentPage = 1;
+      this.postsFiltrados = filtered;
     },
+
+
 
     cambiarCategoria(categoria) {
       this.categoriaSeleccionada = categoria;
@@ -842,11 +1155,6 @@ export default {
       this.comentarioRespondiendo = null;
       this.nuevoComentario = '';
     }
-
-
-
-
-
 
 
 
