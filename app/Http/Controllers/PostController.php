@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Models\Reply;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -59,13 +60,33 @@ class PostController extends Controller
     {
         try {
             $post = Post::findOrFail($id);
-            $post->update($request->all());
-
+            
+            // Verificar autorización
+            if ($request->user()->id !== $post->user_id) {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+    
+            $data = $request->except('imagen');
+            
+            // Manejar nueva imagen
+            if ($request->hasFile('imagen')) {
+                // Eliminar imagen anterior si existe
+                if ($post->imagen) {
+                    Storage::delete('posts/'.$post->id.'/'.$post->imagen);
+                }
+                
+                $imageName = Post::addImages($request->file('imagen'), $post->id);
+                $data['imagen'] = $imageName;
+            }
+    
+            $post->update($data);
+            $post->imagen = url('storage/posts/' . $post->id . '/' . $post->imagen);
+    
             return response()->json([
                 'message' => 'Post actualizado exitosamente',
-                'post' => $post,
+                'post' => $post, // Incluir URL completa de la imagen
             ], 200);
-
+    
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al actualizar el post',
@@ -74,16 +95,27 @@ class PostController extends Controller
         }
     }
 
+
+    
     public function destroy($id)
     {
         try {
             $post = Post::findOrFail($id);
+            
+            // Verificar autorización
+            // if (auth()->user()->id !== $post->user_id) {
+            //     return response()->json(['message' => 'No autorizado'], 403);
+            // }
+    
+            // Eliminar directorio de imágenes
+            Storage::deleteDirectory('posts/'.$post->id);
+            
             $post->delete();
-
+    
             return response()->json([
                 'message' => 'Post eliminado exitosamente',
             ], 200);
-
+    
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al eliminar el post',
@@ -91,6 +123,8 @@ class PostController extends Controller
             ], 500);
         }
     }
+
+
 
     public function createComment(Request $request)
     {

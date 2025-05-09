@@ -70,18 +70,19 @@ Route::resource('/news', NewsController::class);
 Route::resource('/products', ProductController::class);
 
 
-//posts
+// Posts
 Route::post('/post', [PostController::class, 'store']);
 Route::get('/post', [PostController::class, 'index']);
-
+Route::put('/post/{post}', [PostController::class, 'update']);
+Route::delete('/post/{post}', [PostController::class, 'destroy']);
 Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);
 
-//comentarios
+// Comentarios
 Route::post('/post/create-comment', [PostController::class, 'createComment']);
 Route::put('/post/update-comment/{commentId}', [PostController::class, 'updateComment']);
 Route::delete('/post/delete-comment/{commentId}', [PostController::class, 'destroyComment']);
 
-//respuestas
+// Respuestas
 Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
 Route::post('/post/create-reply/{commentId}', [PostController::class, 'createReply']);
 Route::post('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
