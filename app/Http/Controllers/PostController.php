@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use App\Models\Reply;
 
 class PostController extends Controller
 {
@@ -12,7 +13,7 @@ class PostController extends Controller
     {
         try {
             // $posts = Post::with('comments')->get();
-            $posts = Post::with('comments')->get()->map(function ($post) {
+            $posts = Post::with(['comments.replies'])->get()->map(function ($post) {
                 $post->imagen = url('storage/posts/' . $post->id . '/' . $post->imagen);
                 return $post;
             });
@@ -94,17 +95,22 @@ class PostController extends Controller
     public function createComment(Request $request)
     {
         try {
-            $comment = Comment::create($request->all());
-
+            $comment = Comment::create([
+                'texto' => $request->texto,
+                'post_id' => $request->post_id,
+            ]);
+    
             return response()->json([
+                'success' => true,
                 'message' => 'Comentario creado exitosamente',
-                'comment' => $comment,
-            ], 200);
-
+                'comment' => $comment
+            ], 201);
+    
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al crear el comentario',
-                'error' => $e->getMessage(),
+                'success' => false,
+                'message' => 'Error al crear comentario',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -167,19 +173,23 @@ class PostController extends Controller
     public function createReply(Request $request, $commentId)
     {
         try {
-            $comment = Comment::findOrFail($commentId);
-
-            $reply = $comment->replies()->create($request->all());
-
+            $reply = Reply::create([
+                'texto' => $request->texto,
+                'comment_id' => $commentId,
+                'user_id' => auth()->id()
+            ]);
+    
             return response()->json([
+                'success' => true,
                 'message' => 'Respuesta creada exitosamente',
-                'reply' => $reply,
-            ], 200);
-
+                'comment' => $reply
+            ], 201);
+    
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al crear la respuesta',
-                'error' => $e->getMessage(),
+                'success' => false,
+                'message' => 'Error al crear respuesta',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -220,5 +230,27 @@ class PostController extends Controller
             ], 500);
         }
     }
+
+    public function show($id)
+{
+    try {
+        $post = Post::with(['comments' => function($query) {
+            $query->with(['replies'])->orderBy('created_at', 'desc');
+        }])->findOrFail($id);
+
+        $post->imagen = url('storage/posts/' . $post->id . '/' . $post->imagen);
+        
+        return response()->json([
+            'message' => 'Post obtenido exitosamente',
+            'post' => $post,
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error al obtener el post',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
 
 }
