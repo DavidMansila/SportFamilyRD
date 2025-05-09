@@ -81,6 +81,8 @@ Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes'
 Route::post('/post/create-comment', [PostController::class, 'createComment']);
 Route::put('/post/update-comment/{commentId}', [PostController::class, 'updateComment']);
 Route::delete('/post/delete-comment/{commentId}', [PostController::class, 'destroyComment']);
+Route::post('/comment/{comment}/likes_quantity', [CommentController::class, 'updateLikes']);
+
 
 // Respuestas
 Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);

@@ -667,7 +667,6 @@ export default {
     focusComentario() {
       this.$nextTick(() => {
         this.$refs.comentarioInput?.focus();
-        this.scrollToBottom();
       });
     },
 
@@ -832,21 +831,23 @@ export default {
     // METODOS PARA LIKES
 
     async likePost() {
-      try {
-        const response = await axios.post(`/post/{post}/likes_quantity${this.postSeleccionado.id}`);
-        this.postSeleccionado.likes_quantity = response.data.likes_quantity;
-        this.postSeleccionado.isLiked = !this.postSeleccionado.isLiked;
-      } catch (error) {
-        console.error('Error actualizando like:', error);
-      }
-    },
+  try {
+    const response = await axios.post(`/post/${this.postSeleccionado.id}/likes_quantity`); // Usar /post/ID/likes_quantity
+    this.postSeleccionado.likes_quantity = response.data.likes_quantity;
+    this.postSeleccionado.isLiked = response.data.is_liked;
+  } catch (error) {
+    console.error('Error actualizando like:', error);
+  }
+},
 
     async likeComentario(commentId) {
       try {
         const comment = this.findCommentById(commentId);
-        const response = await axios.post(`/post/{comment}/likes_quantity${commentId}`);
+        // Usar la ruta correcta para comentarios
+        const response = await axios.post(`/comment/${commentId}/likes_quantity`);
+        // Actualizar desde la respuesta
         comment.likes = response.data.likes_quantity;
-        comment.isLiked = !comment.isLiked;
+        comment.isLiked = response.data.is_liked;
       } catch (error) {
         console.error('Error actualizando like de comentario:', error);
       }
