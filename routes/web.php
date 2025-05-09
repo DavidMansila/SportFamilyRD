@@ -71,7 +71,11 @@ Route::resource('/products', ProductController::class);
 
 
 //posts
-Route::resource('/post', PostController::class);
+Route::post('/post', [PostController::class, 'store']);
+Route::get('/post', [PostController::class, 'index']);
+
+Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);
+
 //comentarios
 Route::post('/post/create-comment', [PostController::class, 'createComment']);
 Route::put('/post/update-comment/{commentId}', [PostController::class, 'updateComment']);
@@ -86,6 +90,8 @@ Route::post('/post/destroy-reply/{replyId}', [PostController::class, 'destroyRep
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
+
+Route::get('/post/{post}', [PostController::class, 'show']);
 
 
 //scraper

@@ -198,7 +198,7 @@ export default {
   data() {
     return {
       currentPage: 1,
-      itemsPerPage: 6,
+      itemsPerPage: 9,
       noticias: [],
       noticiasFiltradas: [],
       isLoading: false,
