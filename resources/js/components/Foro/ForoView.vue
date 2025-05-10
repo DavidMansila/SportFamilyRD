@@ -311,6 +311,7 @@
                     </div>
                     <div class="comment-content">
                       <div class="comment-header">
+
                         <span class="comment-author"> {{ comentario.user?.id || comentario.userId || '' }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button 
@@ -321,6 +322,22 @@
                           {{ comentariosExpandidos.includes(comentario.id) ? 'Ocultar respuestas' : `Ver ${comentario.respuestas.length} respuesta(s)` }}
                         </button>
                       </div>
+
+
+                        <!-- Mostrar formulario de edición o texto normal -->
+                    <div v-if="comentario.id === comentarioEditando" class="edit-comment-form">
+                      <textarea 
+                        v-model="comentarioEditado" 
+                        class="comment-edit-input"
+                        rows="3"
+                      ></textarea>
+                      <div class="edit-actions">
+                        <button @click="guardarEdicionComentario(comentario)" class="btn-save">Guardar</button>
+                        <button @click="cancelarEdicionComentario" class="btn-cancel">Cancelar</button>
+                      </div>
+                    </div>
+
+
                       <p class="comment-text">{{ comentario.texto }}</p>
                       <div class="comment-actions">
                         <button @click="likeComentario(comentario.id)" class="comment-action like-comment" :class="{ liked: comentario.isLiked }">
@@ -329,6 +346,23 @@
                           </svg>
                           <span>{{ comentario.likes }}</span>
                         </button>
+
+                          <!-- Nuevos botones -->
+                          <button 
+                          v-if="isCommentAuthor(comentario)"
+                          @click="iniciarEdicionComentario(comentario)"
+                          class="comment-action edit-btn"
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          v-if="isCommentAuthor(comentario)"
+                          @click="eliminarComentario(comentario)"
+                          class="comment-action delete-btn"
+                        >
+                          Eliminar
+                        </button>
+
                         <button @click="toggleReply(comentario.id)" class="comment-action reply-comment">
                           {{ comentarioRespondiendo === comentario.id ? 'Cancelar' : 'Responder' }}
                         </button>
@@ -583,7 +617,10 @@ export default {
 
 
       modoEdicion: false,
-      editandoComentario: null
+      editandoComentario: null,
+
+      comentarioEditado: '',
+      comentarioEditando: null
     };
   },
 
@@ -627,6 +664,14 @@ export default {
       });
     },
 
+
+    async submitPost() {
+    if (this.modoEdicion) {
+      await this.editarPost();
+    } else {
+      await this.createPost();
+    }
+  },
 
 
 
@@ -964,118 +1009,125 @@ abrirEditarModal(post) {
 
         // METODOS PARA EDITAR Y ELIMINAR EN COMENTARIOS
 
-
-async editarComentario(comentario) {
-  this.nuevoComentario = comentario.texto;
-  this.editandoComentario = { 
-    id: comentario.id,
-    isReply: !!comentario.parent_id // Para saber si es una respuesta
-  };
-  this.comentarioRespondiendo = null;
-  this.$nextTick(() => {
-    this.$refs.comentarioInput?.focus();
-  });
+        async iniciarEdicionComentario(comentario) {
+    this.comentarioEditando = comentario.id;
+    this.comentarioEditado = comentario.texto;
+  },
+  
+  
+        async editarComentario(comentario) {
+  try {
+    this.editandoComentario = {
+      id: comentario.id,
+      textoOriginal: comentario.texto,
+      isReply: !!comentario.parent_id
+    };
+    
+    // Buscar el comentario en la estructura de datos
+    const commentToEdit = this.findCommentById(comentario.id);
+    if (commentToEdit) {
+      commentToEdit.isEditing = true;
+    }
+  } catch (error) {
+    console.error('Error preparando edición:', error);
+  }
 },
 
 
-async guardarComentarioEditado() {
-  if (!this.nuevoComentario.trim() || !this.editandoComentario) return;
-
+async guardarEdicionComentario(comentario) {
   try {
-    let endpoint, method;
-    
-    if (this.editandoComentario.isReply) {
-      // Es una respuesta
-      endpoint = `/post/update-reply/${this.editandoComentario.id}`;
-      method = 'post'; // POST para update-reply
-    } else {
-      // Es un comentario principal
-      endpoint = `/post/update-comment/${this.editandoComentario.id}`;
-      method = 'put'; // PUT para update-comment
-    }
+    const endpoint = comentario.parent_id 
+      ? `/post/update-reply/${comentario.id}`
+      : `/post/update-comment/${comentario.id}`;
 
-    const response = await axios[method](endpoint, {
-      texto: this.nuevoComentario
-    }, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+    const response = await axios.put(endpoint, {
+      texto: this.comentarioEditado
     });
 
     if (response.data.success) {
-      await this.getPost();
-      
-      // Actualizar el post seleccionado si estamos viendo uno
-      if (this.postSeleccionado) {
-        const updatedPost = this.posts.find(p => p.id === this.postSeleccionado.id);
-        if (updatedPost) {
-          this.postSeleccionado = { ...updatedPost };
+      // Función recursiva para actualizar comentario
+      const actualizarEnArbol = (comments) => {
+        return comments.map(c => {
+          if (c.id === comentario.id) {
+            return { ...c, texto: this.comentarioEditado };
+          }
+          if (c.respuestas && c.respuestas.length) {
+            return { ...c, respuestas: actualizarEnArbol(c.respuestas) };
+          }
+          return c;
+        });
+      };
+
+      // Actualizar en posts principales
+      this.posts = this.posts.map(post => {
+        if (post.id === this.postSeleccionado.id) {
+          return { ...post, comments: actualizarEnArbol(post.comments) };
         }
-      }
-      
-      this.nuevoComentario = '';
-      this.editandoComentario = null;
-      this.$toast.success('Comentario actualizado');
-    }
-  } catch (error) {
-    console.error('Error al editar comentario:', error);
-    this.$toast.error(error.response?.data?.message || 'Error al editar el comentario');
-  }
-},
-
-
-
-async eliminarComentario(comentario) {
-  if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
-    try {
-      let endpoint, method;
-      
-      if (comentario.parent_id) {
-        // Es una respuesta
-        endpoint = `/post/destroy-reply/${comentario.id}`;
-        method = 'post'; // POST para destroy-reply
-      } else {
-        // Es un comentario principal
-        endpoint = `/post/delete-comment/${comentario.id}`;
-        method = 'delete'; // DELETE para delete-comment
-      }
-
-      const response = await axios[method](endpoint, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        return post;
       });
 
-      if (response.data.success) {
-        await this.getPost();
-        
-        // Actualizar el post seleccionado si estamos viendo uno
-        if (this.postSeleccionado) {
-          const updatedPost = this.posts.find(p => p.id === this.postSeleccionado.id);
-          if (updatedPost) {
-            this.postSeleccionado = { ...updatedPost };
-          }
-        }
-        
-        this.$toast.success('Comentario eliminado');
-      }
-    } catch (error) {
-      console.error('Error al eliminar comentario:', error);
-      this.$toast.error(error.response?.data?.message || 'Error al eliminar el comentario');
+      // Sincronizar postSeleccionado con la nueva data
+      const updatedPost = this.posts.find(p => p.id === this.postSeleccionado.id);
+      this.postSeleccionado = { 
+        ...updatedPost,
+        isLiked: this.postSeleccionado.isLiked // Mantener estado de like
+      };
+      
+      this.cancelarEdicionComentario();
     }
+  } catch (error) {
+    console.error('Error editando comentario:', error);
+    alert('Error al guardar cambios');
   }
 },
 
-async submitPost() {
-    if (this.modoEdicion) {
-      await this.editarPost();
-    } else {
-      await this.createPost();
+
+
+  async eliminarComentario(comentario) {
+    if (!confirm('¿Eliminar este comentario permanentemente?')) return;
+
+    try {
+      const endpoint = comentario.parent_id 
+        ? `/post/destroy-reply/${comentario.id}`
+        : `/post/delete-comment/${comentario.id}`;
+
+      const response = await axios.delete(endpoint);
+
+      if (response.data.success) {
+        // Función recursiva para eliminar comentario
+        const eliminarDeArbol = (comments) => {
+          return comments.filter(c => {
+            if (c.id === comentario.id) return false;
+            if (c.respuestas && c.respuestas.length) {
+              c.respuestas = eliminarDeArbol(c.respuestas);
+            }
+            return true;
+          });
+        };
+
+        // Actualizar en posts principales
+        this.posts = this.posts.map(post => {
+          if (post.id === this.postSeleccionado.id) {
+            return { ...post, comments: eliminarDeArbol(post.comments) };
+          }
+          return post;
+        });
+
+        // Actualizar en post seleccionado
+        this.postSeleccionado.comments = eliminarDeArbol(this.postSeleccionado.comments);
+      }
+    } catch (error) {
+      console.error('Error eliminando comentario:', error);
+      alert('Error al eliminar');
     }
   },
     
-    
 
+
+  cancelarEdicionComentario() {
+    this.comentarioEditando = null;
+    this.comentarioEditado = '';
+  },
 
 
 
@@ -1200,5 +1252,109 @@ async submitPost() {
 
 @import '../../../scss/Foro/foro_navbar.scss';
 
+
+
+/* Estilos para acciones de comentarios */
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.comment-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+/* Botón Editar */
+.comment-action.edit-btn {
+  background: #007bff15;
+  color: #007bff !important;
+}
+
+.comment-action.edit-btn:hover {
+  background: #007bff25;
+}
+
+/* Botón Eliminar */
+.comment-action.delete-btn {
+  background: #dc354515;
+  color: #dc3545 !important;
+}
+
+.comment-action.delete-btn:hover {
+  background: #dc354525;
+}
+
+/* Botón Responder */
+.comment-action.reply-comment {
+  background: #28a74515;
+  color: #28a745 !important;
+}
+
+.comment-action.reply-comment:hover {
+  background: #28a74525;
+}
+
+/* Estilos específicos para formulario de edición */
+.edit-comment-form {
+  margin-top: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f8f9fa;
+}
+
+.comment-edit-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  resize: vertical;
+  margin-bottom: 8px;
+  font-family: inherit;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-save {
+  background: #28a745 !important;
+  color: white !important;
+  padding: 6px 16px;
+  border-radius: 4px;
+}
+
+.btn-cancel {
+  background: #6c757d !important;
+  color: white !important;
+  padding: 6px 16px;
+  border-radius: 4px;
+}
+
+/* Estilos para contador de likes */
+.comment-action.like-comment {
+  background: transparent !important;
+  color: #6c757d !important;
+  padding: 0;
+}
+
+.comment-action.like-comment.liked {
+  color: #dc3545 !important;
+}
+
+.comment-action.like-comment svg {
+  fill: currentColor;
+}
 
 </style>
