@@ -69,19 +69,13 @@ Route::resource('/news', NewsController::class);
 //productos
 Route::resource('/products', ProductController::class);
 
-
 // Posts
-Route::post('/post', [PostController::class, 'store']);
-Route::get('/post', [PostController::class, 'index']);
-Route::put('/post/{post}', [PostController::class, 'update']);
-Route::delete('/post/{post}', [PostController::class, 'destroy']);
-Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);
+Route::resource('/post', PostController::class);
 
 // Comentarios
 Route::post('/post/create-comment', [PostController::class, 'createComment']);
 Route::put('/post/update-comment/{commentId}', [PostController::class, 'updateComment']);
 Route::delete('/post/delete-comment/{commentId}', [PostController::class, 'destroyComment']);
-Route::post('/comment/{comment}/likes_quantity', [CommentController::class, 'updateLikes']);
 
 
 // Respuestas
@@ -90,11 +84,13 @@ Route::post('/post/create-reply/{commentId}', [PostController::class, 'createRep
 Route::post('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
 Route::post('/post/destroy-reply/{replyId}', [PostController::class, 'destroyReply']);
 
+
+// Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);
+
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
-Route::get('/post/{post}', [PostController::class, 'show']);
 
 
 //scraper
