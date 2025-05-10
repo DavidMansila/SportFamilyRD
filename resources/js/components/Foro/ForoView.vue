@@ -869,21 +869,24 @@ export default {
 
 async editarPost() {
   try {
-    const formData = new FormData();
-    formData.append('_method', 'PUT');
-    formData.append('titulo', this.nuevoPost.titulo);
-    formData.append('contenido', this.nuevoPost.contenido);
-    formData.append('categoria', this.nuevoPost.categoria);
-    
-    if (this.nuevoPost.imagenFile) {
-      formData.append('imagen', this.nuevoPost.imagenFile);
-    }
 
-    const response = await axios.post(`/post/${this.nuevoPost.id}`, formData);
-    
+    if (this.nuevoPost.imagenFile) {
+      const formData = new FormData();
+      formData.append('_method', 'PUT'); 
+      formData.append('titulo', this.nuevoPost.titulo);
+      formData.append('contenido', this.nuevoPost.contenido);
+      formData.append('categoria', this.nuevoPost.categoria);
+      formData.append('imagen', this.nuevoPost.imagenFile);
+
+      response = await axios.post(`/post/${this.nuevoPost.id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    } else {
+        const response = await axios.put(`/post/${this.nuevoPost.id}`, this.nuevoPost);
+    }
     // Actualizar lista de posts
-    const index = this.posts.findIndex(p => p.id === response.data.post.id);
-    this.posts.splice(index, 1, response.data.post);
+    // const index = this.posts.findIndex(p => p.id === response.data.post.id);
+    // this.posts.splice(index, 1, response.data.post);
     
     // Cerrar modal y popup
     this.cerrarModal();

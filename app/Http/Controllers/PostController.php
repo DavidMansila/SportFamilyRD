@@ -59,12 +59,12 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            // dump($id);
+            // dd($request->all());
             $post = Post::findOrFail($id);
             
             // Verificar autorización
-            if ($request->user()->id !== $post->user_id) {
-                return response()->json(['message' => 'No autorizado'], 403);
-            }
+           
     
             $data = $request->except('imagen');
             
@@ -265,26 +265,5 @@ class PostController extends Controller
         }
     }
 
-    public function show($id)
-{
-    try {
-        $post = Post::with(['comments' => function($query) {
-            $query->with(['replies'])->orderBy('created_at', 'desc');
-        }])->findOrFail($id);
-
-        $post->imagen = url('storage/posts/' . $post->id . '/' . $post->imagen);
-        
-        return response()->json([
-            'message' => 'Post obtenido exitosamente',
-            'post' => $post,
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Error al obtener el post',
-            'error' => $e->getMessage(),
-        ], 500);
-    }
-}
 
 }
