@@ -632,9 +632,13 @@ export default {
 
     // Métodos para el Popup
     abrirPopout(post) {
-      this.scrollPosition = window.pageYOffset;
+      // Guardar posición antes de cualquier cambio de estilo
+      this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Aplicar estilos sin position: fixed
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
+      document.documentElement.style.scrollBehavior = 'auto'; // Prevenir scroll suave
+      
       this.postSeleccionado = { 
         ...post,
         isLiked: false,
@@ -647,9 +651,20 @@ export default {
     },
 
     cerrarPopout() {
+      // Restaurar estilos correctamente
       document.body.style.overflow = 'auto';
-      document.body.style.position = 'static';
-      window.scrollTo(0, this.scrollPosition);
+      document.body.style.position = 'relative'; // Cambiar de static a relative
+      document.body.style.top = 'auto';
+      
+      // Restaurar scroll después de actualizar el DOM
+      this.$nextTick(() => {
+        window.scrollTo({
+          top: this.scrollPosition,
+          behavior: 'auto'
+        });
+      });
+      
+      // Restablecer estados
       this.postSeleccionado = null;
       this.comentarioRespondiendo = null;
       this.nuevoComentario = '';
@@ -851,8 +866,6 @@ export default {
 
 
 
-
-
       // METODOS PARA EDITAR Y ELIMINAR EN POST
 
       isPostAuthor(post) {
@@ -867,8 +880,10 @@ export default {
       return true; // Cambiar según tu lógica
     },
 
+// En el método editarPost
 async editarPost() {
   try {
+    let response;
 
     if (this.nuevoPost.imagenFile) {
       const formData = new FormData();
@@ -882,18 +897,19 @@ async editarPost() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
     } else {
-        const response = await axios.put(`/post/${this.nuevoPost.id}`, this.nuevoPost);
+      response = await axios.put(`/post/${this.nuevoPost.id}`, this.nuevoPost);
     }
+
     // Actualizar lista de posts
-    // const index = this.posts.findIndex(p => p.id === response.data.post.id);
-    // this.posts.splice(index, 1, response.data.post);
-    
+    await this.getPost();
+
     // Cerrar modal y popup
     this.cerrarModal();
-    this.postSeleccionado = null; // Cierra el popup
-    this.$nextTick(() => {
-      this.postsFiltrados = [...this.posts]; // Actualizar posts filtrados
-    });
+    this.postSeleccionado = null;
+
+    // Forzar actualización del paginador
+    this.currentPage = Math.min(this.currentPage, Math.ceil(this.postsFiltrados.length / this.itemsPerPage));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
   } catch (error) {
     console.error('Error:', error.response?.data);
