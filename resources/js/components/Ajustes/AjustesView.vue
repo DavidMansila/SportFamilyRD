@@ -135,14 +135,6 @@
             </div>
           </div>
 
-          <div class="notification-frequency">
-            <h4>Frecuencia de Notificaciones</h4>
-            <select v-model="notifications.frequency">
-              <option value="instant">Inmediatas</option>
-              <option value="daily">Resumen Diario</option>
-              <option value="weekly">Resumen Semanal</option>
-            </select>
-          </div>
         </div>
 
 
@@ -172,21 +164,6 @@
 
   <section class="data-section" aria-labelledby="data-heading">
     <h3 id="data-heading" class="section-title">Gestión de datos</h3>
-    <div class="data-content">
-      <div class="data-option">
-        <h4>Descargar mis datos</h4>
-        <p>Solicita un archivo con toda la información que tenemos sobre ti en formato JSON o CSV.</p>
-        <div class="data-actions">
-          <button class="btn btn-secondary" @click="requestData" aria-describedby="data-description">
-            Solicitar Datos
-          </button>
-          <select v-model="dataFormat" class="format-select" aria-label="Formato de descarga">
-            <option value="json">JSON</option>
-            <option value="csv">CSV</option>
-          </select>
-        </div>
-        <p id="data-description" class="info-text">Recibirás un email con el enlace de descarga en 24-48 horas.</p>
-      </div>
 
       <div class="data-option danger-zone">
         <h4>Eliminar cuenta</h4>
@@ -202,7 +179,7 @@
           <i class="icon-warning"></i> Advertencia: Esta acción eliminará todos tus datos de forma permanente.
         </p>
       </div>
-    </div>
+
   </section>
 
   <!-- Modal de confirmación para eliminación -->
@@ -236,8 +213,6 @@
   </div>
 
 </template>
-
-
 
 
 
