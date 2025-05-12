@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 // usuarios
 Route::resource('/user', UserController::class);
+Route::get('/current-user', [AuthController::class, 'currentUser'])->middleware('auth');
 
 //Noticias
 Route::resource('/news', NewsController::class);
@@ -33,8 +34,8 @@ Route::delete('/post/delete-comment/{commentId}', [PostController::class, 'destr
 // Respuestas
 Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
 Route::post('/post/create-reply/{commentId}', [PostController::class, 'createReply']);
-Route::post('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
-Route::post('/post/destroy-reply/{replyId}', [PostController::class, 'destroyReply']);
+Route::put('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
+Route::delete('/post/destroy-reply/{replyId}', [PostController::class, 'destroyReply']);
 
 
 // Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);

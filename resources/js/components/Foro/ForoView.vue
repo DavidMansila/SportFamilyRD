@@ -310,7 +310,7 @@
                               <polyline points="17 21 17 13 7 13 7 21"></polyline>
                               <polyline points="7 3 7 8 15 8"></polyline>
                             </svg>
-                            Guardar
+                            Guardar Comentario
                           </button>
                           <button @click="cancelarEdicionComentario" class="btn-cancel">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -357,40 +357,69 @@
 
                       <!-- Respuestas // HAY QUE PONER QUE SI EL REPLY USER ID ES IGUAL AL USER ID QUE INICIO SECCION PUES QUE TE SALGAN LOS BOTONES DE EDITAR Y ELIMINAR-->
                       <div
-                        v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0"
+                        v-if="comentariosExpandidos.includes(comentario.id) && comentario.replies && comentario.replies.length > 0"
                         class="comment-replies">
-                        <div v-for="respuesta in comentario.respuestas" :key="respuesta.id"
-                          class="comment-item reply-item">
+                        <div v-for="reply in comentario.replies" :key="reply.id" class="comment-item reply-item">
                           <div class="comment-avatar-wrapper">
                             <div class="comment-avatar-placeholder">
-                              <span>{{ respuesta.user?.id || respuesta.userId || '' }}</span>
+                              <span>{{ reply.user?.id || reply.userId || '' }}</span>
                             </div>
                           </div>
                           <div class="comment-content">
                             <div class="comment-header">
-                              <span class="comment-author">Usuario{{ respuesta.userId }}</span>
-                              <span class="comment-time">{{ formatRelativeTime(respuesta.created_at) }}</span>
+                              <span class="comment-author">Usuario{{ reply.userId }}</span>
+                              <span class="comment-time">{{ formatRelativeTime(reply.created_at) }}</span>
                             </div>
-                            <p class="comment-text">{{ respuesta.texto }}</p>
+
+
+                            <div v-if="reply.id === replyEditando" class="edit-comment-form">
+                              <textarea v-model="replyEditado" class="comment-edit-input" rows="3"
+                                placeholder="Edita tu comentario..." autofocus></textarea>
+                              <div class="edit-actions">
+                                <button @click="guardarEdicionReply(reply)" class="btn-save">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                  </svg>
+                                  Guardar respuesta
+                                </button>
+                                <button @click="cancelarEdicionComentario" class="btn-cancel">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                  </svg>
+                                  Cancelar
+                                </button>
+                              </div>
+                            </div>
+
+                            <p class="comment-text">{{ reply.texto }}</p>
                             <div class="comment-actions">
-                              <button @click="likeComentario(respuesta.id)" class="comment-action like-comment"
-                                :class="{ liked: respuesta.isLiked }">
+                              <button @click="likeComentario(reply.id)" class="comment-action like-comment"
+                                :class="{ liked: reply.isLiked }">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                   <path
                                     d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                                 </svg>
-                                <span>{{ respuesta.likes }}</span>
+                                <span>{{ reply.likes }}</span>
                               </button>
 
                               <!-- EDITAR Y ELIMINAR REPLY BOTONES -->
-                              <button v-if="isCommentAuthor(respuesta)" @click="editarReply(respuesta)"
+                              <button v-if="isCommentAuthor(reply)" @click="editarReply(reply)"
                                 class="comment-action edit-btn">
                                 Editar
                               </button>
-                              <button v-if="isCommentAuthor(respuesta)" @click="eliminarReply(respuesta)"
+                              <button v-if="isCommentAuthor(reply)" @click="eliminarReply(reply)"
                                 class="comment-action delete-btn">
                                 Eliminar
                               </button>
+
 
                             </div>
                           </div>
@@ -585,7 +614,11 @@ export default {
       editandoComentario: null,
 
       comentarioEditado: '',
-      comentarioEditando: null
+      comentarioEditando: null,
+
+      replyEditando: '',
+      replyEditado: null
+
     };
   },
 
@@ -740,7 +773,7 @@ export default {
         const response = await axios.get('/post');
         // Ordenar posts por fecha descendente
         if (!this.posts || !Array.isArray(this.posts)) return [];
-        
+
         this.posts = response.data.posts.sort((a, b) => {
           return new Date(b.created_at) - new Date(a.created_at);
         }).map(post => ({
@@ -962,6 +995,11 @@ export default {
       this.comentarioEditado = comentario.texto;
     },
 
+    editarReply(reply) {
+      this.replyEditando = reply.id;
+      this.replyEditado = reply.texto;
+    },
+
 
     guardarEdicionComentario(comentario) {
 
@@ -970,9 +1008,8 @@ export default {
         return;
       }
 
-      const endpoint = comentario.parent_id
-        ? `/post/update-reply/${comentario.id}`
-        : `/post/update-comment/${comentario.id}`;
+      const endpoint = `/post/update-comment/${comentario.id}`;
+
 
       axios.put(endpoint, { texto: this.comentarioEditado })
         .then(response => {
@@ -992,10 +1029,50 @@ export default {
           alert('Error al guardar cambios: ' + (error.response?.data?.message || error.message));
         });
 
+
       setTimeout(() => {
         this.comentarioEditando = null;
         this.comentarioEditado = '';
-      }, 1500); // 300ms de delay para una transición suave
+      }, 1500);
+
+    },
+
+
+
+
+    guardarEdicionReply(reply) {
+
+      if (!this.replyEditado.trim()) {
+        alert('La respuesta no puede estar vacía');
+        return;
+      }
+
+      const endpoint = `/post/update-reply/${reply.id}`
+
+
+      axios.put(endpoint, { texto: this.replyEditado })
+        .then(response => {
+          this.getPost()
+            .then(() => {
+              const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
+              if (postEncontrado) {
+                this.postSeleccionado = { ...postEncontrado };
+              }
+            })
+            .catch(error => {
+              console.error('Error al editar respuesta:', error);
+            });
+        })
+        .catch(error => {
+          console.error('Error editando respuesta:', error);
+          alert('Error al guardar cambios: ' + (error.response?.data?.message || error.message));
+        });
+
+
+      setTimeout(() => {
+        this.replyEditando = null;
+        this.replyEditado = '';
+      }, 1500);
 
     },
 
@@ -1038,80 +1115,7 @@ export default {
 
     // METODOS PARA EDITAR Y ELIMINAR EN REPLYS
 
-    // Método para editar un reply
-    async editarReply(reply) {
-      if (!this.comentarioEditado.trim()) {
-        alert('La respuesta no puede estar vacía');
-        return;
-      }
 
-      try {
-        const response = await axios.put(`/post/update-reply/${reply.id}`, {
-          texto: this.comentarioEditado
-        });
-
-        // Actualizar el reply directamente en el estado local
-        const postIndex = this.posts.findIndex(p => p.id === this.postSeleccionado.id);
-        if (postIndex !== -1) {
-          // Buscar el comentario padre
-          const parentCommentIndex = this.posts[postIndex].comments.findIndex(
-            c => c.respuestas.some(r => r.id === reply.id)
-          );
-
-          if (parentCommentIndex !== -1) {
-            // Encontrar y actualizar el reply específico
-            const replyIndex = this.posts[postIndex].comments[parentCommentIndex]
-              .respuestas.findIndex(r => r.id === reply.id);
-
-            if (replyIndex !== -1) {
-              this.posts[postIndex].comments[parentCommentIndex].respuestas[replyIndex].texto =
-                this.comentarioEditado;
-
-              // Actualizar el post seleccionado
-              this.postSeleccionado = { ...this.posts[postIndex] };
-            }
-          }
-        }
-
-        this.comentarioEditando = null;
-        this.comentarioEditado = '';
-      } catch (error) {
-        console.error('Error editando respuesta:', error);
-        alert('Error al guardar cambios: ' + (error.response?.data?.message || error.message));
-      }
-    },
-
-    // Método para eliminar un reply
-    async eliminarReply(reply) {
-      if (!confirm('¿Eliminar esta respuesta permanentemente?')) return;
-
-      try {
-        await axios.delete(`/post/destroy-reply/${reply.id}`);
-
-        // Actualizar el estado local
-        const postIndex = this.posts.findIndex(p => p.id === this.postSeleccionado.id);
-        if (postIndex !== -1) {
-          // Buscar el comentario padre
-          const parentCommentIndex = this.posts[postIndex].comments.findIndex(
-            c => c.respuestas.some(r => r.id === reply.id)
-          );
-
-          if (parentCommentIndex !== -1) {
-            // Filtrar para eliminar el reply
-            this.posts[postIndex].comments[parentCommentIndex].respuestas =
-              this.posts[postIndex].comments[parentCommentIndex].respuestas.filter(
-                r => r.id !== reply.id
-              );
-
-            // Actualizar el post seleccionados
-            this.postSeleccionado = { ...this.posts[postIndex] };
-          }
-        }
-      } catch (error) {
-        console.error('Error eliminando respuesta:', error);
-        alert('Error al eliminar: ' + (error.response?.data?.message || error.message));
-      }
-    },
 
 
     // METODOS AUXILIARES
