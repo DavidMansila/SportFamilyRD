@@ -137,7 +137,9 @@ export default {
             console.log(response);
             // Manejar inicio de sesión exitoso
             alert('Bienvenido de nuevo!');
-            window.location.href = '/';
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            this.$root.user = response.data.user; // Actualiza el estado global
+            this.$router.push('/');
           })
           .catch((error) => {
             console.log(error);

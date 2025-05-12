@@ -227,20 +227,21 @@ export default {
   data() {
     return {
       editMode: false,
-      user: {
-        id: null,
-        name: '',
-        email: '',
-        role: 'user',
-        avatar: '/imagenes/AvatarDefault.png',
-        phone: '',
-        location: '',
-        birthdate: '',
-        bio: '',
-        social_links: [],
-        achievements: [],
-        created_at: ''
-      },
+      // user: {
+      //   id: null,
+      //   name: '',
+      //   email: '',
+      //   role: 'user',
+      //   avatar: '/imagenes/AvatarDefault.png',
+      //   phone: '',
+      //   location: '',
+      //   birthdate: '',
+      //   bio: '',
+      //   social_links: [],
+      //   achievements: [],
+      //   created_at: ''
+      // },
+      user:[],
       stats: {
         posts: 0,
         likes: 0,
@@ -252,9 +253,7 @@ export default {
       error: null
     }
   },
-  async created() {
-    await this.loadUserData();
-  },
+ 
   methods: {
     async loadUserData() {
       try {
@@ -404,8 +403,9 @@ export default {
       alert(`${type.toUpperCase()}: ${message}`);
     }
   },
-  mounted() {
-    this.user = localStorage.getItem('user');
+  mounted(){
+    
+   this.user = JSON.parse(localStorage.getItem('user'));
   }
 }
 </script>
