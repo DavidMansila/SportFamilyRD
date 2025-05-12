@@ -14,27 +14,33 @@ Route::get('/', function () {
     return view('Home.HomeView');
 });
 
+
 // Rutas para las vistas
 Route::get('/Login', function () {
     return view('Login.signUp');
 });
+
 
 // Rutas para las vistas
 Route::get('/Directorio', function () {
     return view('Directorio.DirectorioView');
 });
 
+
 Route::get('/Noticias', function () {
     return view('Noticias.NoticiasView');
 });
+
 
 Route::get('/Calendario', function () {
     return view('Calendario.CalendarioView');
 });
 
+
 Route::get('/Tienda', function () {
     return view('Tienda.TiendaView');
 });
+
 
 Route::get('/Entrenadores', function () {
     return view('Entrenadores.EntrenadoresView');
@@ -44,6 +50,17 @@ Route::get('/Solicitud', function () {
     return view('Entrenadores.SolicitudView');
 });
 
+
+
+Route::get('/SolicitudesUsuarios', function () {
+    return view('Solicitudes.SolicitudesUsuarios');
+});
+
+Route::get('/SolicitudesEntrenadores', function () {
+    return view('Solicitudes.SolicitudesEntrenadores');
+});
+
+
 Route::get('/Foro', function () {
     return view('Foro.ForoView');
 });
@@ -52,6 +69,7 @@ Route::get('/Foro', function () {
 Route::get('/Ajustes', function () {
     return view('Ajustes.AjustesView');
 });
+
 
 Route::get('/Perfil', function () {
     return view('Perfil.PerfilView');
@@ -99,10 +117,3 @@ Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
 Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
 Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
 Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
-
-
-
-
-
-
-

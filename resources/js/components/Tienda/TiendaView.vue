@@ -1,30 +1,30 @@
 <template>
   <div class="tienda-page">
-    
-    
+
+
 
     <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
-          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
+          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
         </a>
       </div>
 
       <div class="nav-links">
 
-           <!-- Secciones para lo usuarios y no usuarios -->
-           <a href="/Noticias" class="nav-link">Noticias</a>
-           <a href="/Calendario" class="nav-link">Calendario</a>
-           <a href="/Tienda" class="nav-link">Tienda</a>
-           <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-           <a href="/Foro" class="nav-link">Foro</a>
+        <!-- Secciones para lo usuarios y no usuarios -->
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
 
-          <!-- Secciones para entrenadores -->
-           <a v-if = "userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
+        <!-- Secciones para entrenadores -->
+        <a v-if="userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
 
-          <!-- Secciones para entrenadores -->
-          <a v-if = "userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
+        <!-- Secciones para entrenadores -->
+        <a v-if="userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
 
 
       </div>
@@ -32,19 +32,19 @@
       <div class="Imagenes">
 
         <a href="#" class="Carrito">
-          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
         </a>
 
-        <a href= "/Ajustes" class="Ajustes">
-          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
+        <a href="/Ajustes" class="Ajustes">
+          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
         </a>
 
-        <a href= "/Perfil" class="Perfil">
-          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+        <a href="/Perfil" class="Perfil">
+          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
         </a>
 
-        <a :href=" login ? '/Login' : '/Logout' " class="Logout">
-          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
+        <a :href="login ? '/Login' : '/Logout'" class="Logout">
+          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
         </a>
 
       </div>
@@ -55,13 +55,8 @@
     <!-- Barra de búsqueda -->
     <div class="search-container">
       <div class="search-wrapper">
-        <input
-          type="text"
-          v-model="busqueda"
-          placeholder="Buscar productos..."
-          @input="filtrarPorBusqueda"
-          class="search-input"
-        />
+        <input type="text" v-model="busqueda" placeholder="Buscar productos..." @input="filtrarPorBusqueda"
+          class="search-input" />
         <i class="fas fa-search search-icon"></i>
       </div>
     </div>
@@ -71,31 +66,20 @@
     <!-- Filtros modernos -->
     <div class="filters-section">
       <div class="filter-tabs">
-        <button 
-          class="filter-tab"
-          :class="{ active: subcategoriaSeleccionada === '' }"
-          @click="seleccionarSubcategoria('')"
-        >
+        <button class="filter-tab" :class="{ active: subcategoriaSeleccionada === '' }"
+          @click="seleccionarSubcategoria('')">
           Todos
         </button>
-        
+
         <div v-for="(categoria, index) in categorias" :key="index" class="filter-dropdown">
-          <button 
-            class="filter-tab"
-            :class="{ active: categoriaActiva === index }"
-            @click="toggleAcordeon(index)"
-          >
+          <button class="filter-tab" :class="{ active: categoriaActiva === index }" @click="toggleAcordeon(index)">
             {{ categoria.nombre }}
             <i class="fas fa-chevron-down dropdown-icon"></i>
           </button>
-          
+
           <div class="dropdown-content" :class="{ show: categoriaActiva === index }">
-            <button
-              v-for="(opcion, i) in categoria.opciones"
-              :key="i"
-              class="dropdown-item"
-              @click="seleccionarSubcategoria(opcion.valor)"
-            >
+            <button v-for="(opcion, i) in categoria.opciones" :key="i" class="dropdown-item"
+              @click="seleccionarSubcategoria(opcion.valor)">
               {{ opcion.texto }}
             </button>
           </div>
@@ -107,12 +91,7 @@
 
     <!-- Productos -->
     <div class="products-grid">
-      <div 
-        v-for="producto in productosFiltrados" 
-        :key="producto.id" 
-        class="product-card"
-        @click="abrirPopup(producto)"
-      >
+      <div v-for="producto in productosFiltrados" :key="producto.id" class="product-card" @click="abrirPopup(producto)">
         <div class="product-badge" v-if="producto.oferta">OFERTA</div>
         <div class="product-image-container">
           <img :src="producto.image" :alt="producto.name" class="product-image" />
@@ -127,10 +106,7 @@
             <span class="product-price">{{ producto.price }} RD$</span>
             <span class="product-old-price" v-if="producto.oldPrice">{{ producto.oldPrice }} RD$</span>
           </div>
-          <button 
-            class="add-to-cart-btn"
-            @click.stop="agregarAlCarrito(producto)"
-          >
+          <button class="add-to-cart-btn" @click.stop="agregarAlCarrito(producto)">
             <i class="fas fa-shopping-cart"></i> Añadir
           </button>
         </div>
@@ -145,21 +121,16 @@
         <button class="close-modal" @click="cerrarPopup">
           <i class="fas fa-times"></i>
         </button>
-        
+
         <div class="modal-grid">
           <div class="modal-images">
             <img :src="productoSeleccionado.image" :alt="productoSeleccionado.name" class="main-image" />
             <div class="thumbnail-container">
-              <img 
-                v-for="(img, index) in productoSeleccionado.images" 
-                :key="index" 
-                :src="img" 
-                class="thumbnail"
-                @click="changeMainImage(img)"
-              />
+              <img v-for="(img, index) in productoSeleccionado.images" :key="index" :src="img" class="thumbnail"
+                @click="changeMainImage(img)" />
             </div>
           </div>
-          
+
           <div class="modal-details">
             <div class="product-header">
               <span class="product-category">{{ getCategoryName(productoSeleccionado.categoria) }}</span>
@@ -173,29 +144,30 @@
                 <span class="rating-count">(24 reviews)</span>
               </div>
             </div>
-            
+
             <div class="price-container">
               <span class="current-price">{{ productoSeleccionado.price }} RD$</span>
-              <span class="old-price" v-if="productoSeleccionado.oldPrice">{{ productoSeleccionado.oldPrice }} RD$</span>
+              <span class="old-price" v-if="productoSeleccionado.oldPrice">{{ productoSeleccionado.oldPrice }}
+                RD$</span>
               <span class="discount" v-if="productoSeleccionado.oldPrice">
                 {{ calculateDiscount(productoSeleccionado.price, productoSeleccionado.oldPrice) }}% OFF
               </span>
             </div>
-            
+
             <p class="product-description">{{ productoSeleccionado.description }}</p>
-            
+
             <div class="product-actions">
               <div class="quantity-selector">
                 <button @click="decrementQuantity">-</button>
                 <span>{{ quantity }}</span>
                 <button @click="incrementQuantity">+</button>
               </div>
-              
+
               <button class="add-to-cart" @click="addToCartFromModal">
                 <i class="fas fa-shopping-cart"></i> Añadir al carrito
               </button>
             </div>
-            
+
             <div class="product-meta">
               <div class="meta-item">
                 <i class="fas fa-shield-alt"></i>
@@ -350,7 +322,7 @@ export default {
     },
     agregarAlCarrito(producto) {
       const existingItem = this.carrito.find(item => item.id === producto.id);
-      
+
       if (existingItem) {
         existingItem.quantity = (existingItem.quantity || 1) + 1;
       } else {
@@ -359,7 +331,7 @@ export default {
           quantity: 1
         });
       }
-      
+
       this.showNotification(producto);
     },
     addToCartFromModal() {
@@ -367,15 +339,15 @@ export default {
         ...this.productoSeleccionado,
         quantity: this.quantity
       };
-      
+
       const existingItem = this.carrito.find(item => item.id === productToAdd.id);
-      
+
       if (existingItem) {
         existingItem.quantity += this.quantity;
       } else {
         this.carrito.push(productToAdd);
       }
-      
+
       this.showNotification(productToAdd);
       this.cerrarPopup();
     },
@@ -426,6 +398,18 @@ export default {
       }
       return 'General';
     }
+
+
+
+
+
+    // FUNCIONES PARA ADMINISTRADOR
+
+    // EDITAR PRODUCTO
+    // ELIMINAR PRODUCTO 
+    // AGREGAR PRODUCTO
+
+
   },
   mounted() {
     this.getProducts();
@@ -437,7 +421,6 @@ export default {
 
 
 <style scoped>
-
 @import '../../../scss/Tienda/tienda.scss';
 
 @import '../../../scss/Tienda/tienda_filtros_y_busqueda.scss';
@@ -449,5 +432,4 @@ export default {
 @import '../../../scss/Tienda/tienda_navbar.scss';
 
 @import '../../../scss/Tienda/tienda_responsive.scss';
-
 </style>

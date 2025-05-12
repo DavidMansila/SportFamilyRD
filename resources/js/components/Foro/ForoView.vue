@@ -107,12 +107,12 @@
     <!-- Sección de Posts con diseño de tarjetas -->
     <div class="posts-grid">
 
-      <div v-if="postsFiltrados.length === 0">
+      <div class="no-posts-container" v-if="postsFiltrados.length === 0">
 
-        <div class="no-posts">
-          <h2 class="no-posts">No hay publicaciones disponibles</h2>
-          <p class="no-posts-subtitle">¡Sé el primero en iniciar una publicación!</p>
-          <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear nuevo post</button>
+        <div class="no-posts-content">
+          <h1 class="no-posts">¡No hay publicaciones!</h1>
+          <p class="no-posts-subtitle">Sé el primero en crear una...</p>
+          <button @click="abrirModal" class="btn-crear-post no-posts-btn">Crear Publicación</button>
           <img src="/imagenes/no-news.png" alt="No hay publicaciones" class="no-posts-image">
         </div>
 
@@ -537,7 +537,6 @@
 
 
 
-
 <script>
 import axios from 'axios';
 import paginatorComponent from '@/components/paginatorComponent.vue';
@@ -606,9 +605,9 @@ export default {
       this.mostrarModal = false;
       this.nuevoPost = { titulo: '', contenido: '', categoria: '', imagenFile: null };
       this.imagenMiniatura = null;
+      this.modoEdicion = false;
       document.body.style.overflow = 'auto';
     },
-
 
     handlePageChange(newPage) {
       this.currentPage = newPage;
@@ -621,7 +620,6 @@ export default {
       });
     },
 
-
     async submitPost() {
       if (this.modoEdicion) {
         await this.editarPost();
@@ -629,7 +627,6 @@ export default {
         await this.createPost();
       }
     },
-
 
 
     // Métodos para el Popup
@@ -706,9 +703,6 @@ export default {
     },
 
 
-
-
-
     // Métodos para Posts
     async createPost() {
       const formData = new FormData();
@@ -731,7 +725,6 @@ export default {
         alert('Error al crear el post');
       }
     },
-
 
     async getPost() {
       try {
@@ -758,7 +751,6 @@ export default {
       }
     },
 
-
     handleFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -770,7 +762,6 @@ export default {
       };
       reader.readAsDataURL(file);
     },
-
 
 
     // METODOS PARA COMENTARIOS
@@ -837,9 +828,6 @@ export default {
     },
 
 
-
-
-
     // METODOS PARA LIKES
 
     async likePost() {
@@ -866,10 +854,6 @@ export default {
     },
 
 
-
-
-
-
     // METODOS PARA EDITAR Y ELIMINAR EN POST
 
     isPostAuthor(post) {
@@ -883,7 +867,6 @@ export default {
       // Ejemplo: return comment.userId === this.$store.state.user.id;
       return true; // Cambiar según tu lógica
     },
-
 
     // En el método editarPost
     async editarPost() {
@@ -922,7 +905,6 @@ export default {
       }
     },
 
-
     async confirmarEliminarPost() {
       if (confirm('¿Estás seguro de eliminar este post?')) {
         try {
@@ -948,7 +930,6 @@ export default {
       }
     },
 
-
     abrirEditarModal(post) {
       this.modoEdicion = true;
       this.mostrarModal = true;
@@ -961,10 +942,6 @@ export default {
       };
       this.imagenMiniatura = post.imagen;
     },
-
-
-
-
 
 
     // METODOS PARA EDITAR Y ELIMINAR EN COMENTARIOS
@@ -1004,10 +981,10 @@ export default {
           alert('Error al guardar cambios: ' + (error.response?.data?.message || error.message));
         });
 
-        setTimeout(() => {
-    this.comentarioEditando = null;
-    this.comentarioEditado = '';
-}, 1500); // 300ms de delay para una transición suave
+      setTimeout(() => {
+        this.comentarioEditando = null;
+        this.comentarioEditado = '';
+      }, 1500); // 300ms de delay para una transición suave
 
     },
 
@@ -1045,8 +1022,6 @@ export default {
     },
 
 
-
-
     // METODOS AUXILIARES
 
     filtrarPosts() {
@@ -1067,8 +1042,6 @@ export default {
       this.currentPage = 1;
       this.postsFiltrados = filtered;
     },
-
-
 
     cambiarCategoria(categoria) {
       this.categoriaSeleccionada = categoria;
@@ -1137,8 +1110,9 @@ export default {
     }
 
 
+    // FUNCIONES PARA ADMINISTRADOR
 
-
+    // ELIMINAR POST 
 
 
   },
@@ -1165,5 +1139,4 @@ export default {
 @import '../../../scss/Foro/foro_modal.scss';
 
 @import '../../../scss/Foro/foro_navbar.scss';
-
 </style>
