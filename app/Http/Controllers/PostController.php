@@ -15,9 +15,12 @@ class PostController extends Controller
         try {
             // $posts = Post::with('comments')->get();
             $posts = Post::with(['comments.replies'])->get()->map(function ($post) {
-                $post->imagen = url('storage/posts/' . $post->id . '/' . $post->imagen);
+                $post->imagen = $post->imagen 
+                ? url('storage/posts/' . $post->id . '/' . $post->imagen)
+                : url('public/imagenes/no_image.png');
                 return $post;
             });
+            
             return response()->json([
                 'message' => 'Posts recibidos exitosamente',
                 'posts' => $posts,

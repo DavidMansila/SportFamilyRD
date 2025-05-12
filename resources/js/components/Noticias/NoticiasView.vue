@@ -19,11 +19,11 @@
         <router-link to="/foro" class="nav-link">Foro</router-link>
 
         <!-- Secciones condicionales -->
-        <router-link v-if="userType == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
+        <router-link v-if="user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
           Solicitudes
         </router-link>
 
-        <router-link v-if="userType == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
+        <router-link v-if="user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
           Solicitudes
         </router-link>
       </div>
@@ -48,8 +48,8 @@
     </nav>
 
 
-    <!-- Botón flotante para agregar noticia -- v-if="userType === 'admin'" -->
-    <div v-if="userType === 'admin'" class="floating-action">
+    <!-- Botón flotante para agregar noticia -- v-if="user_type === 'admin'" -->
+    <div v-if="user_type === 'admin'" class="floating-action">
       <button class="btn-agregar" @click="agregarNoticia">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 5V19" stroke="white" stroke-width="2" stroke-linecap="round" />
@@ -116,7 +116,7 @@
               </div>
 
               <!-- ADMIN -->
-              <button v-if="userType === 'admin'" class="btn-editar" @click.stop="editarNoticia(noticia)">
+              <button v-if="user_type === 'admin'" class="btn-editar" @click.stop="editarNoticia(noticia)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M13.945 5.23997L3.87503 15.31C3.70599 15.479 3.58707 15.6913 3.53203 15.923L2.72203 19.447C2.65321 19.735 2.74074 20.0382 2.95403 20.25C3.1489 20.444 3.41422 20.5486 3.68803 20.539L7.19503 20.458C7.42676 20.4494 7.6493 20.3744 7.83803 20.242L17.906 10.172"
@@ -128,7 +128,7 @@
               </button>
 
               <!-- ADMIN -->
-              <button v-if="userType === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
+              <button v-if="user_type === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path d="M4 7H20" stroke="currentColor" stroke-width="2" />
                   <path d="M10 11V17" stroke="currentColor" />
@@ -242,7 +242,7 @@ export default {
       ],
       saved: false,
 
-      userType: '',
+      user_type: '',
     };
   },
   computed: {
