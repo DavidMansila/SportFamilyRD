@@ -1,31 +1,31 @@
 <template>
-  
+
   <div class="entrenadores-page">
-    
+
 
 
     <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
-          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
+          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
         </a>
       </div>
 
       <div class="nav-links">
 
-           <!-- Secciones para lo usuarios y no usuarios -->
-           <a href="/Noticias" class="nav-link">Noticias</a>
-           <a href="/Calendario" class="nav-link">Calendario</a>
-           <a href="/Tienda" class="nav-link">Tienda</a>
-           <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-           <a href="/Foro" class="nav-link">Foro</a>
+        <!-- Secciones para lo usuarios y no usuarios -->
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
 
-          <!-- Secciones para entrenadores -->
-           <a v-if = "userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
+        <!-- Secciones para entrenadores -->
+        <a v-if="userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
 
-          <!-- Secciones para entrenadores -->
-          <a v-if = "userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
+        <!-- Secciones para entrenadores -->
+        <a v-if="userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
 
 
       </div>
@@ -33,19 +33,19 @@
       <div class="Imagenes">
 
         <a href="#" class="Carrito">
-          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
         </a>
 
-        <a href= "/Ajustes" class="Ajustes">
-          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
+        <a href="/Ajustes" class="Ajustes">
+          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
         </a>
 
-        <a href= "/Perfil" class="Perfil">
-          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+        <a href="/Perfil" class="Perfil">
+          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
         </a>
 
-        <a :href=" login ? '/Login' : '/Logout' " class="Logout">
-          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
+        <a :href="login ? '/Login' : '/Logout'" class="Logout">
+          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
         </a>
 
       </div>
@@ -75,7 +75,8 @@
         <a href="/Solicitud" class="cta-button">
           Aplicar Ahora
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
           </svg>
         </a>
       </div>
@@ -89,17 +90,15 @@
       <div class="search-container">
         <input type="text" placeholder="Buscar entrenadores..." v-model="busqueda">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      
+
       <div class="filter-tabs">
-        <button 
-          v-for="deporte in deportes" 
-          :key="deporte" 
-          @click="filtrarPorDeporte(deporte)"
-          :class="{ active: deporteActivo === deporte }"
-        >
+        <button v-for="deporte in deportes" :key="deporte" @click="filtrarPorDeporte(deporte)"
+          :class="{ active: deporteActivo === deporte }">
           {{ deporte }}
         </button>
       </div>
@@ -111,17 +110,13 @@
     <!-- Lista de Entrenadores -->
     <div class="entrenadores-container">
       <transition-group name="cards" tag="div" class="entrenadores-grid">
-        <div 
-          v-for="entrenador in entrenadoresFiltrados" 
-          :key="entrenador.id" 
-          class="entrenador-card"
-          @click="verPerfil(entrenador)"
-        >
+        <div v-for="entrenador in entrenadoresFiltrados" :key="entrenador.id" class="entrenador-card"
+          @click="verPerfil(entrenador)">
           <div class="card-image-container">
             <img :src="entrenador.foto" :alt="`${entrenador.nombre} - ${entrenador.deporte}`">
             <div class="deporte-tag">{{ entrenador.deporte }}</div>
           </div>
-          
+
           <div class="card-content">
             <div class="card-header">
               <h3>{{ entrenador.nombre }}</h3>
@@ -129,14 +124,16 @@
                 <span v-for="star in 5" :key="star" :class="{ filled: star <= entrenador.rating }">★</span>
               </div>
             </div>
-            
+
             <p class="experiencia">{{ entrenador.experiencia }}</p>
             <p class="testimonio">"{{ entrenador.testimonio }}"</p>
-            
+
             <div class="card-footer">
               <button class="contact-btn" @click.stop="contactarEntrenador(entrenador)">
                 <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 Contactar
               </button>
@@ -155,10 +152,11 @@
         <div class="modal-content">
           <button class="close-modal" @click="cerrarPerfil">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </button>
-          
+
           <div class="modal-header">
             <div class="profile-image">
               <img :src="entrenadorSeleccionado.foto" :alt="entrenadorSeleccionado.nombre">
@@ -168,19 +166,21 @@
               <div class="deporte-badge">{{ entrenadorSeleccionado.deporte }}</div>
               <div class="modal-rating">
                 <div class="stars">
-                  <span v-for="star in 5" :key="star" :class="{ filled: star <= entrenadorSeleccionado.rating }">★</span>
+                  <span v-for="star in 5" :key="star"
+                    :class="{ filled: star <= entrenadorSeleccionado.rating }">★</span>
                 </div>
-                <span class="rating-text">{{ entrenadorSeleccionado.rating }}.0 ({{ entrenadorSeleccionado.reseñas }} reseñas)</span>
+                <span class="rating-text">{{ entrenadorSeleccionado.rating }}.0 ({{ entrenadorSeleccionado.reseñas }}
+                  reseñas)</span>
               </div>
             </div>
           </div>
-          
+
           <div class="modal-body">
             <div class="section">
               <h3>Biografía</h3>
               <p>{{ entrenadorSeleccionado.biografia }}</p>
             </div>
-            
+
             <div class="section">
               <h3>Especialidades</h3>
               <div class="especialidades">
@@ -189,14 +189,14 @@
                 </span>
               </div>
             </div>
-            
+
             <div class="section">
               <h3>Logros</h3>
               <ul class="logros">
                 <li v-for="(logro, index) in entrenadorSeleccionado.logros" :key="index">{{ logro }}</li>
               </ul>
             </div>
-            
+
             <div class="section">
               <h3>Testimonios</h3>
               <div class="testimonios">
@@ -207,7 +207,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="modal-footer">
             <button class="primary-btn" @click="contactarEntrenador(entrenadorSeleccionado)">
               Contactar a {{ entrenadorSeleccionado.nombre.split(' ')[0] }}
@@ -222,48 +222,51 @@
 
 
   <!-- Burbuja de Mensajes Flotante -->
-<div class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
-  <div class="message-icon">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
-  </div>
-  
-  <div class="messages-container" v-if="mostrarMensajes">
-    <div class="messages-header">
-      <h3>Mensajes</h3>
-      <button class="close-btn" @click.stop="toggleMensajes">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+  <div class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
+    <div class="message-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
     </div>
-    
-    <div class="messages-list">
-      <div v-for="(mensaje, index) in mensajes" :key="index" class="message-item">
-        <img :src="mensaje.entrenador.foto" :alt="mensaje.entrenador.nombre" class="message-avatar">
-        <div class="message-content">
-          <div class="message-header">
-            <span class="sender-name">{{ mensaje.entrenador.nombre }}</span>
-            <span class="message-time">{{ mensaje.hora }}</span>
+
+    <div class="messages-container" v-if="mostrarMensajes">
+      <div class="messages-header">
+        <h3>Mensajes</h3>
+        <button class="close-btn" @click.stop="toggleMensajes">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="messages-list">
+        <div v-for="(mensaje, index) in mensajes" :key="index" class="message-item">
+          <img :src="mensaje.entrenador.foto" :alt="mensaje.entrenador.nombre" class="message-avatar">
+          <div class="message-content">
+            <div class="message-header">
+              <span class="sender-name">{{ mensaje.entrenador.nombre }}</span>
+              <span class="message-time">{{ mensaje.hora }}</span>
+            </div>
+            <p class="message-text">{{ mensaje.texto }}</p>
           </div>
-          <p class="message-text">{{ mensaje.texto }}</p>
+        </div>
+
+        <div v-if="mensajes.length === 0" class="empty-messages">
+          No tienes mensajes nuevos
         </div>
       </div>
-      
-      <div v-if="mensajes.length === 0" class="empty-messages">
-        No tienes mensajes nuevos
+
+      <div class="messages-footer">
+        <button class="view-all-btn" @click.stop="verTodosLosMensajes">
+          Ver todos los mensajes
+        </button>
       </div>
     </div>
-    
-    <div class="messages-footer">
-      <button class="view-all-btn" @click.stop="verTodosLosMensajes">
-        Ver todos los mensajes
-      </button>
-    </div>
   </div>
-</div>
 
 
 </template>
@@ -499,20 +502,20 @@ export default {
   computed: {
     entrenadoresFiltrados() {
       let filtrados = this.entrenadores;
-      
+
       if (this.deporteActivo !== 'Todos') {
         filtrados = filtrados.filter(e => e.deporte === this.deporteActivo);
       }
-      
+
       if (this.busqueda) {
         const term = this.busqueda.toLowerCase();
-        filtrados = filtrados.filter(e => 
-          e.nombre.toLowerCase().includes(term) || 
+        filtrados = filtrados.filter(e =>
+          e.nombre.toLowerCase().includes(term) ||
           e.deporte.toLowerCase().includes(term) ||
           e.especialidades.some(esp => esp.toLowerCase().includes(term))
         );
       }
-      
+
       return filtrados;
     }
   },
@@ -531,15 +534,27 @@ export default {
       this.cerrarPerfil();
     },
     toggleMensajes() {
-     this.mostrarMensajes = !this.mostrarMensajes;
-   if (this.mostrarMensajes && this.nuevosMensajes > 0) {
-     this.nuevosMensajes = 0; // Resetear notificaciones al abrir
-  }
-},
+      this.mostrarMensajes = !this.mostrarMensajes;
+      if (this.mostrarMensajes && this.nuevosMensajes > 0) {
+        this.nuevosMensajes = 0; // Resetear notificaciones al abrir
+      }
+    },
     verTodosLosMensajes() {
-       // Navegar a la página completa de mensajes
-       this.$router.push('/Mensajes');
+      // Navegar a la página completa de mensajes
+      this.$router.push('/Mensajes');
     }
+
+
+
+
+
+    // FUNCIONES PARA ADMINISTRADOR
+
+    // ELIMINAR ENTRENADOR
+    // AGREGAR ENTRENADOR
+
+
+
   },
   mounted() {
     document.title = 'Entrenadores';
@@ -552,7 +567,6 @@ export default {
 
 
 <style scoped>
-
 @import '../../../scss/Entrenadores/entrenadores.scss';
 
 @import '../../../scss/Entrenadores/entrenadores_grid.scss';
@@ -564,19 +578,4 @@ export default {
 @import '../../../scss/Entrenadores/entrenadores_navbar.scss';
 
 @import '../../../scss/Entrenadores/entrenadores_responsive.scss';
-
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-

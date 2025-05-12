@@ -6,24 +6,24 @@
     <nav class="navbar">
       <div class="logo-container">
         <a href="/" class="logo-container">
-          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
+          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
         </a>
       </div>
 
       <div class="nav-links">
 
-           <!-- Secciones para lo usuarios y no usuarios -->
-           <a href="/Noticias" class="nav-link">Noticias</a>
-           <a href="/Calendario" class="nav-link">Calendario</a>
-           <a href="/Tienda" class="nav-link">Tienda</a>
-           <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-           <a href="/Foro" class="nav-link">Foro</a>
+        <!-- Secciones para lo usuarios y no usuarios -->
+        <a href="/Noticias" class="nav-link">Noticias</a>
+        <a href="/Calendario" class="nav-link">Calendario</a>
+        <a href="/Tienda" class="nav-link">Tienda</a>
+        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
+        <a href="/Foro" class="nav-link">Foro</a>
 
-          <!-- Secciones para entrenadores -->
-           <a v-if = "userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
+        <!-- Secciones para entrenadores -->
+        <a v-if="userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
 
-          <!-- Secciones para entrenadores -->
-          <a v-if = "userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
+        <!-- Secciones para entrenadores -->
+        <a v-if="userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
 
 
       </div>
@@ -31,19 +31,19 @@
       <div class="Imagenes">
 
         <a href="#" class="Carrito">
-          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
         </a>
 
-        <a href= "/Ajustes" class="Ajustes">
-          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
+        <a href="/Ajustes" class="Ajustes">
+          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
         </a>
 
-        <a href= "/Perfil" class="Perfil">
-          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
+        <a href="/Perfil" class="Perfil">
+          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
         </a>
 
-        <a :href=" login ? '/Login' : '/Logout' " class="Logout">
-          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
+        <a :href="login ? '/Login' : '/Logout'" class="Logout">
+          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
         </a>
 
       </div>
@@ -57,13 +57,15 @@
       <div class="calendar-main">
         <div class="calendar-controls">
           <button @click="changeMonth('prev')" class="control-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
           </button>
           <h1 class="calendar-title">{{ monthNames[currentMonth] }} {{ currentYear }}</h1>
           <button @click="changeMonth('next')" class="control-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
           </button>
@@ -73,19 +75,14 @@
           <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-header">
             {{ day }}
           </div>
-          <div 
-            v-for="day in daysInMonth" 
-            :key="day" 
-            :class="['calendar-day', { 
-              'has-events': hasEvents(day), 
-              'selected-day': selectedDay === day,
-              'current-day': isCurrentDay(day)
-            }]" 
-            @click="selectDay(day)"
-          >
+          <div v-for="day in daysInMonth" :key="day" :class="['calendar-day', {
+            'has-events': hasEvents(day),
+            'selected-day': selectedDay === day,
+            'current-day': isCurrentDay(day)
+          }]" @click="selectDay(day)">
             <span class="day-number">{{ day }}</span>
             <div v-if="hasEvents(day)" class="event-dots">
-              <span v-for="(event, index) in getEventsForDay(day)" :key="index" 
+              <span v-for="(event, index) in getEventsForDay(day)" :key="index"
                 :style="{ backgroundColor: event.categoryColor || '#3498db' }"></span>
             </div>
           </div>
@@ -98,20 +95,16 @@
       <div class="events-sidebar">
         <h2 v-if="selectedDay">Eventos del {{ selectedDay }} de {{ monthNames[currentMonth] }}</h2>
         <h2 v-else>Selecciona un día</h2>
-        
+
         <div v-if="selectedDayEvents.length > 0" class="events-list">
-          <div 
-            v-for="event in selectedDayEvents" 
-            :key="event.id" 
-            class="event-card"
-            @click="openEventDetail(event)"
-            :style="{ borderLeft: `4px solid ${event.categoryColor || '#3498db'}` }"
-          >
+          <div v-for="event in selectedDayEvents" :key="event.id" class="event-card" @click="openEventDetail(event)"
+            :style="{ borderLeft: `4px solid ${event.categoryColor || '#3498db'}` }">
             <div class="event-time">{{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}</div>
             <h3 class="event-title">{{ event.nombre }}</h3>
             <div class="event-meta">
               <span class="event-location">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
@@ -123,14 +116,16 @@
           </div>
         </div>
         <div v-else-if="selectedDay" class="no-events">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
           </svg>
           <p>No hay eventos programados para este día</p>
         </div>
         <div v-else class="select-day-prompt">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
             <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -146,12 +141,13 @@
     <div class="event-detail-view" v-if="selectedEvent" @click.self="closeEventDetail">
       <div class="event-detail-container">
         <button class="close-btn" @click="closeEventDetail">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
-        
+
         <div class="event-header">
           <div class="event-date">
             <div class="event-day">{{ new Date(selectedEvent.fecha).getDate() }}</div>
@@ -161,14 +157,16 @@
             <h2>{{ selectedEvent.nombre }}</h2>
             <div class="event-meta">
               <span class="event-time">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
                 {{ formatTime(selectedEvent.startTime) }} - {{ formatTime(selectedEvent.endTime) }}
               </span>
               <span class="event-location">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
@@ -177,32 +175,34 @@
             </div>
           </div>
         </div>
-        
+
         <div class="event-content">
           <div class="event-description">
             <h3>Descripción</h3>
             <p>{{ selectedEvent.descripcion }}</p>
           </div>
-          
+
           <div class="event-tickets">
             <h3>Boletos</h3>
             <div class="ticket-info">
               <span class="ticket-price">${{ selectedEvent.precio }} <small>c/u</small></span>
               <span class="ticket-available">{{ selectedEvent.boletosDisponibles }} disponibles</span>
             </div>
-            
+
             <div class="ticket-controls" v-if="selectedEvent.boletosDisponibles > 0">
               <div class="quantity-selector">
                 <button @click="decrementTicket" :disabled="ticketQuantity <= 1">-</button>
                 <span>{{ ticketQuantity }}</span>
-                <button @click="incrementTicket" :disabled="ticketQuantity >= selectedEvent.boletosDisponibles">+</button>
+                <button @click="incrementTicket"
+                  :disabled="ticketQuantity >= selectedEvent.boletosDisponibles">+</button>
               </div>
               <button class="add-to-cart-btn" @click="addToCart">
                 Añadir al carrito - ${{ selectedEvent.precio * ticketQuantity }}
               </button>
             </div>
             <div v-else class="sold-out">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
               </svg>
@@ -232,74 +232,74 @@ export default {
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
       eventos: [
-        { 
-          id: 1, 
-          nombre: 'Torneo de Fútbol', 
-          fecha: '2025-03-15', 
+        {
+          id: 1,
+          nombre: 'Torneo de Fútbol',
+          fecha: '2025-03-15',
           startTime: '09:00',
           endTime: '18:00',
-          descripcion: 'Un emocionante torneo de fútbol local con equipos de toda la región. Ven a apoyar a tu equipo favorito y disfruta de un día lleno de deporte y diversión.', 
-          boletosDisponibles: 100, 
+          descripcion: 'Un emocionante torneo de fútbol local con equipos de toda la región. Ven a apoyar a tu equipo favorito y disfruta de un día lleno de deporte y diversión.',
+          boletosDisponibles: 100,
           precio: 50,
           location: 'Estadio Municipal',
           categoryColor: '#3498db'
         },
-        { 
-          id: 2, 
-          nombre: 'Maratón Ciudad', 
-          fecha: '2025-03-25', 
+        {
+          id: 2,
+          nombre: 'Maratón Ciudad',
+          fecha: '2025-03-25',
           startTime: '07:00',
           endTime: '12:00',
-          descripcion: 'Participa en nuestra maratón anual de 10k. Rutas certificadas, medallas para todos los participantes y premios para los ganadores.', 
-          boletosDisponibles: 200, 
+          descripcion: 'Participa en nuestra maratón anual de 10k. Rutas certificadas, medallas para todos los participantes y premios para los ganadores.',
+          boletosDisponibles: 200,
           precio: 30,
           location: 'Parque Central',
           categoryColor: '#e74c3c'
         },
-        { 
-          id: 3, 
-          nombre: 'Conferencia Deportiva', 
-          fecha: '2025-03-15', 
+        {
+          id: 3,
+          nombre: 'Conferencia Deportiva',
+          fecha: '2025-03-15',
           startTime: '14:00',
           endTime: '17:00',
-          descripcion: 'Conferencia con expertos en deporte y salud. Aprende sobre las últimas tendencias en entrenamiento, nutrición y psicología deportiva.', 
-          boletosDisponibles: 50, 
+          descripcion: 'Conferencia con expertos en deporte y salud. Aprende sobre las últimas tendencias en entrenamiento, nutrición y psicología deportiva.',
+          boletosDisponibles: 50,
           precio: 20,
           location: 'Centro de Convenciones',
           categoryColor: '#2ecc71'
         },
-        { 
-          id: 4, 
-          nombre: 'Partido de Tenis', 
-          fecha: '2025-04-18', 
+        {
+          id: 4,
+          nombre: 'Partido de Tenis',
+          fecha: '2025-04-18',
           startTime: '10:00',
           endTime: '13:00',
-          descripcion: 'Partido amistoso de tenis entre los equipos regionales. Exhibición de dobles con jugadores profesionales.', 
-          boletosDisponibles: 75, 
+          descripcion: 'Partido amistoso de tenis entre los equipos regionales. Exhibición de dobles con jugadores profesionales.',
+          boletosDisponibles: 75,
           precio: 40,
           location: 'Club de Tenis',
           categoryColor: '#9b59b6'
         },
-        { 
-          id: 5, 
-          nombre: 'Torneo de Baloncesto', 
-          fecha: '2025-04-22', 
+        {
+          id: 5,
+          nombre: 'Torneo de Baloncesto',
+          fecha: '2025-04-22',
           startTime: '08:00',
           endTime: '20:00',
-          descripcion: 'Torneo local de baloncesto con equipos regionales. Tres categorías: infantil, juvenil y adultos.', 
-          boletosDisponibles: 120, 
+          descripcion: 'Torneo local de baloncesto con equipos regionales. Tres categorías: infantil, juvenil y adultos.',
+          boletosDisponibles: 120,
           precio: 25,
           location: 'Coliseo Municipal',
           categoryColor: '#f39c12'
         },
-        { 
-          id: 6, 
-          nombre: 'Clínica de Natación', 
-          fecha: '2025-05-05', 
+        {
+          id: 6,
+          nombre: 'Clínica de Natación',
+          fecha: '2025-05-05',
           startTime: '15:00',
           endTime: '18:00',
-          descripcion: 'Clínica intensiva para nadadores principiantes e intermedios. Instructores certificados y grupos reducidos.', 
-          boletosDisponibles: 60, 
+          descripcion: 'Clínica intensiva para nadadores principiantes e intermedios. Instructores certificados y grupos reducidos.',
+          boletosDisponibles: 60,
           precio: 35,
           location: 'Piscina Olímpica',
           categoryColor: '#1abc9c'
@@ -312,17 +312,17 @@ export default {
       const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
       const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
       let days = [];
-      
+
       // Días vacíos para alinear el primer día del mes
       for (let i = 0; i < firstDay; i++) {
         days.push(null);
       }
-      
+
       // Días del mes
       for (let i = 1; i <= daysInMonth; i++) {
         days.push(i);
       }
-      
+
       return days;
     },
     cartTotal() {
@@ -349,7 +349,7 @@ export default {
           this.currentMonth++;
         }
       }
-      
+
       this.selectedDay = null;
       this.selectedDayEvents = [];
     },
@@ -362,32 +362,32 @@ export default {
     updateSelectedDayEvents() {
       this.selectedDayEvents = this.eventos.filter(evento => {
         const eventDate = new Date(evento.fecha);
-        return eventDate.getDate() === this.selectedDay && 
-               eventDate.getMonth() === this.currentMonth && 
-               eventDate.getFullYear() === this.currentYear;
+        return eventDate.getDate() === this.selectedDay &&
+          eventDate.getMonth() === this.currentMonth &&
+          eventDate.getFullYear() === this.currentYear;
       });
     },
     hasEvents(day) {
       return this.eventos.some(evento => {
         const eventDate = new Date(evento.fecha);
-        return eventDate.getDate() === day && 
-               eventDate.getMonth() === this.currentMonth && 
-               eventDate.getFullYear() === this.currentYear;
+        return eventDate.getDate() === day &&
+          eventDate.getMonth() === this.currentMonth &&
+          eventDate.getFullYear() === this.currentYear;
       });
     },
     getEventsForDay(day) {
       return this.eventos.filter(evento => {
         const eventDate = new Date(evento.fecha);
-        return eventDate.getDate() === day && 
-               eventDate.getMonth() === this.currentMonth && 
-               eventDate.getFullYear() === this.currentYear;
+        return eventDate.getDate() === day &&
+          eventDate.getMonth() === this.currentMonth &&
+          eventDate.getFullYear() === this.currentYear;
       });
     },
     isCurrentDay(day) {
       const today = new Date();
-      return day === today.getDate() && 
-             this.currentMonth === today.getMonth() && 
-             this.currentYear === today.getFullYear();
+      return day === today.getDate() &&
+        this.currentMonth === today.getMonth() &&
+        this.currentYear === today.getFullYear();
     },
     formatTime(time) {
       if (!time) return '';
@@ -416,7 +416,7 @@ export default {
     },
     addToCart() {
       const existingItem = this.cartItems.find(item => item.id === this.selectedEvent.id);
-      
+
       if (existingItem) {
         existingItem.quantity += this.ticketQuantity;
       } else {
@@ -427,25 +427,25 @@ export default {
           quantity: this.ticketQuantity
         });
       }
-      
+
       // Actualizar disponibilidad
       const event = this.eventos.find(e => e.id === this.selectedEvent.id);
       if (event) {
         event.boletosDisponibles -= this.ticketQuantity;
       }
-      
+
       this.closeEventDetail();
       this.showCartPopup = true;
     },
     removeFromCart(index) {
       const removedItem = this.cartItems[index];
-      
+
       // Devolver boletos al evento
       const event = this.eventos.find(e => e.id === removedItem.id);
       if (event) {
         event.boletosDisponibles += removedItem.quantity;
       }
-      
+
       this.cartItems.splice(index, 1);
     },
     toggleCartPopup() {
@@ -456,6 +456,18 @@ export default {
       this.cartItems = [];
       this.showCartPopup = false;
     }
+
+
+
+
+
+    // FUNCIONES PARA ADMINISTRADOR
+
+    // EDITAR EVENTO
+    // ELIMINAR EVENTO
+    // AGREGAR EVENTO
+
+
   },
   mounted() {
     document.title = 'Calendario';
@@ -467,5 +479,5 @@ export default {
 
 
 <style scoped>
-  @import '../../../scss/Calendario/calendario.scss';
+@import '../../../scss/Calendario/calendario.scss';
 </style>

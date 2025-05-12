@@ -110,14 +110,6 @@ body {
 
 
 
-
-/* Estilos base */
-.solicitud-view {
-  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  color: #333;
-  line-height: 1.6;
-}
-
 .container {
   max-width: 900px;
   margin: 0 auto;
@@ -653,48 +645,3 @@ body {
   }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
-  
-  .page-title {
-    font-size: 2rem;
-  }
-  
-  .solicitud-form {
-    padding: 20px;
-  }
-  
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .availability-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .btn {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .page-title {
-    font-size: 1.8rem;
-  }
-  
-  .step-title {
-    font-size: 1.5rem;
-  }
-  
-  .availability-grid {
-    grid-template-columns: 1fr;
-  }
-}
