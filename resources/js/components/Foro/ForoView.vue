@@ -1,50 +1,49 @@
 <template>
   <div class="foro-page" :class="{ 'no-scroll': postSeleccionado }">
 
+
     <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
-        <a href="/" class="logo-container">
+        <router-link to="/" class="logo-container">
           <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
-        </a>
+        </router-link>
       </div>
 
       <div class="nav-links">
+        <!-- Secciones para usuarios -->
+        <router-link to="/noticias" class="nav-link">Noticias</router-link>
+        <router-link to="/calendario" class="nav-link">Calendario</router-link>
+        <router-link to="/tienda" class="nav-link">Tienda</router-link>
+        <router-link to="/entrenadores" class="nav-link">Entrenadores</router-link>
+        <router-link to="/foro" class="nav-link">Foro</router-link>
 
-        <!-- Secciones para lo usuarios y no usuarios -->
-        <a href="/Noticias" class="nav-link">Noticias</a>
-        <a href="/Calendario" class="nav-link">Calendario</a>
-        <a href="/Tienda" class="nav-link">Tienda</a>
-        <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-        <a href="/Foro" class="nav-link">Foro</a>
+        <!-- Secciones condicionales -->
+        <router-link v-if="userType == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
+          Solicitudes
+        </router-link>
 
-        <!-- Secciones para entrenadores -->
-        <a v-if="userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
-
-        <!-- Secciones para entrenadores -->
-        <a v-if="userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
-
-
+        <router-link v-if="userType == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
+          Solicitudes
+        </router-link>
       </div>
 
       <div class="Imagenes">
-
-        <a href="#" class="Carrito">
+        <router-link to="/carrito" class="Carrito">
           <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
-        </a>
+        </router-link>
 
-        <a href="/Ajustes" class="Ajustes">
+        <router-link to="/ajustes" class="Ajustes">
           <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
-        </a>
+        </router-link>
 
-        <a href="/Perfil" class="Perfil">
+        <router-link to="/perfil" class="Perfil">
           <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
-        </a>
+        </router-link>
 
-        <a :href="login ? '/Login' : '/Logout'" class="Logout">
+        <router-link :to="login ? '/login' : '/logout'" class="Logout">
           <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
-        </a>
-
+        </router-link>
       </div>
     </nav>
 
@@ -170,9 +169,6 @@
 
 
 
-
-
-
     <!-- Popout para ver publicación completa -->
     <transition name="fade">
       <div v-if="postSeleccionado" class="post-popout-overlay" @click.self="cerrarPopout">
@@ -279,7 +275,9 @@
                 </h4>
 
                 <div class="comments-container" ref="commentsContainer">
-                  <!-- Comentarios principales -->
+
+                  <!-- Comentarios principales // HAY QUE PONER QUE SI EL COMENTARIO USER ID ES IGUAL AL USER ID QUE INICIO SECCION PUES QUE TE SALGAN LOS BOTONES DE EDITAR Y ELIMINAR--->
+
                   <div v-for="(comentario) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
                       <div class="comment-avatar-placeholder">
@@ -339,7 +337,7 @@
                           <span>{{ comentario.likes }}</span>
                         </button>
 
-                        <!-- Nuevos botones -->
+                        <!-- EDITAR Y ELIMINAR COMENTARIOS BOTONES -->
                         <button v-if="isCommentAuthor(comentario)" @click="editarComentario(comentario)"
                           class="comment-action edit-btn">
                           Editar
@@ -357,7 +355,7 @@
 
 
 
-                      <!-- Respuestas -->
+                      <!-- Respuestas // HAY QUE PONER QUE SI EL REPLY USER ID ES IGUAL AL USER ID QUE INICIO SECCION PUES QUE TE SALGAN LOS BOTONES DE EDITAR Y ELIMINAR-->
                       <div
                         v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0"
                         class="comment-replies">
@@ -383,6 +381,17 @@
                                 </svg>
                                 <span>{{ respuesta.likes }}</span>
                               </button>
+
+                              <!-- EDITAR Y ELIMINAR REPLY BOTONES -->
+                              <button v-if="isCommentAuthor(respuesta)" @click="editarReply(respuesta)"
+                                class="comment-action edit-btn">
+                                Editar
+                              </button>
+                              <button v-if="isCommentAuthor(respuesta)" @click="eliminarReply(respuesta)"
+                                class="comment-action delete-btn">
+                                Eliminar
+                              </button>
+
                             </div>
                           </div>
                         </div>
@@ -730,6 +739,8 @@ export default {
       try {
         const response = await axios.get('/post');
         // Ordenar posts por fecha descendente
+        if (!this.posts || !Array.isArray(this.posts)) return [];
+        
         this.posts = response.data.posts.sort((a, b) => {
           return new Date(b.created_at) - new Date(a.created_at);
         }).map(post => ({
@@ -1019,6 +1030,87 @@ export default {
     cancelarEdicionComentario() {
       this.comentarioEditando = null;
       this.comentarioEditado = '';
+    },
+
+
+
+
+
+    // METODOS PARA EDITAR Y ELIMINAR EN REPLYS
+
+    // Método para editar un reply
+    async editarReply(reply) {
+      if (!this.comentarioEditado.trim()) {
+        alert('La respuesta no puede estar vacía');
+        return;
+      }
+
+      try {
+        const response = await axios.put(`/post/update-reply/${reply.id}`, {
+          texto: this.comentarioEditado
+        });
+
+        // Actualizar el reply directamente en el estado local
+        const postIndex = this.posts.findIndex(p => p.id === this.postSeleccionado.id);
+        if (postIndex !== -1) {
+          // Buscar el comentario padre
+          const parentCommentIndex = this.posts[postIndex].comments.findIndex(
+            c => c.respuestas.some(r => r.id === reply.id)
+          );
+
+          if (parentCommentIndex !== -1) {
+            // Encontrar y actualizar el reply específico
+            const replyIndex = this.posts[postIndex].comments[parentCommentIndex]
+              .respuestas.findIndex(r => r.id === reply.id);
+
+            if (replyIndex !== -1) {
+              this.posts[postIndex].comments[parentCommentIndex].respuestas[replyIndex].texto =
+                this.comentarioEditado;
+
+              // Actualizar el post seleccionado
+              this.postSeleccionado = { ...this.posts[postIndex] };
+            }
+          }
+        }
+
+        this.comentarioEditando = null;
+        this.comentarioEditado = '';
+      } catch (error) {
+        console.error('Error editando respuesta:', error);
+        alert('Error al guardar cambios: ' + (error.response?.data?.message || error.message));
+      }
+    },
+
+    // Método para eliminar un reply
+    async eliminarReply(reply) {
+      if (!confirm('¿Eliminar esta respuesta permanentemente?')) return;
+
+      try {
+        await axios.delete(`/post/destroy-reply/${reply.id}`);
+
+        // Actualizar el estado local
+        const postIndex = this.posts.findIndex(p => p.id === this.postSeleccionado.id);
+        if (postIndex !== -1) {
+          // Buscar el comentario padre
+          const parentCommentIndex = this.posts[postIndex].comments.findIndex(
+            c => c.respuestas.some(r => r.id === reply.id)
+          );
+
+          if (parentCommentIndex !== -1) {
+            // Filtrar para eliminar el reply
+            this.posts[postIndex].comments[parentCommentIndex].respuestas =
+              this.posts[postIndex].comments[parentCommentIndex].respuestas.filter(
+                r => r.id !== reply.id
+              );
+
+            // Actualizar el post seleccionados
+            this.postSeleccionado = { ...this.posts[postIndex] };
+          }
+        }
+      } catch (error) {
+        console.error('Error eliminando respuesta:', error);
+        alert('Error al eliminar: ' + (error.response?.data?.message || error.message));
+      }
     },
 
 
