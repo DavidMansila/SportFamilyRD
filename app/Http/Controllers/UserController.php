@@ -15,7 +15,14 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::all()->map(function ($user) {
+            $user->image = $user->image 
+            ? url('storage/users/' . $user->id . '/' . $user->image) 
+            : url('public/imagenes/no_image.png');
+            return $user;
+        });
+
+
         return response()->json([
             'message' => 'Usuarios obtenidos con éxito',
             'users' => $users
@@ -48,8 +55,8 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'user_type'=> 'user',
                 // 'last_name' => $request->name,
-                // 'user_type'=> 'user',
                 // 'date' => "2003-03-21"
             ]);
 

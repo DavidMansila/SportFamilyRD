@@ -20,11 +20,11 @@
         <router-link to="/foro" class="nav-link">Foro</router-link>
 
         <!-- Secciones condicionales -->
-        <router-link v-if="userType == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
+        <router-link v-if="user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
           Solicitudes
         </router-link>
 
-        <router-link v-if="userType == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
+        <router-link v-if="user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
           Solicitudes
         </router-link>
       </div>
@@ -53,7 +53,7 @@
       <!-- Header del Perfil -->
       <div class="profile-header">
         <div class="avatar-container">
-          <img :src="user.avatar" alt="Avatar" class="profile-avatar">
+          <img :src="user.image" alt="Avatar" class="profile-avatar">
           <button class="edit-avatar" @click="triggerFileInput">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -227,20 +227,21 @@ export default {
   data() {
     return {
       editMode: false,
-      user: {
-        id: null,
-        name: '',
-        email: '',
-        role: 'user',
-        avatar: '/imagenes/AvatarDefault.png',
-        phone: '',
-        location: '',
-        birthdate: '',
-        bio: '',
-        social_links: [],
-        achievements: [],
-        created_at: ''
-      },
+      // user: {
+      //   id: null,
+      //   name: '',
+      //   email: '',
+      //   role: 'user',
+      //   image: '/imagenes/AvatarDefault.png',
+      //   phone: '',
+      //   location: '',
+      //   birthdate: '',
+      //   bio: '',
+      //   social_links: [],
+      //   achievements: [],
+      //  
+      // },
+      user:[],
       stats: {
         posts: 0,
         likes: 0,
@@ -252,9 +253,7 @@ export default {
       error: null
     }
   },
-  async created() {
-    await this.loadUserData();
-  },
+ 
   methods: {
     async loadUserData() {
       try {
@@ -265,7 +264,7 @@ export default {
           ...response.data,
           socialLinks: response.data.social_links || [],
           achievements: response.data.achievements || [],
-          avatar: response.data.avatar || this.user.avatar
+          image: response.data.image || this.user.image
         };
 
         // Cargar estadísticas
@@ -297,7 +296,7 @@ export default {
 
         // Subir avatar si existe
         if (this.$refs.avatarInput.files[0]) {
-          formData.append('avatar', this.$refs.avatarInput.files[0]);
+          formData.append('image', this.$refs.avatarInput.files[0]);
         }
 
         const { data } = await this.$axios.put(`/user/${this.user.id}`, formData, {
@@ -334,7 +333,7 @@ export default {
       try {
         const reader = new FileReader();
         reader.onload = (e) => {
-          this.user.avatar = e.target.result;
+          this.user.image = e.target.result;
           this.autoSaveAvatar(file);
         };
         reader.readAsDataURL(file);
@@ -345,10 +344,10 @@ export default {
 
     async autoSaveAvatar(file) {
       const formData = new FormData();
-      formData.append('avatar', file);
+      formData.append('image', file);
 
       try {
-        await this.$axios.post(`/user/${this.user.id}/avatar`, formData);
+        await this.$axios.post(`/user/${this.user.id}/image`, formData);
         this.showToast('Foto de perfil actualizada', 'success');
       } catch (error) {
         this.handleError(error, 'Error al guardar foto');
@@ -404,8 +403,9 @@ export default {
       alert(`${type.toUpperCase()}: ${message}`);
     }
   },
-  mounted() {
-    this.user = localStorage.getItem('user');
+  mounted(){
+    
+   this.user = JSON.parse(localStorage.getItem('user'));
   }
 }
 </script>
