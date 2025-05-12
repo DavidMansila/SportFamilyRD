@@ -4,49 +4,48 @@
     <!-- Navbar -->
     <nav class="navbar">
       <div class="logo-container">
-        <a href="/" class="logo-container">
-          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo"/>
-        </a>
+        <router-link to="/" class="logo-container">
+          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
+        </router-link>
       </div>
 
       <div class="nav-links">
+        <!-- Secciones para usuarios -->
+        <router-link to="/noticias" class="nav-link">Noticias</router-link>
+        <router-link to="/calendario" class="nav-link">Calendario</router-link>
+        <router-link to="/tienda" class="nav-link">Tienda</router-link>
+        <router-link to="/entrenadores" class="nav-link">Entrenadores</router-link>
+        <router-link to="/foro" class="nav-link">Foro</router-link>
 
-           <!-- Secciones para lo usuarios y no usuarios -->
-           <a href="/Noticias" class="nav-link">Noticias</a>
-           <a href="/Calendario" class="nav-link">Calendario</a>
-           <a href="/Tienda" class="nav-link">Tienda</a>
-           <a href="/Entrenadores" class="nav-link">Entrenadores</a>
-           <a href="/Foro" class="nav-link">Foro</a>
+        <!-- Secciones condicionales -->
+        <router-link v-if="userType == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
+          Solicitudes
+        </router-link>
 
-          <!-- Secciones para entrenadores -->
-           <a v-if = "userType == 'entrenador'" href="/SolicitudesUsuarios" class="nav-link">Solicitudes</a>
-
-          <!-- Secciones para entrenadores -->
-          <a v-if = "userType == 'admin'" href="/SolicitudesEntrenadores" class="nav-link">Solicitudes</a>
-
-
+        <router-link v-if="userType == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
+          Solicitudes
+        </router-link>
       </div>
 
       <div class="Imagenes">
+        <router-link to="/carrito" class="Carrito">
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
+        </router-link>
 
-        <a href="#" class="Carrito">
-          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon"/>
-        </a>
+        <router-link to="/ajustes" class="Ajustes">
+          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
+        </router-link>
 
-        <a href= "/Ajustes" class="Ajustes">
-          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon"/>
-        </a>
+        <router-link to="/perfil" class="Perfil">
+          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
+        </router-link>
 
-        <a href= "/Perfil" class="Perfil">
-          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon"/>
-        </a>
-
-        <a :href=" login ? '/Login' : '/Logout' " class="Logout">
-          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon"/>
-        </a>
-
+        <router-link :to="login ? '/login' : '/logout'" class="Logout">
+          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
+        </router-link>
       </div>
     </nav>
+
 
     <div class="hero-banner">
       <div class="hero-content">
@@ -64,11 +63,7 @@
         <p class="section-description">Descubre los deportes más populares</p>
       </div>
       <div class="category-grid">
-        <a
-          v-for="category in categories"
-          :key="category.name"
-          class="category-card"
-        >
+        <a v-for="category in categories" :key="category.name" class="category-card">
           <div class="card-image">
             <img :src="category.image" :alt="category.name" />
             <div class="card-overlay"></div>
@@ -103,11 +98,7 @@
         <h2>Únete a nuestra comunidad</h2>
         <p>Conecta con otros entusiastas del deporte en nuestro foro</p>
         <div class="thread-preview">
-          <a
-            v-for="thread in threads"
-            :key="thread.title"
-            class="thread-card"
-          >
+          <a v-for="thread in threads" :key="thread.title" class="thread-card">
             <img :src="thread.image" :alt="thread.title" />
             <div class="thread-details">
               <h4>{{ thread.title }}</h4>
@@ -122,7 +113,7 @@
       </div>
     </section>
 
-     <footer class="main-footer">
+    <footer class="main-footer">
       <div class="footer-content">
         <div class="footer-section">
           <h3>SportFamilyRD</h3>
@@ -194,7 +185,7 @@ export default {
 
   mounted() {
 
-    
+
     document.title = 'SportFamilyRD';
 
   },
@@ -206,7 +197,6 @@ export default {
 
 
 <style scoped>
-
 @import '../../../scss/Home/home.scss';
 
 @import '../../../scss/Home/home_footer.scss';
@@ -218,5 +208,4 @@ export default {
 @import '../../../scss/Home/home_comunidad.scss';
 
 @import '../../../scss/Home/home_responsive.scss';
-
 </style>
