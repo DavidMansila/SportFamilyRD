@@ -189,6 +189,7 @@ class PostController extends Controller
     public function getReply($commentId)
     {
         try {
+            //todo verificar si es necesaria esta funcion
             $comment = Comment::with('replies')->findOrFail($commentId);
 
             return response()->json([
@@ -231,7 +232,7 @@ class PostController extends Controller
     public function updateReply(Request $request, $replyId)
     {
         try {
-            $reply = Comment::findOrFail($replyId);
+            $reply = Reply::findOrFail($replyId);
             $reply->update($request->all());
 
             return response()->json([
@@ -250,7 +251,7 @@ class PostController extends Controller
     public function destroyReply($replyId)
     {
         try {
-            $reply = Comment::findOrFail($replyId);
+            $reply = Reply::findOrFail($replyId);
             $reply->delete();
 
             return response()->json([

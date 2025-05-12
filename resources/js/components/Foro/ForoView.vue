@@ -376,7 +376,7 @@
                               <textarea v-model="replyEditado" class="comment-edit-input" rows="3"
                                 placeholder="Edita tu comentario..." autofocus></textarea>
                               <div class="edit-actions">
-                                <button @click="guardarEdicionReply(reply)" class="btn-save">
+                                <button @click="guardarEdicionReply(reply, comentario.id)" class="btn-save">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
@@ -1038,19 +1038,17 @@ export default {
     },
 
 
-
-
-    guardarEdicionReply(reply) {
+    guardarEdicionReply(reply, comentarioID) {
 
       if (!this.replyEditado.trim()) {
         alert('La respuesta no puede estar vacía');
         return;
       }
-
+      
       const endpoint = `/post/update-reply/${reply.id}`
 
 
-      axios.put(endpoint, { texto: this.replyEditado })
+      axios.put(endpoint, { comment_id:comentarioID , texto: this.replyEditado,  })
         .then(response => {
           this.getPost()
             .then(() => {
@@ -1115,7 +1113,29 @@ export default {
 
     // METODOS PARA EDITAR Y ELIMINAR EN REPLYS
 
+    eliminarReply(reply) {
+      if (!confirm('¿Eliminar esta respuesta permanentemente?')) return;
 
+      const endpoint = `/post/destroy-reply/${reply.id}`
+
+      axios.delete(endpoint)
+        .then(() => {
+          this.getPost()
+            .then(() => {
+              const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
+              if (postEncontrado) {
+                this.postSeleccionado = { ...postEncontrado };
+              }
+            })
+            .catch(error => {
+              console.error('Error al eliminar la respuesta:', error);
+            });
+        })
+        .catch(error => {
+          console.error('Error eliminando respuesta:', error);
+          alert('Error al eliminar');
+        });
+    },
 
 
     // METODOS AUXILIARES
