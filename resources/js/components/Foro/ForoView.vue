@@ -339,7 +339,7 @@
                           <span>{{ comentario.likes }}</span>
                         </button>
 
-                        <!-- Nuevos botones -->
+                        <!-- EDITAR Y ELIMINAR COMENTARIOS BOTONES -->
                         <button v-if="isCommentAuthor(comentario)" @click="editarComentario(comentario)"
                           class="comment-action edit-btn">
                           Editar
@@ -383,6 +383,17 @@
                                 </svg>
                                 <span>{{ respuesta.likes }}</span>
                               </button>
+
+                              <!-- EDITAR Y ELIMINAR REPLY BOTONES -->
+                              <button v-if="isCommentAuthor(respuesta)" @click="editarReply(respuesta)"
+                                class="comment-action edit-btn">
+                                Editar
+                              </button>
+                              <button v-if="isCommentAuthor(respuesta)" @click="eliminarReply(respuesta)"
+                                class="comment-action delete-btn">
+                                Eliminar
+                              </button>
+
                             </div>
                           </div>
                         </div>
@@ -1019,6 +1030,87 @@ export default {
     cancelarEdicionComentario() {
       this.comentarioEditando = null;
       this.comentarioEditado = '';
+    },
+
+
+
+
+
+    // METODOS PARA EDITAR Y ELIMINAR EN REPLYS
+
+    // Método para editar un reply
+    async editarReply(reply) {
+      if (!this.comentarioEditado.trim()) {
+        alert('La respuesta no puede estar vacía');
+        return;
+      }
+
+      try {
+        const response = await axios.put(`/post/update-reply/${reply.id}`, {
+          texto: this.comentarioEditado
+        });
+
+        // Actualizar el reply directamente en el estado local
+        const postIndex = this.posts.findIndex(p => p.id === this.postSeleccionado.id);
+        if (postIndex !== -1) {
+          // Buscar el comentario padre
+          const parentCommentIndex = this.posts[postIndex].comments.findIndex(
+            c => c.respuestas.some(r => r.id === reply.id)
+          );
+
+          if (parentCommentIndex !== -1) {
+            // Encontrar y actualizar el reply específico
+            const replyIndex = this.posts[postIndex].comments[parentCommentIndex]
+              .respuestas.findIndex(r => r.id === reply.id);
+
+            if (replyIndex !== -1) {
+              this.posts[postIndex].comments[parentCommentIndex].respuestas[replyIndex].texto =
+                this.comentarioEditado;
+
+              // Actualizar el post seleccionado
+              this.postSeleccionado = { ...this.posts[postIndex] };
+            }
+          }
+        }
+
+        this.comentarioEditando = null;
+        this.comentarioEditado = '';
+      } catch (error) {
+        console.error('Error editando respuesta:', error);
+        alert('Error al guardar cambios: ' + (error.response?.data?.message || error.message));
+      }
+    },
+
+    // Método para eliminar un reply
+    async eliminarReply(reply) {
+      if (!confirm('¿Eliminar esta respuesta permanentemente?')) return;
+
+      try {
+        await axios.delete(`/post/destroy-reply/${reply.id}`);
+
+        // Actualizar el estado local
+        const postIndex = this.posts.findIndex(p => p.id === this.postSeleccionado.id);
+        if (postIndex !== -1) {
+          // Buscar el comentario padre
+          const parentCommentIndex = this.posts[postIndex].comments.findIndex(
+            c => c.respuestas.some(r => r.id === reply.id)
+          );
+
+          if (parentCommentIndex !== -1) {
+            // Filtrar para eliminar el reply
+            this.posts[postIndex].comments[parentCommentIndex].respuestas =
+              this.posts[postIndex].comments[parentCommentIndex].respuestas.filter(
+                r => r.id !== reply.id
+              );
+
+            // Actualizar el post seleccionados
+            this.postSeleccionado = { ...this.posts[postIndex] };
+          }
+        }
+      } catch (error) {
+        console.error('Error eliminando respuesta:', error);
+        alert('Error al eliminar: ' + (error.response?.data?.message || error.message));
+      }
     },
 
 
