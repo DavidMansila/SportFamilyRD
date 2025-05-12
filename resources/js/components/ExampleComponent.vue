@@ -15,23 +15,39 @@
 export default {
   data() {
     return {
-      isMenuOpen: false,
-      isAuthenticated: false, // Debes conectar esto con tu sistema de autenticación
-      user: {}, // Datos del usuario desde tu store
-      cartCount: 0 // Conectar con tu carrito
+      user: null
     }
   },
+  async created() {
+    await this.loadUser();
+  },
   methods: {
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen
+    async loadUser() {
+      try {
+        // Intenta cargar usuario desde localStorage
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          this.user = JSON.parse(storedUser);
+        }
+        
+        // Verifica con el backend
+        const response = await this.$axios.get('/current-user');
+        this.user = response.data;
+        localStorage.setItem('user', JSON.stringify(response.data));
+      } catch (error) {
+        // Si hay error, limpia los datos
+        this.user = null;
+        localStorage.removeItem('user');
+      }
     },
     async logout() {
       try {
-        await this.$axios.post('/logout')
-        // Limpiar estado del usuario
-        this.$router.push('/')
+        await this.$axios.post('/logout');
+        this.user = null;
+        localStorage.removeItem('user');
+        this.$router.push('/');
       } catch (error) {
-        console.error('Error al cerrar sesión:', error)
+        console.error('Error al cerrar sesión:', error);
       }
     }
   }
@@ -39,5 +55,6 @@ export default {
 </script>
 
 <style lang="scss">
+
 
 </style>

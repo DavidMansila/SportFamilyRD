@@ -179,10 +179,10 @@
             </button>
           </div>
           <!-- Botones de acción en modo edición -->
-        <div v-if="editMode" class="action-buttons">
-          <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
-          <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
-        </div>
+          <div v-if="editMode" class="action-buttons">
+            <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
+            <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
+          </div>
         </div>
 
 
@@ -219,73 +219,161 @@
   </div>
 </template>
 
+
 <script>
 export default {
   name: 'ProfileView',
+  inject: ['userData'], // Asumiendo que inyectas el usuario desde el root
   data() {
     return {
       editMode: false,
       user: {
-        name: 'Carlos Pérez',
-        role: 'Usuario',
-        email: 'carlos@ejemplo.com',
-        phone: '+1 234 567 890',
-        location: 'Santo Domingo, RD',
-        birthdate: '1985-05-15',
-        bio: 'Entrenador profesional con más de 10 años de experiencia formando jugadores de alto rendimiento. Especializado en táctica y desarrollo de habilidades técnicas.',
+        id: null,
+        name: '',
+        email: '',
+        role: 'user',
         avatar: '/imagenes/AvatarDefault.png',
-        socialLinks: [
-          { platform: 'facebook', url: 'https://facebook.com/carlosperez' },
-          { platform: 'instagram', url: 'https://instagram.com/carlosperez' }
-        ],
-        achievements: [
-          {
-            title: 'Campeón Nacional 2020',
-            description: 'Entrenador principal del equipo campeón de la liga nacional',
-            date: '2020-12-15'
-          },
-          {
-            title: 'Certificación UEFA Pro',
-            description: 'Obtuve la certificación más alta para entrenadores de fútbol',
-            date: '2018-06-10'
-          }
-        ]
+        phone: '',
+        location: '',
+        birthdate: '',
+        bio: '',
+        social_links: [],
+        achievements: [],
+        created_at: ''
       },
       stats: {
-        posts: 245,
-        likes: 156,
-        rating: 4.8
+        posts: 0,
+        likes: 0,
+        SolicitudesUsuarios: 0,
+        rating: 0
       },
-      originalUserData: null
+      originalUserData: null,
+      isLoading: true,
+      error: null
     }
   },
-  created() {
-    // Guardar copia original para poder descartar cambios
-    this.originalUserData = JSON.parse(JSON.stringify(this.user));
+  async created() {
+    await this.loadUserData();
   },
   methods: {
-    triggerFileInput() {
-      this.$refs.avatarInput.click();
+    async loadUserData() {
+      try {
+        const response = await this.$axios.get('/current-user');
+
+        // Mapear datos del backend
+        this.user = {
+          ...response.data,
+          socialLinks: response.data.social_links || [],
+          achievements: response.data.achievements || [],
+          avatar: response.data.avatar || this.user.avatar
+        };
+
+        // Cargar estadísticas
+        const statsResponse = await this.$axios.get(`/user-stats/${this.user.id}`);
+        this.stats = statsResponse.data;
+
+        this.originalUserData = JSON.parse(JSON.stringify(this.user));
+        this.isLoading = false;
+      } catch (error) {
+        this.handleError(error, 'Error al cargar el perfil');
+      }
     },
-    handleAvatarChange(event) {
+
+    async saveProfile() {
+      try {
+        const formData = new FormData();
+        const changes = this.getChangedFields();
+
+        // Agregar solo campos modificados
+        Object.keys(changes).forEach(key => {
+          if (key === 'socialLinks') {
+            formData.append('social_links', JSON.stringify(this.user.socialLinks));
+          } else if (key === 'achievements') {
+            formData.append('achievements', JSON.stringify(this.user.achievements));
+          } else {
+            formData.append(key, this.user[key]);
+          }
+        });
+
+        // Subir avatar si existe
+        if (this.$refs.avatarInput.files[0]) {
+          formData.append('avatar', this.$refs.avatarInput.files[0]);
+        }
+
+        const { data } = await this.$axios.put(`/user/${this.user.id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        // Actualizar datos locales
+        this.user = { ...this.user, ...data.user };
+        this.originalUserData = JSON.parse(JSON.stringify(this.user));
+        this.editMode = false;
+        this.$emit('user-updated', this.user);
+        this.showToast('Perfil actualizado correctamente', 'success');
+      } catch (error) {
+        this.handleError(error, 'Error al guardar cambios');
+      }
+    },
+
+    getChangedFields() {
+      const changes = {};
+      Object.keys(this.user).forEach(key => {
+        if (JSON.stringify(this.user[key]) !== JSON.stringify(this.originalUserData[key])) {
+          changes[key] = this.user[key];
+        }
+      });
+      return changes;
+    },
+
+    async handleAvatarChange(event) {
       const file = event.target.files[0];
-      if (file) {
+      if (!file) return;
+
+      try {
         const reader = new FileReader();
         reader.onload = (e) => {
           this.user.avatar = e.target.result;
+          this.autoSaveAvatar(file);
         };
         reader.readAsDataURL(file);
+      } catch (error) {
+        this.handleError(error, 'Error al subir imagen');
       }
     },
-    getSocialIcon(platform) {
-      return `/imagenes/social-${platform}.svg`;
+
+    async autoSaveAvatar(file) {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      try {
+        await this.$axios.post(`/user/${this.user.id}/avatar`, formData);
+        this.showToast('Foto de perfil actualizada', 'success');
+      } catch (error) {
+        this.handleError(error, 'Error al guardar foto');
+      }
     },
+
+    getSocialIcon(platform) {
+      const icons = {
+        facebook: 'facebook-icon.svg',
+        twitter: 'twitter-icon.svg',
+        instagram: 'instagram-icon.svg',
+        linkedin: 'linkedin-icon.svg',
+        youtube: 'youtube-icon.svg'
+      };
+      return `/imagenes/social/${icons[platform] || 'default-social-icon.svg'}`;
+    },
+
     addSocialLink() {
       this.user.socialLinks.push({ platform: 'facebook', url: '' });
     },
+
     removeSocialLink(index) {
       this.user.socialLinks.splice(index, 1);
     },
+
     addAchievement() {
       this.user.achievements.push({
         title: '',
@@ -293,23 +381,31 @@ export default {
         date: new Date().toISOString().split('T')[0]
       });
     },
+
     removeAchievement(index) {
       this.user.achievements.splice(index, 1);
     },
-    saveProfile() {
-      // Aquí iría la lógica para guardar en el backend
-      console.log('Perfil guardado:', this.user);
-      this.originalUserData = JSON.parse(JSON.stringify(this.user));
-      this.editMode = false;
-      alert('Tus cambios se han guardado correctamente');
-    },
+
     discardChanges() {
       this.user = JSON.parse(JSON.stringify(this.originalUserData));
       this.editMode = false;
+      this.showToast('Cambios descartados', 'info');
+    },
+
+    handleError(error, defaultMsg) {
+      const errorMsg = error.response?.data?.message || defaultMsg;
+      this.error = errorMsg;
+      this.showToast(errorMsg, 'error');
+      console.error(error);
+    },
+
+    showToast(message, type = 'info') {
+      // Implementar lógica de tu sistema de notificaciones
+      alert(`${type.toUpperCase()}: ${message}`);
     }
   },
   mounted() {
-    document.title = 'Perfil';
+    this.user = localStorage.getItem('user');
   }
 }
 </script>
