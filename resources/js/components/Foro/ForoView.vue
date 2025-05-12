@@ -1039,7 +1039,6 @@ export default {
 
 
 
-
     guardarEdicionReply(reply) {
 
       if (!this.replyEditado.trim()) {
@@ -1079,11 +1078,10 @@ export default {
 
 
     eliminarComentario(comentario) {
+
       if (!confirm('¿Eliminar este comentario permanentemente?')) return;
 
-      const endpoint = comentario.parent_id
-        ? `/post/destroy-reply/${comentario.id}`
-        : `/post/delete-comment/${comentario.id}`;
+      const endpoint = `/post/delete-comment/${comentario.id}`;
 
       axios.delete(endpoint)
         .then(() => {
@@ -1103,6 +1101,34 @@ export default {
           alert('Error al eliminar');
         });
     },
+
+
+
+    eliminarReply(reply) {
+      if (!confirm('¿Eliminar esta respuesta permanentemente?')) return;
+
+      const endpoint = `/post/destroy-reply/${reply.id}`
+
+      axios.delete(endpoint)
+        .then(() => {
+          this.getPost()
+            .then(() => {
+              const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
+              if (postEncontrado) {
+                this.postSeleccionado = { ...postEncontrado };
+              }
+            })
+            .catch(error => {
+              console.error('Error al eliminar la respuesta:', error);
+            });
+        })
+        .catch(error => {
+          console.error('Error eliminando respuesta:', error);
+          alert('Error al eliminar');
+        });
+    },
+
+
 
     cancelarEdicionComentario() {
       this.comentarioEditando = null;
