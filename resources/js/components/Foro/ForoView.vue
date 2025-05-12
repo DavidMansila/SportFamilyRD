@@ -170,9 +170,6 @@
 
 
 
-
-
-
     <!-- Popout para ver publicación completa -->
     <transition name="fade">
       <div v-if="postSeleccionado" class="post-popout-overlay" @click.self="cerrarPopout">
@@ -279,7 +276,9 @@
                 </h4>
 
                 <div class="comments-container" ref="commentsContainer">
-                  <!-- Comentarios principales -->
+
+                  <!-- Comentarios principales // HAY QUE PONER QUE SI EL COMENTARIO USER ID ES IGUAL AL USER ID QUE INICIO SECCION PUES QUE TE SALGAN LOS BOTONES DE EDITAR Y ELIMINAR--->
+
                   <div v-for="(comentario) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
                       <div class="comment-avatar-placeholder">
@@ -357,7 +356,7 @@
 
 
 
-                      <!-- Respuestas -->
+                      <!-- Respuestas // HAY QUE PONER QUE SI EL REPLY USER ID ES IGUAL AL USER ID QUE INICIO SECCION PUES QUE TE SALGAN LOS BOTONES DE EDITAR Y ELIMINAR-->
                       <div
                         v-if="comentariosExpandidos.includes(comentario.id) && comentario.respuestas && comentario.respuestas.length > 0"
                         class="comment-replies">
