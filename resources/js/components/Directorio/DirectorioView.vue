@@ -19,11 +19,11 @@
         <router-link to="/foro" class="nav-link">Foro</router-link>
 
         <!-- Secciones condicionales -->
-        <router-link v-if="userType == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
+        <router-link v-if="user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
           Solicitudes
         </router-link>
 
-        <router-link v-if="userType == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
+        <router-link v-if="user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
           Solicitudes
         </router-link>
       </div>

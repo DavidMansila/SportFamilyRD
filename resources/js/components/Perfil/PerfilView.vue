@@ -20,11 +20,11 @@
         <router-link to="/foro" class="nav-link">Foro</router-link>
 
         <!-- Secciones condicionales -->
-        <router-link v-if="userType == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
+        <router-link v-if="user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
           Solicitudes
         </router-link>
 
-        <router-link v-if="userType == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
+        <router-link v-if="user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
           Solicitudes
         </router-link>
       </div>
@@ -53,7 +53,7 @@
       <!-- Header del Perfil -->
       <div class="profile-header">
         <div class="avatar-container">
-          <img :src="user.avatar" alt="Avatar" class="profile-avatar">
+          <img :src="user.imagen" alt="Avatar" class="profile-avatar">
           <button class="edit-avatar" @click="triggerFileInput">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -232,7 +232,7 @@ export default {
         name: '',
         email: '',
         role: 'user',
-        avatar: '/imagenes/AvatarDefault.png',
+        imagen: '/imagenes/AvatarDefault.png',
         phone: '',
         location: '',
         birthdate: '',
@@ -241,6 +241,7 @@ export default {
         achievements: [],
         created_at: ''
       },
+      // TODO - HACER MODDELO RELACIONAL 
       stats: {
         posts: 0,
         likes: 0,
@@ -256,28 +257,28 @@ export default {
     await this.loadUserData();
   },
   methods: {
-    async loadUserData() {
-      try {
-        const response = await this.$axios.get('/current-user');
+    // async loadUserData() {
+    //   try {
+    //     const response = await this.$axios.get('/current-user');
 
-        // Mapear datos del backend
-        this.user = {
-          ...response.data,
-          socialLinks: response.data.social_links || [],
-          achievements: response.data.achievements || [],
-          avatar: response.data.avatar || this.user.avatar
-        };
+    //     // Mapear datos del backend
+    //     this.user = {
+    //       ...response.data,
+    //       socialLinks: response.data.social_links || [],
+    //       achievements: response.data.achievements || [],
+    //       avatar: response.data.avatar || this.user.avatar
+    //     };
 
-        // Cargar estadísticas
-        const statsResponse = await this.$axios.get(`/user-stats/${this.user.id}`);
-        this.stats = statsResponse.data;
+    //     // Cargar estadísticas
+    //     const statsResponse = await this.$axios.get(`/user-stats/${this.user.id}`);
+    //     this.stats = statsResponse.data;
 
-        this.originalUserData = JSON.parse(JSON.stringify(this.user));
-        this.isLoading = false;
-      } catch (error) {
-        this.handleError(error, 'Error al cargar el perfil');
-      }
-    },
+    //     this.originalUserData = JSON.parse(JSON.stringify(this.user));
+    //     this.isLoading = false;
+    //   } catch (error) {
+    //     this.handleError(error, 'Error al cargar el perfil');
+    //   }
+    // },
 
     async saveProfile() {
       try {
@@ -334,7 +335,7 @@ export default {
       try {
         const reader = new FileReader();
         reader.onload = (e) => {
-          this.user.avatar = e.target.result;
+          this.user.imagen = e.target.result;
           this.autoSaveAvatar(file);
         };
         reader.readAsDataURL(file);
