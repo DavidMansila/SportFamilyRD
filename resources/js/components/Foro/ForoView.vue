@@ -862,6 +862,17 @@ export default {
           };
         }
 
+        this.getPost()
+            .then(() => {
+              const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
+              if (postEncontrado) {
+                this.postSeleccionado = { ...postEncontrado };
+              }
+            })
+            .catch(error => {
+              console.error('Error al editar comentario:', error);
+            });
+
         this.nuevoComentario = '';
         this.comentarioRespondiendo = null;
 
@@ -1038,18 +1049,17 @@ export default {
     },
 
 
-
-    guardarEdicionReply(reply) {
+    guardarEdicionReply(reply, comentarioID) {
 
       if (!this.replyEditado.trim()) {
         alert('La respuesta no puede estar vacía');
         return;
       }
-      
+
       const endpoint = `/post/update-reply/${reply.id}`
 
 
-      axios.put(endpoint, { comment_id:comentarioID , texto: this.replyEditado,  })
+      axios.put(endpoint, { comment_id: comentarioID, texto: this.replyEditado, })
         .then(response => {
           this.getPost()
             .then(() => {
@@ -1078,10 +1088,11 @@ export default {
 
 
     eliminarComentario(comentario) {
-
       if (!confirm('¿Eliminar este comentario permanentemente?')) return;
 
-      const endpoint = `/post/delete-comment/${comentario.id}`;
+      const endpoint = comentario.parent_id
+        ? `/post/destroy-reply/${comentario.id}`
+        : `/post/delete-comment/${comentario.id}`;
 
       axios.delete(endpoint)
         .then(() => {
@@ -1101,34 +1112,6 @@ export default {
           alert('Error al eliminar');
         });
     },
-
-
-
-    eliminarReply(reply) {
-      if (!confirm('¿Eliminar esta respuesta permanentemente?')) return;
-
-      const endpoint = `/post/destroy-reply/${reply.id}`
-
-      axios.delete(endpoint)
-        .then(() => {
-          this.getPost()
-            .then(() => {
-              const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
-              if (postEncontrado) {
-                this.postSeleccionado = { ...postEncontrado };
-              }
-            })
-            .catch(error => {
-              console.error('Error al eliminar la respuesta:', error);
-            });
-        })
-        .catch(error => {
-          console.error('Error eliminando respuesta:', error);
-          alert('Error al eliminar');
-        });
-    },
-
-
 
     cancelarEdicionComentario() {
       this.comentarioEditando = null;
