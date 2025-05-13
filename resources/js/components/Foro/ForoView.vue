@@ -862,6 +862,17 @@ export default {
           };
         }
 
+        this.getPost()
+            .then(() => {
+              const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
+              if (postEncontrado) {
+                this.postSeleccionado = { ...postEncontrado };
+              }
+            })
+            .catch(error => {
+              console.error('Error al editar comentario:', error);
+            });
+
         this.nuevoComentario = '';
         this.comentarioRespondiendo = null;
 
@@ -1044,11 +1055,11 @@ export default {
         alert('La respuesta no puede estar vacía');
         return;
       }
-      
+
       const endpoint = `/post/update-reply/${reply.id}`
 
 
-      axios.put(endpoint, { comment_id:comentarioID , texto: this.replyEditado,  })
+      axios.put(endpoint, { comment_id: comentarioID, texto: this.replyEditado, })
         .then(response => {
           this.getPost()
             .then(() => {

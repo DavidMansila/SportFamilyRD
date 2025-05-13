@@ -53,7 +53,7 @@
       <!-- Header del Perfil -->
       <div class="profile-header">
         <div class="avatar-container">
-          <img :src="user.image" alt="Avatar" class="profile-avatar">
+          <img :src="user.imagen" alt="Avatar" class="profile-avatar">
           <button class="edit-avatar" @click="triggerFileInput">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -255,9 +255,10 @@ export default {
   },
  
   methods: {
-    async loadUserData() {
-      try {
-        const response = await this.$axios.get('/current-user');
+    
+     async loadUserData() {
+       try {
+         const response = await this.$axios.get('/current-user');
 
         // Mapear datos del backend
         this.user = {
@@ -267,16 +268,16 @@ export default {
           image: response.data.image || this.user.image
         };
 
-        // Cargar estadísticas
-        const statsResponse = await this.$axios.get(`/user-stats/${this.user.id}`);
-        this.stats = statsResponse.data;
+         // Cargar estadísticas
+         const statsResponse = await this.$axios.get(`/user-stats/${this.user.id}`);
+         this.stats = statsResponse.data;
 
-        this.originalUserData = JSON.parse(JSON.stringify(this.user));
-        this.isLoading = false;
-      } catch (error) {
-        this.handleError(error, 'Error al cargar el perfil');
-      }
-    },
+         this.originalUserData = JSON.parse(JSON.stringify(this.user));
+         this.isLoading = false;
+       } catch (error) {
+         this.handleError(error, 'Error al cargar el perfil');
+       }
+     },
 
     async saveProfile() {
       try {
@@ -333,6 +334,7 @@ export default {
       try {
         const reader = new FileReader();
         reader.onload = (e) => {
+          this.user.imagen = e.target.result;
           this.user.image = e.target.result;
           this.autoSaveAvatar(file);
         };
