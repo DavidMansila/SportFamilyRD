@@ -53,7 +53,7 @@
       <!-- Header del Perfil -->
       <div class="profile-header">
         <div class="avatar-container">
-          <!-- <img :src="user.avatar" alt="Avatar" class="profile-avatar"> -->
+          <img :src="user.imagen" alt="Avatar" class="profile-avatar">
           <button class="edit-avatar" @click="triggerFileInput">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
