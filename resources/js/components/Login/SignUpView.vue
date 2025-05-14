@@ -1,6 +1,11 @@
 <template>
 
   <div class="container" ref="container">
+
+    <div v-if="showLogoutMessage" class="logout-message">
+      ✅ Sesión cerrada exitosamente
+    </div>
+
     <div class="form-container sign-up-container">
       <form>
         <!-- @submit.prevent="submitForm" -->
@@ -49,17 +54,17 @@
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
-          <a href="/" class="mb-6">
+          <router-link to="/" class="mb-6">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
-          </a>
+          </router-link>
           <h1>Welcome Back!</h1>
           <p>To keep connected with us, please login with your personal info</p>
           <button class="ghost" @click="toggleForm('signIn')">Sign In</button>
         </div>
         <div class="overlay-panel overlay-right">
-          <a href="/" class="mb-6">
+          <router-link to="/" class="mb-6">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
-          </a>
+          </router-link>
           <h1>Hello, Friend!</h1>
           <p>Enter your details and start your journey with us</p>
           <button class="ghost" @click="toggleForm('signUp')">Sign Up</button>
@@ -77,6 +82,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      showLogoutMessage: false,
+
       registerForm: {
         name: '',
         email: '',
@@ -103,7 +110,6 @@ export default {
 
     async submitForm() {
       // this.isSubmitting = true;
-
       try {
         console.log('Registering:', this.registerForm);
 
@@ -114,7 +120,6 @@ export default {
           })
           .catch((error) => {
             console.log(error);
-
             alert('Algo salió mal, por favor intenta de nuevo');
           });
       } catch (error) {
@@ -124,7 +129,7 @@ export default {
     },
 
     async submitLoginForm() {
-      this.isSubmitting = true; 
+      this.isSubmitting = true;
       try {
         console.log('Logging in:', this.loginForm);
 
@@ -150,6 +155,23 @@ export default {
       }
       this.isSubmitting = false;
     },
+
+
+
+    checkLogoutMessage() {
+      if (this.$route.query.logoutSuccess || sessionStorage.getItem('logoutMessage')) {
+        this.showLogoutMessage = true;
+        sessionStorage.removeItem('logoutMessage');
+
+        setTimeout(() => {
+          this.showLogoutMessage = false;
+        }, 5000);
+      }
+    }
+
+  },
+    mounted() {
+    this.checkLogoutMessage();
   },
 };
 </script>
@@ -157,4 +179,23 @@ export default {
 
 <style scoped>
 @import '../../../scss/Login/signup.scss';
+
+.logout-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4CAF50;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from { top: -50px; }
+  to { top: 20px; }
+}
 </style>

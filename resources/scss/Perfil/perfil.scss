@@ -1,16 +1,6 @@
+/* Contenedor de perfil */
 
- /* General styles */
- body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
-  }
-  
-  
-  /* Contenedor de perfil */
-  
-  .profile-container {
+.profile-container {
     background: white;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
@@ -19,16 +9,15 @@
     max-width: 1200px;
     position: relative;
     transition: all 0.3s ease;
-  }
-  
-  .profile-container:hover {
+}
+
+.profile-container:hover {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
-  }
-  
-  
-  /* Cabezera de perfil */
-  
-  .profile-header {
+}
+
+/* Cabezera de perfil */
+
+.profile-header {
     display: flex;
     align-items: center;
     padding: 50px;
@@ -36,15 +25,15 @@
     color: #2d3748;
     position: relative;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  }
-  
-  .avatar-container {
+}
+
+.avatar-container {
     position: relative;
     margin-right: 40px;
     transition: all 0.3s ease;
-  }
-  
-  .profile-avatar {
+}
+
+.profile-avatar {
     width: 180px;
     height: 180px;
     border-radius: 50%;
@@ -52,13 +41,13 @@
     border: 5px solid white;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     transition: transform 0.3s ease;
-  }
-  
-  .profile-avatar:hover {
+}
+
+.profile-avatar:hover {
     transform: scale(1.03);
-  }
-  
-  .edit-avatar {
+}
+
+.edit-avatar {
     position: absolute;
     bottom: 15px;
     right: 15px;
@@ -74,51 +63,51 @@
     color: white;
     box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
     transition: all 0.3s ease;
-  }
-  
-  .edit-avatar:hover {
+}
+
+.edit-avatar:hover {
     background: #2980b9;
     transform: translateY(-2px);
-  }
-  
-  .edit-avatar svg {
+}
+
+.edit-avatar svg {
     width: 22px;
     height: 22px;
-  }
-  
-  .profile-info {
+}
+
+.profile-info {
     flex: 1;
-  }
-  
-  .profile-name {
+}
+
+.profile-name {
     font-size: 2.5rem;
     margin: 0 0 8px 0;
     font-weight: 700;
     color: #1a202c;
-  }
-  
-  .profile-role {
+}
+
+.profile-role {
     font-size: 1.3rem;
     opacity: 0.9;
     margin: 0 0 25px 0;
     color: #4a5568;
     font-weight: 500;
-  }
-  
-  .profile-stats {
+}
+
+.profile-stats {
     display: flex;
     gap: 40px;
-  }
-  
-  .stat-item {
+}
+
+.stat-item {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     position: relative;
     padding-right: 20px;
-  }
-  
-  .stat-item:not(:last-child)::after {
+}
+
+.stat-item:not(:last-child)::after {
     content: "";
     position: absolute;
     right: 0;
@@ -127,21 +116,21 @@
     height: 30px;
     width: 1px;
     background: rgba(0, 0, 0, 0.1);
-  }
-  
-  .stat-number {
+}
+
+.stat-number {
     font-size: 1.8rem;
     font-weight: 700;
     color: #2d3748;
-  }
-  
-  .stat-label {
+}
+
+.stat-label {
     font-size: 1rem;
     color: #718096;
     font-weight: 500;
-  }
-  
-  .edit-profile-btn {
+}
+
+.edit-profile-btn {
     position: absolute;
     top: 30px;
     right: 30px;
@@ -157,19 +146,17 @@
     display: flex;
     align-items: center;
     gap: 8px;
-  }
-  
-  .edit-profile-btn:hover {
+}
+
+.edit-profile-btn:hover {
     background: white;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
-  }
-  
-  
-  
-  /* Elementos del form */
-  
-  textarea {
+}
+
+/* Elementos del form */
+
+textarea {
     width: 100%;
     padding: 15px;
     border: 1px solid #e2e8f0;
@@ -179,25 +166,23 @@
     min-height: 120px;
     transition: all 0.3s ease;
     background: #f8fafc;
-  }
-  
-  textarea:focus {
+}
+
+textarea:focus {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-  }
-  
-  
-  
-  /* Botones */
-  
-  .action-buttons {
+}
+
+/* Botones */
+
+.action-buttons {
     display: flex;
     gap: 20px;
     margin-top: 50px;
-  }
-  
-  .save-btn {
+}
+
+.save-btn {
     background: linear-gradient(to right, #2ecc71, #27ae60);
     color: white;
     border: none;
@@ -211,14 +196,14 @@
     display: flex;
     align-items: center;
     gap: 8px;
-  }
-  
-  .save-btn:hover {
+}
+
+.save-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
-  }
-  
-  .discard-btn {
+}
+
+.discard-btn {
     background: linear-gradient(to right, #e74c3c, #c0392b);
     color: white;
     border: none;
@@ -232,120 +217,108 @@
     display: flex;
     align-items: center;
     gap: 8px;
-  }
-  
-  .discard-btn:hover {
+}
+
+.discard-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
-  }
-  
-  
-  
-  
-  
-  
-  /* Inputs */
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="date"] {
+}
+
+/* Inputs */
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"] {
     padding: 12px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     font-size: 1rem;
     background: #f8fafc;
     transition: all 0.3s ease;
-  }
-  
-  input:focus {
+}
+
+input:focus {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
     background: white;
-  }
-  
-  select {
+}
+
+select {
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
     background: #f8fafc;
     font-size: 1rem;
     transition: all 0.3s ease;
-  }
-  
-  select:focus {
+}
+
+select:focus {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-  }
-  
-  /* Modern Sidebar */
-  .profile-sidebar {
+}
+
+/* Modern Sidebar */
+.profile-sidebar {
     background: #f8fafc;
     border-radius: 12px;
     padding: 30px;
     height: fit-content;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  }
-  
-  .sidebar-section {
+}
+
+.sidebar-section {
     margin-bottom: 30px;
-  }
-  
-  .sidebar-section h3 {
+}
+
+.sidebar-section h3 {
     font-size: 1.3rem;
     color: #2d3748;
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid #e2e8f0;
-  }
-  
-  .skill-item {
+}
+
+.skill-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-  }
-  
-  .skill-name {
+}
+
+.skill-name {
     font-weight: 500;
     color: #4a5568;
-  }
-  
-  .skill-level {
+}
+
+.skill-level {
     height: 8px;
     background: #e2e8f0;
     border-radius: 4px;
     overflow: hidden;
     margin-top: 5px;
-  }
-  
-  .skill-progress {
+}
+
+.skill-progress {
     height: 100%;
     background: linear-gradient(to right, #3498db, #2980b9);
     border-radius: 4px;
-  }
-  
-  .language-item {
+}
+
+.language-item {
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
-  }
-  
-  .language-name {
+}
+
+.language-name {
     font-weight: 500;
     color: #4a5568;
-  }
-  
-  .language-level {
+}
+
+.language-level {
     color: #718096;
     font-size: 0.9rem;
-  }
-  
-  
-  
-  
-  
-  
-  
+}

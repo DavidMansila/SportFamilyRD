@@ -1,62 +1,14 @@
 <template>
     <div class="solicitudes-container">
 
+        <!-- Navbar -->
+        <Navbar />
 
-
-    <!-- Navbar -->
-    <nav class="navbar">
-      <div class="logo-container">
-        <router-link to="/" class="logo-container">
-          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
-        </router-link>
-      </div>
-
-      <div class="nav-links">
-        <!-- Secciones para usuarios -->
-        <router-link to="/noticias" class="nav-link">Noticias</router-link>
-        <router-link to="/calendario" class="nav-link">Calendario</router-link>
-        <router-link to="/tienda" class="nav-link">Tienda</router-link>
-        <router-link to="/entrenadores" class="nav-link">Entrenadores</router-link>
-        <router-link to="/foro" class="nav-link">Foro</router-link>
-
-        <!-- Secciones condicionales -->
-        <router-link v-if="user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
-          Solicitudes
-        </router-link>
-
-        <router-link v-if="user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
-          Solicitudes
-        </router-link>
-      </div>
-
-      <div class="Imagenes">
-        <router-link to="/carrito" class="Carrito">
-          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
-        </router-link>
-
-        <router-link to="/ajustes" class="Ajustes">
-          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
-        </router-link>
-
-        <router-link to="/perfil" class="Perfil">
-          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
-        </router-link>
-
-        <router-link :to="login ? '/login' : '/logout'" class="Logout">
-          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
-        </router-link>
-      </div>
-    </nav>
-
-
-
-        <main class="solicitudes-container">
+        <main class="solicitudes-main">
             <header class="page-header">
-
                 <h1 class="title">Solicitudes de Entrenamiento</h1>
 
                 <div class="filters-container">
-
                     <select v-model="filtroEstado" class="filter-select" @change="actualizarFiltros">
                         <option value="todos">Todas las solicitudes</option>
                         <option value="pendiente">Pendientes</option>
@@ -71,12 +23,14 @@
             </header>
 
             <section class="solicitudes-grid">
-                <transition-group name="list" tag="div">
+                <transition-group name="list" tag="div" class="solicitudes-list">
                     <article v-for="solicitud in solicitudesFiltradas" :key="solicitud.id" class="solicitud-card"
                         :class="solicitud.estado">
                         <div class="card-header">
                             <div class="user-info">
-                                <avatar :initials="getInitials(solicitud.userName)" />
+                                <div class="avatar" :style="{ backgroundColor: getAvatarColor(solicitud.userName) }">
+                                    {{ getInitials(solicitud.userName) }}
+                                </div>
                                 <div>
                                     <h3 class="user-name">{{ solicitud.userName }}</h3>
                                     <p class="user-age">Edad: {{ solicitud.edad }}</p>
@@ -106,7 +60,9 @@
                         </div>
 
                         <div class="card-actions">
-                            <status-badge :estado="solicitud.estado" />
+                            <span class="status-badge" :class="solicitud.estado">
+                                {{ getEstadoTexto(solicitud.estado) }}
+                            </span>
 
                             <div v-if="solicitud.estado === 'pendiente'" class="action-buttons">
                                 <button @click="manejarAccion(solicitud.id, 'aprobado')" class="btn-success"
@@ -122,8 +78,18 @@
                     </article>
                 </transition-group>
 
-                <empty-state v-if="!solicitudes.length" />
-                <empty-filter-state v-else-if="!solicitudesFiltradas.length" />
+                <div v-if="!solicitudes.length" class="empty-state">
+                    <img src="/public/imagenes/no-news.png" alt="No hay solicitudes" class="empty-image">
+                    <h3>No hay solicitudes disponibles</h3>
+                    <p>Actualmente no hay solicitudes de entrenamiento para mostrar.</p>
+                </div>
+
+                <div v-else-if="!solicitudesFiltradas.length" class="empty-filter-state">
+                    <img src="/public/imagenes/no-news.png" alt="No hay resultados" class="empty-image">
+                    <h3>No hay coincidencias</h3>
+                    <p>No se encontraron solicitudes con el filtro aplicado.</p>
+                    <button @click="filtroEstado = 'todos'" class="btn-clear-filter">Limpiar filtros</button>
+                </div>
             </section>
         </main>
 
@@ -135,10 +101,14 @@
     </div>
 </template>
 
-
-
 <script>
+import Navbar from '../navbarComponent.vue';
+
 export default {
+    name: 'SolicitudesEntrenamientos',
+    components: {
+        Navbar
+    },
     data() {
         return {
             filtroEstado: 'todos',
@@ -164,19 +134,47 @@ export default {
                     mensaje: "Quiero prepararme para pruebas universitarias",
                     fechaSolicitud: new Date('2024-02-15'),
                     estado: "aprobado"
+                },
+                {
+                    id: 3,
+                    userName: "Carlos Rodríguez",
+                    edad: 30,
+                    deporte: "Fútbol",
+                    email: "carlos@example.com",
+                    telefono: "849-555-9012",
+                    mensaje: "Necesito entrenamiento personalizado para mejorar mi resistencia",
+                    fechaSolicitud: new Date('2024-03-10'),
+                    estado: "rechazado"
                 }
+                ,
+                {
+                    id: 4,
+                    userName: "Carlos Rodríguez",
+                    edad: 30,
+                    deporte: "Fútbol",
+                    email: "carlos@example.com",
+                    telefono: "849-555-9012",
+                    mensaje: "Necesito entrenamiento personalizado para mejorar mi resistencia",
+                    fechaSolicitud: new Date('2024-03-10'),
+                    estado: "rechazado"
+                },
+                {
+                    id: 5,
+                    userName: "Carlos Rodríguez",
+                    edad: 30,
+                    deporte: "Fútbol",
+                    email: "carlos@example.com",
+                    telefono: "849-555-9012",
+                    mensaje: "Necesito entrenamiento personalizado para mejorar mi resistencia",
+                    fechaSolicitud: new Date('2024-03-10'),
+                    estado: "rechazado"
+                },
             ],
-
-            user_type: 'entrenador',
-            
-            filtroEstado: 'todos',
-
             mostrarToast: false,
-
             toastMessage: '',
+            colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8']
         }
     },
-
     computed: {
         solicitudesFiltradas() {
             return this.solicitudes
@@ -184,51 +182,41 @@ export default {
                 .sort((a, b) => new Date(b.fechaSolicitud) - new Date(a.fechaSolicitud))
         }
     },
-
-    async created() {
-        await this.cargarSolicitudes()
-    },
-
     methods: {
         async cargarSolicitudes() {
             try {
-                // Simular llamada API
-                this.solicitudes = await this.$api.get('/solicitudes')
+                // Simulación de carga de datos
+                this.mostrarNotificacion('Solicitudes actualizadas');
             } catch (error) {
-                this.mostrarNotificacion('Error cargando solicitudes')
+                this.mostrarNotificacion('Error cargando solicitudes');
+                console.error(error);
             }
         },
-
         async manejarAccion(id, accion) {
             try {
-                await this.$api.patch(`/solicitudes/${id}`, { estado: accion })
-                this.actualizarEstadoLocal(id, accion)
-                this.mostrarNotificacion(`Solicitud ${accion} correctamente`)
+                // Simulación de API
+                const index = this.solicitudes.findIndex(s => s.id === id);
+                if (index !== -1) {
+                    this.solicitudes[index].estado = accion;
+                    this.mostrarNotificacion(`Solicitud ${accion === 'aprobado' ? 'aprobada' : 'rechazada'} correctamente`);
+                }
             } catch (error) {
-                this.mostrarNotificacion('Error actualizando estado')
+                this.mostrarNotificacion('Error actualizando estado');
+                console.error(error);
             }
         },
-
-        actualizarEstadoLocal(id, nuevoEstado) {
-            const index = this.solicitudes.findIndex(s => s.id === id)
-            if (index > -1) {
-                this.$set(this.solicitudes, index, {
-                    ...this.solicitudes[index],
-                    estado: nuevoEstado
-                })
-            }
-        },
-
         mostrarNotificacion(mensaje) {
-            this.toastMessage = mensaje
-            this.mostrarToast = true
-            setTimeout(() => this.mostrarToast = false, 3000)
+            this.toastMessage = mensaje;
+            this.mostrarToast = true;
+            setTimeout(() => this.mostrarToast = false, 3000);
         },
-
         getInitials(nombre) {
-            return nombre.split(' ').map(p => p[0]).join('').toUpperCase()
+            return nombre.split(' ').map(p => p[0]).join('').toUpperCase().substring(0, 2);
         },
-
+        getAvatarColor(nombre) {
+            const hash = nombre.split('').reduce((acc, char) => char.charCodeAt(0) + acc, 0);
+            return this.colors[hash % this.colors.length];
+        },
         formatFecha(fecha) {
             return new Date(fecha).toLocaleDateString('es-ES', {
                 year: 'numeric',
@@ -236,8 +224,22 @@ export default {
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
-            })
+            });
+        },
+        getEstadoTexto(estado) {
+            const estados = {
+                pendiente: 'Pendiente',
+                aprobado: 'Aprobado',
+                rechazado: 'Rechazado'
+            };
+            return estados[estado];
+        },
+        actualizarFiltros() {
+            // Puedes añadir lógica adicional aquí si necesitas
         }
+    },
+    mounted() {
+        this.cargarSolicitudes();
     }
 }
 </script>
@@ -245,9 +247,8 @@ export default {
 
 
 <style scoped>
+@import '../../../scss/SolicitudUsuarios/SolicitudU.scss';
 
 @import '../../../scss/SolicitudUsuarios/SolicitudU_navbar.scss';
-
-@import '../../../scss/SolicitudUsuarios/SolicitudU.scss';
 
 </style>

@@ -2,53 +2,8 @@
 
   <div class="entrenadores-page">
 
-
-
     <!-- Navbar -->
-    <nav class="navbar">
-      <div class="logo-container">
-        <router-link to="/" class="logo-container">
-          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
-        </router-link>
-      </div>
-
-      <div class="nav-links">
-        <!-- Secciones para usuarios -->
-        <router-link to="/noticias" class="nav-link">Noticias</router-link>
-        <router-link to="/calendario" class="nav-link">Calendario</router-link>
-        <router-link to="/tienda" class="nav-link">Tienda</router-link>
-        <router-link to="/entrenadores" class="nav-link">Entrenadores</router-link>
-        <router-link to="/foro" class="nav-link">Foro</router-link>
-
-        <!-- Secciones condicionales -->
-        <router-link v-if="user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
-          Solicitudes
-        </router-link>
-
-        <router-link v-if="user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
-          Solicitudes
-        </router-link>
-      </div>
-
-      <div class="Imagenes">
-        <router-link to="/carrito" class="Carrito">
-          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
-        </router-link>
-
-        <router-link to="/ajustes" class="Ajustes">
-          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
-        </router-link>
-
-        <router-link to="/perfil" class="Perfil">
-          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
-        </router-link>
-
-        <router-link :to="login ? '/login' : '/logout'" class="Logout">
-          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
-        </router-link>
-      </div>
-    </nav>
-
+    <Navbar />
 
 
     <!-- Hero Section -->
@@ -70,13 +25,13 @@
           <h2>¿Tienes lo necesario para ser entrenador?</h2>
           <p>Únete a nuestra red de profesionales y comparte tu conocimiento</p>
         </div>
-        <a href="/Solicitud" class="cta-button">
+        <router-link to="/Solicitud" class="cta-button">
           Aplicar Ahora
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" />
           </svg>
-        </a>
+        </router-link>
       </div>
     </div>
 
@@ -274,8 +229,13 @@
 
 
 <script>
+import Navbar from '../navbarComponent.vue';
+
 export default {
-  name: 'EntrenadoresPage',
+  name: 'Entrenadores',
+    components: {
+    Navbar
+  },
   data() {
     return {
       busqueda: '',

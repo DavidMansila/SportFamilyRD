@@ -1,11 +1,5 @@
 <template>
   <div>
-    <nav class="main-nav">
-      <div class="nav-container">
-      
-      </div>
-
-    </nav>
 
     <router-view></router-view>
   </div>
@@ -42,24 +36,18 @@ export default {
         localStorage.removeItem('user');
       }
     },
-    logout() {
-      axios.post('/logout')
-      .then(response => {
-        console.log('Logout successful:', response.data);
-        this.user = null;
-        sessionStorage.removeItem('user');
-        this.$router.push('/');
 
-      }).catch((error) => {
-        console.log(error);
-        console.error('Error al cerrar sesión:', error);
-      });
-    }
   }
 }
 </script>
 
 <style lang="scss">
 
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
 
 </style>

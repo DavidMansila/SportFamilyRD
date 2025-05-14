@@ -1,72 +1,70 @@
-
 /* Modal */
 
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
-  
+
 .modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 450px;
-  width: 100%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
-  
-  @keyframes modalFadeIn {
+
+@keyframes modalFadeIn {
     from {
-      opacity: 0;
-      transform: translateY(-20px);
+        opacity: 0;
+        transform: translateY(-20px);
     }
     to {
-      opacity: 1;
-      transform: translateY(0);
+        opacity: 1;
+        transform: translateY(0);
     }
-  }
-  
-  
-  .modal-actions {
+}
+
+.modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
     margin-top: 1.5rem;
-  }
-  
-  .modal-actions button {
+}
+
+.modal-actions button {
     padding: 0.8rem 1.5rem;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.3s ease;
-  }
-  
-  .modal-actions .cancel {
+}
+
+.modal-actions .cancel {
     background: #e2e8f0;
     border: none;
     color: #4a5568;
-  }
-  
-  .modal-actions .cancel:hover {
+}
+
+.modal-actions .cancel:hover {
     background: #cbd5e0;
-  }
-  
-  .modal-actions .confirm {
+}
+
+.modal-actions .confirm {
     background: linear-gradient(to right, #e53e3e, #c53030);
     color: white;
     border: none;
-  }
-  
-  .modal-actions .confirm:hover {
+}
+
+.modal-actions .confirm:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
-  }
+}

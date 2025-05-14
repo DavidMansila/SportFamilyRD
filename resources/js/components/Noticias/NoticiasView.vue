@@ -3,50 +3,7 @@
 
 
     <!-- Navbar -->
-    <nav class="navbar">
-      <div class="logo-container">
-        <router-link to="/" class="logo-container">
-          <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
-        </router-link>
-      </div>
-
-      <div class="nav-links">
-        <!-- Secciones para usuarios -->
-        <router-link to="/noticias" class="nav-link">Noticias</router-link>
-        <router-link to="/calendario" class="nav-link">Calendario</router-link>
-        <router-link to="/tienda" class="nav-link">Tienda</router-link>
-        <router-link to="/entrenadores" class="nav-link">Entrenadores</router-link>
-        <router-link to="/foro" class="nav-link">Foro</router-link>
-
-        <!-- Secciones condicionales -->
-        <router-link v-if="user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
-          Solicitudes
-        </router-link>
-
-        <router-link v-if="user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
-          Solicitudes
-        </router-link>
-      </div>
-
-      <div class="Imagenes">
-        <router-link to="/carrito" class="Carrito">
-          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
-        </router-link>
-
-        <router-link to="/ajustes" class="Ajustes">
-          <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
-        </router-link>
-
-        <router-link to="/perfil" class="Perfil">
-          <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
-        </router-link>
-
-        <router-link :to="login ? '/login' : '/logout'" class="Logout">
-          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
-        </router-link>
-      </div>
-    </nav>
-
+     <Navbar/>
 
     <!-- Botón flotante para agregar noticia -- v-if="user_type === 'admin'" -->
     <div v-if="user_type === 'admin'" class="floating-action">
@@ -57,7 +14,6 @@
         </svg>
       </button>
     </div>
-
 
     <!-- Contenido principal -->
     <div class="container">
@@ -216,11 +172,13 @@
 <script>
 import axios from 'axios';
 import paginatorComponent from '@/components/paginatorComponent.vue';
+import Navbar from '../navbarComponent.vue';
 
 export default {
   name: 'NoticiasComponent',
   components: {
     paginatorComponent,
+    Navbar
   },
   data() {
     return {
@@ -549,6 +507,7 @@ export default {
 
 
 <style scoped>
+
 @import '../../../scss/Noticias/noticias.scss';
 
 @import '../../../scss/Noticias/noticias_navbar.scss';

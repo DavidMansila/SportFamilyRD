@@ -1,331 +1,188 @@
-
 /* ------------------- RESPONSIVE ENTRENADORES ------------------ */
 
 /* Pantallas grandes (TVs, monitores 4K) - 1920px+ */
 @media (min-width: 1920px) {
-    .navbar {
-      padding: 1.5rem 2rem;
-    }
-    
     .hero-section {
-      height: 500px;
+        height: 500px;
     }
-    
+
     .page-title {
-      font-size: 3.5rem;
+        font-size: 3.5rem;
     }
-    
+
     .entrenadores-grid {
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 2.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2.5rem;
     }
-  }
-  
-  /* Laptops y pantallas medianas - 1440px-1599px */
-  @media (max-width: 1599px) and (min-width: 1440px) {
-    .navbar {
-      padding: 1.2rem 1.5rem;
-    }
-    
-    .nav-links {
-      gap: 1.8rem;
-    }
-    
-    .logo {
-      width: 190px;
-      height: 65px;
-    }
-    
+}
+
+/* Laptops y pantallas medianas - 1440px-1599px */
+@media (max-width: 1599px) and (min-width: 1440px) {
     .entrenadores-grid {
-      gap: 2rem;
+        gap: 2rem;
     }
-  }
-  
-  /* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
-  @media (max-width: 1439px) and (min-width: 1200px) {
-    .navbar {
-      padding: 1rem 1.2rem;
-    }
-    
-    .nav-links {
-      gap: 1.5rem;
-    }
-    
-    .logo {
-      width: 180px;
-      height: 60px;
-    }
-    
+}
+
+/* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
+@media (max-width: 1439px) and (min-width: 1200px) {
     .filter-tabs {
-      gap: 0.75rem;
+        gap: 0.75rem;
     }
-  }
-  
-  /* Tablets grandes - 1024px-1199px */
-  @media (max-width: 1199px) and (min-width: 1024px) {
-    .navbar {
-      padding: 1rem;
-    }
-    
-    .nav-links {
-      gap: 1.2rem;
-    }
-    
-    .logo {
-      width: 170px;
-      height: 55px;
-    }
-    
+}
+
+/* Tablets grandes - 1024px-1199px */
+@media (max-width: 1199px) and (min-width: 1024px) {
     .entrenadores-grid {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
-    
+
     .modal-content {
-      width: 85%;
+        width: 85%;
     }
-  }
-  
-  /* Tablets en vertical - 768px-1023px */
-  @media (max-width: 1023px) and (min-width: 768px) {
-    .navbar {
-      flex-direction: column;
-      padding: 1rem;
-    }
-    
-    .logo-container {
-      margin-bottom: 1rem;
-    }
-    
-    .nav-links {
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin: 1rem 0;
-    }
-    
-    .logo {
-      width: 180px;
-      height: 60px;
-    }
-    
+}
+
+/* Tablets en vertical - 768px-1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
     .hero-section {
-      height: 350px;
+        height: 350px;
     }
-    
+
     .page-title {
-      font-size: 2.5rem;
+        font-size: 2.5rem;
     }
-    
+
     .entrenadores-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
-    
+
     .filter-tabs {
-      justify-content: flex-start;
-      overflow-x: auto;
-      padding-bottom: 10px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
     }
-    
+
     .modal-header {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
-    
+
     .profile-image {
-      margin-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
     }
-  }
-  
-  /* Teléfonos grandes - 576px-767px */
-  @media (max-width: 767px) and (min-width: 576px) {
-    .navbar {
-      padding: 0.8rem 1rem;
-    }
-    
-    .nav-links {
-      gap: 0.8rem;
-    }
-    
-    .logo {
-      width: 170px;
-      height: 55px;
-    }
-    
+}
+
+/* Teléfonos grandes - 576px-767px */
+@media (max-width: 767px) and (min-width: 576px) {
     .hero-section {
-      height: 300px;
+        height: 300px;
     }
-    
+
     .page-title {
-      font-size: 2.2rem;
+        font-size: 2.2rem;
     }
-    
+
     .entrenadores-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
     }
-    
+
     .card-image-container {
-      height: 180px;
+        height: 180px;
     }
-    
+
     .modal-content {
-      width: 95%;
+        width: 95%;
     }
-  }
-  
-  /* Teléfonos medianos - 481px-575px */
-  @media (max-width: 575px) and (min-width: 481px) {
-    .navbar {
-      padding: 0.8rem;
-    }
-    
-    .logo {
-      width: 160px;
-      height: 50px;
-    }
-    
-    .nav-links {
-      gap: 0.7rem;
-    }
-    
-    .nav-link {
-      font-size: 0.9rem;
-    }
-    
-    .Imagenes a {
-      width: 35px;
-      height: 35px;
-    }
-    
+}
+
+/* Teléfonos medianos - 481px-575px */
+@media (max-width: 575px) and (min-width: 481px) {
     .hero-subtitle {
-      font-size: 1.1rem;
+        font-size: 1.1rem;
     }
-    
+
     .cta-card {
-      padding: 1.5rem;
+        padding: 1.5rem;
     }
-    
+
     .filter-tabs button {
-      padding: 0.4rem 1rem;
-      font-size: 0.9rem;
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
     }
-    
+
     .card-header h3 {
-      font-size: 1.1rem;
+        font-size: 1.1rem;
     }
-  }
-  
-  /* Teléfonos pequeños - 320px-480px */
-  @media (max-width: 480px) {
-    .navbar {
-      padding: 0.8rem;
-    }
-    
-    .logo {
-      width: 160px;
-      height: 60px;
-    }
-    
-    .nav-links {
-      gap: 1rem;
-    }
-    
-    .nav-link {
-      font-size: 0.9rem;
-    }
-    
-    .Imagenes a {
-      width: 35px;
-      height: 35px;
-    }
-    
+}
+
+/* Teléfonos pequeños - 320px-480px */
+@media (max-width: 480px) {
     .hero-section {
-      height: 250px;
+        height: 250px;
     }
-    
+
     .page-title {
-      font-size: 1.8rem;
+        font-size: 1.8rem;
     }
-    
+
     .hero-subtitle {
-      font-size: 1rem;
+        font-size: 1rem;
     }
-    
+
     .entrenadores-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
-    
+
     .cta-card {
-      text-align: center;
+        text-align: center;
     }
-    
+
     .cta-button {
-      width: 100%;
-      justify-content: center;
+        width: 100%;
+        justify-content: center;
     }
-    
+
     .search-container {
-      max-width: 100%;
+        max-width: 100%;
     }
-    
+
     .modal-content {
-      width: 100%;
-      max-height: 100vh;
-      border-radius: 0;
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
     }
-    
+
     .modal-header {
-      padding: 1.5rem;
+        padding: 1.5rem;
     }
-    
+
     .modal-body {
-      padding: 0 1.5rem 1.5rem;
+        padding: 0 1.5rem 1.5rem;
     }
-  }
-  
-  /* Teléfonos muy pequeños - hasta 320px */
-  @media (max-width: 320px) {
-    .navbar {
-      padding: 0.6rem;
-    }
-    
-    .logo {
-      width: 140px;
-      height: 40px;
-    }
-    
-    .nav-links {
-      gap: 0.5rem;
-    }
-    
-    .nav-link {
-      font-size: 0.8rem;
-    }
-    
-    .Imagenes a {
-      width: 30px;
-      height: 30px;
-    }
-    
+}
+
+/* Teléfonos muy pequeños - hasta 320px */
+@media (max-width: 320px) {
     .page-title {
-      font-size: 1.6rem;
+        font-size: 1.6rem;
     }
-    
+
     .filter-tabs button {
-      padding: 0.35rem 0.8rem;
-      font-size: 0.8rem;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.8rem;
     }
-    
+
     .card-content {
-      padding: 1rem;
+        padding: 1rem;
     }
-    
+
     .modal-footer {
-      padding: 1rem 1.5rem;
+        padding: 1rem 1.5rem;
     }
-    
+
     .primary-btn {
-      width: 100%;
+        width: 100%;
     }
-  }
+}
