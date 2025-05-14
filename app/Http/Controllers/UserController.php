@@ -47,7 +47,8 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',//ponerle confirmed cuando david mande el front
+            'password' => 'required|string|min:8',
+            //todo ponerle confirmed cuando david mande el front
         ]);
 
         try{
@@ -56,15 +57,14 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'user_type'=> 'user',
-                // 'last_name' => $request->name,
-                // 'date' => "2003-03-21"
             ]);
 
             //iniciar sesion automaticamente al crear un usuario
             Auth::login($user);
 
             return response()->json([
-                'message' => 'Usuario creado con éxito'
+                'message' => 'Usuario creado con éxito',
+                 'user' => $user,
             ], 200);
 
         }catch(\Exception $e){
