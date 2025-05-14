@@ -20,12 +20,7 @@ class AuthController extends Controller
             // Devolver el rol del usuario junto con el mensaje de éxito
             return response()->json([
                 'message' => 'Login successful',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role, // Asegúrate de que el modelo User tenga un campo 'role'
-                ],
+                'user' => $user,
             ], 200);
         }
 

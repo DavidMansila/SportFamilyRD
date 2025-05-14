@@ -109,8 +109,7 @@ export default {
 
         axios.post('/user', this.registerForm)
           .then(response => {
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            this.$root.user = response.data.user; // Actualiza el estado global
+            sessionStorage.setItem('user', JSON.stringify(response.data.user));
             this.$router.push('/');
           })
           .catch((error) => {
@@ -125,7 +124,7 @@ export default {
     },
 
     async submitLoginForm() {
-      this.isSubmitting = true;
+      this.isSubmitting = true; 
       try {
         console.log('Logging in:', this.loginForm);
 
@@ -137,8 +136,7 @@ export default {
             console.log(response);
             // Manejar inicio de sesión exitoso
             alert('Bienvenido de nuevo!');
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            this.$root.user = response.data.user; // Actualiza el estado global
+            sessionStorage.setItem('user', JSON.stringify(response.data.user));
             this.$router.push('/');
           })
           .catch((error) => {

@@ -12,10 +12,12 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
+
   data() {
     return {
-      user: null
+      user: '',
     }
   },
   async created() {
@@ -40,15 +42,18 @@ export default {
         localStorage.removeItem('user');
       }
     },
-    async logout() {
-      try {
-        await this.$axios.post('/logout');
+    logout() {
+      axios.post('/logout')
+      .then(response => {
+        console.log('Logout successful:', response.data);
         this.user = null;
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
         this.$router.push('/');
-      } catch (error) {
+
+      }).catch((error) => {
+        console.log(error);
         console.error('Error al cerrar sesión:', error);
-      }
+      });
     }
   }
 }
