@@ -506,7 +506,7 @@ export default {
 
 
 
-<style>
+<style scoped>
 
 @import '../../../scss/Noticias/noticias.scss';
 
