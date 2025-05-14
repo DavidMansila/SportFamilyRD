@@ -1,324 +1,181 @@
-
 //* ------------------- RESPONSIVE TIENDA ------------------ */
 
 /* Pantallas grandes (TVs, monitores 4K) - 1920px+ */
 @media (min-width: 1920px) {
-    .navbar {
-      padding: 1.5rem 2rem;
-    }
-    
     .search-container {
-      max-width: 1000px;
+        max-width: 1000px;
     }
-    
+
     .products-grid {
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 30px;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
     }
-  }
-  
-  /* Laptops y pantallas medianas - 1440px-1599px */
-  @media (max-width: 1599px) and (min-width: 1440px) {
-    .navbar {
-      padding: 1.2rem 1.5rem;
-    }
-    
-    .nav-links {
-      gap: 1.8rem;
-    }
-    
-    .logo {
-      width: 190px;
-      height: 65px;
-    }
-    
+}
+
+/* Laptops y pantallas medianas - 1440px-1599px */
+@media (max-width: 1599px) and (min-width: 1440px) {
     .products-grid {
-      gap: 25px;
+        gap: 25px;
     }
-  }
-  
-  /* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
-  @media (max-width: 1439px) and (min-width: 1200px) {
-    .navbar {
-      padding: 1rem 1.2rem;
-    }
-    
-    .nav-links {
-      gap: 1.5rem;
-    }
-    
-    .logo {
-      width: 180px;
-      height: 60px;
-    }
-    
+}
+
+/* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
+@media (max-width: 1439px) and (min-width: 1200px) {
     .filter-tabs {
-      gap: 8px;
+        gap: 8px;
     }
-  }
-  
-  /* Tablets grandes - 1024px-1199px */
-  @media (max-width: 1199px) and (min-width: 1024px) {
-    .navbar {
-      padding: 1rem;
-    }
-    
-    .nav-links {
-      gap: 1.2rem;
-    }
-    
-    .logo {
-      width: 170px;
-      height: 55px;
-    }
-    
+}
+
+/* Tablets grandes - 1024px-1199px */
+@media (max-width: 1199px) and (min-width: 1024px) {
     .products-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
-    
+
     .modal-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      padding: 20px;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 20px;
     }
-  }
-  
-  /* Tablets en vertical - 768px-1023px */
-  @media (max-width: 1023px) and (min-width: 768px) {
-    .navbar {
-      flex-direction: column;
-      padding: 1rem;
-    }
-    
-    .logo-container {
-      margin-bottom: 1rem;
-    }
-    
-    .nav-links {
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin: 1rem 0;
-    }
-    
-    .logo {
-      width: 180px;
-      height: 60px;
-    }
-    
+}
+
+/* Tablets en vertical - 768px-1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
     .products-grid {
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     }
-    
+
     .filter-tabs {
-      justify-content: flex-start;
-      overflow-x: auto;
-      padding-bottom: 10px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
     }
-    
+
     .modal-grid {
-      grid-template-columns: 1fr;
+        grid-template-columns: 1fr;
     }
-    
+
     .main-image {
-      height: 350px;
+        height: 350px;
     }
-  }
-  
-  /* Teléfonos grandes - 576px-767px */
-  @media (max-width: 767px) and (min-width: 576px) {
-    .navbar {
-      padding: 0.8rem 1rem;
-    }
-    
-    .nav-links {
-      gap: 0.8rem;
-    }
-    
-    .logo {
-      width: 170px;
-      height: 55px;
-    }
-    
+}
+
+/* Teléfonos grandes - 576px-767px */
+@media (max-width: 767px) and (min-width: 576px) {
     .products-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
     }
-    
+
     .product-image-container {
-      height: 180px;
+        height: 180px;
     }
-    
+
     .modal-content {
-      width: 95%;
+        width: 95%;
     }
-    
+
     .main-image {
-      height: 250px;
+        height: 250px;
     }
-    
+
     .product-title {
-      font-size: 1.5rem;
+        font-size: 1.5rem;
     }
-    
+
     .current-price {
-      font-size: 1.5rem;
+        font-size: 1.5rem;
     }
-  }
-  
-  /* Teléfonos medianos - 481px-575px */
-  @media (max-width: 575px) and (min-width: 481px) {
-    .navbar {
-      padding: 0.8rem;
-    }
-    
-    .logo {
-      width: 160px;
-      height: 50px;
-    }
-    
-    .nav-links {
-      gap: 0.7rem;
-    }
-    
-    .nav-link {
-      font-size: 0.9rem;
-    }
-    
-    .Imagenes a {
-      width: 35px;
-      height: 35px;
-    }
-    
+}
+
+/* Teléfonos medianos - 481px-575px */
+@media (max-width: 575px) and (min-width: 481px) {
     .search-input {
-      padding: 12px 20px 12px 40px;
+        padding: 12px 20px 12px 40px;
     }
-    
+
     .filter-tab {
-      padding: 8px 15px;
-      font-size: 0.9rem;
+        padding: 8px 15px;
+        font-size: 0.9rem;
     }
-    
+
     .product-name {
-      font-size: 1rem;
+        font-size: 1rem;
     }
-    
+
     .product-price {
-      font-size: 1.1rem;
+        font-size: 1.1rem;
     }
-  }
-  
-  /* Teléfonos pequeños - 320px-480px */
-  @media (max-width: 480px) {
-    .navbar {
-      padding: 0.8rem;
-    }
-    
-    .logo {
-      width: 160px;
-      height: 60px;
-    }
-    
-    .nav-links {
-      gap: 1rem;
-    }
-    
-    .nav-link {
-      font-size: 0.9rem;
-    }
-    
-    .Imagenes a {
-      width: 35px;
-      height: 35px;
-    }
-    
+}
+
+/* Teléfonos pequeños - 320px-480px */
+@media (max-width: 480px) {
     .products-grid {
-      grid-template-columns: 1fr;
-      gap: 20px;
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
-    
+
     .search-container {
-      padding: 20px 15px;
+        padding: 20px 15px;
     }
-    
+
     .filter-tabs {
-      justify-content: flex-start;
-      padding: 0 15px 10px;
+        justify-content: flex-start;
+        padding: 0 15px 10px;
     }
-    
+
     .product-image-container {
-      height: 200px;
+        height: 200px;
     }
-    
+
     .modal-content {
-      width: 100%;
-      max-height: 100vh;
-      border-radius: 0;
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
     }
-    
+
     .modal-grid {
-      padding: 15px;
-      gap: 20px;
+        padding: 15px;
+        gap: 20px;
     }
-    
+
     .product-title {
-      font-size: 1.4rem;
+        font-size: 1.4rem;
     }
-    
+
     .product-actions {
-      flex-direction: column;
+        flex-direction: column;
     }
-    
+
     .quantity-selector {
-      width: 100%;
+        width: 100%;
     }
-    
+
     .add-to-cart {
-      width: 100%;
+        width: 100%;
     }
-  }
-  
-  /* Teléfonos muy pequeños - hasta 320px */
-  @media (max-width: 320px) {
-    .navbar {
-      padding: 0.6rem;
-    }
-    
-    .logo {
-      width: 140px;
-      height: 40px;
-    }
-    
-    .nav-links {
-      gap: 0.5rem;
-    }
-    
-    .nav-link {
-      font-size: 0.8rem;
-    }
-    
-    .Imagenes a {
-      width: 30px;
-      height: 30px;
-    }
-    
+}
+
+/* Teléfonos muy pequeños - hasta 320px */
+@media (max-width: 320px) {
     .search-input {
-      font-size: 0.9rem;
+        font-size: 0.9rem;
     }
-    
+
     .filter-tab {
-      padding: 6px 12px;
-      font-size: 0.8rem;
+        padding: 6px 12px;
+        font-size: 0.8rem;
     }
-    
+
     .product-name {
-      font-size: 0.95rem;
+        font-size: 0.95rem;
     }
-    
+
     .product-price {
-      font-size: 1rem;
+        font-size: 1rem;
     }
-    
+
     .product-old-price {
-      font-size: 0.8rem;
+        font-size: 0.8rem;
     }
-  }
+}

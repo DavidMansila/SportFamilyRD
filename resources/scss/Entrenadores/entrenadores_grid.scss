@@ -1,329 +1,338 @@
 /* Contenedor Principal con efecto neumórfico */
 .entrenadores-container {
-  max-width: 1400px;
-  margin: 0 auto 5rem;
-  padding: 0 2rem;
+    max-width: 1400px;
+    margin: 0 auto 5rem;
+    padding: 0 2rem;
 }
 
 /* Grid de Entrenadores con layout dinámico */
 .entrenadores-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 2.5rem;
-  margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
 }
 
 /* Tarjeta de Entrenador - Diseño Glassmorphism */
 .entrenador-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.05),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-  cursor: pointer;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    cursor: pointer;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .entrenador-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 
-    0 15px 40px rgba(0, 0, 0, 0.15),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.95);
 }
 
 /* Contenedor de Imagen con overlay */
 .card-image-container {
-  position: relative;
-  height: 280px;
-  overflow: hidden;
+    position: relative;
+    height: 280px;
+    overflow: hidden;
 }
 
 .card-image-container::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.7) 0%,
+        transparent 100%
+    );
 }
 
 .card-image-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .entrenador-card:hover .card-image-container img {
-  transform: scale(1.1);
+    transform: scale(1.1);
 }
 
 /* Etiqueta de Deporte con gradiente */
 .deporte-tag {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 0.4rem 1.2rem;
-  border-radius: 50px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-  z-index: 2;
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.4rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    z-index: 2;
 }
 
 /* Contenido de la Tarjeta */
 .card-content {
-  padding: 2rem;
+    padding: 2rem;
 }
 
 .card-header {
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .card-header h3 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #1A202C;
-  margin: 0;
-  letter-spacing: -0.5px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1a202c;
+    margin: 0;
+    letter-spacing: -0.5px;
 }
 
 /* Rating con estrellas mejoradas */
 .rating {
-  display: flex;
-  gap: 0.3rem;
-  margin: 0.75rem 0;
+    display: flex;
+    gap: 0.3rem;
+    margin: 0.75rem 0;
 }
 
 .rating .filled {
-  color: #FFB74D;
-  filter: drop-shadow(0 2px 4px rgba(255, 183, 77, 0.3));
+    color: #ffb74d;
+    filter: drop-shadow(0 2px 4px rgba(255, 183, 77, 0.3));
 }
 
 .rating .empty {
-  color: #EDF2F7;
+    color: #edf2f7;
 }
 
 /* Texto de Experiencia con animación */
 .experiencia {
-  color: #4A5568;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  margin-bottom: 1.5rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: all 0.4s ease;
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.4s ease;
 }
 
 .entrenador-card:hover .experiencia {
-  -webkit-line-clamp: 5;
+    -webkit-line-clamp: 5;
 }
 
 /* Testimonio con efecto de cita moderna */
 .testimonio {
-  position: relative;
-  font-style: normal;
-  color: #4A5568;
-  font-size: 0.9rem;
-  line-height: 1.8;
-  margin-bottom: 2rem;
-  padding: 1.25rem;
-  background: rgba(248, 250, 252, 0.7);
-  border-radius: 12px;
-  font-weight: 500;
+    position: relative;
+    font-style: normal;
+    color: #4a5568;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: rgba(248, 250, 252, 0.7);
+    border-radius: 12px;
+    font-weight: 500;
 }
 
 .testimonio::before {
-  content: '"';
-  position: absolute;
-  top: 0.5rem;
-  left: 0.8rem;
-  font-size: 3rem;
-  font-family: serif;
-  color: rgba(76, 81, 191, 0.1);
-  line-height: 1;
+    content: '"';
+    position: absolute;
+    top: 0.5rem;
+    left: 0.8rem;
+    font-size: 3rem;
+    font-family: serif;
+    color: rgba(76, 81, 191, 0.1);
+    line-height: 1;
 }
 
 /* Pie de Tarjeta con diseño mejorado */
 .card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(237, 242, 247, 0.7);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(237, 242, 247, 0.7);
 }
 
 .precio {
-  font-weight: 800;
-  color: #1A202C;
-  font-size: 1.25rem;
+    font-weight: 800;
+    color: #1a202c;
+    font-size: 1.25rem;
 }
 
 .precio span {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #718096;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #718096;
 }
 
 /* Botón de Contacto con efecto 3D */
 .contact-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: linear-gradient(135deg, #4C51BF 0%, #667eea 100%);
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 
-    0 4px 6px rgba(76, 81, 191, 0.2),
-    0 1px 3px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, #4c51bf 0%, #667eea 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(76, 81, 191, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
 .contact-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: all 0.6s ease;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: all 0.6s ease;
 }
 
 .contact-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 
-    0 7px 14px rgba(76, 81, 191, 0.25),
-    0 3px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(76, 81, 191, 0.25), 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .contact-btn:hover::before {
-  left: 100%;
+    left: 100%;
 }
 
 .message-icon {
-  width: 18px;
-  height: 18px;
-  transition: transform 0.4s ease;
+    width: 18px;
+    height: 18px;
+    transition: transform 0.4s ease;
 }
 
 .contact-btn:hover .message-icon {
-  transform: translateX(3px) rotate(5deg);
+    transform: translateX(3px) rotate(5deg);
 }
 
 /* Efecto de esquina con animación */
 .entrenador-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(45deg, #4C51BF 0%, #667eea 100%);
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
-  opacity: 0;
-  transition: all 0.4s ease;
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, #4c51bf 0%, #667eea 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    opacity: 0;
+    transition: all 0.4s ease;
 }
 
 .entrenador-card:hover::before {
-  opacity: 1;
-  width: 60px;
-  height: 60px;
+    opacity: 1;
+    width: 60px;
+    height: 60px;
 }
 
 /* Badge de destacado */
 .featured-badge {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  background: #FF6B6B;
-  color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 50px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-  z-index: 2;
-  animation: pulse 2s infinite;
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: #ff6b6b;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    z-index: 2;
+    animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Responsive Design Mejorado */
 @media (max-width: 1024px) {
-  .entrenadores-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-  }
-  
-  .card-image-container {
-    height: 240px;
-  }
+    .entrenadores-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .card-image-container {
+        height: 240px;
+    }
 }
 
 @media (max-width: 768px) {
-  .entrenadores-container {
-    padding: 0 1.5rem;
-  }
-  
-  .entrenadores-grid {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.8rem;
-  }
-  
-  .card-content {
-    padding: 1.5rem;
-  }
+    .entrenadores-container {
+        padding: 0 1.5rem;
+    }
+
+    .entrenadores-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.8rem;
+    }
+
+    .card-content {
+        padding: 1.5rem;
+    }
 }
 
 @media (max-width: 480px) {
-  .entrenadores-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-  
-  .card-footer {
-    flex-direction: column;
-    gap: 1.2rem;
-    align-items: flex-start;
-  }
-  
-  .contact-btn {
-    width: 100%;
-    justify-content: center;
-    padding: 0.9rem 1.5rem;
-  }
-  
-  .card-image-container {
-    height: 220px;
-  }
+    .entrenadores-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .card-footer {
+        flex-direction: column;
+        gap: 1.2rem;
+        align-items: flex-start;
+    }
+
+    .contact-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.9rem 1.5rem;
+    }
+
+    .card-image-container {
+        height: 220px;
+    }
 }

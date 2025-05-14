@@ -1,401 +1,259 @@
-
 /* ------------------- RESPONSIVE DE NOTICIAS PARA TODOS LOS DISPOSITIVOS ------------------ */
 
 /* Pantallas grandes (TVs, monitores 4K) - 1920px+ */
 @media (min-width: 1920px) {
-    .navbar {
-      padding: 1.5rem 2rem;
-    }
-    
     .hero-banner {
-      height: 90vh;
+        height: 90vh;
     }
-  }
-  
-  /* Laptops y pantallas medianas - 1440px-1599px */
-  @media (max-width: 1599px) and (min-width: 1440px) {
-    .navbar {
-      padding: 1.2rem 1.5rem;
-    }
-    
-    .nav-links {
-      gap: 1.8rem;
-    }
-    
-    .logo {
-      width: 190px;
-      height: 65px;
-    }
-    
+}
+
+/* Laptops y pantallas medianas - 1440px-1599px */
+@media (max-width: 1599px) and (min-width: 1440px) {
     .hero-title {
-      font-size: 3rem;
+        font-size: 3rem;
     }
-    
+
     /* Noticias */
     .news-grid {
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
-  }
-  
-  /* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
-  @media (max-width: 1439px) and (min-width: 1200px) {
-    .navbar {
-      padding: 1rem 1.2rem;
-    }
-    
-    .nav-links {
-      gap: 1.5rem;
-    }
-    
-    .logo {
-      width: 180px;
-      height: 60px;
-    }
-    
+}
+
+/* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
+@media (max-width: 1439px) and (min-width: 1200px) {
     /* Noticias */
     .popup-content {
-      max-width: 900px;
+        max-width: 900px;
     }
-  }
-  
-  /* Tablets grandes - 1024px-1199px */
-  @media (max-width: 1199px) and (min-width: 1024px) {
-    .navbar {
-      padding: 1rem;
-    }
-    
-    .nav-links {
-      gap: 1.2rem;
-    }
-    
-    .logo {
-      width: 170px;
-      height: 55px;
-    }
-    
+}
+
+/* Tablets grandes - 1024px-1199px */
+@media (max-width: 1199px) and (min-width: 1024px) {
     .hero-banner {
-      height: 70vh;
+        height: 70vh;
     }
-    
+
     .hero-title {
-      font-size: 2.8rem;
+        font-size: 2.8rem;
     }
-    
+
     .category-grid {
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
-    
+
     /* Noticias */
     .news-grid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
     }
-  }
-  
-  /* Tablets en vertical - 768px-1023px */
-  @media (max-width: 1023px) and (min-width: 768px) {
-    .navbar {
-      flex-direction: column;
-      padding: 1rem;
-    }
-    
-    .logo-container {
-      margin-bottom: 1rem;
-    }
-    
-    .nav-links {
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin: 1rem 0;
-    }
-    
-    .logo {
-      width: 180px;
-      height: 60px;
-    }
-    
+}
+
+/* Tablets en vertical - 768px-1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
     .hero-title {
-      font-size: 2.5rem;
+        font-size: 2.5rem;
     }
-    
+
     .hero-subtitle {
-      font-size: 1.2rem;
+        font-size: 1.2rem;
     }
-    
+
     .hero-cta {
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
     }
-    
+
     .section-title {
-      font-size: 2rem;
+        font-size: 2rem;
     }
-    
+
     .footer-content {
-      grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
-    
+
     /* Noticias */
     .news-grid {
-      grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .page-title {
-      font-size: 2.2rem;
+        font-size: 2.2rem;
     }
-    
+
     .popup-content {
-      max-width: 700px;
+        max-width: 700px;
     }
-    
+
     .popup-image-container {
-      height: 300px;
+        height: 300px;
     }
-    
+
     .popup-titulo {
-      font-size: 1.6rem;
+        font-size: 1.6rem;
     }
-  }
-  
-  /* Teléfonos grandes - 576px-767px */
-  @media (max-width: 767px) and (min-width: 576px) {
-    .navbar {
-      padding: 0.8rem 1rem;
-    }
-    
-    .nav-links {
-      gap: 0.8rem;
-    }
-    
-    .logo {
-      width: 170px;
-      height: 55px;
-    }
-    
+}
+
+/* Teléfonos grandes - 576px-767px */
+@media (max-width: 767px) and (min-width: 576px) {
     .hero-banner {
-      height: 60vh;
-      min-height: 400px;
+        height: 60vh;
+        min-height: 400px;
     }
-    
+
     .hero-title {
-      font-size: 2.2rem;
+        font-size: 2.2rem;
     }
-    
+
     .category-grid {
-      grid-template-columns: 1fr;
+        grid-template-columns: 1fr;
     }
-    
+
     .product-carousel {
-      gap: 15px;
+        gap: 15px;
     }
-    
+
     .product-card {
-      min-width: 240px;
+        min-width: 240px;
     }
-    
+
     /* Noticias */
     .news-grid {
-      grid-template-columns: 1fr;
+        grid-template-columns: 1fr;
     }
-    
+
     .noticia-card {
-      max-width: 500px;
-      margin: 0 auto;
+        max-width: 500px;
+        margin: 0 auto;
     }
-    
+
     .filtro-deportes {
-      justify-content: flex-start;
-      overflow-x: auto;
-      padding-bottom: 10px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
     }
-    
+
     .popup-content {
-      max-width: 90%;
+        max-width: 90%;
     }
-    
+
     .popup-image-container {
-      height: 250px;
+        height: 250px;
     }
-  }
-  
-  /* Teléfonos medianos - 481px-575px */
-  @media (max-width: 575px) and (min-width: 481px) {
-    .navbar {
-      padding: 0.8rem;
-    }
-    
-    .logo {
-      width: 160px;
-      height: 50px;
-    }
-    
-    .nav-links {
-      gap: 0.7rem;
-    }
-    
-    .nav-link {
-      font-size: 0.9rem;
-    }
-    
-    .Imagenes a {
-      width: 35px;
-      height: 35px;
-    }
-    
+}
+
+/* Teléfonos medianos - 481px-575px */
+@media (max-width: 575px) and (min-width: 481px) {
     .hero-title {
-      font-size: 2rem;
+        font-size: 2rem;
     }
-    
+
     /* Noticias */
     .page-title {
-      font-size: 1.8rem;
+        font-size: 1.8rem;
     }
-    
+
     .page-subtitle {
-      font-size: 1rem;
+        font-size: 1rem;
     }
-    
+
     .noticia-image {
-      height: 180px;
+        height: 180px;
     }
-    
+
     .noticia-title {
-      font-size: 1.1rem;
+        font-size: 1.1rem;
     }
-    
+
     .popup-titulo {
-      font-size: 1.4rem;
+        font-size: 1.4rem;
     }
-  }
-  
-  /* Teléfonos pequeños - 320px-480px */
-  @media (max-width: 480px) {
-    .navbar {
-      padding: 0.8rem;
-    }
-    
-    .logo {
-      width: 160px;
-      height: 60px;
-    }
-    
-    .nav-links {
-      gap: 1rem;
-    }
-    
-    .nav-link {
-      font-size: 0.9rem;
-    }
-    
-    .Imagenes a {
-      width: 35px;
-      height: 35px;
-    }
-    
+}
+
+/* Teléfonos pequeños - 320px-480px */
+@media (max-width: 480px) {
     .hero-title {
-      font-size: 1.8rem;
+        font-size: 1.8rem;
     }
-    
+
     .section-title {
-      font-size: 1.8rem;
+        font-size: 1.8rem;
     }
-    
-    .cta-button, .community-button {
-      padding: 10px 20px;
-      font-size: 1rem;
+
+    .cta-button,
+    .community-button {
+        padding: 10px 20px;
+        font-size: 1rem;
     }
-    
+
     /* Noticias */
     .page-title {
-      font-size: 1.6rem;
-      margin-bottom: 5px;
+        font-size: 1.6rem;
+        margin-bottom: 5px;
     }
-    
+
     .page-subtitle {
-      font-size: 0.9rem;
+        font-size: 0.9rem;
     }
-    
+
     .filtro-btn {
-      padding: 6px 12px;
-      font-size: 0.8rem;
+        padding: 6px 12px;
+        font-size: 0.8rem;
     }
-    
+
     .noticia-image {
-      height: 160px;
+        height: 160px;
     }
-    
+
     .noticia-title {
-      font-size: 1rem;
+        font-size: 1rem;
     }
-    
+
     .popup-content {
-      max-height: 95vh;
+        max-height: 95vh;
     }
-    
+
     .popup-titulo {
-      font-size: 1.2rem;
+        font-size: 1.2rem;
     }
-  }
-  
-  /* Teléfonos muy pequeños - hasta 320px */
-  @media (max-width: 320px) {
-    .navbar {
-      padding: 0.6rem;
-    }
-    
-    .logo {
-      width: 140px;
-      height: 40px;
-    }
-    
-    .nav-links {
-      gap: 0.5rem;
-    }
-    
-    .nav-link {
-      font-size: 0.8rem;
-    }
-    
-    .Imagenes a {
-      width: 30px;
-      height: 30px;
-    }
-    
+}
+
+/* Teléfonos muy pequeños - hasta 320px */
+@media (max-width: 320px) {
     .hero-title {
-      font-size: 1.6rem;
+        font-size: 1.6rem;
     }
-    
+
     .product-card {
-      min-width: 200px;
+        min-width: 200px;
     }
-    
+
     .section-title {
-      font-size: 1.5rem;
+        font-size: 1.5rem;
     }
-    
+
     /* Noticias */
     .page-title {
-      font-size: 1.4rem;
+        font-size: 1.4rem;
     }
-    
+
     .filtro-deportes {
-      gap: 5px;
+        gap: 5px;
     }
-    
+
     .filtro-btn {
-      padding: 5px 10px;
+        padding: 5px 10px;
     }
-    
+
     .noticia-image {
-      height: 140px;
+        height: 140px;
     }
-    
+
     .popup-header {
-      padding: 15px 10px 10px;
+        padding: 15px 10px 10px;
     }
-    
+
     .popup-titulo {
-      font-size: 1.1rem;
+        font-size: 1.1rem;
     }
-  }
+}

@@ -1,13 +1,12 @@
+/* Social links */
 
-  /* Social links */
-  
-  .social-links {
+.social-links {
     display: flex;
     flex-direction: column;
     gap: 15px;
-  }
-  
-  .social-item {
+}
+
+.social-item {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -15,13 +14,13 @@
     padding: 15px;
     border-radius: 8px;
     transition: all 0.3s ease;
-  }
-  
-  .social-item:hover {
+}
+
+.social-item:hover {
     background: #f1f5f9;
-  }
-  
-  .social-icon {
+}
+
+.social-icon {
     width: 40px;
     height: 40px;
     background: white;
@@ -30,29 +29,29 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
-  
-  .social-icon img {
+}
+
+.social-icon img {
     width: 22px;
     height: 22px;
-  }
-  
-  .social-item input {
+}
+
+.social-item input {
     flex: 1;
     padding: 12px;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     background: white;
     transition: all 0.3s ease;
-  }
-  
-  .social-item input:focus {
+}
+
+.social-item input:focus {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-  }
-  
-  .remove-social {
+}
+
+.remove-social {
     background: #e74c3c;
     color: white;
     border: none;
@@ -64,14 +63,14 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-  }
-  
-  .remove-social:hover {
+}
+
+.remove-social:hover {
     background: #c0392b;
     transform: scale(1.1);
-  }
-  
-  .add-social {
+}
+
+.add-social {
     background: none;
     border: 1px dashed #3498db;
     color: #3498db;
@@ -85,10 +84,9 @@
     gap: 8px;
     font-weight: 500;
     transition: all 0.3s ease;
-  }
-  
-  .add-social:hover {
+}
+
+.add-social:hover {
     background: rgba(52, 152, 219, 0.05);
     border-style: solid;
-  }
-  
+}

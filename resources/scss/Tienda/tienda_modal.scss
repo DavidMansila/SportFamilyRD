@@ -1,4 +1,3 @@
-
 /* Modal de producto */
 .product-modal {
     position: fixed;
@@ -10,9 +9,9 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-  }
-  
-  .modal-content {
+}
+
+.modal-content {
     background: white;
     border-radius: 15px;
     width: 90%;
@@ -22,9 +21,9 @@
     z-index: 1001;
     position: relative;
     animation: modalFadeIn 0.3s ease;
-  }
-  
-  .close-modal {
+}
+
+.close-modal {
     position: absolute;
     top: 15px;
     right: 15px;
@@ -35,39 +34,39 @@
     color: #777;
     transition: all 0.2s ease;
     z-index: 2;
-  }
-  
-  .close-modal:hover {
+}
+
+.close-modal:hover {
     color: #333;
-  }
-  
-  .modal-grid {
+}
+
+.modal-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     padding: 30px;
-  }
-  
-  .modal-images {
+}
+
+.modal-images {
     display: flex;
     flex-direction: column;
     gap: 15px;
-  }
-  
-  .main-image {
+}
+
+.main-image {
     width: 100%;
     height: 400px;
     object-fit: contain;
     border-radius: 10px;
     background: #f9f9f9;
-  }
-  
-  .thumbnail-container {
+}
+
+.thumbnail-container {
     display: flex;
     gap: 10px;
-  }
-  
-  .thumbnail {
+}
+
+.thumbnail {
     width: 60px;
     height: 60px;
     object-fit: cover;
@@ -75,94 +74,94 @@
     cursor: pointer;
     border: 2px solid transparent;
     transition: all 0.2s ease;
-  }
-  
-  .thumbnail:hover {
+}
+
+.thumbnail:hover {
     border-color: #17a2b8;
-  }
-  
-  .modal-details {
+}
+
+.modal-details {
     padding-top: 20px;
-  }
-  
-  .product-header {
+}
+
+.product-header {
     margin-bottom: 20px;
-  }
-  
-  .product-category {
+}
+
+.product-category {
     font-size: 0.9rem;
     color: #777;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 5px;
-  }
-  
-  .product-title {
+}
+
+.product-title {
     font-size: 1.8rem;
     margin-bottom: 10px;
     color: #333;
-  }
-  
-  .product-rating {
+}
+
+.product-rating {
     color: #ffc107;
     margin-bottom: 15px;
-  }
-  
-  .rating-count {
+}
+
+.rating-count {
     color: #777;
     font-size: 0.9rem;
     margin-left: 5px;
-  }
-  
-  .price-container {
+}
+
+.price-container {
     display: flex;
     align-items: center;
     gap: 15px;
     margin-bottom: 20px;
-  }
-  
-  .current-price {
+}
+
+.current-price {
     font-size: 1.8rem;
     font-weight: 700;
     color: #17a2b8;
-  }
-  
-  .old-price {
+}
+
+.old-price {
     font-size: 1.2rem;
     color: #999;
     text-decoration: line-through;
-  }
-  
-  .discount {
+}
+
+.discount {
     background: #ff4757;
     color: white;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 600;
-  }
-  
-  .product-description {
+}
+
+.product-description {
     color: #555;
     line-height: 1.6;
     margin-bottom: 25px;
-  }
-  
-  .product-actions {
+}
+
+.product-actions {
     display: flex;
     gap: 15px;
     margin-bottom: 30px;
-  }
-  
-  .quantity-selector {
+}
+
+.quantity-selector {
     display: flex;
     align-items: center;
     border: 1px solid #ddd;
     border-radius: 5px;
     overflow: hidden;
-  }
-  
-  .quantity-selector button {
+}
+
+.quantity-selector button {
     width: 40px;
     height: 40px;
     background: #f1f1f1;
@@ -170,18 +169,18 @@
     font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.2s ease;
-  }
-  
-  .quantity-selector button:hover {
+}
+
+.quantity-selector button:hover {
     background: #e0e0e0;
-  }
-  
-  .quantity-selector span {
+}
+
+.quantity-selector span {
     width: 50px;
     text-align: center;
-  }
-  
-  .add-to-cart {
+}
+
+.add-to-cart {
     flex: 1;
     background: #17a2b8;
     color: white;
@@ -196,27 +195,27 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-  }
-  
-  .add-to-cart:hover {
+}
+
+.add-to-cart:hover {
     background: #17a2b8;
-  }
-  
-  .product-meta {
+}
+
+.product-meta {
     display: flex;
     flex-direction: column;
     gap: 15px;
     border-top: 1px solid #eee;
     padding-top: 20px;
-  }
-  
-  .meta-item {
+}
+
+.meta-item {
     display: flex;
     align-items: center;
     gap: 10px;
     color: #555;
-  }
-  
-  .meta-item i {
+}
+
+.meta-item i {
     color: #17a2b8;
-  }
+}

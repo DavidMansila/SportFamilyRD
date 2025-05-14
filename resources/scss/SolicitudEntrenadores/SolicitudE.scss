@@ -1,21 +1,20 @@
-
 /* ESTILOS GENERALES */
 .page-container {
     min-height: 100vh;
     background: #f8f9fa;
     display: flex;
     flex-direction: column;
-  }
-  
-  .solicitudes-container {
+}
+
+.solicitudes-container {
     flex: 1;
     padding: 3rem 2rem;
     max-width: 1400px;
     margin: 0 auto;
-  }
-  
-  /* HEADER */
-  .page-header {
+}
+
+/* HEADER */
+.page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -24,24 +23,24 @@
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  }
-  
-  .title {
+}
+
+.title {
     font-size: 2rem;
     color: #1a1a1a;
     margin: 0;
     font-weight: 700;
     letter-spacing: -0.5px;
-  }
-  
-  /* FILTROS */
-  .filters-container {
+}
+
+/* FILTROS */
+.filters-container {
     display: flex;
     gap: 1.5rem;
     align-items: center;
-  }
-  
-  .filter-select {
+}
+
+.filter-select {
     padding: 0.75rem 1.5rem;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
@@ -49,15 +48,15 @@
     background: white;
     transition: all 0.3s ease;
     cursor: pointer;
-  }
-  
-  .filter-select:focus {
+}
+
+.filter-select:focus {
     outline: none;
     border-color: #ff9900;
     box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.2);
-  }
-  
-  .btn-refresh {
+}
+
+.btn-refresh {
     background: none;
     border: none;
     cursor: pointer;
@@ -65,22 +64,22 @@
     border-radius: 50%;
     transition: transform 0.3s ease;
     font-size: 1.2rem;
-  }
-  
-  .btn-refresh:hover {
+}
+
+.btn-refresh:hover {
     transform: rotate(180deg) scale(1.1);
     color: #ff9900;
-  }
-  
-  /* GRID DE SOLICITUDES */
-  .solicitudes-grid {
+}
+
+/* GRID DE SOLICITUDES */
+.solicitudes-grid {
     display: grid;
     gap: 2rem;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  }
-  
-  /* TARJETAS */
-  .solicitud-card {
+}
+
+/* TARJETAS */
+.solicitud-card {
     background: white;
     border-radius: 16px;
     padding: 1.75rem;
@@ -89,10 +88,10 @@
     position: relative;
     overflow: hidden;
     border-left: 6px solid transparent;
-  }
-  
-  .solicitud-card::before {
-    content: '';
+}
+
+.solicitud-card::before {
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -101,67 +100,67 @@
     background: linear-gradient(90deg, #ff9900, #ff6b00);
     opacity: 0;
     transition: opacity 0.3s ease;
-  }
-  
-  .solicitud-card:hover {
+}
+
+.solicitud-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-  }
-  
-  .solicitud-card:hover::before {
+}
+
+.solicitud-card:hover::before {
     opacity: 1;
-  }
-  
-  /* ESTADOS TARJETAS */
-  .solicitud-card.aprobado {
+}
+
+/* ESTADOS TARJETAS */
+.solicitud-card.aprobado {
     border-left-color: #00c853;
     background: linear-gradient(to right, #f8fff9 0%, #ffffff 30%);
-  }
-  
-  .solicitud-card.rechazado {
+}
+
+.solicitud-card.rechazado {
     border-left-color: #d50000;
     background: linear-gradient(to right, #fff5f5 0%, #ffffff 30%);
-  }
-  
-  .solicitud-card.pendiente {
+}
+
+.solicitud-card.pendiente {
     border-left-color: #ffab00;
     background: linear-gradient(to right, #fff8e5 0%, #ffffff 30%);
-  }
-  
-  /* CONTENIDO TARJETAS */
-  .card-header {
+}
+
+/* CONTENIDO TARJETAS */
+.card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1.25rem;
-  }
-  
-  .user-info {
+}
+
+.user-info {
     display: flex;
     align-items: center;
     gap: 1.25rem;
-  }
-  
-  .user-name {
+}
+
+.user-name {
     margin: 0;
     font-size: 1.25rem;
     color: #1a1a1a;
     font-weight: 700;
-  }
-  
-  .user-age {
+}
+
+.user-age {
     margin: 0.25rem 0 0;
     color: #666;
     font-size: 0.9rem;
-  }
-  
-  .request-date {
+}
+
+.request-date {
     color: #888;
     font-size: 0.85rem;
     white-space: nowrap;
-  }
-  
-  .sport-tag {
+}
+
+.sport-tag {
     display: inline-block;
     padding: 0.35rem 1rem;
     border-radius: 20px;
@@ -169,60 +168,63 @@
     font-weight: 500;
     background: #e0e0e0;
     color: #444;
-  }
-  
-  .contact-info {
+}
+
+.contact-info {
     margin: 1.5rem 0;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-  }
-  
-  .email-link, .phone-link {
+}
+
+.email-link,
+.phone-link {
     color: #444;
     text-decoration: none;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     transition: color 0.3s ease;
-  }
-  
-  .email-link:hover, .phone-link:hover {
+}
+
+.email-link:hover,
+.phone-link:hover {
     color: #ff9900;
-  }
-  
-  .message-container {
+}
+
+.message-container {
     background: #f8f8f8;
     padding: 1rem;
     border-radius: 8px;
     position: relative;
-  }
-  
-  .user-message {
+}
+
+.user-message {
     margin: 0;
     font-style: italic;
     color: #444;
     line-height: 1.5;
-  }
-  
-  .user-message::before {
-    content: '“';
+}
+
+.user-message::before {
+    content: "“";
     font-size: 2rem;
     color: #ff9900;
     position: absolute;
     left: 0.5rem;
     top: -0.5rem;
     opacity: 0.3;
-  }
-  
-  /* BOTONES */
-  .action-buttons {
+}
+
+/* BOTONES */
+.action-buttons {
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
-  }
-  
-  .btn-success, .btn-danger {
+}
+
+.btn-success,
+.btn-danger {
     flex: 1;
     padding: 0.75rem 1.5rem;
     border: none;
@@ -234,32 +236,32 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-  }
-  
-  .btn-success {
+}
+
+.btn-success {
     background: linear-gradient(135deg, #00c853, #009624);
     color: white;
     box-shadow: 0 4px 6px rgba(0, 200, 83, 0.2);
-  }
-  
-  .btn-success:hover {
+}
+
+.btn-success:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 200, 83, 0.3);
-  }
-  
-  .btn-danger {
+}
+
+.btn-danger {
     background: linear-gradient(135deg, #d50000, #9b0000);
     color: white;
     box-shadow: 0 4px 6px rgba(213, 0, 0, 0.2);
-  }
-  
-  .btn-danger:hover {
+}
+
+.btn-danger:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(213, 0, 0, 0.3);
-  }
-  
-  /* NOTIFICACIONES */
-  .toast-message {
+}
+
+/* NOTIFICACIONES */
+.toast-message {
     position: fixed;
     bottom: 30px;
     left: 50%;
@@ -274,54 +276,54 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-  }
-  
-  /* ANIMACIONES */
-  .list-enter-active {
+}
+
+/* ANIMACIONES */
+.list-enter-active {
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-  }
-  .list-leave-active {
+}
+.list-leave-active {
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-  }
-  .list-enter {
+}
+.list-enter {
     opacity: 0;
     transform: translateY(20px) scale(0.95);
-  }
-  .list-leave-to {
+}
+.list-leave-to {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
-  }
-  
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity 0.5s;
-  }
-  .fade-enter, .fade-leave-to {
-    opacity: 0;
-  }
-  
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .page-header {
-      flex-direction: column;
-      gap: 1.5rem;
-      align-items: stretch;
-    }
-    
-    .solicitudes-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .solicitud-card {
-      padding: 1.5rem;
-    }
-    
-    .action-buttons {
-      flex-direction: column;
-    }
-  }
-  
+}
 
-  
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+
+    .solicitudes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .solicitud-card {
+        padding: 1.5rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+
 /* Mantener los mismos estilos del componente original */
 .solicitudes-container {
     max-width: 1200px;
@@ -348,7 +350,7 @@
 }
 
 .btn-aprobar {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
     margin-right: 10px;
 }
@@ -359,7 +361,7 @@
 }
 
 .aprobada {
-    border-left: 5px solid #4CAF50;
+    border-left: 5px solid #4caf50;
 }
 
 .rechazada {
@@ -367,7 +369,7 @@
 }
 
 .documentos a {
-    color: #2196F3;
+    color: #2196f3;
     text-decoration: none;
 }
 

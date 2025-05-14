@@ -1,6 +1,11 @@
 <template>
 
   <div class="container" ref="container">
+
+    <div v-if="showLogoutMessage" class="logout-message">
+      ✅ Sesión cerrada exitosamente
+    </div>
+
     <div class="form-container sign-up-container">
       <form>
         <!-- @submit.prevent="submitForm" -->
@@ -77,6 +82,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      showLogoutMessage: false,
+
       registerForm: {
         name: '',
         email: '',
@@ -122,7 +129,7 @@ export default {
     },
 
     async submitLoginForm() {
-      this.isSubmitting = true; 
+      this.isSubmitting = true;
       try {
         console.log('Logging in:', this.loginForm);
 
@@ -148,6 +155,23 @@ export default {
       }
       this.isSubmitting = false;
     },
+
+
+
+    checkLogoutMessage() {
+      if (this.$route.query.logoutSuccess || sessionStorage.getItem('logoutMessage')) {
+        this.showLogoutMessage = true;
+        sessionStorage.removeItem('logoutMessage');
+
+        setTimeout(() => {
+          this.showLogoutMessage = false;
+        }, 5000);
+      }
+    }
+
+  },
+    mounted() {
+    this.checkLogoutMessage();
   },
 };
 </script>
@@ -155,4 +179,23 @@ export default {
 
 <style scoped>
 @import '../../../scss/Login/signup.scss';
+
+.logout-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4CAF50;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from { top: -50px; }
+  to { top: 20px; }
+}
 </style>

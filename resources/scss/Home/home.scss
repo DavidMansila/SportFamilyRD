@@ -1,180 +1,162 @@
- 
- /* General styles */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-
-
-
 /* Estilos generales */
 .home-container {
-  color: #333;
+    color: #333;
 }
-
 
 /* Hero Banner */
 .hero-banner {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)), url("/imagenes/estadio.jpg");
-  background-size: cover;
-  background-position: center;
-  height: 80vh;
-  min-height: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: white;
-  padding: 0 20px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)),
+        url("/imagenes/estadio.jpg");
+    background-size: cover;
+    background-position: center;
+    height: 80vh;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 0 20px;
 }
 
 .hero-content {
-  max-width: 800px;
+    max-width: 800px;
 }
 
 .hero-title {
-  font-size: 3.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hero-cta {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
 }
 
 .cta-button {
-  padding: 12px 30px;
-  border-radius: 30px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .cta-button {
-  background-color: #ff3149;
-  color: white;
+    background-color: #ff3149;
+    color: white;
 }
 
 .cta-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
-
-
 
 /* Secciones comunes */
 .section-header {
-  text-align: center;
-  margin-bottom: 40px;
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 .section-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #2d3748;
-  margin-bottom: 10px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
 }
 
 .section-description {
-  font-size: 1.2rem;
-  color: #718096;
-  max-width: 700px;
-  margin: 0 auto;
+    font-size: 1.2rem;
+    color: #718096;
+    max-width: 700px;
+    margin: 0 auto;
 }
-
-
 
 /* Newsletter */
 .newsletter-section {
-  padding: 80px 20px;
-  background-color: #2d3748;
-  color: white;
-  text-align: center;
+    padding: 80px 20px;
+    background-color: #2d3748;
+    color: white;
+    text-align: center;
 }
 
 .newsletter-content {
-  max-width: 600px;
-  margin: 0 auto;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .newsletter-content h2 {
-  font-size: 2.2rem;
-  margin-bottom: 15px;
+    font-size: 2.2rem;
+    margin-bottom: 15px;
 }
 
 .newsletter-content p {
-  font-size: 1.1rem;
-  margin-bottom: 30px;
-  opacity: 0.9;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
 }
 
 .newsletter-form {
-  display: flex;
-  max-width: 500px;
-  margin: 0 auto;
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .newsletter-form input {
-  flex: 1;
-  padding: 15px;
-  border: none;
-  border-radius: 30px 0 0 30px;
-  font-size: 1rem;
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 30px 0 0 30px;
+    font-size: 1rem;
 }
 
 .newsletter-form button {
-  padding: 15px 25px;
-  background-color: #ff3149;
-  color: white;
-  border: none;
-  border-radius: 0 30px 30px 0;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
+    padding: 15px 25px;
+    background-color: #ff3149;
+    color: white;
+    border: none;
+    border-radius: 0 30px 30px 0;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .newsletter-form button:hover {
-  background-color: #e0263d;
+    background-color: #e0263d;
 }
-
-
 
 /* Cursor pointer */
-.category-card, .thread-card {
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.category-card,
+.thread-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.category-card:hover, .thread-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+.category-card:hover,
+.thread-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
-
-
 
 /* Estilos para los botones que son en realidad router-links */
 .cta-button {
-  display: inline-block;
-  text-decoration: none;
-  text-align: center;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
 }
 
 .community-button {
-  display: inline-block;
-  text-decoration: none;
+    display: inline-block;
+    text-decoration: none;
 }
-
-
