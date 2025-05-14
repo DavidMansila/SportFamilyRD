@@ -163,7 +163,7 @@ export default {
 
 <style scoped>
 
-@import '../../../scss/SolicitudEntrenadores/SolicitudE_navbar.scss';
+@import '../../../scss/Entrenadores/entrenadores_navbar.scss';
 
 @import '../../../scss/SolicitudEntrenadores/SolicitudE.scss';
 

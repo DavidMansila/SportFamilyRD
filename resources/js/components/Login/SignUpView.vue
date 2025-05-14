@@ -49,17 +49,17 @@
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
-          <a href="/" class="mb-6">
+          <router-link to="/" class="mb-6">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
-          </a>
+          </router-link>
           <h1>Welcome Back!</h1>
           <p>To keep connected with us, please login with your personal info</p>
           <button class="ghost" @click="toggleForm('signIn')">Sign In</button>
         </div>
         <div class="overlay-panel overlay-right">
-          <a href="/" class="mb-6">
+          <router-link to="/" class="mb-6">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
-          </a>
+          </router-link>
           <h1>Hello, Friend!</h1>
           <p>Enter your details and start your journey with us</p>
           <button class="ghost" @click="toggleForm('signUp')">Sign Up</button>
@@ -103,7 +103,6 @@ export default {
 
     async submitForm() {
       // this.isSubmitting = true;
-
       try {
         console.log('Registering:', this.registerForm);
 
@@ -114,7 +113,6 @@ export default {
           })
           .catch((error) => {
             console.log(error);
-
             alert('Algo salió mal, por favor intenta de nuevo');
           });
       } catch (error) {

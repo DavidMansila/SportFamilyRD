@@ -1,11 +1,5 @@
 <template>
   <div>
-    <nav class="main-nav">
-      <div class="nav-container">
-      
-      </div>
-
-    </nav>
 
     <router-view></router-view>
   </div>
@@ -55,6 +49,7 @@ export default {
         console.error('Error al cerrar sesión:', error);
       });
     }
+
   }
 }
 </script>

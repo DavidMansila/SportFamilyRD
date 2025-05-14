@@ -246,7 +246,7 @@ export default {
 
 <style scoped>
 
-@import '../../../scss/SolicitudUsuarios/SolicitudU_navbar.scss';
+@import '../../../scss/Entrenadores/entrenadores_navbar.scss';
 
 @import '../../../scss/SolicitudUsuarios/SolicitudU.scss';
 

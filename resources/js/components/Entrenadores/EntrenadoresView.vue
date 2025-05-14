@@ -70,13 +70,13 @@
           <h2>¿Tienes lo necesario para ser entrenador?</h2>
           <p>Únete a nuestra red de profesionales y comparte tu conocimiento</p>
         </div>
-        <a href="/Solicitud" class="cta-button">
+        <router-link to="/Solicitud" class="cta-button">
           Aplicar Ahora
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" />
           </svg>
-        </a>
+        </router-link>
       </div>
     </div>
 
