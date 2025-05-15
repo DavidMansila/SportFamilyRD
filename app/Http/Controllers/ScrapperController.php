@@ -275,8 +275,8 @@ class ScrapperController extends Controller
 
     public function baseballNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché
-        $articles = \Cache::remember('baseball_news', now()->addDays(2), function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('baseball_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -338,7 +338,6 @@ class ScrapperController extends Controller
                             'date' => $date,
                             'image' => $image,
                             'description' => implode("\n", $description[0] ?? []),
-                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     } catch (\Exception $e) {
                         $articles[] = [
@@ -347,7 +346,6 @@ class ScrapperController extends Controller
                             'date' => 'No date available',
                             'image' => 'No image available',
                             'description' => 'No description available',
-                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     }
                 }
@@ -363,8 +361,8 @@ class ScrapperController extends Controller
 
     public function futbolNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché
-        $articles = \Cache::remember('futbol_news', now()->addDays(2), function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('futbol_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -416,7 +414,6 @@ class ScrapperController extends Controller
                             'image' => $image,
                             'date' => $date,
                             'description' => implode("\n", $description),
-                            // 'link' => $links[$index], // Usar el enlace original
                             'author' => $author,
                         ];
                     } catch (\Exception $e) {
@@ -426,7 +423,6 @@ class ScrapperController extends Controller
                             'date' => 'No date available',
                             'description' => 'No description available',
                             'author' => 'No author available',
-                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     }
                 }
@@ -440,10 +436,10 @@ class ScrapperController extends Controller
         ]);
     }
 
-    //todo chequear si basket tiene cache remenber
     public function basketballNews()
     {
-        $articles = \Cache::remember('basketball_news', now()->addDays(2), function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('basketball_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -493,7 +489,7 @@ class ScrapperController extends Controller
 
                         $articles[] = [
                             'title' => $title,
-                            'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
+                            'author' => trim(str_replace('Por:', '', $author)),
                             'date' => $date,
                             'image' => $image,
                             'description' => implode("\n", $description),
@@ -520,8 +516,8 @@ class ScrapperController extends Controller
 
     public function volleyballNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché durante 2 días
-        $articles = \Cache::remember('volleyball_news', now()->addDays(2), function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('volleyball_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -592,7 +588,12 @@ class ScrapperController extends Controller
                     }
     
                     // Verificar si hay una página siguiente
-                    $nextPage = $crawler->filter('a[rel="next"]')->attr('href') ?? null;
+                    $nextPage = null;
+                    try {
+                        $nextPage = $crawler->filter('a[rel="next"]')->attr('href');
+                    } catch (\Exception $e) {
+                        $nextPage = null;
+                    }
                     $currentPage = $nextPage;
                 } catch (\Exception $e) {
                     // Manejo de errores para la página principal
@@ -608,10 +609,10 @@ class ScrapperController extends Controller
         ]);
     }
 
-    //todo chequear si swimming tiene cache remenber
     public function swimmingNews()
     {
-        $articles = (function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('swimming_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -662,7 +663,7 @@ class ScrapperController extends Controller
             $linksAndSubtitles = array_filter($linksAndSubtitles);
 
             return $linksAndSubtitles;
-        })();
+        });
 
         return response()->json([
             'swimming_news' => $articles,
