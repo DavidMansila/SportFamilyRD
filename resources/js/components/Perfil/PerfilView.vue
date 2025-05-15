@@ -40,12 +40,12 @@
                             <span class="stat-label">Likes</span>
                         </div>
 
-                        <div class="stat-item" v-if="user.role === 'entrenador'">
+                        <div class="stat-item" v-if="user.user_type === 'entrenador'">
                             <span class="stat-number">{{ stats.SolicitudesUsuarios }}</span>
                             <span class="stat-label">Siguiendo</span>
                         </div>
 
-                        <div class="stat-item" v-if="user.role === 'entrenador'">
+                        <div class="stat-item" v-if="user.user_type === 'entrenador'">
                             <span class="stat-number">{{ stats.rating }}</span>
                             <span class="stat-label">Valoración</span>
                         </div>
@@ -112,10 +112,10 @@
 
 
                 <!-- Sección de Redes Sociales -->
-                <div class="profile-section">
+                <div class="profile-section"> 
                     <h2>Redes Sociales</h2>
                     <div class="social-links">
-                        <div v-for="(social, index) in user.socialLinks" :key="index" class="social-item">
+                        <div v-for="(social, index) in user.social_links" :key="index" class="social-item">
                             <select v-model="social.platform" v-if="editMode">
                                 <option value="facebook">Facebook</option>
                                 <option value="twitter">Twitter</option>
@@ -132,7 +132,7 @@
                                 ×
                             </button>
                         </div>
-                        <button v-if="editMode" @click="addSocialLink" class="add-social">
+                        <button v-if="editMode" @click="" class="add-social">
                             + Añadir Red Social
                         </button>
                     </div>
@@ -145,7 +145,7 @@
 
 
                 <!-- Sección de Logros -->
-                <div class="profile-section" v-if="user.role === 'entrenador'">
+                <div class="profile-section" v-if="user.user_type === 'entrenador'">
                     <h2>Mis Logros</h2>
                     <div class="achievements">
                         <div v-for="(achievement, index) in user.achievements" :key="index" class="achievement-item">
@@ -180,7 +180,7 @@
 
 <script>
 import Navbar from '../navbarComponent.vue';
-
+import axios from 'axios';
 export default {
     name: 'ProfileView',
     components: {
@@ -213,145 +213,134 @@ export default {
 
     methods: {
 
-        async loadUserData() {
-            try {
-                const response = await this.$axios.get('/api/user');
-                this.user = response.data;
-                sessionStorage.setItem('user', JSON.stringify(this.user));
-                this.originalUserData = JSON.parse(JSON.stringify(this.user));
-            } catch (error) {
-                alert('Error cargando datos: ' + error.message);
-            }
-        },
+      async saveProfile() {
+       
+        const formData = new FormData();
 
-        async saveProfile() {
-            try {
-                const formData = new FormData();
+        // Agregar campos básicos
+        formData.append('_method', 'PUT');
+        formData.append('name', this.user.name);
+        formData.append('email', this.user.email);
+        formData.append('phone', this.user.phone);
+        formData.append('location', this.user.location);
+        formData.append('birthdate', this.user.birthdate);
+        formData.append('bio', this.user.bio);
 
-                // Agregar campos básicos
-                formData.append('name', this.user.name);
-                formData.append('email', this.user.email);
-                formData.append('phone', this.user.phone);
-                formData.append('location', this.user.location);
-                formData.append('birthdate', this.user.birthdate);
-                formData.append('bio', this.user.bio);
-
-                // Agregar imagen si existe
-                if (this.$refs.avatarInput.files[0]) {
-                    formData.append('image', this.$refs.avatarInput.files[0]);
-                }
-
-                // Enviar solicitud PUT
-                const { data } = await this.$axios.post(`/user/${this.user.id}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-
-                // Actualizar datos locales
-                this.user = data;
-                sessionStorage.setItem('user', JSON.stringify(data));
-                this.editMode = false;
-                alert('¡Perfil actualizado correctamente!');
-
-            } catch (error) {
-                alert('Error al guardar: ' + error.response?.data?.message || error.message);
-            }
-        },
-
-        handleAvatarChange(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.user.image = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        },
-
-
-        discardChanges() {
-            this.user = JSON.parse(JSON.stringify(this.originalUserData));
-            this.editMode = false;
-        },
-
-
-        getChangedFields() {
-            const changes = {};
-            Object.keys(this.user).forEach(key => {
-                if (JSON.stringify(this.user[key]) !== JSON.stringify(this.originalUserData[key])) {
-                    changes[key] = this.user[key];
-                }
-            });
-            return changes;
-        },
-
-        async autoSaveAvatar(file) {
-            const formData = new FormData();
-            formData.append('image', file);
-
-            try {
-                await this.$axios.post(`/user/${this.user.id}/image`, formData);
-                this.showToast('Foto de perfil actualizada', 'success');
-            } catch (error) {
-                this.handleError(error, 'Error al guardar foto');
-            }
-        },
-
-        getSocialIcon(platform) {
-            const icons = {
-                facebook: 'facebook-icon.svg',
-                twitter: 'twitter-icon.svg',
-                instagram: 'instagram-icon.svg',
-                linkedin: 'linkedin-icon.svg',
-                youtube: 'youtube-icon.svg'
-            };
-            return `/imagenes/social/${icons[platform] || 'default-social-icon.svg'}`;
-        },
-
-        addSocialLink() {
-            this.user.socialLinks.push({ platform: 'facebook', url: '' });
-        },
-
-        removeSocialLink(index) {
-            this.user.socialLinks.splice(index, 1);
-        },
-
-        addAchievement() {
-            this.user.achievements.push({
-                title: '',
-                description: '',
-                date: new Date().toISOString().split('T')[0]
-            });
-        },
-
-        removeAchievement(index) {
-            this.user.achievements.splice(index, 1);
-        },
-
-        handleError(error, defaultMsg) {
-            const errorMsg = error.response?.data?.message || defaultMsg;
-            this.error = errorMsg;
-            this.showToast(errorMsg, 'error');
-            console.error(error);
-        },
-
-        showToast(message, type = 'info') {
-            // Implementar lógica de tu sistema de notificaciones
-            alert(`${type.toUpperCase()}: ${message}`);
+        // Agregar imagen si existe
+        if (this.$refs.avatarInput.files[0]) {
+            formData.append('image', this.$refs.avatarInput.files[0]);
         }
+
+        // Enviar solicitud PUT
+        axios.post(`/user/${this.user.id}`, formData, {
+         headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then(response => {
+          // Actualizar datos locales
+          this.user = response.data.user;
+          sessionStorage.setItem('user', JSON.stringify(response.data.user));
+          this.editMode = false;
+          alert('¡Perfil actualizado correctamente!');
+
+        })
+        .catch(error => {
+            this.handleError(error, 'Error al guardar perfil');
+        });
+
+        
+        
+      },
+
+      handleAvatarChange(event) {
+          const file = event.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                  this.user.image = e.target.result;
+              };
+              reader.readAsDataURL(file);
+          }
+      },
+
+
+      discardChanges() {
+          this.user = JSON.parse(JSON.stringify(this.originalUserData));
+          this.editMode = false;
+      },
+
+
+      getChangedFields() {
+          const changes = {};
+          Object.keys(this.user).forEach(key => {
+              if (JSON.stringify(this.user[key]) !== JSON.stringify(this.originalUserData[key])) {
+                  changes[key] = this.user[key];
+              }
+          });
+          return changes;
+      },
+
+      async autoSaveAvatar(file) {
+          const formData = new FormData();
+          formData.append('image', file);
+
+          try {
+              await this.$axios.post(`/user/${this.user.id}/image`, formData);
+              this.showToast('Foto de perfil actualizada', 'success');
+          } catch (error) {
+              this.handleError(error, 'Error al guardar foto');
+          }
+      },
+
+      getSocialIcon(platform) {
+          const icons = {
+              facebook: 'facebook-icon.svg',
+              twitter: 'twitter-icon.svg',
+              instagram: 'instagram-icon.svg',
+              linkedin: 'linkedin-icon.svg',
+              youtube: 'youtube-icon.svg'
+          };
+          return `/imagenes/social/${icons[platform] || 'default-social-icon.svg'}`;
+      },
+
+      addSocialLink() {
+        this.user.social_links.push({ platform: 'facebook', url: '' });
+      },
+
+      removeSocialLink(index) {
+          this.user.socialLinks.splice(index, 1);
+      },
+
+      addAchievement() {
+          this.user.achievements.push({
+              title: '',
+              description: '',
+              date: new Date().toISOString().split('T')[0]
+          });
+      },
+
+      removeAchievement(index) {
+          this.user.achievements.splice(index, 1);
+      },
+
+      handleError(error, defaultMsg) {
+          const errorMsg = error.response?.data?.message || defaultMsg;
+          this.error = errorMsg;
+          this.showToast(errorMsg, 'error');
+          console.error(error);
+      },
+
+      showToast(message, type = 'info') {
+          // Implementar lógica de tu sistema de notificaciones
+          alert(`${type.toUpperCase()}: ${message}`);
+      }
     },
     mounted() {
-        // Cargar datos iniciales
-        const savedUser = sessionStorage.getItem('user');
-        if (savedUser) {
-            this.user = JSON.parse(savedUser);
-            this.originalUserData = JSON.parse(savedUser);
-        }
-        this.loadUserData();
+      // Cargar datos iniciales
+      this.user = JSON.parse(sessionStorage.getItem('user'));
+      
+      
     }
-}
+  }
 </script>
 
 
