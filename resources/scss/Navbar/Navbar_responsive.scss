@@ -1,0 +1,149 @@
+/* ------------------- RESPONSIVE FLUIDO ------------------ */
+:root {
+  --logo-base-width: 200px;
+  --logo-base-height: 70px;
+  --nav-link-gap: 2rem;
+  --icon-size: 40px;
+}
+
+/* Escalado fluido para dispositivos medianos/grandes */
+@media (min-width: 768px) {
+  .navbar {
+    padding: clamp(0.5rem, 2vw, 2rem);
+    
+    .logo {
+      width: clamp(160px, 15vw, 220px);
+      height: clamp(50px, calc(15vw * 0.4), 80px);
+    }
+    
+    .nav-links {
+      gap: clamp(1rem, 2vw, 2.5rem);
+    }
+    
+    .nav-link {
+      font-size: clamp(0.9rem, 1.2vw, 1.2rem);
+    }
+    
+    .Imagenes {
+      gap: clamp(0.5rem, 1.5vw, 2rem);
+      
+      a, button {
+        width: clamp(30px, 3vw, 50px) !important;
+        height: clamp(30px, 3vw, 50px) !important;
+        
+        img {
+          width: clamp(16px, 2vw, 28px) !important;
+          height: clamp(16px, 2vw, 28px) !important;
+        }
+      }
+    }
+  }
+}
+
+/* Dispositivos móviles (orientación vertical) */
+@media (max-width: 767px) {
+  .navbar {
+    flex-direction: column;
+    padding: clamp(0.3rem, 3vw, 1rem);
+    
+    .logo-container {
+      margin-bottom: clamp(0.5rem, 2vw, 1.5rem);
+    }
+    
+    .logo {
+      width: clamp(120px, 30vw, 180px);
+      height: auto;
+      aspect-ratio: 200/70;
+    }
+    
+    .nav-links {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: clamp(0.3rem, 2vw, 1rem);
+      margin: clamp(0.5rem, 2vw, 1.5rem) 0;
+      
+      .nav-link {
+        font-size: clamp(0.7rem, 3vw, 1rem);
+        padding: 0.3em 0.5em;
+      }
+    }
+    
+    .Imagenes {
+      gap: clamp(0.3rem, 2vw, 1rem);
+      margin-top: clamp(0.5rem, 2vw, 1rem);
+      
+    a, button {
+      width: clamp(28px, 8vw, 40px) !important;
+      height: clamp(28px, 8vw, 40px) !important;
+      
+      img {
+        width: clamp(14px, 5vw, 24px) !important;
+        height: clamp(14px, 5vw, 24px) !important;
+      }
+      }
+      
+      .cart-badge {
+        width: clamp(14px, 4vw, 20px);
+        height: clamp(14px, 4vw, 20px);
+        font-size: clamp(0.5rem, 3vw, 0.75rem);
+      }
+    }
+  }
+  
+  .auth-alert {
+    font-size: clamp(0.7rem, 3vw, 0.9rem);
+    padding: clamp(0.3rem, 2vw, 0.8rem);
+    top: clamp(30px, 10vw, 50px);
+  }
+  
+  .confirm-dialog {
+    width: clamp(280px, 90vw, 400px);
+    padding: clamp(1rem, 5vw, 2rem);
+    
+    h3 {
+      font-size: clamp(1rem, 4vw, 1.3rem);
+    }
+    
+    button {
+      padding: clamp(0.5rem, 3vw, 1rem) clamp(1rem, 5vw, 2rem);
+      font-size: clamp(0.8rem, 3.5vw, 1.1rem);
+    }
+  }
+}
+
+/* Ajustes especiales para orientación horizontal en móviles */
+@media (max-width: 767px) and (orientation: landscape) {
+  .navbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+    .nav-links {
+      order: 3;
+      width: 100%;
+      margin: 0.5rem 0;
+    }
+    
+    .Imagenes {
+      margin-top: 0;
+    }
+  }
+}
+
+/* Ajustes para pantallas ultra anchas */
+@media (min-width: 2000px) {
+  :root {
+    --logo-base-width: 260px;
+    --logo-base-height: 90px;
+    --nav-link-gap: 3rem;
+    --icon-size: 50px;
+  }
+  
+  .nav-link {
+    font-size: 1.4rem;
+  }
+}
+
+/* Transiciones fluidas para todos los elementos */
+.navbar * {
+  transition: all 0.3s ease-in-out;
+}
