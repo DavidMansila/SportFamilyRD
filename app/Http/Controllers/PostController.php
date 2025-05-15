@@ -62,32 +62,21 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            // dump($id);
-            // dd($request->all());
             $post = Post::findOrFail($id);
-            
             // Verificar autorización
-           
-    
             $data = $request->except('imagen');
             
             // Manejar nueva imagen
             if ($request->hasFile('imagen')) {
-                // Eliminar imagen anterior si existe
-                if ($post->imagen) {
-                    Storage::delete('posts/'.$post->id.'/'.$post->imagen);
-                }
-                
-                $imageName = Post::addImages($request->file('imagen'), $post->id);
+                $imageName = Post::addImages($request->file('imagen'), $post->id, 'posts');
                 $data['imagen'] = $imageName;
             }
     
             $post->update($data);
-            $post->imagen = url('storage/posts/' . $post->id . '/' . $post->imagen);
     
             return response()->json([
                 'message' => 'Post actualizado exitosamente',
-                'post' => $post, // Incluir URL completa de la imagen
+                'post' => $post, 
             ], 200);
     
         } catch (\Exception $e) {

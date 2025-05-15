@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
 
 class UserController extends Controller
 {
@@ -100,10 +101,10 @@ class UserController extends Controller
             $user->update($request->all());
 
             // todo cambia la funcion para que sea dinamica entre user y post
-            // if(isset($request['image']) && $request['image']){
-            //     $imageName = Post::addImages($request['image'], $user->id);
-            //     User::where('id', $user->id)->update(['image' => $imageName]);
-            // }
+            if(isset($request['image']) && $request['image']){
+                $imageName = Post::addImages($request['image'], $user->id,'users');
+                User::where('id', $user->id)->update(['image' => $imageName]);
+            }
 
             return response()->json([
                 'message' => 'Usuario actualizado con éxito',
