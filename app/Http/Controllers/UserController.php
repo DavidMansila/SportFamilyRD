@@ -20,7 +20,7 @@ class UserController extends Controller
         $users = User::all()->map(function ($user) {
             $user->image = $user->image 
             ? url('storage/users/' . $user->id . '/' . $user->image) 
-            : url('public/imagenes/no_image.png');
+            : url('storage/users/Perfil-Icon.png');
             return $user;
         });
 
@@ -57,6 +57,7 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'user_type'=> 'user',
+                'image' => url('storage/users/Perfil-Icon.png'),
             ]);
 
             //iniciar sesion automaticamente al crear un usuario
@@ -100,16 +101,18 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $user->update($request->all());
 
-            // todo cambia la funcion para que sea dinamica entre user y post
             if(isset($request['image']) && $request['image']){
+                // dd($request['image']);
                 $imageName = Post::addImages($request['image'], $user->id,'users');
                 User::where('id', $user->id)->update(['image' => $imageName]);
+                $user['image'] = url('storage/users/' . $user->id . '/' . $imageName);
             }
 
             return response()->json([
                 'message' => 'Usuario actualizado con éxito',
                 'user' => $user,
             ], 200);
+
         }catch(\Exception $e){
             return response()->json([
                 'message' => 'Error: '.$e->getMessage()

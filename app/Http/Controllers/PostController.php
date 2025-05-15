@@ -17,7 +17,7 @@ class PostController extends Controller
             $posts = Post::with(['comments.replies'])->get()->map(function ($post) {
                 $post->imagen = $post->imagen 
                 ? url('storage/posts/' . $post->id . '/' . $post->imagen)
-                : url('public/imagenes/no_image.png');
+                : url('storage/posts/no_image.png');
                 return $post;
             });
             

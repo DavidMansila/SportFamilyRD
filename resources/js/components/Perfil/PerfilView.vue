@@ -9,19 +9,21 @@
             <!-- Header del Perfil -->
             <div class="profile-header">
                 <div class="avatar-container">
-                    <img :src="user.image" alt="Avatar" class="profile-avatar">
-                    <button class="edit-avatar" @click="triggerFileInput">
+                    <img :src=" user.image" alt="Avatar" class="profile-avatar">
+                    <button class="edit-avatar" @click="handleAvatarChange">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
-                                d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                              d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                            />
                             <path
-                                d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                              d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                            />
                         </svg>
                     </button>
                     <input type="file" ref="avatarInput" @change="handleAvatarChange" accept="image/*"
-                        style="display: none;">
+                      style="display: none;">
                 </div>
                 <div class="profile-info">
 
@@ -252,22 +254,68 @@ export default {
       },
 
       handleAvatarChange(event) {
-          const file = event.target.files[0];
-          if (file) {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                  this.user.image = e.target.result;
-              };
-              reader.readAsDataURL(file);
-          }
+        // Si es el clic en el botón
+        if (!event.target.files) {
+          this.$refs.avatarInput.click()
+          return
+        }
+
+        // Si es la selección de archivo
+        const file = event.target.files[0]
+        if (file) {
+          this.validarYActualizarAvatar(file)
+        }
       },
 
+      validarYActualizarAvatar(file) {
+        // Validar tipo de archivo
+        if (!file.type.startsWith('image/')) {
+          alert('Por favor selecciona un archivo de imagen válido')
+          return
+        }
+
+        // Validar tamaño (ejemplo: 2MB máximo)
+        const maxSize = 2 * 1024 * 1024
+        if (file.size > maxSize) {
+          alert('El tamaño máximo permitido es 2MB')
+          return
+        }
+
+        // Crear previsualización
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          this.user.image = e.target.result
+
+         
+          this.subirAvatarAlServidor(file)
+        }
+        reader.readAsDataURL(file)
+      },
+
+      async subirAvatarAlServidor(file) {
+        const formData = new FormData()
+        formData.append('_method', 'PUT');
+        formData.append('image', file)
+
+        axios.post(`/user/${this.user.id}`, formData, {
+         headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then(response => {
+          this.user = response.data.user;
+          sessionStorage.setItem('user', JSON.stringify(response.data.user));
+          alert('imagen actualizada correctamente!');
+
+        })
+        .catch(error => {
+            this.handleError(error, 'Error al guardar perfil');
+        });
+        
+      },
 
       discardChanges() {
           this.user = JSON.parse(JSON.stringify(this.originalUserData));
           this.editMode = false;
       },
-
 
       getChangedFields() {
           const changes = {};
@@ -277,18 +325,6 @@ export default {
               }
           });
           return changes;
-      },
-
-      async autoSaveAvatar(file) {
-          const formData = new FormData();
-          formData.append('image', file);
-
-          try {
-              await this.$axios.post(`/user/${this.user.id}/image`, formData);
-              this.showToast('Foto de perfil actualizada', 'success');
-          } catch (error) {
-              this.handleError(error, 'Error al guardar foto');
-          }
       },
 
       getSocialIcon(platform) {
