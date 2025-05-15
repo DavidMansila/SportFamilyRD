@@ -10,273 +10,11 @@ use Illuminate\Support\Facades\Cache;
 
 class ScrapperController extends Controller
 {
-    //?? abajo las antiguas funciones de scrapping, las cuales no se usan en el controlador, pero pueden ser utiles para el futuro
-    // public function baseballNews()
-    // {
-    //     $client = new Client([
-    //         'verify' => false,
-    //     ]);
-
-    //     // Primer scraping: Obtener solo los enlaces
-    //     $response = $client->request('GET', 'https://lidom.com/');
-    //     $html = (string) $response->getBody();
-
-    //     $crawler = new Crawler($html);
-
-    //     $links = $crawler->filter('.entry-box a.cover-link')->each(function (Crawler $node) {
-    //         try {
-    //             return $node->attr('href'); // Extraer solo el enlace
-    //         } catch (\Exception $e) {
-    //             return null;
-    //         }
-    //     });
-
-    //     // Filtrar enlaces no válidos
-    //     $links = array_filter($links);
-
-    //     // Segundo scraping: Obtener los datos de cada enlace
-    //     $promises = [];
-    //     foreach ($links as $link) {
-    //         $promises[] = $client->getAsync($link);
-    //     }
-
-    //     $responses = Utils::settle($promises)->wait();
-
-    //     $articles = [];
-    //     foreach ($responses as $index => $response) {
-    //         if ($response['state'] === 'fulfilled') {
-    //             try {
-    //                 $html = (string) $response['value']->getBody();
-    //                 $subCrawler = new Crawler($html);
-
-    //                 // Extraer datos desde la página del enlace
-    //                 $title = $subCrawler->filter('section.nota-top-part h1')->text();
-    //                 $subtitle = $subCrawler->filter('section.nota-top-part h2')->text();
-
-    //                 $author = $subCrawler->filter('div.autor div.extra-holder p')->text();
-    //                 $date = $subCrawler->filter('div.autor div.extra-holder time')->text();
-
-    //                 $image = $subCrawler->filter('div.preview-images figure img')->attr('src');
-
-    //                 // Filtrar y extraer la descripción ignorando elementos no deseados
-    //                 $description = $subCrawler->filter('div.article-body')->each(function (Crawler $node) {
-    //                     // Eliminar elementos no deseados
-    //                     $node->filter('div.article-audio-container, amp-ad, amp, amp-youtube')->each(function (Crawler $childNode) {
-    //                         foreach ($childNode as $child) {
-    //                             $child->parentNode->removeChild($child);
-    //                         }
-    //                     });
-
-    //                     // Extraer solo el texto de las etiquetas <p>
-    //                     return $node->filter('p')->each(function (Crawler $pNode) {
-    //                         return $pNode->text();
-    //                     });
-    //                 });
-
-    //                 $articles[] = [
-    //                     'title' => $title,
-    //                     'subtitle' => $subtitle,
-    //                     'author' => $author,
-    //                     'date' => $date,
-    //                     'image' => $image,
-    //                     'description' => implode("\n", $description[0] ?? []),
-    //                     'link' => $links[$index], // Usar el enlace original
-    //                 ];
-    //             } catch (\Exception $e) {
-    //                 $articles[] = [
-    //                     'title' => 'No title available',
-    //                     'subtitle' => 'No subtitle available',
-    //                     'author' => 'No author available',
-    //                     'date' => 'No date available',
-    //                     'image' => 'No image available',
-    //                     'description' => 'No description available',
-    //                     'link' => $links[$index], // Usar el enlace original
-    //                 ];
-    //             }
-    //         } else {
-    //             $articles[] = [
-    //                 'title' => 'No title available',
-    //                 'subtitle' => 'No subtitle available',
-    //                 'author' => 'No author available',
-    //                 'date' => 'No date available',
-    //                 'image' => 'No image available',
-    //                 'description' => 'No description available',
-    //                 'link' => $links[$index], // Usar el enlace original
-    //             ];
-    //         }
-    //     }
-
-    //     return response()->json([
-    //         'baseball_news' => $articles,
-    //     ]);
-    // }
-
-    // public function futbolNews()
-    // {
-    //     $client = new Client([
-    //         'verify' => false,
-    //     ]);
-
-    //     // Primer scraping: Obtener solo los enlaces
-    //     $response = $client->request('GET', 'https://www.fedofutbol.do/all-posts/');
-    //     $html = (string) $response->getBody();
-
-    //     $crawler = new Crawler($html);
-
-    //     $links = $crawler->filter('.posts_container article .post_featured.with_thumb.hover_simple a')->each(function (Crawler $node) {
-    //         try {
-    //             return $node->attr('href'); // Extraer solo el enlace
-    //         } catch (\Exception $e) {
-    //             return null;
-    //         }
-    //     });
-
-    //     // Filtrar enlaces no válidos
-    //     $links = array_filter($links);
-
-    //     // Segundo scraping: Obtener los datos de cada enlace
-    //     $promises = [];
-    //     foreach ($links as $link) {
-    //         $promises[] = $client->getAsync($link);
-    //     }
-
-    //     $responses = Utils::settle($promises)->wait();
-
-    //     $articles = [];
-    //     foreach ($responses as $response) {
-    //         if ($response['state'] === 'fulfilled') {
-    //             try {
-    //                 $html = (string) $response['value']->getBody();
-    //                 $subCrawler = new Crawler($html);
-
-    //                 // Extraer datos desde la página del enlace
-    //                 $title = $subCrawler->filter('.post_title.entry-title')->text();
-    //                 $image = $subCrawler->filter('.post_featured img')->attr('src');
-    //                 $date = $subCrawler->filter('.post_meta_item.post_date')->text();
-    //                 $subtitle = $subCrawler->filter('.post_content_inner')->text();
-    //                 $author = $subCrawler->filter('.post_meta_item.post_categories')->text();
-
-    //                 $description = $subCrawler->filter('.content .post_content.post_content_single.entry-content p')->each(function (Crawler $pNode) {
-    //                     return $pNode->text();
-    //                 });
-
-    //                 $articles[] = [
-    //                     'title' => $title,
-    //                     'image' => $image,
-    //                     'date' => $date,
-    //                     'subtitle' => $subtitle,
-    //                     'description' => implode("\n", $description),
-    //                     'link' => $link,
-    //                     'author' => $author,
-    //                 ];
-    //             } catch (\Exception $e) {
-    //                 $articles[] = [
-    //                     'title' => 'No title available',
-    //                     'image' => 'No image available',
-    //                     'date' => 'No date available',
-    //                     'subtitle' => 'No subtitle available',
-    //                     'description' => 'No description available',
-    //                     'author' => 'No author available',	
-    //                     'link' => $link,
-    //                 ];
-    //             }
-    //         } else {
-    //             $articles[] = [
-    //                 'title' => 'No title available',
-    //                 'image' => 'No image available',
-    //                 'date' => 'No date available',
-    //                 'subtitle' => 'No subtitle available',
-    //                 'description' => 'No description available',
-    //                 'link' => 'No link available',
-    //                 'author' => 'No author available',	
-    //             ];
-    //         }
-    //     }
-
-    //     return response()->json([
-    //         'futbol_news' => $articles,
-    //     ]);
-    // }
-
-    // public function basketballNews()
-    // {
-    //     $client = new Client([
-    //         'verify' => false,
-    //     ]);
-
-    //     // Primer scraping: Obtener solo los enlaces
-    //     $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
-    //     $html = (string) $response->getBody();
-
-    //     $crawler = new Crawler($html);
-
-    //     // Ajustar el selector para evitar duplicados
-    //     $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a:first-of-type')->each(function (Crawler $node) {
-    //         try {
-    //             return trim($node->attr('href')); // Extraer y normalizar el enlace
-    //         } catch (\Exception $e) {
-    //             return null;
-    //         }
-    //     });
-
-    //     // Filtrar enlaces no válidos y eliminar duplicados
-    //     $links = array_filter($links);
-    //     $links = array_unique($links);
-
-    //     // Segundo scraping: Obtener los datos de cada enlace
-    //     $promises = [];
-    //     foreach ($links as $link) {
-    //         $promises[] = $client->getAsync($link);
-    //     }
-
-    //     $responses = Utils::settle($promises)->wait();
-
-    //     $articles = [];
-    //     foreach ($responses as $index => $response) {
-    //         if ($response['state'] === 'fulfilled') {
-    //             try {
-    //                 $html = (string) $response['value']->getBody();
-    //                 $subCrawler = new Crawler($html);
-
-    //                 // Extraer datos desde la página del enlace
-    //                 $title = $subCrawler->filter('div.col-md-12.col-xs-12 h1.single-title')->text();
-    //                 $author = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(1)->text();
-    //                 $date = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(2)->text();
-    //                 $image = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box figure.nota-img amp-img')->attr('src');
-    //                 $description = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box div.nota p')->each(function (Crawler $pNode) {
-    //                     return $pNode->text();
-    //                 });
-
-    //                 $articles[] = [
-    //                     'title' => $title,
-    //                     'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
-    //                     'date' => $date,
-    //                     'image' => $image,
-    //                     'description' => implode("\n", $description),
-    //                 ];
-    //             } catch (\Exception $e) {
-    //                 $articles[] = [
-    //                     'title' => 'No title available',
-    //                     'author' => 'No author available',
-    //                     'date' => 'No date available',
-    //                     'image' => 'No image available',
-    //                     'description' => 'No description available',
-    //                 ];
-    //             }
-    //         }
-    //     }
-
-    //     return response()->json([
-    //         'basketball_news' => $articles,
-    //     ]);
-    // }
-
-    //?? abajo las funciones almacenadas en el cache por 2 dias, podemos manipular el tiempo asi esta optimizado el tiempo de carga
-
+  
     public function baseballNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché
-        $articles = \Cache::remember('baseball_news', now()->addDays(2), function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('baseball_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -338,7 +76,6 @@ class ScrapperController extends Controller
                             'date' => $date,
                             'image' => $image,
                             'description' => implode("\n", $description[0] ?? []),
-                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     } catch (\Exception $e) {
                         $articles[] = [
@@ -347,7 +84,6 @@ class ScrapperController extends Controller
                             'date' => 'No date available',
                             'image' => 'No image available',
                             'description' => 'No description available',
-                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     }
                 }
@@ -363,8 +99,8 @@ class ScrapperController extends Controller
 
     public function futbolNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché
-        $articles = \Cache::remember('futbol_news', now()->addDays(2), function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('futbol_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -416,7 +152,6 @@ class ScrapperController extends Controller
                             'image' => $image,
                             'date' => $date,
                             'description' => implode("\n", $description),
-                            // 'link' => $links[$index], // Usar el enlace original
                             'author' => $author,
                         ];
                     } catch (\Exception $e) {
@@ -426,7 +161,6 @@ class ScrapperController extends Controller
                             'date' => 'No date available',
                             'description' => 'No description available',
                             'author' => 'No author available',
-                            // 'link' => $links[$index], // Usar el enlace original
                         ];
                     }
                 }
@@ -440,10 +174,10 @@ class ScrapperController extends Controller
         ]);
     }
 
-    //todo chequear si basket tiene cache remenber
     public function basketballNews()
     {
-        $articles = \Cache::remember('basketball_news', now()->addDays(2), function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('basketball_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -493,7 +227,7 @@ class ScrapperController extends Controller
 
                         $articles[] = [
                             'title' => $title,
-                            'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
+                            'author' => trim(str_replace('Por:', '', $author)),
                             'date' => $date,
                             'image' => $image,
                             'description' => implode("\n", $description),
@@ -520,8 +254,8 @@ class ScrapperController extends Controller
 
     public function volleyballNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché durante 2 días
-        $articles = \Cache::remember('volleyball_news', now()->addDays(2), function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('volleyball_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -592,7 +326,12 @@ class ScrapperController extends Controller
                     }
 
                     // Verificar si hay una página siguiente
-                    $nextPage = $crawler->filter('a[rel="next"]')->attr('href') ?? null;
+                    $nextPage = null;
+                    try {
+                        $nextPage = $crawler->filter('a[rel="next"]')->attr('href');
+                    } catch (\Exception $e) {
+                        $nextPage = null;
+                    }
                     $currentPage = $nextPage;
                 } catch (\Exception $e) {
                     // Manejo de errores para la página principal
@@ -608,10 +347,10 @@ class ScrapperController extends Controller
         ]);
     }
 
-    //todo chequear si swimming tiene cache remenber
     public function swimmingNews()
     {
-        $articles = (function () {
+        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
+        $articles = Cache::remember('swimming_news', now()->addDays(30), function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -621,7 +360,7 @@ class ScrapperController extends Controller
             $crawler = new Crawler($html);
 
             // Extraer los enlaces y subtítulos
-            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) use ($client) {
+            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post_gridlayoutstyle_2 div.single_post_text')->each(function (Crawler $node) use ($client) {
                 try {
                     $link = $node->filter('h4 a')->attr('href'); // Extraer el enlace
 
@@ -633,7 +372,7 @@ class ScrapperController extends Controller
                     // Extraer datos desde la página del enlace
                     $title = $subCrawler->filter('div.elementor-widget-container h1.elementor-heading-title.elementor-size-default')->text();
                     $image = $subCrawler->filter('div.elementor-element.elementor-element-a663d17.elementor-widget.elementor-widget-theme-post-featured-image.elementor-widget-image div.elementor-widget-container img')->attr('src');
-                    $author = $subCrawler->filter('div.elementor-author-box .elementor-author-box__text .elementor-author-box__name')->text();
+                    $author = $subCrawler->filter('div.elementor-author-box .elementor-author-box_text .elementor-author-box_name')->text();
 
                     // Ajustar selector para descripción
                     $description = $subCrawler->filter('div.elementor-element.elementor-element-0259b0e.elementor-widget.elementor-widget-theme-post-content .elementor-widget-container p')->each(function (Crawler $pNode) {
@@ -662,7 +401,7 @@ class ScrapperController extends Controller
             $linksAndSubtitles = array_filter($linksAndSubtitles);
 
             return $linksAndSubtitles;
-        })();
+        });
 
         return response()->json([
             'swimming_news' => $articles,
