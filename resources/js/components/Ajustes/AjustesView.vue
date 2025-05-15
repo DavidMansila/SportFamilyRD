@@ -8,8 +8,6 @@
     <Navbar />
 
 
-
-
     <div class="settings-container">
       <h1 class="settings-title">Configuración de Cuenta</h1>
 
@@ -23,21 +21,6 @@
       <div class="settings-content">
         <!-- Pestaña de Configuración de Cuenta -->
         <div v-if="activeTab === 'account'" class="tab-content">
-          <div class="form-section">
-            <h3>Información Personal</h3>
-            <div class="form-group">
-              <label>Nombre</label>
-              <input type="text" v-model="user.name" placeholder="Tu nombre completo">
-            </div>
-            <div class="form-group">
-              <label>Correo Electrónico</label>
-              <input type="email" v-model="user.email" placeholder="tu@email.com">
-            </div>
-            <div class="form-group">
-              <label>Teléfono</label>
-              <input type="tel" v-model="user.phone" placeholder="+1 234 567 890">
-            </div>
-          </div>
 
           <div class="form-section">
             <h3>Seguridad</h3>
@@ -65,6 +48,7 @@
           <h3>Preferencias de Notificación</h3>
           <div class="toggle-group">
             <div class="toggle-item">
+
               <span>Notificaciones por Email</span>
               <label class="switch">
                 <input type="checkbox" v-model="notifications.email">
@@ -72,19 +56,14 @@
               </label>
             </div>
             <div class="toggle-item">
-              <span>Notificaciones Push</span>
+
+              <span>Notificaciones por Telefono</span>
               <label class="switch">
                 <input type="checkbox" v-model="notifications.push">
                 <span class="slider"></span>
               </label>
             </div>
-            <div class="toggle-item">
-              <span>Recordatorios de Entrenamiento</span>
-              <label class="switch">
-                <input type="checkbox" v-model="notifications.reminders">
-                <span class="slider"></span>
-              </label>
-            </div>
+
           </div>
 
         </div>

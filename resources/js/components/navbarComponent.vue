@@ -30,9 +30,11 @@
     <!-- HACER CARRITO FUNCIONAL, PUEDE SER CREAR UN COMPONENT Y LLAMAR AL COMPONENTE AQUI O CREAR EL CARRITO AQUI MISMO, LO
     MEJOR FUERA HACER UN COMPONENTE DE CARRITO -->
     <div class="Imagenes">
-      <router-link to="/carrito" class="Carrito">
+
+      <button @click="toggleCart" class="Carrito">
         <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
-      </router-link>
+        <span v-if="cartItems.length > 0" class="cart-badge">{{ cartItems.length }}</span>
+      </button>
 
       <router-link to="/ajustes" class="Ajustes">
         <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
@@ -56,16 +58,28 @@
       </template>
 
     </div>
+
+    <!-- Componente del carrito -->
+    <CarritoComponent :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" @close="closeCart"
+      @update-quantity="handleUpdateQuantity" @remove-item="handleRemoveItem" @checkout="handleCheckout" />
+
   </nav>
 </template>
 
 
 <script>
+import CarritoComponent from './CarritoComponent.vue';
+
 export default {
+  components: {
+    CarritoComponent
+  },
   data() {
     return {
       user: null, // Cambiado a null para mejor manejo
-      user_type: ''
+      user_type: '',
+      isCartVisible: false,
+      cartItems: [] // Debes llenar esto con tu lógica de carrito
     }
   },
   created() {
@@ -80,6 +94,7 @@ export default {
     window.removeEventListener('user-logged-out', this.checkAuthStatus);
   },
   methods: {
+
     checkAuthStatus() {
       // Verificar si hay usuario en sessionStorage
       const userData = sessionStorage.getItem('user');
@@ -96,24 +111,26 @@ export default {
         this.clearAuthData();
       }
     },
+
     clearAuthData() {
       this.user = null;
       this.user_type = '';
     },
+
     async logout() {
       try {
         await axios.post('/logout');
         this.clearAuthData();
         sessionStorage.removeItem('user');
-        
+
         // Disparar evento para notificar a otros componentes
         window.dispatchEvent(new Event('user-logged-out'));
-        
+
         this.$router.push({
           path: '/signup',
           query: { logoutSuccess: 'true' }
         });
-        
+
         // Mostrar notificación
         this.$toast.success('Has cerrado sesión correctamente', {
           position: 'top-right',
@@ -126,7 +143,39 @@ export default {
           duration: 3000
         });
       }
+    },
+
+    toggleCart() {
+      this.isCartVisible = !this.isCartVisible;
+    },
+
+    closeCart() {
+      this.isCartVisible = false;
+    },
+
+    updateQuantity({ index, quantity }) {
+      // Tu lógica para actualizar cantidad
+      this.cartItems[index].quantity = quantity;
+    },
+
+    removeItem(index) {
+      // Tu lógica para eliminar item
+      this.cartItems.splice(index, 1);
+    },
+
+    handleCheckout() {
+      // Tu lógica de checkout
+      console.log('Procesar compra');
+    },
+
+    handleUpdateQuantity({ index, quantity }) {
+      this.$store.dispatch('updateQuantity', { index, quantity });
+    },
+
+    handleRemoveItem(index) {
+      this.$store.dispatch('removeItem', index);
     }
+
   }
 }
 </script>
@@ -241,7 +290,76 @@ export default {
   opacity: 0;
 }
 
+/* En la sección de Imagenes del nav bar */
+.Imagenes {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 
+  .Carrito {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease-in-out;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+
+    .carrito-icon {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+      box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+
+      .carrito-icon {
+        transform: rotate(10deg) scale(1.2);
+      }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      transform: scale(0);
+      border-radius: 50%;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    &:hover::before {
+      transform: scale(1.3);
+      opacity: 0;
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #e74c3c;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      pointer-events: none;
+    }
+  }
+}
 /* ------------------- RESPONSIVE DE HOME PARA TODOS LOS DISPOSITIVOS ------------------ */
 
 /* Pantallas grandes (TVs, monitores 4K) - 1920px+ */

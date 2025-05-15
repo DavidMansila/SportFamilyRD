@@ -26,7 +26,7 @@
                 <div class="profile-info">
 
                     <h1 class="profile-name">{{ user.name }}</h1>
-                    <p class="profile-role">{{ user.role }}</p>
+                    <p class="profile-role">{{ user.user_type }}</p>
 
                     <div class="profile-stats">
 
@@ -186,84 +186,96 @@ export default {
     components: {
         Navbar
     },
-    inject: ['userData'], // Asumiendo que inyectas el usuario desde el root
     data() {
         return {
             editMode: false,
-            user: [],
+            user: {
+                id: null,
+                name: '',
+                email: '',
+                phone: '',
+                location: '',
+                birthdate: '',
+                bio: '',
+                image: '/default-avatar.png',
+                socialLinks: [],
+                achievements: []
+            },
             stats: {
                 posts: 0,
                 likes: 0,
                 SolicitudesUsuarios: 0,
                 rating: 0
             },
-            originalUserData: null,
-            isLoading: true,
-            error: null
+            originalUserData: null
         }
     },
 
     methods: {
+
         async loadUserData() {
             try {
-                const response = await this.$axios.get('/current-user');
-
-                // Mapear datos del backend
-                this.user = {
-                    ...response.data,
-                    socialLinks: response.data.social_links || [],
-                    achievements: response.data.achievements || [],
-                    image: response.data.image || this.user.image
-                };
-
-                // Cargar estadísticas
-                const statsResponse = await this.$axios.get(`/user-stats/${this.user.id}`);
-                this.stats = statsResponse.data;
-
+                const response = await this.$axios.get('/api/user');
+                this.user = response.data;
+                sessionStorage.setItem('user', JSON.stringify(this.user));
                 this.originalUserData = JSON.parse(JSON.stringify(this.user));
-                this.isLoading = false;
             } catch (error) {
-                this.handleError(error, 'Error al cargar el perfil');
+                alert('Error cargando datos: ' + error.message);
             }
         },
 
         async saveProfile() {
             try {
                 const formData = new FormData();
-                const changes = this.getChangedFields();
 
-                // Agregar solo campos modificados
-                Object.keys(changes).forEach(key => {
-                    if (key === 'socialLinks') {
-                        formData.append('social_links', JSON.stringify(this.user.socialLinks));
-                    } else if (key === 'achievements') {
-                        formData.append('achievements', JSON.stringify(this.user.achievements));
-                    } else {
-                        formData.append(key, this.user[key]);
-                    }
-                });
+                // Agregar campos básicos
+                formData.append('name', this.user.name);
+                formData.append('email', this.user.email);
+                formData.append('phone', this.user.phone);
+                formData.append('location', this.user.location);
+                formData.append('birthdate', this.user.birthdate);
+                formData.append('bio', this.user.bio);
 
-                // Subir avatar si existe
+                // Agregar imagen si existe
                 if (this.$refs.avatarInput.files[0]) {
                     formData.append('image', this.$refs.avatarInput.files[0]);
                 }
 
-                const { data } = await this.$axios.put(`/user/${this.user.id}`, formData, {
+                // Enviar solicitud PUT
+                const { data } = await this.$axios.post(`/user/${this.user.id}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
 
                 // Actualizar datos locales
-                this.user = { ...this.user, ...data.user };
-                this.originalUserData = JSON.parse(JSON.stringify(this.user));
+                this.user = data;
+                sessionStorage.setItem('user', JSON.stringify(data));
                 this.editMode = false;
-                this.$emit('user-updated', this.user);
-                this.showToast('Perfil actualizado correctamente', 'success');
+                alert('¡Perfil actualizado correctamente!');
+
             } catch (error) {
-                this.handleError(error, 'Error al guardar cambios');
+                alert('Error al guardar: ' + error.response?.data?.message || error.message);
             }
         },
+
+        handleAvatarChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.user.image = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+
+
+        discardChanges() {
+            this.user = JSON.parse(JSON.stringify(this.originalUserData));
+            this.editMode = false;
+        },
+
 
         getChangedFields() {
             const changes = {};
@@ -273,22 +285,6 @@ export default {
                 }
             });
             return changes;
-        },
-
-        async handleAvatarChange(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            try {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.user.image = e.target.result;
-                    this.autoSaveAvatar(file);
-                };
-                reader.readAsDataURL(file);
-            } catch (error) {
-                this.handleError(error, 'Error al subir imagen');
-            }
         },
 
         async autoSaveAvatar(file) {
@@ -334,12 +330,6 @@ export default {
             this.user.achievements.splice(index, 1);
         },
 
-        discardChanges() {
-            this.user = JSON.parse(JSON.stringify(this.originalUserData));
-            this.editMode = false;
-            this.showToast('Cambios descartados', 'info');
-        },
-
         handleError(error, defaultMsg) {
             const errorMsg = error.response?.data?.message || defaultMsg;
             this.error = errorMsg;
@@ -353,9 +343,13 @@ export default {
         }
     },
     mounted() {
-
-        //  this.user = JSON.parse(localStorage.getItem('user'));
-        this.user = JSON.parse(sessionStorage.getItem('user'));
+        // Cargar datos iniciales
+        const savedUser = sessionStorage.getItem('user');
+        if (savedUser) {
+            this.user = JSON.parse(savedUser);
+            this.originalUserData = JSON.parse(savedUser);
+        }
+        this.loadUserData();
     }
 }
 </script>
