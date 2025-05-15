@@ -144,7 +144,7 @@
               </div>
 
               <div class="image-container">
-                <img :src="postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
+                <img :src=" postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
               </div>
 
 

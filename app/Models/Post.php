@@ -17,10 +17,10 @@ class Post extends Model
         return $this->hasMany(Comment::class);
     }
    
-    public static function addImages($image, $id)
+    public static function addImages($image, $id, $model)
     {
         // Get the path to store the images
-        $path = "/posts/$id";
+        $path = "/$model/$id";
         $files = Storage::disk('public')->files($path);
        
         foreach ($files as $file) {

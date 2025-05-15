@@ -16,6 +16,11 @@ class AuthController extends Controller
 
             // Obtener el usuario autenticado
             $user = Auth::user();
+           
+            $user->image = $user->image 
+            ? url('storage/users/' . $user->id . '/' . $user->image) 
+            : url('storage/users/Perfil-Icon.png');
+
 
             // Devolver el rol del usuario junto con el mensaje de éxito
             return response()->json([
