@@ -31,10 +31,19 @@
     MEJOR FUERA HACER UN COMPONENTE DE CARRITO -->
     <div class="Imagenes">
 
-      <button @click="toggleCart" class="Carrito">
-        <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
-        <span v-if="cartItems.length > 0" class="cart-badge">{{ cartItems.length }}</span>
-      </button>
+      <div class="carrito-container">
+        <button @click="handleCartClick" class="Carrito">
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
+          <span v-if="user && cartItems.length > 0" class="cart-badge">{{ cartItems.length }}</span>
+        </button>
+
+        <!-- Mensaje flotante -->
+        <transition name="fade">
+          <div v-if="authMessage" class="auth-alert">
+            {{ authMessage }}
+          </div>
+        </transition>
+      </div>
 
       <router-link to="/ajustes" class="Ajustes">
         <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
@@ -59,8 +68,7 @@
 
     </div>
 
-    <!-- Componente del carrito -->
-    <CarritoComponent :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" @close="closeCart"
+    <CarritoComponent :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" :user="user" @close="closeCart"
       @update-quantity="handleUpdateQuantity" @remove-item="handleRemoveItem" @checkout="handleCheckout" />
 
   </nav>
@@ -79,7 +87,9 @@ export default {
       user: null, // Cambiado a null para mejor manejo
       user_type: '',
       isCartVisible: false,
-      cartItems: [] // Debes llenar esto con tu lógica de carrito
+      cartItems: [], // Debes llenar esto con tu lógica de carrito
+      authMessage: ''
+
     }
   },
   created() {
@@ -174,6 +184,17 @@ export default {
 
     handleRemoveItem(index) {
       this.$store.dispatch('removeItem', index);
+    },
+
+    handleCartClick() {
+      if (!this.user) {
+        this.authMessage = '⚠️ Debes iniciar sesión para ver el carrito';
+        setTimeout(() => {
+          this.authMessage = '';
+        }, 3000);
+        return;
+      }
+      this.toggleCart();
     }
 
   }
@@ -360,6 +381,43 @@ export default {
     }
   }
 }
+
+.carrito-container {
+  position: relative;
+}
+
+.auth-alert {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #fff3cd;
+  color: #856404;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  z-index: 100;
+  border: 1px solid #ffeeba;
+}
+
+.auth-alert::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 15px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #fff3cd transparent;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
 /* ------------------- RESPONSIVE DE HOME PARA TODOS LOS DISPOSITIVOS ------------------ */
 
 /* Pantallas grandes (TVs, monitores 4K) - 1920px+ */

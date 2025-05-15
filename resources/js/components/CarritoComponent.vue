@@ -1,13 +1,17 @@
 <template>
   <transition name="cart-slide">
+
     <div v-if="isVisible" class="cart-overlay" @click.self="$emit('close')">
       <div class="cart-container">
+
         <!-- Encabezado con efecto vidrio -->
         <div class="cart-header glassmorphism">
           <div class="header-content">
+            
             <h2>🛒 Tu Carrito <span class="items-count">{{ cartItems.length }} items</span></h2>
             <button @click="$emit('close')" class="close-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -35,7 +39,7 @@
               <img :src="item.image" :alt="item.name" class="item-img">
               <div class="item-type" :class="item.type">{{ item.type === 'product' ? '🛍️' : '🎟️' }}</div>
             </div>
-            
+
             <div class="item-details">
               <h3>{{ item.name }}</h3>
               <div v-if="item.type === 'ticket'" class="event-details">
@@ -47,20 +51,12 @@
 
             <div class="item-controls">
               <div class="quantity-control">
-                <button 
-                  @click="updateQuantity(index, item.quantity - 1)"
-                  :disabled="item.quantity <= 1"
-                  class="qty-btn minus"
-                >
+                <button @click="updateQuantity(index, item.quantity - 1)" :disabled="item.quantity <= 1"
+                  class="qty-btn minus">
                   ➖
                 </button>
-                <input 
-                  type="number" 
-                  v-model.number="item.quantity"
-                  min="1"
-                  @change="updateQuantity(index, item.quantity)"
-                  class="qty-input"
-                >
+                <input type="number" v-model.number="item.quantity" min="1"
+                  @change="updateQuantity(index, item.quantity)" class="qty-input">
                 <button @click="updateQuantity(index, item.quantity + 1)" class="qty-btn plus">
                   ➕
                 </button>
@@ -88,7 +84,7 @@
               <span class="total-price">${{ (cartTotal + shippingCostValue).toFixed(2) }}</span>
             </div>
           </div>
-          
+
           <div class="actions">
             <button @click="$emit('close')" class="continue-shopping">
               ⏪ Seguir comprando
@@ -120,9 +116,9 @@ const cartTotal = computed(() => {
 const shippingCostValue = computed(() => cartTotal.value > 50 ? 0 : 5.99);
 const shippingCost = computed(() => cartTotal.value > 50 ? '¡Gratis! 🎉' : `$${shippingCostValue.value.toFixed(2)}`);
 const shippingProgress = computed(() => Math.min((cartTotal.value / 50) * 100, 100));
-const shippingMessage = computed(() => 
-  cartTotal.value > 50 
-    ? '¡Felicidades! Envío gratis aplicado' 
+const shippingMessage = computed(() =>
+  cartTotal.value > 50
+    ? '¡Felicidades! Envío gratis aplicado'
     : `$${(50 - cartTotal.value).toFixed(2)} más para envío gratis`
 );
 
@@ -169,7 +165,7 @@ const formatDate = (dateString) => {
   background: #f5f5f5;
   border-radius: 15px;
   box-shadow: 8px 8px 16px #d9d9d9,
-             -8px -8px 16px #ffffff;
+    -8px -8px 16px #ffffff;
 }
 
 .cart-header {
@@ -278,8 +274,15 @@ h2 {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(10deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(10deg);
+  }
 }
 
 .empty-text {
@@ -325,7 +328,7 @@ h2 {
   padding: 3px 8px;
   border-radius: 20px;
   font-size: 0.8em;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .price {
@@ -461,19 +464,26 @@ h2 {
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @media (max-width: 480px) {
   .cart-container {
     max-width: 100%;
   }
-  
+
   .cart-item {
     grid-template-columns: 1fr;
   }
-  
+
   .item-image {
     width: 100%;
     height: 150px;
