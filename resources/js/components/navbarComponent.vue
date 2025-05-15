@@ -31,10 +31,19 @@
     MEJOR FUERA HACER UN COMPONENTE DE CARRITO -->
     <div class="Imagenes">
 
-      <button @click="toggleCart" class="Carrito">
-        <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
-        <span v-if="cartItems.length > 0" class="cart-badge">{{ cartItems.length }}</span>
-      </button>
+      <div class="carrito-container">
+        <button @click="handleCartClick" class="Carrito">
+          <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
+          <span v-if="user && cartItems.length > 0" class="cart-badge">{{ cartItems.length }}</span>
+        </button>
+
+        <!-- Mensaje flotante -->
+        <transition name="fade">
+          <div v-if="authMessage" class="auth-alert">
+            {{ authMessage }}
+          </div>
+        </transition>
+      </div>
 
       <router-link to="/ajustes" class="Ajustes">
         <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
@@ -47,10 +56,23 @@
 
       <!-- SI EL USUARIO ESTA REGISTRADO PUES APARECE LOGOUT Y SINO PUES APARECE EL REGISTRARSE -->
       <template v-if="user">
-        <router-link to="" class="Logout" @click.native.prevent="logout">
-          <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
-        </router-link>
+        <div class="logout-container">
+          <button @click="showLogoutConfirm = true" class="Logout">
+            <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
+          </button>
+        </div>
+        <!-- Diálogo de confirmación para cerrar seccion-->
+        <div v-if="showLogoutConfirm" class="confirm-dialog-overlay">
+          <div class="confirm-dialog">
+            <h3>¿Estás seguro de cerrar sesión?</h3>
+            <div class="dialog-buttons">
+              <button @click="logout" class="confirm-btn">Confirmar</button>
+              <button @click="showLogoutConfirm = false" class="cancel-btn">Cancelar</button>
+            </div>
+          </div>
+        </div>
       </template>
+
       <template v-else>
         <router-link to="/signup" class="Signup">
           <img src="/imagenes/Signup-Icon.png" alt="Registrarse" class="signup-icon" />
@@ -59,8 +81,7 @@
 
     </div>
 
-    <!-- Componente del carrito -->
-    <CarritoComponent :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" @close="closeCart"
+    <CarritoComponent :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" :user="user" @close="closeCart"
       @update-quantity="handleUpdateQuantity" @remove-item="handleRemoveItem" @checkout="handleCheckout" />
 
   </nav>
@@ -79,7 +100,12 @@ export default {
       user: null, // Cambiado a null para mejor manejo
       user_type: '',
       isCartVisible: false,
-      cartItems: [] // Debes llenar esto con tu lógica de carrito
+      cartItems: [], // Debes llenar esto con tu lógica de carrito
+
+      authMessage: '',
+
+      showLogoutConfirm: false,
+
     }
   },
   created() {
@@ -136,6 +162,8 @@ export default {
           position: 'top-right',
           duration: 3000
         });
+
+        this.showLogoutConfirm = false; // Cerrar diálogo después de confirmar
       } catch (error) {
         console.error('Error al cerrar sesión:', error);
         this.$toast.error('Ocurrió un error al cerrar sesión', {
@@ -174,6 +202,17 @@ export default {
 
     handleRemoveItem(index) {
       this.$store.dispatch('removeItem', index);
+    },
+
+    handleCartClick() {
+      if (!this.user) {
+        this.authMessage = '⚠️ Debes iniciar sesión para ver el carrito';
+        setTimeout(() => {
+          this.authMessage = '';
+        }, 3000);
+        return;
+      }
+      this.toggleCart();
     }
 
   }
@@ -182,6 +221,9 @@ export default {
 
 
 <style lang="scss">
+
+@import '/resources/scss/Navbar/Navbar_responsive.scss';
+
 /* Navbar */
 .navbar {
   padding: 1rem 2rem;
@@ -290,7 +332,66 @@ export default {
   opacity: 0;
 }
 
-/* En la sección de Imagenes del nav bar */
+
+
+// PARA EL LOGOUT
+
+.logout-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease-in-out;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  .logout-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+    
+    .logout-icon {
+      transform: rotate(10deg) scale(1.2);
+    }
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    transform: scale(0);
+    border-radius: 50%;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &:hover::before {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+/* En la sección de Imagenes del nav bar PARA EL CARRITO */
+
 .Imagenes {
   display: flex;
   align-items: center;
@@ -360,178 +461,153 @@ export default {
     }
   }
 }
-/* ------------------- RESPONSIVE DE HOME PARA TODOS LOS DISPOSITIVOS ------------------ */
 
-/* Pantallas grandes (TVs, monitores 4K) - 1920px+ */
-@media (min-width: 1920px) {
-  .navbar {
-    padding: 1em 1rem;
-  }
+.carrito-container {
+  position: relative;
 }
 
-/* Laptops y pantallas medianas - 1440px-1599px */
-@media (max-width: 1599px) and (min-width: 1440px) {
-  .navbar {
-    padding: 1.2rem 1.5rem;
-  }
-
-  .nav-links {
-    gap: 1.8rem;
-  }
-
-  .logo {
-    width: 190px;
-    height: 65px;
-  }
+.auth-alert {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #fff3cd;
+  color: #856404;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  z-index: 100;
+  border: 1px solid #ffeeba;
 }
 
-/* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
-@media (max-width: 1439px) and (min-width: 1200px) {
-  .navbar {
-    padding: 1rem 1.2rem;
-  }
-
-  .nav-links {
-    gap: 1.5rem;
-  }
-
-  .logo {
-    width: 180px;
-    height: 60px;
-  }
+.auth-alert::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 15px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #fff3cd transparent;
 }
 
-/* Tablets grandes - 1024px-1199px */
-@media (max-width: 1199px) and (min-width: 1024px) {
-  .navbar {
-    padding: 1rem;
-  }
-
-  .nav-links {
-    gap: 1.2rem;
-  }
-
-  .logo {
-    width: 170px;
-    height: 55px;
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
 }
 
-/* Tablets en vertical - 768px-1023px */
-@media (max-width: 1023px) and (min-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    padding: 1rem;
-  }
-
-  .logo-container {
-    margin-bottom: 1rem;
-  }
-
-  .nav-links {
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin: 1rem 0;
-  }
-
-  .logo {
-    width: 180px;
-    height: 60px;
-  }
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 
-/* Teléfonos grandes - 576px-767px */
-@media (max-width: 767px) and (min-width: 576px) {
-  .navbar {
-    padding: 0.8rem 1rem;
-  }
 
-  .nav-links {
+// PARA EL LOGOUT UN MENSAJE DE CONFIRMACION
+
+.confirm-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.3s ease;
+}
+
+.confirm-dialog {
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 450px;
+  width: 90%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: scale(0.95);
+  animation: scaleUp 0.3s ease forwards;
+  
+  h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 0.8rem;
-  }
-
-  .logo {
-    width: 170px;
-    height: 55px;
-  }
-}
-
-/* Teléfonos medianos - 481px-575px */
-@media (max-width: 575px) and (min-width: 481px) {
-  .navbar {
-    padding: 0.8rem;
-  }
-
-  .logo {
-    width: 160px;
-    height: 50px;
-  }
-
-  .nav-links {
-    gap: 0.7rem;
-  }
-
-  .nav-link {
-    font-size: 0.9rem;
-  }
-
-  .Imagenes a {
-    width: 35px;
-    height: 35px;
-  }
-
-  .hero-title {
-    font-size: 2rem;
+    
+    &::before {
+      content: '🔒';
+      font-size: 1.8rem;
+    }
   }
 }
 
-/* Teléfonos pequeños - 320px-480px */
-@media (max-width: 480px) {
-  .navbar {
-    padding: 0.8rem;
-  }
+.dialog-buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
 
-  .logo {
-    width: 160px;
-    height: 60px;
-  }
+.confirm-btn,
+.cancel-btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
 
-  .nav-links {
-    gap: 1rem;
+.confirm-btn {
+  background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+  color: white;
+  
+  &::after {
+    content: '✓';
+    font-size: 1.2rem;
   }
-
-  .nav-link {
-    font-size: 0.9rem;
-  }
-
-  .Imagenes a {
-    width: 35px;
-    height: 35px;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
   }
 }
 
-/* Teléfonos muy pequeños - hasta 320px */
-@media (max-width: 320px) {
-  .navbar {
-    padding: 0.6rem;
+.cancel-btn {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  
+  &::after {
+    content: '✕';
+    font-size: 1.2rem;
   }
-
-  .logo {
-    width: 140px;
-    height: 40px;
-  }
-
-  .nav-links {
-    gap: 0.5rem;
-  }
-
-  .nav-link {
-    font-size: 0.8rem;
-  }
-
-  .Imagenes a {
-    width: 30px;
-    height: 30px;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
   }
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); }
+  to { transform: scale(1); }
+}
+
 </style>
