@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\User;
 
 use Illuminate\Support\Facades\Auth;
@@ -42,8 +43,6 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {   
-        // dd($request->all());
-        // Validar los datos de entrada
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -68,7 +67,6 @@ class UserController extends Controller
             ], 200);
 
         }catch(\Exception $e){
-            // \Log::error('Error al crear usuario: '.$e->getMessage());
             return response()->json([
                 'message' => 'Error: '.$e->getMessage()
             ], 500);
@@ -96,11 +94,25 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        User::where('id', $id)->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-        ]);
+        try{
+            $user = User::findOrFail($id);
+            $user->update($request->all());
+
+            // todo cambia la funcion para que sea dinamica entre user y post
+            // if(isset($request['image']) && $request['image']){
+            //     $imageName = Post::addImages($request['image'], $user->id);
+            //     User::where('id', $user->id)->update(['image' => $imageName]);
+            // }
+
+            return response()->json([
+                'message' => 'Usuario actualizado con éxito',
+                'user' => $user,
+            ], 200);
+        }catch(\Exception $e){
+            return response()->json([
+                'message' => 'Error: '.$e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -108,7 +120,20 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        User::where('id', $id)->delete();
+        try{
+            $user = User::findOrFail($id);
+            $user->delete();
+          
+            return response()->json([
+                'message' => 'Usuario eliminado con éxito',
+            ], 200);
+            
+            
+        }catch(\Exception $e){
+            return response()->json([
+                'message' => 'Error: '.$e->getMessage()
+            ], 500);
+        }
     }
 
     
