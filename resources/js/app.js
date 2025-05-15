@@ -19,6 +19,8 @@ import AjustesView from './components/Ajustes/AjustesView.vue';
 import PerfilView from './components/Perfil/PerfilView.vue';
 import App from './components/ExampleComponent.vue'; // Componente raíz nuevo
 
+import store from './cartStore';
+
 // Paginate
 import VueAwesomePaginate from "vue-awesome-paginate";
 import "vue-awesome-paginate/dist/style.css";
@@ -50,6 +52,7 @@ const app = createApp(App);
 // Usa el router y VueAwesomePaginate
 app.use(router);
 app.use(VueAwesomePaginate);
+app.use(store);
 
 // Registra componentes globales solo si son necesarios en múltiples lugares
 app.component('example-component', ExampleComponent);

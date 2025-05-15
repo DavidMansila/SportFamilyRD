@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 // usuarios
 Route::resource('/user', UserController::class);
-Route::get('/current-user', [AuthController::class, 'currentUser'])->middleware('auth');
+Route::get('/user-stats/{user}', [UserController::class, 'stats']);
+Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
 
 //Noticias
 Route::resource('/news', NewsController::class);
