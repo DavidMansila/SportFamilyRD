@@ -194,7 +194,7 @@
                 </div>
 
                 <!-- EDITAR Y ELIMINAR POST | HAY QUE PONER QUE SI EL ID DEL USUARIO COINCIDE CON EL ID DEL USUARIO DEL POST PUES PUEDE EDITAR Y ELIMINAR DICHO POST-->
-                <div class="post-actions" v-if="isPostAuthor(postSeleccionado)">
+                <div class="post-actions" v-if="isPostAuthor(postSeleccionado) || user.user_type === 'admin'">
                   <button @click="abrirEditarModal(postSeleccionado)" class="edit-post-btn" title="Editar post">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -210,8 +210,6 @@
                     </svg>
                   </button>
                 </div>
-
-
                 <button @click="cerrarPopout" class="close-popout-btn" :class="{ 'hidden': inputFocused }">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -369,11 +367,11 @@
                               </button>
 
                               <!-- EDITAR Y ELIMINAR REPLY BOTONES -->
-                              <button v-if="isCommentAuthor(reply)" @click="editarReply(reply)"
+                              <button v-if="isReplyAuthor(reply)" @click="editarReply(reply)"
                                 class="comment-action edit-btn">
                                 Editar
                               </button>
-                              <button v-if="isCommentAuthor(reply)" @click="eliminarReply(reply)"
+                              <button v-if="isReplyAuthor(reply)" @click="eliminarReply(reply)"
                                 class="comment-action delete-btn">
                                 Eliminar
                               </button>
@@ -544,6 +542,8 @@ export default {
   },
   data() {
     return {
+
+      user: [],
       currentPage: 1,
       itemsPerPage: 9,
 
@@ -591,11 +591,6 @@ export default {
 
     totalPages() {
       return Math.ceil(this.postsFiltrados.length / this.itemsPerPage);
-    },
-    currentUserId() {
-      const user = JSON.parse(sessionStorage.getItem('user'));
-      console.log('Usuario en sesión:', user);
-      return user ? user.id : null;
     },
   },
 
@@ -896,15 +891,15 @@ export default {
     // METODOS PARA EDITAR Y ELIMINAR EN POST
 
     isPostAuthor(post) {
-      return Number(post.user_id) === Number(this.currentUserId);
+      return Number(post.user_id) === Number(this.user.id);
     },
 
     isCommentAuthor(comment) {
-      //   return Number(comment.user_id) === Number(this.currentUserId);
+      //   return Number(comment.user_id) === Number(this.user.id);
     },
 
     isReplyAuthor(reply) {
-      //   return Number(reply.user_id) === Number(this.currentUserId);
+      //   return Number(reply.user_id) === Number(this.user.id);
     },
 
     // En el método editarPost
@@ -1230,6 +1225,7 @@ export default {
   mounted() {
     this.getPost();
     document.title = 'Foro';
+    this.user = JSON.parse(sessionStorage.getItem('user'));
   }
 }
 </script>
