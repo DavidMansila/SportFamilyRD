@@ -148,6 +148,7 @@ export default {
         await axios.post('/logout');
         this.clearAuthData();
         sessionStorage.removeItem('user');
+        sessionStorage.removeItem('savedNews');
 
         // Disparar evento para notificar a otros componentes
         window.dispatchEvent(new Event('user-logged-out'));
