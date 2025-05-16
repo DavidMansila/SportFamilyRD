@@ -3,7 +3,7 @@
 
 
     <!-- Navbar -->
-     <Navbar/>
+    <Navbar />
 
     <!-- Botón flotante para agregar noticia -- v-if="user_type === 'admin'" -->
     <div v-if="user_type === 'admin'" class="floating-action">
@@ -212,6 +212,23 @@ export default {
   },
   methods: {
 
+
+    generateStableId(title, date) {
+      const str = `${title}-${date}`;
+
+      if (typeof TextEncoder !== 'undefined') {
+        const utf8Bytes = new TextEncoder().encode(str);
+        const base64 = btoa(String.fromCharCode(...new Uint8Array(utf8Bytes)));
+        return base64.replace(/[+/=]/g, '').substr(0, 12);
+      }
+
+      // Fallback para navegadores antiguos
+      return btoa(unescape(encodeURIComponent(str)))
+        .replace(/[+/=]/g, '')
+        .substr(0, 12);
+    },
+
+
     async cargarNoticias() {
       this.isLoading = true;
       this.errorMessage = '';
@@ -228,11 +245,10 @@ export default {
         const processCategory = (news, category) => {
           return news.map(n => {
             const parsedDate = this.parseDate(n.date, category);
-            console.log(`Original: ${n.date}, Parsed: ${parsedDate}, Category: ${category}`);
             return {
               ...n,
-              id: n.id || Math.random().toString(36).substr(2, 9), // Asegurar ID único
-              saved: false, // Valor por defecto
+              id: n.id || this.generateStableId(n.title, n.date),
+              saved: false,
               categoria: category,
               parsedDate: parsedDate
             };
@@ -426,7 +442,9 @@ export default {
       noticia.saved = !noticia.saved;
       this.guardarEnLocalStorage(noticia);
       this.ordenarNoticiasGuardadas();
-      this.mostrarFeedbackGuardado(noticia);
+
+      // Forzar actualización del DOM para el popup
+      this.noticiaSeleccionada = { ...this.noticiaSeleccionada };
     },
 
     guardarEnLocalStorage(noticia) {
@@ -437,6 +455,11 @@ export default {
         delete savedNews[noticia.id];
       }
       localStorage.setItem('savedNews', JSON.stringify(savedNews));
+
+      // Actualizar la lista completa de noticias
+      this.noticias = this.noticias.map(n =>
+        n.id === noticia.id ? { ...n, saved: noticia.saved } : n
+      );
     },
 
     ordenarNoticiasGuardadas() {
@@ -456,7 +479,7 @@ export default {
       const savedNews = JSON.parse(localStorage.getItem('savedNews')) || {};
       this.noticias = this.noticias.map(noticia => ({
         ...noticia,
-        saved: !!savedNews[noticia.id] // Convertir a booleano
+        saved: savedNews[noticia.id] || false
       }));
     },
 
@@ -491,9 +514,18 @@ export default {
   },
   async mounted() {
     try {
+      // Cargar savedNews primero para tenerlos disponibles
+      const savedNews = JSON.parse(localStorage.getItem('savedNews') || '{}');
+
       await this.cargarNoticias();
-      this.cargarGuardados();
-      this.ordenarNoticiasGuardadas();
+
+      // Aplicar savedNews después de cargar
+      this.noticias = this.noticias.map(noticia => ({
+        ...noticia,
+        saved: savedNews[noticia.id] || false
+      }));
+
+      this.filtrarNoticias();
     } catch (error) {
       console.error('Error al cargar noticias:', error);
     }
@@ -507,7 +539,6 @@ export default {
 
 
 <style scoped>
-
 @import '../../../scss/Noticias/noticias.scss';
 
 @import '../../../scss/Noticias/noticias_navbar.scss';
