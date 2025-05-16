@@ -212,7 +212,6 @@ export default {
   },
   methods: {
 
-
     generateStableId(title, date) {
       const str = `${title}-${date}`;
 
