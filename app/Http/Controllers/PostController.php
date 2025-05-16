@@ -120,7 +120,6 @@ class PostController extends Controller
 
     public function createComment(Request $request)
     {
-        dd($request->all());
         try {
             $comment = Comment::create($request->all());
     
