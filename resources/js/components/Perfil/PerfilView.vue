@@ -437,7 +437,7 @@ export default {
     },
     mounted() {
         // Cargar datos iniciales
-        this.user = JSON.parse(localStorage.getItem('user'));
+        this.user = JSON.parse(sessionStorage.getItem('user'));
 
 
     }

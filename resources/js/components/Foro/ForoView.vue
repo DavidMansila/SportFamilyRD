@@ -239,13 +239,13 @@
                   <div v-for="(comentario) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
                       <div class="comment-avatar-placeholder">
-                        <span>U{{ comentario.userId }}</span>
+                        <span>U{{ comentario.user_id }}</span>
                       </div>
                     </div>
                     <div class="comment-content">
                       <div class="comment-header">
 
-                        <span class="comment-author"> {{ comentario.user?.id || comentario.userId || '' }}</span>
+                        <span class="comment-author"> {{ comentario.user?.id || comentario.user_id || '' }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.respuestas && comentario.respuestas.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -320,12 +320,12 @@
                         <div v-for="reply in comentario.replies" :key="reply.id" class="comment-item reply-item">
                           <div class="comment-avatar-wrapper">
                             <div class="comment-avatar-placeholder">
-                              <span>{{ reply.user?.id || reply.userId || '' }}</span>
+                              <span>{{ reply.user?.id || reply.user_id || '' }}</span>
                             </div>
                           </div>
                           <div class="comment-content">
                             <div class="comment-header">
-                              <span class="comment-author">Usuario{{ reply.userId }}</span>
+                              <span class="comment-author">Usuario{{ reply.user_id }}</span>
                               <span class="comment-time">{{ formatRelativeTime(reply.created_at) }}</span>
                             </div>
 
@@ -391,12 +391,10 @@
 
 
 
-
-
                 <!-- Formulario de comentario principal o respuesta -->
                 <div class="add-comment-form">
                   <div v-if="comentarioRespondiendo" class="replying-to">
-                    Respondiendo a <strong>@Usuario{{ findCommentById(comentarioRespondiendo)?.userId }}</strong>
+                    Respondiendo a <strong>@Usuario{{ findCommentById(comentarioRespondiendo)?.user_id }}</strong>
                     <button @click="cancelarRespuesta" class="cancel-reply-btn">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
