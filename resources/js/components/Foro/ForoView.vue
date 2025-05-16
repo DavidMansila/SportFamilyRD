@@ -788,13 +788,23 @@ export default {
       if (!this.nuevoComentario.trim()) return;
 
       try {
+
+        // const user = JSON.parse(sessionStorage.getItem('user')); // o localStorage
+        // const userId = user?.id;
+
+        // if (!userId) {
+        //   alert('No se encontró el usuario. Inicia sesión nuevamente.');
+        //   return;
+        // }
+
         const endpoint = this.comentarioRespondiendo
           ? `/post/create-reply/${this.comentarioRespondiendo}`
           : `/post/create-comment`;
 
         const payload = {
           texto: this.nuevoComentario,
-          post_id: this.postSeleccionado.id
+          post_id: this.postSeleccionado.id,
+          // user_id: userId
         };
 
         const response = await axios.post(endpoint, payload);
