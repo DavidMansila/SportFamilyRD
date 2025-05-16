@@ -169,18 +169,6 @@ const sports = ref([
         website: 'https://prospectoacademy.com'
       }
     ],
-    events: [
-      {
-        name: 'Serie Nacional de Béisbol',
-        date: 'Octubre - Enero',
-        location: 'Estadios en todo el país'
-      },
-      {
-        name: 'Torneo de Béisbol de Verano',
-        date: 'Julio - Agosto',
-        location: 'Santo Domingo y Santiago'
-      }
-    ]
   },
   {
     id: 2,
@@ -208,13 +196,6 @@ const sports = ref([
         cost: 'RD$500 membresía anual'
       }
     ],
-    events: [
-      {
-        name: 'Campeonato Nacional de Domino',
-        date: 'Noviembre',
-        location: 'Santo Domingo'
-      }
-    ]
   },
   {
     id: 3,
@@ -245,13 +226,6 @@ const sports = ref([
         website: 'https://velacabarete.com'
       }
     ],
-    events: [
-      {
-        name: 'Master of the Ocean',
-        date: 'Febrero',
-        location: 'Cabarete'
-      }
-    ]
   },
   {
     id: 4,
@@ -280,7 +254,6 @@ const sports = ref([
         cost: 'RD$1,500 por temporada en ligas locales'
       }
     ],
-    events: []
   },
   {
     id: 5,
@@ -310,13 +283,6 @@ const sports = ref([
         cost: 'RD$12,000 por excursión compartida'
       }
     ],
-    events: [
-      {
-        name: 'Torneo Internacional de Pesca de Pez Vela',
-        date: 'Marzo',
-        location: 'Samaná'
-      }
-    ]
   },
   {
     id: 6,
@@ -344,13 +310,6 @@ const sports = ref([
         cost: 'Gratis para entrenamientos'
       }
     ],
-    events: [
-      {
-        name: 'Torneo Superior de Baloncesto',
-        date: 'Octubre - Diciembre',
-        location: 'Santo Domingo'
-      }
-    ]
   },
   {
     id: 7,
@@ -378,13 +337,6 @@ const sports = ref([
         cost: 'RD$500 por sesión de entrenamiento'
       }
     ],
-    events: [
-      {
-        name: 'Liga Nacional de Volleyball',
-        date: 'Todo el año',
-        location: 'Santo Domingo'
-      }
-    ]
   },
   {
     id: 8,
@@ -406,18 +358,6 @@ const sports = ref([
         cost: 'Gratis para entrenamientos'
       }
     ],
-    events: [
-      {
-        name: 'Maratón Internacional de Santo Domingo',
-        date: 'Febrero',
-        location: 'Santo Domingo'
-      },
-      {
-        name: 'Carrera Pedestre Banreservas',
-        date: 'Noviembre',
-        location: 'Todo el país'
-      }
-    ]
   },
   {
     id: 9,
@@ -440,13 +380,6 @@ const sports = ref([
         cost: 'Gratis'
       }
     ],
-    events: [
-      {
-        name: 'Torneos Clásicos del Caribe',
-        date: 'Trimestral',
-        location: 'Gimnasio Nacional'
-      }
-    ]
   },
   {
     id: 10,
@@ -476,13 +409,6 @@ const sports = ref([
         website: 'https://casadecampo.com.do'
       }
     ],
-    events: [
-      {
-        name: 'Open de Golf República Dominicana',
-        date: 'Marzo',
-        location: 'Punta Cana'
-      }
-    ]
   },
   {
     id: 11,
@@ -506,13 +432,6 @@ const sports = ref([
         website: 'https://surfencuentro.com'
       }
     ],
-    events: [
-      {
-        name: 'Campeonato Nacional de Surf',
-        date: 'Julio',
-        location: 'Playa Encuentro'
-      }
-    ]
   },
   {
     id: 12,
@@ -536,13 +455,6 @@ const sports = ref([
         website: 'https://clubtenis.com.do'
       }
     ],
-    events: [
-      {
-        name: 'Abierto Nacional de Tenis',
-        date: 'Septiembre',
-        location: 'Santo Domingo'
-      }
-    ]
   },
   {
     id: 13,
@@ -565,13 +477,6 @@ const sports = ref([
         cost: 'Gratis'
       }
     ],
-    events: [
-      {
-        name: 'Vuelta Ciclística a la Independencia',
-        date: 'Febrero',
-        location: 'Todo el país'
-      }
-    ]
   },
   {
     id: 14,
@@ -593,13 +498,6 @@ const sports = ref([
         cost: 'RD$1,500/mes'
       }
     ],
-    events: [
-      {
-        name: 'Campeonato Nacional de Judo',
-        date: 'Agosto',
-        location: 'Santo Domingo'
-      }
-    ]
   },
   {
     id: 15,
@@ -622,13 +520,6 @@ const sports = ref([
         website: 'https://clubhipico.com.do'
       }
     ],
-    events: [
-      {
-        name: 'Gran Premio Clásico del Caribe',
-        date: 'Diciembre',
-        location: 'Santo Domingo'
-      }
-    ]
   },
   {
     id: 16,
@@ -651,13 +542,6 @@ const sports = ref([
         cost: 'Gratis para espectadores'
       }
     ],
-    events: [
-      {
-        name: 'Competencia Nacional de Palo Ensebado',
-        date: 'Junio (durante fiestas patronales)',
-        location: 'Varias provincias'
-      }
-    ]
   },
   {
     id: 17,
@@ -680,7 +564,6 @@ const sports = ref([
         cost: 'RD$300-1,000 entrada'
       }
     ],
-    events: []
   },
   {
     id: 18,
@@ -704,13 +587,6 @@ const sports = ref([
         website: 'https://scubadivebayahibe.com'
       }
     ],
-    events: [
-      {
-        name: 'Torneo de Pesca Submarina',
-        date: 'Agosto',
-        location: 'Samaná'
-      }
-    ]
   },
   {
     id: 19,
@@ -734,7 +610,6 @@ const sports = ref([
         website: 'https://ecoparapenterd.com'
       }
     ],
-    events: []
   },
   {
     id: 20,
@@ -758,13 +633,6 @@ const sports = ref([
         website: 'https://ranchobaiguate.com'
       }
     ],
-    events: [
-      {
-        name: 'Competencia Internacional de Rafting',
-        date: 'Julio',
-        location: 'Jarabacoa'
-      }
-    ]
   },
   {
     id: 21,
@@ -787,13 +655,6 @@ const sports = ref([
         website: 'https://hipodromord.com'
       }
     ],
-    events: [
-      {
-        name: 'Gran Premio Clásico del Caribe',
-        date: 'Diciembre',
-        location: 'Santo Domingo'
-      }
-    ]
   },
   {
     id: 22,
@@ -817,7 +678,6 @@ const sports = ref([
         website: 'https://clubtiro.com.do'
       }
     ],
-    events: []
   },
   {
     id: 23,
@@ -840,13 +700,6 @@ const sports = ref([
         website: 'https://yogapuntacana.com'
       }
     ],
-    events: [
-      {
-        name: 'Festival de Yoga al Amanecer',
-        date: 'Enero',
-        location: 'Playa Macao'
-      }
-    ]
   },
   {
     id: 24,
@@ -869,13 +722,6 @@ const sports = ref([
         website: 'https://padelcenterrd.com'
       }
     ],
-    events: [
-      {
-        name: 'Torneo Abierto de Padel RD',
-        date: 'Noviembre',
-        location: 'Santo Domingo'
-      }
-    ]
   },
   {
     id: 25,
@@ -897,13 +743,6 @@ const sports = ref([
         cost: 'Gratis'
       }
     ],
-    events: [
-      {
-        name: 'Torneo Interuniversitario de Ultimate',
-        date: 'Abril',
-        location: 'Santo Domingo'
-      }
-    ]
   }
 ]);
 

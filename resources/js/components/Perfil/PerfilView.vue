@@ -59,9 +59,9 @@
                 </button>
 
                 
-                <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
+                <!-- <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
                     Subir Información
-                </button>
+                </button> -->
 
             </div>
 
@@ -426,12 +426,12 @@ export default {
         },
 
 
-        redirectToTrainersPage() {
-            // Guardar los datos del perfil para usarlos en la página de entrenadores
-            sessionStorage.setItem('profileToSubmit', JSON.stringify(this.user));
-            // Redirigir a la página de entrenadores
-            this.$router.push('/entrenadores');
-        },
+        // redirectToTrainersPage() {
+        //     // Guardar los datos del perfil para usarlos en la página de entrenadores
+        //     sessionStorage.setItem('profileToSubmit', JSON.stringify(this.user));
+        //     // Redirigir a la página de entrenadores
+        //     this.$router.push('/entrenadores');
+        // },
 
 
     },
