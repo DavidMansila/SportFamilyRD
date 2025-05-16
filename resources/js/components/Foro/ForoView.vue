@@ -144,7 +144,7 @@
               </div>
 
               <div class="image-container">
-                <img :src=" postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
+                <img :src="postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
               </div>
 
 
@@ -593,7 +593,12 @@ export default {
 
     totalPages() {
       return Math.ceil(this.postsFiltrados.length / this.itemsPerPage);
-    }
+    },
+    // currentUserId() {
+    //   const user = JSON.parse(sessionStorage.getItem('user'));
+    //   console.log('Usuario en sesión:', user);
+    //   return user ? user.id : null;
+    // },
   },
 
   methods: {
@@ -823,15 +828,15 @@ export default {
         }
 
         this.getPost()
-            .then(() => {
-              const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
-              if (postEncontrado) {
-                this.postSeleccionado = { ...postEncontrado };
-              }
-            })
-            .catch(error => {
-              console.error('Error al editar comentario:', error);
-            });
+          .then(() => {
+            const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
+            if (postEncontrado) {
+              this.postSeleccionado = { ...postEncontrado };
+            }
+          })
+          .catch(error => {
+            console.error('Error al editar comentario:', error);
+          });
 
         this.nuevoComentario = '';
         this.comentarioRespondiendo = null;
@@ -871,16 +876,16 @@ export default {
 
     // METODOS PARA EDITAR Y ELIMINAR EN POST
 
-    isPostAuthor(post) {
-      // Implementa según tu sistema de autenticación
-      // Ejemplo: return post.userId === this.$store.state.user.id;
-      return true; // Cambiar según tu lógica
-    },
+     isPostAuthor(post) {
+    //   return Number(post.user_id) === Number(this.currentUserId);
+     },
 
-    isCommentAuthor(comment) {
-      // Implementa según tu sistema de autenticación
-      // Ejemplo: return comment.userId === this.$store.state.user.id;
-      return true; // Cambiar según tu lógica
+     isCommentAuthor(comment) {
+    //   return Number(comment.user_id) === Number(this.currentUserId);
+     },
+
+    isReplyAuthor(reply) {
+    //   return Number(reply.user_id) === Number(this.currentUserId);
     },
 
     // En el método editarPost

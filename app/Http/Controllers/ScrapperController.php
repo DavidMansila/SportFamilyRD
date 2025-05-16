@@ -16,13 +16,13 @@ class ScrapperController extends Controller
     //     $client = new Client([
     //         'verify' => false,
     //     ]);
-    
+
     //     // Primer scraping: Obtener solo los enlaces
     //     $response = $client->request('GET', 'https://lidom.com/');
     //     $html = (string) $response->getBody();
-    
+
     //     $crawler = new Crawler($html);
-    
+
     //     $links = $crawler->filter('.entry-box a.cover-link')->each(function (Crawler $node) {
     //         try {
     //             return $node->attr('href'); // Extraer solo el enlace
@@ -30,34 +30,34 @@ class ScrapperController extends Controller
     //             return null;
     //         }
     //     });
-    
+
     //     // Filtrar enlaces no válidos
     //     $links = array_filter($links);
-    
+
     //     // Segundo scraping: Obtener los datos de cada enlace
     //     $promises = [];
     //     foreach ($links as $link) {
     //         $promises[] = $client->getAsync($link);
     //     }
-    
+
     //     $responses = Utils::settle($promises)->wait();
-    
+
     //     $articles = [];
     //     foreach ($responses as $index => $response) {
     //         if ($response['state'] === 'fulfilled') {
     //             try {
     //                 $html = (string) $response['value']->getBody();
     //                 $subCrawler = new Crawler($html);
-    
+
     //                 // Extraer datos desde la página del enlace
     //                 $title = $subCrawler->filter('section.nota-top-part h1')->text();
     //                 $subtitle = $subCrawler->filter('section.nota-top-part h2')->text();
-    
+
     //                 $author = $subCrawler->filter('div.autor div.extra-holder p')->text();
     //                 $date = $subCrawler->filter('div.autor div.extra-holder time')->text();
-    
+
     //                 $image = $subCrawler->filter('div.preview-images figure img')->attr('src');
-    
+
     //                 // Filtrar y extraer la descripción ignorando elementos no deseados
     //                 $description = $subCrawler->filter('div.article-body')->each(function (Crawler $node) {
     //                     // Eliminar elementos no deseados
@@ -66,13 +66,13 @@ class ScrapperController extends Controller
     //                             $child->parentNode->removeChild($child);
     //                         }
     //                     });
-    
+
     //                     // Extraer solo el texto de las etiquetas <p>
     //                     return $node->filter('p')->each(function (Crawler $pNode) {
     //                         return $pNode->text();
     //                     });
     //                 });
-    
+
     //                 $articles[] = [
     //                     'title' => $title,
     //                     'subtitle' => $subtitle,
@@ -105,7 +105,7 @@ class ScrapperController extends Controller
     //             ];
     //         }
     //     }
-    
+
     //     return response()->json([
     //         'baseball_news' => $articles,
     //     ]);
@@ -155,7 +155,7 @@ class ScrapperController extends Controller
     //                 $date = $subCrawler->filter('.post_meta_item.post_date')->text();
     //                 $subtitle = $subCrawler->filter('.post_content_inner')->text();
     //                 $author = $subCrawler->filter('.post_meta_item.post_categories')->text();
-                   
+
     //                 $description = $subCrawler->filter('.content .post_content.post_content_single.entry-content p')->each(function (Crawler $pNode) {
     //                     return $pNode->text();
     //                 });
@@ -203,13 +203,13 @@ class ScrapperController extends Controller
     //     $client = new Client([
     //         'verify' => false,
     //     ]);
-    
+
     //     // Primer scraping: Obtener solo los enlaces
     //     $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
     //     $html = (string) $response->getBody();
-    
+
     //     $crawler = new Crawler($html);
-    
+
     //     // Ajustar el selector para evitar duplicados
     //     $links = $crawler->filter('div.container div.row div.col-md-4.col-xs-12 div.seccion-item-box a:first-of-type')->each(function (Crawler $node) {
     //         try {
@@ -218,26 +218,26 @@ class ScrapperController extends Controller
     //             return null;
     //         }
     //     });
-    
+
     //     // Filtrar enlaces no válidos y eliminar duplicados
     //     $links = array_filter($links);
     //     $links = array_unique($links);
-    
+
     //     // Segundo scraping: Obtener los datos de cada enlace
     //     $promises = [];
     //     foreach ($links as $link) {
     //         $promises[] = $client->getAsync($link);
     //     }
-    
+
     //     $responses = Utils::settle($promises)->wait();
-    
+
     //     $articles = [];
     //     foreach ($responses as $index => $response) {
     //         if ($response['state'] === 'fulfilled') {
     //             try {
     //                 $html = (string) $response['value']->getBody();
     //                 $subCrawler = new Crawler($html);
-    
+
     //                 // Extraer datos desde la página del enlace
     //                 $title = $subCrawler->filter('div.col-md-12.col-xs-12 h1.single-title')->text();
     //                 $author = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(1)->text();
@@ -246,7 +246,7 @@ class ScrapperController extends Controller
     //                 $description = $subCrawler->filter('div.col-md-8.col-xs-12 div.white-box div.nota p')->each(function (Crawler $pNode) {
     //                     return $pNode->text();
     //                 });
-    
+
     //                 $articles[] = [
     //                     'title' => $title,
     //                     'author' => trim(str_replace('Por:', '', $author)), // Limpiar el texto del autor
@@ -265,7 +265,7 @@ class ScrapperController extends Controller
     //             }
     //         }
     //     }
-    
+
     //     return response()->json([
     //         'basketball_news' => $articles,
     //     ]);
@@ -368,13 +368,13 @@ class ScrapperController extends Controller
             $client = new Client([
                 'verify' => false,
             ]);
-    
+
             // Primer scraping: Obtener solo los enlaces
             $response = $client->request('GET', 'https://www.fedofutbol.do/all-posts/');
             $html = (string) $response->getBody();
-    
+
             $crawler = new Crawler($html);
-    
+
             $links = $crawler->filter('.posts_container article .post_featured.with_thumb.hover_simple a')->each(function (Crawler $node) {
                 try {
                     return $node->attr('href'); // Extraer solo el enlace
@@ -382,35 +382,35 @@ class ScrapperController extends Controller
                     return null;
                 }
             });
-    
+
             // Filtrar enlaces no válidos
             $links = array_filter($links);
-    
+
             // Segundo scraping: Obtener los datos de cada enlace
             $promises = [];
             foreach ($links as $link) {
                 $promises[] = $client->getAsync($link);
             }
-    
+
             $responses = Utils::settle($promises)->wait();
-    
+
             $articles = [];
             foreach ($responses as $index => $response) {
                 if ($response['state'] === 'fulfilled') {
                     try {
                         $html = (string) $response['value']->getBody();
                         $subCrawler = new Crawler($html);
-    
+
                         // Extraer datos desde la página del enlace
                         $title = $subCrawler->filter('.post_title.entry-title')->text();
                         $image = $subCrawler->filter('.post_featured img')->attr('src');
                         $date = $subCrawler->filter('.post_meta_item.post_date')->text();
                         $author = $subCrawler->filter('.post_meta_item.post_categories')->text();
-    
+
                         $description = $subCrawler->filter('.content .post_content.post_content_single.entry-content p')->each(function (Crawler $pNode) {
                             return $pNode->text();
                         });
-    
+
                         $articles[] = [
                             'title' => $title,
                             'image' => $image,
@@ -431,10 +431,10 @@ class ScrapperController extends Controller
                     }
                 }
             }
-    
+
             return $articles;
         });
-    
+
         return response()->json([
             'futbol_news' => $articles,
         ]);
@@ -525,17 +525,17 @@ class ScrapperController extends Controller
             $client = new Client([
                 'verify' => false,
             ]);
-    
+
             $baseUrl = 'https://voleiboldominicano.com/author/admin/';
             $currentPage = $baseUrl;
             $articles = [];
-    
+
             do {
                 try {
                     $response = $client->request('GET', $currentPage);
                     $html = (string) $response->getBody();
                     $crawler = new Crawler($html);
-    
+
                     // Extraer los enlaces únicos de las etiquetas <a class="link-div">
                     $links = $crawler->filter('div.mg-posts-sec.mg-posts-modul-6 div.mg-posts-sec-inner article div.col-12.col-md-6 div.mg-post-thumb.back-img.md a.link-div')->each(function (Crawler $node) {
                         try {
@@ -544,25 +544,25 @@ class ScrapperController extends Controller
                             return null;
                         }
                     });
-    
+
                     // Filtrar enlaces no válidos y eliminar duplicados
                     $links = array_filter($links);
                     $links = array_unique($links);
-    
+
                     // Segundo scraping: Obtener los datos de cada enlace
                     $promises = [];
                     foreach ($links as $link) {
                         $promises[] = $client->getAsync($link);
                     }
-    
+
                     $responses = Utils::settle($promises)->wait();
-    
+
                     foreach ($responses as $index => $response) {
                         if ($response['state'] === 'fulfilled') {
                             try {
                                 $html = (string) $response['value']->getBody();
                                 $subCrawler = new Crawler($html);
-    
+
                                 // Extraer datos desde la página del enlace
                                 $title = $subCrawler->filter('div.mg-header h1.title.single')->text();
                                 $author = $subCrawler->filter('div.media.mg-info-author-block div.media-body h4 a')->text();
@@ -571,7 +571,7 @@ class ScrapperController extends Controller
                                 $description = $subCrawler->filter('article.page-content-single.small.single p')->each(function (Crawler $pNode) {
                                     return $pNode->text();
                                 });
-    
+
                                 $articles[] = [
                                     'title' => $title,
                                     'author' => $author,
@@ -590,7 +590,7 @@ class ScrapperController extends Controller
                             }
                         }
                     }
-    
+
                     // Verificar si hay una página siguiente
                     $nextPage = $crawler->filter('a[rel="next"]')->attr('href') ?? null;
                     $currentPage = $nextPage;
@@ -602,7 +602,7 @@ class ScrapperController extends Controller
             // Almacenar los artículos en caché
             return $articles;
         });
-    
+
         return response()->json([
             'volleyball_news' => $articles,
         ]);
