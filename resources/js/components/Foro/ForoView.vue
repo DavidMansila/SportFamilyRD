@@ -85,7 +85,7 @@
 
           <div class="post-meta">
             <span class="post-author">
-              Usuario{{ post.id }}
+              {{ `Usuario${post.user_id}` }}
             </span>
             <span class="post-date">{{ formatDate(post.created_at) }}</span>
           </div>
@@ -243,7 +243,7 @@
                     <div class="comment-content">
                       <div class="comment-header">
 
-                        <span class="comment-author"> {{ comentario.user?.id || comentario.user_id || '' }}</span>
+                        <span class="comment-author"> {{ `Usuario${comentario.user_id}` }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.respuestas && comentario.respuestas.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -323,7 +323,7 @@
                           </div>
                           <div class="comment-content">
                             <div class="comment-header">
-                              <span class="comment-author">Usuario{{ reply.user_id }}</span>
+                              <span class="comment-author">{{ `Usuario${comentario.user_id}` }}</span>
                               <span class="comment-time">{{ formatRelativeTime(reply.created_at) }}</span>
                             </div>
 
@@ -706,23 +706,19 @@ export default {
     // Métodos para Posts
     async createPost() {
 
-      const user = JSON.parse(sessionStorage.getItem('user')); // o localStorage
-      const userId = user?.id;
+      if (!this.user?.id) {
+        alert('Debes iniciar sesión para crear posts');
+        return;
+      }
 
       const formData = new FormData();
       formData.append('titulo', this.nuevoPost.titulo);
       formData.append('contenido', this.nuevoPost.contenido);
       formData.append('categoria', this.nuevoPost.categoria);
+      formData.append('user_id', this.user.id); // Asegurar user_id en el formData
 
       if (this.nuevoPost.imagenFile) {
         formData.append('imagen', this.nuevoPost.imagenFile);
-      }
-
-      if (userId) {
-        formData.append('user_id', userId);
-      } else {
-        alert('No se encontró el usuario. Inicia sesión nuevamente.');
-        return;
       }
 
       try {
@@ -784,11 +780,9 @@ export default {
 
       try {
 
-        // const user = JSON.parse(sessionStorage.getItem('user')); // o localStorage
-        // const userId = user?.id;
-
-        // if (!userId) {
-        //   alert('No se encontró el usuario. Inicia sesión nuevamente.');
+        // Verificar que el usuario está autenticado
+        // if (!this.user.id) {
+        //   alert('Debes iniciar sesión para comentar');
         //   return;
         // }
 
@@ -799,7 +793,7 @@ export default {
         const payload = {
           texto: this.nuevoComentario,
           post_id: this.postSeleccionado.id,
-          // user_id: userId
+          user_id: this.user.id
         };
 
         const response = await axios.post(endpoint, payload);
@@ -891,15 +885,15 @@ export default {
     // METODOS PARA EDITAR Y ELIMINAR EN POST
 
     isPostAuthor(post) {
-      return Number(post.user_id) === Number(this.user.id);
+      return post.user_id === this.user.id;
     },
 
     isCommentAuthor(comment) {
-      //   return Number(comment.user_id) === Number(this.user.id);
+      return comment.user_id === this.user.id;
     },
 
     isReplyAuthor(reply) {
-      //   return Number(reply.user_id) === Number(this.user.id);
+      return reply.user_id === this.user.id;
     },
 
     // En el método editarPost
