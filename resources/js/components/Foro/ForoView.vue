@@ -194,15 +194,15 @@
                 </div>
 
                 <!-- EDITAR Y ELIMINAR POST | HAY QUE PONER QUE SI EL ID DEL USUARIO COINCIDE CON EL ID DEL USUARIO DEL POST PUES PUEDE EDITAR Y ELIMINAR DICHO POST-->
-                <div class="post-actions" v-if="isPostAuthor(postSeleccionado) || user.user_type === 'admin'">
-                  <button @click="abrirEditarModal(postSeleccionado)" class="edit-post-btn" title="Editar post">
+                <div class="post-actions">
+                  <button v-if="isPostAuthor(postSeleccionado)" @click="abrirEditarModal(postSeleccionado)" class="edit-post-btn" title="Editar post">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
                   </button>
-                  <button @click="confirmarEliminarPost" class="delete-post-btn" title="Eliminar post">
+                  <button v-if="isPostAuthor(postSeleccionado) || user.user_type === 'admin'" @click="confirmarEliminarPost" class="delete-post-btn" title="Eliminar post">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="3 6 5 6 21 6"></polyline>
@@ -298,7 +298,7 @@
                           class="comment-action edit-btn">
                           Editar
                         </button>
-                        <button v-if="isCommentAuthor(comentario)" @click="eliminarComentario(comentario)"
+                        <button v-if="isCommentAuthor(comentario) || user.user_type === 'admin'" @click="eliminarComentario(comentario)"
                           class="comment-action delete-btn">
                           Eliminar
                         </button>
@@ -371,7 +371,7 @@
                                 class="comment-action edit-btn">
                                 Editar
                               </button>
-                              <button v-if="isReplyAuthor(reply)" @click="eliminarReply(reply)"
+                              <button v-if="isReplyAuthor(reply)|| user.user_type === 'admin'" @click="eliminarReply(reply)"
                                 class="comment-action delete-btn">
                                 Eliminar
                               </button>
@@ -1208,11 +1208,6 @@ export default {
       this.comentarioRespondiendo = null;
       this.nuevoComentario = '';
     }
-
-
-    // FUNCIONES PARA ADMINISTRADOR
-
-    // ELIMINAR POST 
 
 
   },
