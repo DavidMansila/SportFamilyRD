@@ -592,11 +592,11 @@ export default {
     totalPages() {
       return Math.ceil(this.postsFiltrados.length / this.itemsPerPage);
     },
-    // currentUserId() {
-    //   const user = JSON.parse(sessionStorage.getItem('user'));
-    //   console.log('Usuario en sesión:', user);
-    //   return user ? user.id : null;
-    // },
+    currentUserId() {
+      const user = JSON.parse(sessionStorage.getItem('user'));
+      console.log('Usuario en sesión:', user);
+      return user ? user.id : null;
+    },
   },
 
   methods: {
@@ -710,6 +710,10 @@ export default {
 
     // Métodos para Posts
     async createPost() {
+
+      const user = JSON.parse(sessionStorage.getItem('user')); // o localStorage
+      const userId = user?.id;
+
       const formData = new FormData();
       formData.append('titulo', this.nuevoPost.titulo);
       formData.append('contenido', this.nuevoPost.contenido);
@@ -717,6 +721,13 @@ export default {
 
       if (this.nuevoPost.imagenFile) {
         formData.append('imagen', this.nuevoPost.imagenFile);
+      }
+
+      if (userId) {
+        formData.append('user_id', userId);
+      } else {
+        alert('No se encontró el usuario. Inicia sesión nuevamente.');
+        return;
       }
 
       try {
@@ -874,16 +885,16 @@ export default {
 
     // METODOS PARA EDITAR Y ELIMINAR EN POST
 
-     isPostAuthor(post) {
-    //   return Number(post.user_id) === Number(this.currentUserId);
-     },
+    isPostAuthor(post) {
+      return Number(post.user_id) === Number(this.currentUserId);
+    },
 
-     isCommentAuthor(comment) {
-    //   return Number(comment.user_id) === Number(this.currentUserId);
-     },
+    isCommentAuthor(comment) {
+      //   return Number(comment.user_id) === Number(this.currentUserId);
+    },
 
     isReplyAuthor(reply) {
-    //   return Number(reply.user_id) === Number(this.currentUserId);
+      //   return Number(reply.user_id) === Number(this.currentUserId);
     },
 
     // En el método editarPost
