@@ -42,7 +42,7 @@ class PostController extends Controller
             $post = Post::create($request->all());
 
             if(isset($request['imagen']) && $request['imagen']){
-                $imageName = Post::addImages($request['imagen'], $post->id);
+                $imageName = Post::addImages($request['imagen'], $post->id, 'posts');
                 Post::where('id', $post->id)->update(['imagen' => $imageName]);
             }
             
