@@ -85,7 +85,7 @@
 
           <div class="post-meta">
             <span class="post-author">
-              {{ `Usuario${post.user_id}` }}
+              {{ `${post.user_id}` }}
             </span>
             <span class="post-date">{{ formatDate(post.created_at) }}</span>
           </div>
@@ -237,7 +237,7 @@
                   <div v-for="(comentario) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
                       <div class="comment-avatar-placeholder">
-                        <span>U{{ comentario.user_id }}</span>
+                        <span>{{ comentario.user_id }}</span>
                       </div>
                     </div>
                     <div class="comment-content">
