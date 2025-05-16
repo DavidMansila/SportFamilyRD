@@ -1,14 +1,13 @@
-
 /* Estilos para los botones de administración */
 .floating-action {
     position: fixed;
     bottom: 30px;
     right: 30px;
     z-index: 1000;
-  }
-  
-  .btn-agregar {
-    background: #2196F3;
+}
+
+.btn-agregar {
+    background: #2196f3;
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -19,23 +18,23 @@
     border: none;
     cursor: pointer;
     transition: transform 0.2s;
-  }
-  
-  .btn-agregar:hover {
+}
+
+.btn-agregar:hover {
     transform: scale(1.1);
-  }
-  
-  .noticia-card .admin-actions {
+}
+
+.noticia-card .admin-actions {
     position: absolute;
     top: 10px;
     right: 10px;
     display: flex;
     gap: 8px;
     z-index: 2;
-  }
-  
-  .btn-editar,
-  .btn-eliminar {
+}
+
+.btn-editar,
+.btn-eliminar {
     background: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 4px;
@@ -43,30 +42,124 @@
     margin-top: 12px;
     cursor: pointer;
     transition: all 0.2s;
-  }
-  
-  .btn-editar:hover {
-    background: #2196F3;
+}
+
+.btn-editar:hover {
+    background: #2196f3;
     color: white;
-  }
-  
-  .btn-eliminar:hover {
+}
+
+.btn-eliminar:hover {
     background: #f44336;
     color: white;
-  }
-  
-  .popup-actions {
+}
+
+.popup-actions {
     display: flex;
     gap: 10px;
     margin-top: 20px;
-  }
-  
-  .popup-editar {
-    background: #2196F3;
+}
+
+.popup-editar {
+    background: #2196f3;
     color: white;
-  }
-  
-  .popup-eliminar {
+}
+
+.popup-eliminar {
     background: #f44336;
     color: white;
-  }
+}
+
+/* Asegurar que los botones de admin no interfieran */
+.btn-editar,
+.btn-eliminar {
+    z-index: 4;
+    /* Por encima del saved-indicator */
+    bottom: 15px;
+}
+
+.btn-editar {
+    right: 50px;
+}
+
+.btn-eliminar {
+    right: 15px;
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+    .saved-indicator {
+        top: 10px;
+        right: 10px;
+        width: 28px;
+        height: 28px;
+        padding: 5px;
+    }
+
+    .noticia-content {
+        padding-right: 50px;
+        min-height: 200px;
+    }
+
+    .noticia-title {
+        font-size: 1.1rem;
+        max-height: 3.6em;
+    }
+
+    .noticia-excerpt {
+        font-size: 0.95rem;
+        max-height: 4em;
+    }
+}
+
+/* Asegurar que el SVG del icono no tenga clicks fantasmas */
+.saved-indicator svg {
+    pointer-events: none;
+}
+
+/* Estilos para el modo edición */
+.edit-select,
+.edit-title,
+.edit-author,
+.edit-date,
+.edit-description {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.edit-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.edit-description {
+    min-height: 200px;
+    resize: vertical;
+}
+
+.image-upload {
+    margin-bottom: 15px;
+}
+
+.image-upload label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.popup-cancel {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.popup-cancel {
+    background-color: #f44336;
+    color: white;
+}

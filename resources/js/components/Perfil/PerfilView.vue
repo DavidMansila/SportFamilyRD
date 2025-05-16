@@ -42,7 +42,12 @@
 
                         <div class="stat-item" v-if="user.user_type === 'entrenador'">
                             <span class="stat-number">{{ stats.SolicitudesUsuarios }}</span>
-                            <span class="stat-label">Siguiendo</span>
+                            <span class="stat-label">Solicitudes Usuarios</span>
+                        </div>
+
+                        <div class="stat-item" v-if="user.user_type === 'admin'">
+                            <span class="stat-number">{{ stats.SolicitudesUsuarios }}</span>
+                            <span class="stat-label">Solicitudes Entrenadores</span>
                         </div>
 
                         <div class="stat-item" v-if="user.user_type === 'entrenador'">
@@ -51,14 +56,14 @@
                         </div>
 
                     </div>
-                    
+
                 </div>
 
                 <button class="edit-profile-btn" @click="editMode = !editMode">
                     {{ editMode ? 'Cancelar' : 'Editar Perfil' }}
                 </button>
 
-                
+
                 <!-- <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
                     Subir Información
                 </button> -->
@@ -438,8 +443,6 @@ export default {
     mounted() {
         // Cargar datos iniciales
         this.user = JSON.parse(sessionStorage.getItem('user'));
-
-
     }
 }
 </script>
@@ -517,7 +520,8 @@ export default {
     height: 24px;
 }
 
-.add-social, .add-achievement {
+.add-social,
+.add-achievement {
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -527,7 +531,8 @@ export default {
     margin-top: 10px;
 }
 
-.remove-social, .remove-achievement {
+.remove-social,
+.remove-achievement {
     background-color: #f44336;
     color: white;
     border: none;
@@ -545,45 +550,47 @@ export default {
 
 /* Estilo para el botón Subir Información */
 .upload-info-btn {
-  background-color: #4CAF50; /* Verde */
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-left: 11px; /* Espacio del botón Editar Perfil */
+    background-color: #4CAF50;
+    /* Verde */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-left: 11px;
+    /* Espacio del botón Editar Perfil */
 }
 
 .upload-info-btn:hover {
-  background-color: #45a049; /* Verde más oscuro al pasar el mouse */
+    background-color: #45a049;
+    /* Verde más oscuro al pasar el mouse */
 }
 
 /* Estilos para móviles */
 @media (max-width: 768px) {
-  .profile-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .upload-info-btn {
-    margin-left: 0;
-    margin-top: 10px;
-    width: 100%;
-  }
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .upload-info-btn {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+    }
 }
 
 /* Si quieres un diseño con icono */
 .upload-info-btn.with-icon {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .upload-info-btn.with-icon::before {
-  content: "↑";
-  font-size: 1.1em;
+    content: "↑";
+    font-size: 1.1em;
 }
-
 </style>

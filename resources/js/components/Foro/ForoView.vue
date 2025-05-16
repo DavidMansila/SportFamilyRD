@@ -755,6 +755,9 @@ export default {
             }))
         }));
         this.postsFiltrados = [...this.posts];
+
+        // sessionStorage.setItem('posts', JSON.stringify(this.posts));
+
       } catch (error) {
         console.error('Error obteniendo posts:', error);
       }
