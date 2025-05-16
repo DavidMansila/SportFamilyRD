@@ -448,13 +448,13 @@ export default {
     },
 
     guardarEnLocalStorage(noticia) {
-      const savedNews = JSON.parse(localStorage.getItem('savedNews') || '{}');
+      const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
       if (noticia.saved) {
         savedNews[noticia.id] = true;
       } else {
         delete savedNews[noticia.id];
       }
-      localStorage.setItem('savedNews', JSON.stringify(savedNews));
+      sessionStorage.setItem('savedNews', JSON.stringify(savedNews));
 
       // Actualizar la lista completa de noticias
       this.noticias = this.noticias.map(n =>
@@ -476,7 +476,7 @@ export default {
     },
 
     cargarGuardados() {
-      const savedNews = JSON.parse(localStorage.getItem('savedNews')) || {};
+      const savedNews = JSON.parse(sessionStorage.getItem('savedNews')) || {};
       this.noticias = this.noticias.map(noticia => ({
         ...noticia,
         saved: savedNews[noticia.id] || false
@@ -515,7 +515,7 @@ export default {
   async mounted() {
     try {
       // Cargar savedNews primero para tenerlos disponibles
-      const savedNews = JSON.parse(localStorage.getItem('savedNews') || '{}');
+      const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
 
       await this.cargarNoticias();
 
