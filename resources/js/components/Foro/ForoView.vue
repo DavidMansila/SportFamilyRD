@@ -781,10 +781,10 @@ export default {
       try {
 
         // Verificar que el usuario está autenticado
-        if (!this.user?.id) {
-          alert('Debes iniciar sesión para comentar');
-          return;
-        }
+        // if (!this.user.id) {
+        //   alert('Debes iniciar sesión para comentar');
+        //   return;
+        // }
 
         const endpoint = this.comentarioRespondiendo
           ? `/post/create-reply/${this.comentarioRespondiendo}`
@@ -885,15 +885,15 @@ export default {
     // METODOS PARA EDITAR Y ELIMINAR EN POST
 
     isPostAuthor(post) {
-      return Number(post.user_id) === Number(this.user.id);
+      return post.user_id === this.user.id;
     },
 
     isCommentAuthor(comment) {
-      return Number(comment.user_id) === Number(this.user.id);
+      return comment.user_id === this.user.id;
     },
 
     isReplyAuthor(reply) {
-      return Number(reply.user_id) === Number(this.user.id);
+      return reply.user_id === this.user.id;
     },
 
     // En el método editarPost
