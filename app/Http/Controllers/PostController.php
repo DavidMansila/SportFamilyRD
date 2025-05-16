@@ -19,8 +19,9 @@ class PostController extends Controller
                 $post->imagen = $post->imagen 
                 ? url('storage/posts/' . $post->id . '/' . $post->imagen)
                 : url('storage/posts/no_image.png');
-                $user = User::findOrFail($post->user_id);
-                $post->user_name = $user->name;
+                $post->user_name = $post->user_id 
+                    ? User::find($post->user_id)?->name 
+                    : null;
                 return $post;
             });
             
