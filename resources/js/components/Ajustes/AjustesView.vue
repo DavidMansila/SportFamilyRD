@@ -320,16 +320,7 @@ export default {
 
   mounted() {
     document.title = 'Ajustes';
-    // Cargar datos iniciales
-    // axios.get('/api/user/settings')
-    //   .then(response => {
-    //     this.user = response.data.user;
-    //     this.notifications = response.data.notifications;
-    //     this.privacy = response.data.privacy;
-    //   })
-    //   .catch(error => {
-    //     this.handleApiError(error, 'Error al cargar configuración');
-    //   });
+    // this.user.saveSettings = JSON.parse(seccionStorage.getItem('userData'));
   },
 }
 </script>
