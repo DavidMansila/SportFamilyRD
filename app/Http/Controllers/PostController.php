@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Models\Reply;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
@@ -18,6 +19,8 @@ class PostController extends Controller
                 $post->imagen = $post->imagen 
                 ? url('storage/posts/' . $post->id . '/' . $post->imagen)
                 : url('storage/posts/no_image.png');
+                $user = User::findOrFail($post->user_id);
+                $post->user_name = $user->name;
                 return $post;
             });
             
