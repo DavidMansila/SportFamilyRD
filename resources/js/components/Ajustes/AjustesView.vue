@@ -47,22 +47,22 @@
         <div v-if="activeTab === 'notifications'" class="tab-content">
           <h3>Preferencias de Notificación</h3>
           <div class="toggle-group">
-            <div class="toggle-item">
 
+            <div class="toggle-item">
               <span>Notificaciones por Email</span>
               <label class="switch">
                 <input type="checkbox" v-model="notifications.email">
                 <span class="slider"></span>
               </label>
             </div>
-            <div class="toggle-item">
 
+            <!-- <div class="toggle-item">
               <span>Notificaciones por Telefono</span>
               <label class="switch">
                 <input type="checkbox" v-model="notifications.push">
                 <span class="slider"></span>
               </label>
-            </div>
+            </div> -->
 
           </div>
 
@@ -141,6 +141,7 @@
 
 
 <script>
+import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 
 export default {
@@ -214,62 +215,122 @@ export default {
       ],
 
       dataFormat: 'json',
-      showDeleteModal: false
+      showDeleteModal: false,
+
+      loading: false,
+      error: null
 
     }
   },
 
   methods: {
-    saveSettings() {
-      // Lógica para guardar ajustes
-      console.log('Configuración guardada:', {
-        user: this.user,
-        security: this.security,
-        notifications: this.notifications,
-        privacy: this.privacy
-      });
-      this.showToast('Tus cambios se han guardado correctamente');
-    },
-    requestData() {
-      this.modalTitle = 'Solicitar Mis Datos';
-      this.modalMessage = '¿Quieres solicitar un archivo con todos tus datos? Esto puede tomar hasta 48 horas.';
-      this.currentAction = 'requestData';
-      this.showModal = true;
-    },
-    confirmDeletion() {
-      this.modalTitle = 'Eliminar Cuenta';
-      this.modalMessage = '¿Estás seguro de que quieres eliminar tu cuenta permanentemente? Esta acción no se puede deshacer.';
-      this.currentAction = 'deleteAccount';
-      this.showModal = true;
-    },
-    confirmAction() {
-      if (this.currentAction === 'deleteAccount') {
-        console.log('Cuenta eliminada');
-        this.showToast('Tu cuenta ha sido eliminada');
-        // Redirigir al inicio
-      } else if (this.currentAction === 'requestData') {
-        console.log('Datos solicitados');
-        this.showToast('Hemos recibido tu solicitud de datos');
+
+    async saveSettings() {
+      if (this.security.newPassword !== this.security.confirmPassword) {
+        this.showToast('Las nuevas contraseñas no coinciden', 'error');
+        return;
       }
-      this.showModal = false;
-    },
-    showToast(message) {
-      // Implementar lógica de toast/notificación
-      alert(message); // Temporal
+
+      this.loading = true;
+      try {
+        const response = await axios.put('/api/user/security', {
+          currentPassword: this.security.currentPassword,
+          newPassword: this.security.newPassword
+        });
+
+        this.showToast('Configuración guardada correctamente', 'success');
+        this.security = { currentPassword: '', newPassword: '', confirmPassword: '' };
+      } catch (error) {
+        this.handleApiError(error, 'Error al guardar la configuración');
+      } finally {
+        this.loading = false;
+      }
     },
 
+    async deleteAccount() {
+      try {
+        await axios.delete('/api/user');
 
-    confirmDeletion() {
-      this.showDeleteModal = true;
-    },
-    deleteAccount() {
-      // Lógica para eliminar cuenta
+        this.showToast('Cuenta eliminada exitosamente', 'success');
+        localStorage.removeItem('authToken');
+        this.$router.push('/login');
+      } catch (error) {
+        this.handleApiError(error, 'Error al eliminar la cuenta');
+      }
       this.showDeleteModal = false;
     },
+
+    async requestUserData() {
+      this.loading = true;
+      try {
+        const response = await axios.get('/api/user/export', {
+          params: { format: this.dataFormat },
+          responseType: 'blob'
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `user-data.${this.dataFormat}`);
+        document.body.appendChild(link);
+        link.click();
+        this.showToast('Datos descargados exitosamente', 'success');
+      } catch (error) {
+        this.handleApiError(error, 'Error al solicitar datos');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    confirmAction() {
+      if (this.currentAction === 'deleteAccount') {
+        this.deleteAccount()
+          .then(() => {
+            this.$router.push('/login');
+          })
+          .catch(() => {
+            this.showModal = false;
+          });
+      } else if (this.currentAction === 'requestData') {
+        this.requestUserData()
+          .finally(() => {
+            this.showModal = false;
+          });
+      }
+    },
+
+    handleApiError(error, defaultMessage) {
+      const message = error.response?.data?.message || defaultMessage;
+      const status = error.response?.status;
+
+      if (status === 401) {
+        this.$router.push('/login');
+      }
+
+      this.showToast(`${message} (Código: ${status || 'N/A'})`, 'error');
+      console.error('API Error:', error);
+    },
+
+    showToast(message, type = 'info') {
+      // Implementar lógica de toast con tipo (success, error, warning, info)
+      alert(`${type.toUpperCase()}: ${message}`);
+    },
+
   },
+
   mounted() {
     document.title = 'Ajustes';
-  }
+    // Cargar datos iniciales
+    // axios.get('/api/user/settings')
+    //   .then(response => {
+    //     this.user = response.data.user;
+    //     this.notifications = response.data.notifications;
+    //     this.privacy = response.data.privacy;
+    //   })
+    //   .catch(error => {
+    //     this.handleApiError(error, 'Error al cargar configuración');
+    //   });
+  },
 }
 </script>
 
