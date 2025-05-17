@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PostController;
+use App\Models\Configuration;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,9 @@ Route::resource('/products', ProductController::class);
 
 // Posts
 Route::resource('/post', PostController::class);
+
+//configuracion
+Route::resource('config', ConfigurationController::class);
 
 // Comentarios
 Route::post('/post/create-comment', [PostController::class, 'createComment']);
