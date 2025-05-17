@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('configuration_id')->constrained('configuration')->onDelete('cascade');
-            $table->text('value')->nullable();
+            $table->enum('status', ['disabled', 'enabled'])->default('enabled');
             $table->timestamps();
             $table->unique(['user_id', 'configuration_id']);
         });

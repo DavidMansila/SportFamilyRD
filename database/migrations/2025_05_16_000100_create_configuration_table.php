@@ -10,8 +10,10 @@ return new class extends Migration
     {
         Schema::create('configuration', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
-            $table->text('value')->nullable();
+            $table->string('notification', 255)->nullable();
+            $table->string('public_profile', 255)->nullable();
+            $table->string('view_statistics', 255)->nullable();
+            $table->string('allow_messages', 255)->nullable();
             $table->timestamps();
         });
     }
