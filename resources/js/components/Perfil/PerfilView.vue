@@ -74,7 +74,17 @@
             <div class="profile-content">
                 <!-- Sección de Información Básica -->
                 <div class="profile-section">
-                    <h2>Información Básica</h2>
+
+                    <template v-if="user.user_type === 'entrenador'">
+                        <h2>Información de Entrenador</h2>
+                        <p class="profile-subtitle">Información del Entrenador</p>
+                    </template>
+
+                    <template v-else>
+                        <h2>Información de Usuario</h2>
+                        <p class="profile-subtitle">Información del Usuario</p>
+                    </template>
+
 
                     <div class="info-grid">
 
@@ -111,6 +121,16 @@
                             <span v-if="!editMode" class="info-value">{{ user.birthdate || 'No especificada' }}</span>
                             <input v-else type="date" v-model="user.birthdate">
                         </div>
+                        <div class="info-item" v-if="user.user_type === 'entrenador'">
+                            <span class="info-label">Deporte:</span>
+
+                            <span v-if="!editMode" class="info-value">
+                                {{ user.categoria || 'No especificada' }} <!-- Cambiado a mostrar string simple -->
+                            </span>
+
+                            <multiselect v-else v-model="user.categoria" :options="deportes" :multiple="false"
+                                placeholder="Selecciona un deporte" :allow-empty="false" required></multiselect>
+                        </div>
 
                     </div>
 
@@ -124,6 +144,52 @@
                     </p>
                     <textarea v-else v-model="user.bio" placeholder="Cuéntanos sobre ti, tus logros, experiencia..."
                         rows="4"></textarea>
+                </div>
+
+
+                <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                    <h2>Mis Especialidades</h2>
+
+                    <div v-if="!editMode" class="especialidades-list">
+                        <div v-if="user.especialidades && user.especialidades.length > 0"
+                            class="especialidades-container">
+                            <span v-for="(especialidad, index) in user.especialidades" :key="index"
+                                class="especialidad-tag">
+                                {{ especialidad }}
+                            </span>
+                        </div>
+                        <p v-else class="no-especialidades">No has agregado especialidades aún</p>
+                    </div>
+
+                    <div v-else class="especialidades-edit">
+                        <div class="especialidades-input-container">
+                            <input type="text" v-model="nuevaEspecialidad" @keydown.enter.prevent="agregarEspecialidad"
+                                placeholder="Escribe una especialidad y presiona Enter" class="especialidad-input">
+                            <button @click="agregarEspecialidad" class="btn-agregar-especialidad">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="especialidades-edit-list">
+                            <div v-for="(especialidad, index) in user.especialidades" :key="index"
+                                class="especialidad-edit-item">
+                                <span>{{ especialidad }}</span>
+                                <button @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 
@@ -153,13 +219,7 @@
                         </button>
                     </div> -->
 
-                    <!-- Botones de acción en modo edición -->
-                    <div v-if="editMode" class="action-buttons">
-                        <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
-                        <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
-                    </div>
                 </div>
-
 
                 <!-- Sección de Logros -->
                 <div class="profile-section" v-if="user.user_type === 'entrenador'">
@@ -188,6 +248,13 @@
 
 
             </div>
+            
+            <!-- Botones de acción en modo edición -->
+            <div v-if="editMode" class="action-buttons">
+                <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
+                <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
+            </div>
+
 
         </div>
 
@@ -196,27 +263,25 @@
 
 
 <script>
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.css'
 import Navbar from '../navbarComponent.vue';
 import axios from 'axios';
+
 export default {
     name: 'ProfileView',
     components: {
-        Navbar
+        Navbar,
+        Multiselect
     },
     data() {
         return {
             editMode: false,
+            // nuevaEspecialidad: '',
+            deportes: ['Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
             user: {
-                id: null,
-                name: '',
-                email: '',
-                phone: '',
-                location: '',
-                birthdate: '',
-                bio: '',
-                image: '',
-                socialLinks: [],
-                achievements: []
+                categoria: '',
+                // especialidades: []
             },
             stats: {
                 posts: 0,
@@ -243,10 +308,16 @@ export default {
             formData.append('birthdate', this.user.birthdate);
             formData.append('bio', this.user.bio);
 
+            // formData.append('categoria', this.user.categoria);
+
             // Agregar imagen si existe
             if (this.$refs.avatarInput.files[0]) {
                 formData.append('image', this.$refs.avatarInput.files[0]);
             }
+
+            // if (this.user.especialidades) {
+            //     formData.append('especialidades', this.user.especialidades.join(','));
+            // }
 
             // Enviar solicitud PUT
             axios.post(`/user/${this.user.id}`, formData, {
@@ -433,9 +504,24 @@ export default {
 
         // redirectToTrainersPage() {
         //     // Guardar los datos del perfil para usarlos en la página de entrenadores
-        //     sessionStorage.setItem('profileToSubmit', JSON.stringify(this.user));
+        //     sessionStorage.setItem('DatosEntrenador', JSON.stringify(this.user));
         //     // Redirigir a la página de entrenadores
         //     this.$router.push('/entrenadores');
+        // },
+
+
+        // agregarEspecialidad() {
+        //     if (this.nuevaEspecialidad.trim() && !this.user.especialidades.includes(this.nuevaEspecialidad.trim())) {
+        //         if (!this.user.especialidades) {
+        //             this.user.especialidades = [];
+        //         }
+        //         this.user.especialidades.push(this.nuevaEspecialidad.trim());
+        //         this.nuevaEspecialidad = '';
+        //     }
+        // },
+
+        // eliminarEspecialidad(index) {
+        //     this.user.especialidades.splice(index, 1);
         // },
 
 
@@ -582,15 +668,121 @@ export default {
     }
 }
 
-/* Si quieres un diseño con icono */
-.upload-info-btn.with-icon {
-    display: inline-flex;
+
+
+
+
+/* Ajusta estos estilos según necesites */
+.multiselect {
+    width: 100%;
+    max-width: 300px;
+    margin-top: 8px;
+}
+
+.multiselect__tags {
+    min-height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.multiselect__option--highlight {
+    background: #4CAF50;
+    color: white;
+}
+
+
+
+
+/* Estilos para la sección de especialidades */
+.especialidades-list {
+    margin-top: 15px;
+}
+
+.especialidades-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.especialidad-tag {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.no-especialidades {
+    color: #757575;
+    font-style: italic;
+}
+
+.especialidades-edit {
+    margin-top: 15px;
+}
+
+.especialidades-input-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.especialidad-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn-agregar-especialidad {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0 12px;
+    cursor: pointer;
+    display: flex;
     align-items: center;
+    justify-content: center;
+}
+
+.especialidades-edit-list {
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
-.upload-info-btn.with-icon::before {
-    content: "↑";
-    font-size: 1.1em;
+.especialidad-edit-item {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 6px 12px 6px 12px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-eliminar-especialidad {
+    background: none;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .especialidades-input-container {
+        flex-direction: column;
+    }
+
+    .btn-agregar-especialidad {
+        padding: 8px;
+    }
 }
 </style>
