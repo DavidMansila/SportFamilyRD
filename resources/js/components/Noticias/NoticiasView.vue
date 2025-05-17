@@ -72,7 +72,7 @@
               </div>
 
               <!-- ADMIN -->
-              <button v-if="user_type === 'admin'" class="btn-editar" @click.stop="editarNoticia(noticia)">
+              <button v-if="user.user_type === 'admin'" class="btn-editar" @click.stop="editarNoticia(noticia)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M13.945 5.23997L3.87503 15.31C3.70599 15.479 3.58707 15.6913 3.53203 15.923L2.72203 19.447C2.65321 19.735 2.74074 20.0382 2.95403 20.25C3.1489 20.444 3.41422 20.5486 3.68803 20.539L7.19503 20.458C7.42676 20.4494 7.6493 20.3744 7.83803 20.242L17.906 10.172"
@@ -84,7 +84,7 @@
               </button>
 
               <!-- ADMIN -->
-              <button v-if="user_type === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
+              <button v-if="user.user_type === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path d="M4 7H20" stroke="currentColor" stroke-width="2" />
                   <path d="M10 11V17" stroke="currentColor" />
@@ -125,44 +125,81 @@
                 stroke-linejoin="round" />
             </svg>
           </button>
+
           <div class="popup-header">
-            <span class="popup-category" :class="noticiaSeleccionada.categoria">{{
-              getCategoryName(noticiaSeleccionada.categoria) }}</span>
-            <h3 class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
+            <!-- Selector de categoría (solo en edición) -->
+            <select v-if="noticiaSeleccionada.isEditing" v-model="noticiaSeleccionada.categoria" class="edit-select">
+              <option v-for="deporte in deportes.filter(d => d.value !== 'todos')" :key="deporte.value"
+                :value="deporte.value">
+                {{ deporte.label }}
+              </option>
+            </select>
+            <span v-else class="popup-category" :class="noticiaSeleccionada.categoria">
+              {{ getCategoryName(noticiaSeleccionada.categoria) }}
+            </span>
+
+            <!-- Título editable -->
+            <input v-if="noticiaSeleccionada.isEditing" v-model="noticiaSeleccionada.title" class="edit-title"
+              placeholder="Título de la noticia">
+            <h3 v-else class="popup-titulo">{{ noticiaSeleccionada.title }}</h3>
+
             <div class="popup-author-date">
               <span class="author-avatar">{{ getInitials(noticiaSeleccionada.author) }}</span>
               <div class="author-info">
-                <span class="popup-author">Por {{ noticiaSeleccionada.author }}</span>
-                <span class="popup-date">{{ noticiaSeleccionada.date }}</span>
+                <!-- Autor editable -->
+                <input v-if="noticiaSeleccionada.isEditing" v-model="noticiaSeleccionada.author" class="edit-author"
+                  placeholder="Autor">
+                <span v-else class="popup-author">Por {{ noticiaSeleccionada.author }}</span>
+
+                <!-- Fecha editable -->
+                <input v-if="noticiaSeleccionada.isEditing" type="date" v-model="noticiaSeleccionada.date"
+                  class="edit-date">
+                <span v-else class="popup-date">{{ noticiaSeleccionada.date }}</span>
               </div>
             </div>
           </div>
+
           <div class="popup-image-container">
             <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="popup-image" />
           </div>
+
           <div class="popup-body">
-            <div class="popup-descripcion" v-html="formatDescription(noticiaSeleccionada.description)"></div>
+            <!-- Descripción editable -->
+            <textarea v-if="noticiaSeleccionada.isEditing" v-model="noticiaSeleccionada.description"
+              class="edit-description" placeholder="Descripción de la noticia"></textarea>
+            <div v-else class="popup-descripcion" v-html="formatDescription(noticiaSeleccionada.description)"></div>
+
             <div class="popup-actions">
-              <button class="popup-share">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37061L8.0826 9.84066C7.54305 9.32015 6.8089 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15C6.8089 15 7.54305 14.6798 8.0826 14.1593L15.0227 18.6294C15.0077 18.7508 15 18.8745 15 19C15 20.6569 16.3431 22 18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C17.1911 16 16.457 16.3202 15.9174 16.8407L8.9773 12.3706C8.99225 12.2492 9 12.1255 9 12C9 11.8745 8.99225 11.7508 8.9773 11.6294L15.9174 7.15934C16.457 7.67985 17.1911 8 18 8Z"
-                    fill="currentColor" />
-                </svg>
-                Compartir
+              <button v-if="noticiaSeleccionada.isEditing" class="popup-save" @click="guardarCambios">
+                Guardar cambios
               </button>
-              <button class="popup-save" @click.stop="toggleSave(noticiaSeleccionada)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path :fill="noticiaSeleccionada.saved ? 'currentColor' : 'none'" stroke="currentColor"
-                    d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z" />
-                </svg>
-                {{ noticiaSeleccionada.saved ? 'Guardado' : 'Guardar' }}
+              <button v-if="noticiaSeleccionada.isEditing" class="popup-cancel" @click="cancelarEdicion">
+                Cancelar
               </button>
+
+              <template v-else>
+                <button class="popup-share">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37061L8.0826 9.84066C7.54305 9.32015 6.8089 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15C6.8089 15 7.54305 14.6798 8.0826 14.1593L15.0227 18.6294C15.0077 18.7508 15 18.8745 15 19C15 20.6569 16.3431 22 18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C17.1911 16 16.457 16.3202 15.9174 16.8407L8.9773 12.3706C8.99225 12.2492 9 12.1255 9 12C9 11.8745 8.99225 11.7508 8.9773 11.6294L15.9174 7.15934C16.457 7.67985 17.1911 8 18 8Z"
+                      fill="currentColor" />
+                  </svg>
+                  Compartir
+                </button>
+                <button class="popup-save" @click.stop="toggleSave(noticiaSeleccionada)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path :fill="noticiaSeleccionada.saved ? 'currentColor' : 'none'" stroke="currentColor"
+                      d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z" />
+                  </svg>
+                  {{ noticiaSeleccionada.saved ? 'Guardado' : 'Guardar' }}
+                </button>
+              </template>
             </div>
           </div>
         </div>
       </div>
     </transition>
+
   </div>
 </template>
 
@@ -199,8 +236,6 @@ export default {
         { value: 'swimming', label: 'Natacion' },
       ],
       saved: false,
-
-      user_type: '',
     };
   },
   computed: {
@@ -489,6 +524,8 @@ export default {
 
 
 
+
+
     // FUNCIONES PARA ADMINISTRADOR
 
     agregarNoticia() {
@@ -497,8 +534,12 @@ export default {
     },
 
     editarNoticia(noticia) {
-      // Lógica para editar noticia
-      console.log('Editar noticia:', noticia);
+      // Abre la noticia en modo edición
+      this.noticiaSeleccionada = {
+        ...noticia,
+        isEditing: true // Añadimos un flag para indicar que estamos editando
+      };
+      document.body.style.overflow = 'hidden';
     },
 
     eliminarNoticia(noticia) {
@@ -506,7 +547,55 @@ export default {
       if (confirm(`¿Estás seguro de eliminar "${noticia.title}"?`)) {
         console.log('Eliminar noticia:', noticia);
       }
-    }
+    },
+
+    cancelarEdicion() {
+      this.cerrarNoticia();
+    },
+
+    async guardarCambios() {
+      try {
+        this.isLoading = true;
+
+        // Determinar el endpoint basado en la categoría
+        let endpoint = '';
+        switch (this.noticiaSeleccionada.categoria) {
+          case 'futbol': endpoint = '/update_futbol_news'; break;
+          case 'baloncesto': endpoint = '/update_basketball_news'; break;
+          case 'beisbol': endpoint = '/update_baseball_news'; break;
+          case 'volleyball': endpoint = '/update_volleyball_news'; break;
+          case 'swimming': endpoint = '/update_swimming_news'; break;
+        }
+
+        // Enviar los cambios al servidor
+        const response = await axios.put(endpoint, {
+          id: this.noticiaSeleccionada.id,
+          title: this.noticiaSeleccionada.title,
+          author: this.noticiaSeleccionada.author,
+          description: this.noticiaSeleccionada.description,
+          date: this.noticiaSeleccionada.date,
+          // image: this.noticiaSeleccionada.image (manejaría esto aparte si cambió)
+        });
+
+        // Actualizar la noticia en la lista local
+        const index = this.noticias.findIndex(n => n.id === this.noticiaSeleccionada.id);
+        if (index !== -1) {
+          this.noticias[index] = { ...this.noticiaSeleccionada, isEditing: false };
+        }
+
+        // Cerrar el popup
+        this.cerrarNoticia();
+
+        // Mostrar feedback
+        alert('Cambios guardados exitosamente');
+
+      } catch (error) {
+        console.error('Error al guardar cambios:', error);
+        alert('Error al guardar cambios. Por favor intente nuevamente.');
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
 
 
@@ -515,7 +604,6 @@ export default {
     try {
       // Cargar savedNews primero para tenerlos disponibles
       const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
-
       await this.cargarNoticias();
 
       // Aplicar savedNews después de cargar
@@ -525,6 +613,7 @@ export default {
       }));
 
       this.filtrarNoticias();
+      this.user = JSON.parse(sessionStorage.getItem('user'));
     } catch (error) {
       console.error('Error al cargar noticias:', error);
     }
@@ -552,22 +641,24 @@ export default {
 
 @import '../../../scss/Noticias/noticias_responsive.scss';
 
-
 @import '../../../scss/Admin/Admin_Noticias.scss';
 
 
 
 /* En el CSS del componente */
 .noticia-card {
-  position: relative; /* Asegurar contexto de posicionamiento */
-  overflow: hidden; /* Prevenir desbordamientos */
+  position: relative;
+  /* Asegurar contexto de posicionamiento */
+  overflow: hidden;
+  /* Prevenir desbordamientos */
 }
 
 .saved-indicator {
   position: absolute;
   top: 15px;
   right: 15px;
-  z-index: 3; /* Asegurar que está por encima de todo */
+  z-index: 3;
+  /* Asegurar que está por encima de todo */
   background: rgba(255, 255, 255, 0.95);
   padding: 6px;
   border-radius: 50%;
@@ -583,7 +674,8 @@ export default {
 .noticia-content {
   position: relative;
   padding: 20px;
-  padding-right: 60px; /* Espacio para el icono */
+  padding-right: 60px;
+  /* Espacio para el icono */
   min-height: 220px;
   display: flex;
   flex-direction: column;
@@ -595,54 +687,9 @@ export default {
   padding-right: 30px;
   margin-bottom: 15px;
   line-height: 1.4;
-  max-height: 4.2em; /* Limitar altura basado en línea */
+  max-height: 4.2em;
+  /* Limitar altura basado en línea */
   overflow: hidden;
 }
-
-/* Asegurar que los botones de admin no interfieran */
-.btn-editar, .btn-eliminar {
-  z-index: 4; /* Por encima del saved-indicator */
-  bottom: 15px;
-}
-
-.btn-editar {
-  right: 50px;
-}
-
-.btn-eliminar {
-  right: 15px;
-}
-
-/* Ajustes responsive */
-@media (max-width: 768px) {
-  .saved-indicator {
-    top: 10px;
-    right: 10px;
-    width: 28px;
-    height: 28px;
-    padding: 5px;
-  }
-  
-  .noticia-content {
-    padding-right: 50px;
-    min-height: 200px;
-  }
-  
-  .noticia-title {
-    font-size: 1.1rem;
-    max-height: 3.6em;
-  }
-  
-  .noticia-excerpt {
-    font-size: 0.95rem;
-    max-height: 4em;
-  }
-}
-
-/* Asegurar que el SVG del icono no tenga clicks fantasmas */
-.saved-indicator svg {
-  pointer-events: none;
-}
-
 
 </style>

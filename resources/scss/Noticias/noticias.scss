@@ -139,3 +139,103 @@
     color: #666;
     margin-bottom: 25px;
 }
+
+
+
+
+
+
+
+/* En el CSS del componente */
+.noticia-card {
+  position: relative;
+  /* Asegurar contexto de posicionamiento */
+  overflow: hidden;
+  /* Prevenir desbordamientos */
+}
+
+.saved-indicator {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 3;
+  /* Asegurar que está por encima de todo */
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.noticia-content {
+  position: relative;
+  padding: 20px;
+  padding-right: 60px;
+  /* Espacio para el icono */
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+.noticia-excerpt {
+  padding-right: 30px;
+  margin-bottom: 15px;
+  line-height: 1.4;
+  max-height: 4.2em;
+  /* Limitar altura basado en línea */
+  overflow: hidden;
+}
+
+/* Asegurar que los botones de admin no interfieran */
+.btn-editar,
+.btn-eliminar {
+  z-index: 4;
+  /* Por encima del saved-indicator */
+  bottom: 15px;
+}
+
+.btn-editar {
+  right: 50px;
+}
+
+.btn-eliminar {
+  right: 15px;
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+  .saved-indicator {
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    padding: 5px;
+  }
+
+  .noticia-content {
+    padding-right: 50px;
+    min-height: 200px;
+  }
+
+  .noticia-title {
+    font-size: 1.1rem;
+    max-height: 3.6em;
+  }
+
+  .noticia-excerpt {
+    font-size: 0.95rem;
+    max-height: 4em;
+  }
+}
+
+/* Asegurar que el SVG del icono no tenga clicks fantasmas */
+.saved-indicator svg {
+  pointer-events: none;
+}

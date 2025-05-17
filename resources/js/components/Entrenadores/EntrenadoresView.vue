@@ -233,11 +233,12 @@ import Navbar from '../navbarComponent.vue';
 
 export default {
   name: 'Entrenadores',
-    components: {
+  components: {
     Navbar
   },
   data() {
     return {
+      scrollPosition: 0,
       busqueda: '',
       deporteActivo: 'Todos',
       deportes: ['Todos', 'Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
@@ -481,12 +482,38 @@ export default {
     filtrarPorDeporte(deporte) {
       this.deporteActivo = deporte;
     },
+
     verPerfil(entrenador) {
+      // Guardar posición actual del scroll antes de abrir el modal
+      this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+      // Deshabilitar scroll del body
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${this.scrollPosition}px`;
+      document.body.style.width = '100%';
+
       this.entrenadorSeleccionado = entrenador;
     },
+
     cerrarPerfil() {
-      this.entrenadorSeleccionado = null;
+      try {
+        // Habilitar scroll del body
+        document.body.style.overflow = 'auto';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+
+        // Restaurar posición del scroll
+        window.scrollTo(0, this.scrollPosition);
+      } finally {
+        document.body.style.overflow = 'auto';
+        this.entrenadorSeleccionado = null;
+      }
     },
+
+
+
     contactarEntrenador(entrenador) {
       alert(`Solicitud de contacto enviada a ${entrenador.nombre}. Te responderá pronto.`);
       this.cerrarPerfil();

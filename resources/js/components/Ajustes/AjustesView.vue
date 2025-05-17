@@ -26,7 +26,7 @@
             <h3>Seguridad</h3>
             <div class="form-group">
               <label>Contraseña Actual</label>
-              <input type="password" v-model="security.currentPassword" placeholder="••••••••">
+              <input type="password" v-model="security.password" placeholder="••••••••">
             </div>
             <div class="form-group">
               <label>Nueva Contraseña</label>
@@ -160,16 +160,12 @@ export default {
         { id: 'notifications', label: 'Notificaciones' },
         { id: 'privacy', label: 'Privacidad' }
       ],
-
+      
       user: {
-        name: '',
-        email: '',
-        phone: '',
-        avatar: ''
       },
 
       security: {
-        currentPassword: '',
+        password: '',
         newPassword: '',
         confirmPassword: ''
       },
@@ -214,7 +210,6 @@ export default {
         }
       ],
 
-      dataFormat: 'json',
       showDeleteModal: false,
 
       loading: false,
@@ -225,62 +220,47 @@ export default {
 
   methods: {
 
-    async saveSettings() {
+    saveSettings(security) {
       if (this.security.newPassword !== this.security.confirmPassword) {
         this.showToast('Las nuevas contraseñas no coinciden', 'error');
         return;
       }
 
       this.loading = true;
-      try {
-        const response = await axios.put('/api/user/security', {
-          currentPassword: this.security.currentPassword,
-          newPassword: this.security.newPassword
+      axios.put('/user/security', {
+        currentPassword: this.security.password,
+        newPassword: this.security.newPassword
+      })
+        .then(response => {
+          this.showToast('Configuración guardada correctamente', 'success');
+          this.security = { password: '', newPassword: '', confirmPassword: '' };
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al guardar la configuración');
+        })
+        .finally(() => {
+          this.loading = false;
         });
-
-        this.showToast('Configuración guardada correctamente', 'success');
-        this.security = { currentPassword: '', newPassword: '', confirmPassword: '' };
-      } catch (error) {
-        this.handleApiError(error, 'Error al guardar la configuración');
-      } finally {
-        this.loading = false;
-      }
     },
 
-    async deleteAccount() {
-      try {
-        await axios.delete('/api/user');
 
-        this.showToast('Cuenta eliminada exitosamente', 'success');
-        localStorage.removeItem('authToken');
-        this.$router.push('/login');
-      } catch (error) {
-        this.handleApiError(error, 'Error al eliminar la cuenta');
-      }
-      this.showDeleteModal = false;
-    },
 
-    async requestUserData() {
-      this.loading = true;
-      try {
-        const response = await axios.get('/api/user/export', {
-          params: { format: this.dataFormat },
-          responseType: 'blob'
+    deleteAccount() {
+      axios.delete('/api/user')
+        .then(() => {
+          this.showToast('Cuenta eliminada exitosamente', 'success');
+          localStorage.removeItem('authToken');
+          this.$router.push('/login');
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al eliminar la cuenta');
+        })
+        .finally(() => {
+          this.showDeleteModal = false;
         });
-
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `user-data.${this.dataFormat}`);
-        document.body.appendChild(link);
-        link.click();
-        this.showToast('Datos descargados exitosamente', 'success');
-      } catch (error) {
-        this.handleApiError(error, 'Error al solicitar datos');
-      } finally {
-        this.loading = false;
-      }
     },
+
+
 
     confirmAction() {
       if (this.currentAction === 'deleteAccount') {
@@ -299,6 +279,8 @@ export default {
       }
     },
 
+
+
     handleApiError(error, defaultMessage) {
       const message = error.response?.data?.message || defaultMessage;
       const status = error.response?.status;
@@ -311,6 +293,8 @@ export default {
       console.error('API Error:', error);
     },
 
+
+
     showToast(message, type = 'info') {
       // Implementar lógica de toast con tipo (success, error, warning, info)
       alert(`${type.toUpperCase()}: ${message}`);
@@ -318,18 +302,11 @@ export default {
 
   },
 
+
+
   mounted() {
     document.title = 'Ajustes';
-    // Cargar datos iniciales
-    // axios.get('/api/user/settings')
-    //   .then(response => {
-    //     this.user = response.data.user;
-    //     this.notifications = response.data.notifications;
-    //     this.privacy = response.data.privacy;
-    //   })
-    //   .catch(error => {
-    //     this.handleApiError(error, 'Error al cargar configuración');
-    //   });
+    this.user = JSON.parse(sessionStorage.getItem('user'));
   },
 }
 </script>
