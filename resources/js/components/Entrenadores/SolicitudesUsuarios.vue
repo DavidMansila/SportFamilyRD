@@ -240,6 +240,7 @@ export default {
     },
     mounted() {
         this.cargarSolicitudes();
+        document.title = 'Solicitudes Usuarios';
     }
 }
 </script>

@@ -177,6 +177,9 @@ export default {
             const solicitud = this.solicitudes.find(s => s.id === id);
             if (solicitud) solicitud.estado = 'rechazado';
         }
+    },
+    mounted() {
+        document.title = 'Solicitudes Entrenadores';
     }
 }
 </script>

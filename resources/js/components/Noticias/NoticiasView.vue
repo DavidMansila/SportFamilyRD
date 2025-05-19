@@ -671,16 +671,7 @@ export default {
   transition: all 0.2s ease;
 }
 
-.noticia-content {
-  position: relative;
-  padding: 20px;
-  padding-right: 60px;
-  /* Espacio para el icono */
-  min-height: 220px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
+
 
 
 .noticia-excerpt {
