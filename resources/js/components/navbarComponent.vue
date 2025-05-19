@@ -18,12 +18,12 @@
       <router-link to="/foro" class="nav-link">Foro</router-link>
 
       <!-- Secciones condicionales -->
-      <router-link v-if="user_type == 'entrenador' || user_type == 'admin'" to="/solicitudes-usuarios" class="nav-link">
-        SolicitudesU
+      <router-link v-if="user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
+        Solicitudes-Us
       </router-link>
 
       <router-link v-if="user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
-        SolicitudesE
+        Solicitudes-E
       </router-link>
     </div>
 
@@ -222,7 +222,6 @@ export default {
 
 
 <style lang="scss">
-
 @import '/resources/scss/Navbar/Navbar_responsive.scss';
 
 /* Navbar */
@@ -368,7 +367,7 @@ export default {
     background: rgba(255, 255, 255, 0.2);
     transform: scale(1.1);
     box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
-    
+
     .logout-icon {
       transform: rotate(10deg) scale(1.2);
     }
@@ -531,7 +530,7 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.3);
   transform: scale(0.95);
   animation: scaleUp 0.3s ease forwards;
-  
+
   h3 {
     color: #2c3e50;
     margin-bottom: 1.5rem;
@@ -541,7 +540,7 @@ export default {
     align-items: center;
     justify-content: center;
     gap: 0.8rem;
-    
+
     &::before {
       content: '🔒';
       font-size: 1.8rem;
@@ -574,12 +573,12 @@ export default {
 .confirm-btn {
   background: linear-gradient(135deg, #ff6b6b, #e74c3c);
   color: white;
-  
+
   &::after {
     content: '✓';
     font-size: 1.2rem;
   }
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
@@ -589,12 +588,12 @@ export default {
 .cancel-btn {
   background: linear-gradient(135deg, #3498db, #2980b9);
   color: white;
-  
+
   &::after {
     content: '✕';
     font-size: 1.2rem;
   }
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
@@ -602,13 +601,22 @@ export default {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleUp {
-  from { transform: scale(0.95); }
-  to { transform: scale(1); }
-}
+  from {
+    transform: scale(0.95);
+  }
 
+  to {
+    transform: scale(1);
+  }
+}
 </style>

@@ -25,6 +25,8 @@ Route::resource('/news', NewsController::class);
 
 //productos
 Route::resource('/products', ProductController::class);
+Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
+Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
 
 // Posts
 Route::resource('/post', PostController::class);

@@ -529,6 +529,7 @@ export default {
     mounted() {
         // Cargar datos iniciales
         this.user = JSON.parse(sessionStorage.getItem('user'));
+        document.title = 'Perfil de ' + this.user.name;
     }
 }
 </script>

@@ -54,6 +54,9 @@
     border: 1px solid rgba(255, 255, 255, 0.1); /* Borde sutil para profundidad */
     transform-origin: center center;
     animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Nueva animación de escala */
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
 }
 
 .modal-header {
@@ -104,32 +107,42 @@
 }
 
 .modal-content-wrapper {
-    display: flex;
     flex: 1;
+    min-height: 0; /* Importante para el scroll */
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-form {
-    padding: 28px; /* Más espacio interno */
     flex: 1;
     overflow-y: auto;
-    min-width: 0;
-    scrollbar-width: thin; /* Scrollbar más delgada */
+    padding: 28px;
+    scrollbar-width: thin;
     scrollbar-color: var(--primary-light) var(--secondary);
 }
 
 .modal-form::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
+    background-color: rgba(242, 242, 242, 0.5);
 }
 
 .modal-form::-webkit-scrollbar-track {
-    background: var(--secondary);
+    background-color: var(--primary-light);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
 }
 
 .modal-form::-webkit-scrollbar-thumb {
     background-color: var(--primary-light);
     border-radius: 3px;
 }
+
+.modal-form::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
+}
+
 
 /* Nuevas animaciones */
 @keyframes fadeIn {
