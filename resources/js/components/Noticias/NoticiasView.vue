@@ -682,5 +682,4 @@ export default {
   /* Limitar altura basado en línea */
   overflow: hidden;
 }
-
 </style>
