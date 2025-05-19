@@ -327,8 +327,6 @@ export default {
       });
     },
 
-   
-
   },
 
   mounted() {
