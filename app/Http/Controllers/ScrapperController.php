@@ -347,27 +347,87 @@ class ScrapperController extends Controller
         ]);
     }
 
-    //todo chequear si swimming tiene cache remenber
+   //todo chequear si swimming tiene cache remenber
+    // public function swimmingNews()
+    // {
+    //     $articles = (function () {
+    //         $client = new Client([
+    //             'verify' => false,
+    //         ]);
+
+    //         $response = $client->request('GET', 'https://cdndeportes.com.do/tag/natacion/');
+    //         $html = (string) $response->getBody();
+    //         $crawler = new Crawler($html);
+
+    //         // Extraer los enlaces y subtítulos
+    //         $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) use ($client) {
+    //             try {
+    //                 $link = $node->filter('h4 a')->attr('href'); // Extraer el enlace
+
+    //                 // Realizar el segundo scraping
+    //                 $response = $client->request('GET', $link);
+    //                 $html = (string) $response->getBody();
+    //                 $subCrawler = new Crawler($html);
+
+    //                 // Extraer datos desde la página del enlace
+    //                 $title = $subCrawler->filter('div.elementor-widget-container h1.elementor-heading-title.elementor-size-default')->text();
+    //                 $image = $subCrawler->filter('div.elementor-element.elementor-element-a663d17.elementor-widget.elementor-widget-theme-post-featured-image.elementor-widget-image div.elementor-widget-container img')->attr('src');
+    //                 $author = $subCrawler->filter('div.elementor-author-box .elementor-author-box__text .elementor-author-box__name')->text();
+
+    //                 // Ajustar selector para descripción
+    //                 $description = $subCrawler->filter('div.elementor-element.elementor-element-0259b0e.elementor-widget.elementor-widget-theme-post-content .elementor-widget-container p')->each(function (Crawler $pNode) {
+    //                     return trim($pNode->text());
+    //                 });
+
+    //                 // Ajustar selector para fecha
+    //                 $date = $subCrawler->filter('div.elementor-widget-container .post-single .page_comments ul.inline li')->reduce(function (Crawler $node) {
+    //                     return $node->text() !== '' && strpos($node->text(), ',') !== false;
+    //                 })->text();
+
+    //                 return [
+    //                     'title' => $title,
+    //                     'image' => $image,
+    //                     'author' => $author,
+    //                     'description' => implode("\n", $description),
+    //                     'date' => $date,
+    //                     'link' => trim($link),
+    //                 ];
+    //             } catch (\Exception $e) {
+    //                 return null;
+    //             }
+    //         });
+
+    //         // Filtrar resultados no válidos
+    //         $linksAndSubtitles = array_filter($linksAndSubtitles);
+
+    //         return $linksAndSubtitles;
+    //     })();
+
+    //     return response()->json([
+    //         'swimming_news' => $articles,
+    //     ]);
+    // }
+
     public function swimmingNews()
     {
-        $articles = (function () {
-            $client = new Client([
+        $articles = \Cache::remember('swimming_news', now()->addDays(30), function () {
+            $client = new \GuzzleHttp\Client([
                 'verify' => false,
             ]);
 
             $response = $client->request('GET', 'https://cdndeportes.com.do/tag/natacion/');
             $html = (string) $response->getBody();
-            $crawler = new Crawler($html);
+            $crawler = new \Symfony\Component\DomCrawler\Crawler($html);
 
             // Extraer los enlaces y subtítulos
-            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) use ($client) {
+            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (\Symfony\Component\DomCrawler\Crawler $node) use ($client) {
                 try {
                     $link = $node->filter('h4 a')->attr('href'); // Extraer el enlace
 
                     // Realizar el segundo scraping
                     $response = $client->request('GET', $link);
                     $html = (string) $response->getBody();
-                    $subCrawler = new Crawler($html);
+                    $subCrawler = new \Symfony\Component\DomCrawler\Crawler($html);
 
                     // Extraer datos desde la página del enlace
                     $title = $subCrawler->filter('div.elementor-widget-container h1.elementor-heading-title.elementor-size-default')->text();
@@ -375,12 +435,12 @@ class ScrapperController extends Controller
                     $author = $subCrawler->filter('div.elementor-author-box .elementor-author-box__text .elementor-author-box__name')->text();
 
                     // Ajustar selector para descripción
-                    $description = $subCrawler->filter('div.elementor-element.elementor-element-0259b0e.elementor-widget.elementor-widget-theme-post-content .elementor-widget-container p')->each(function (Crawler $pNode) {
+                    $description = $subCrawler->filter('div.elementor-element.elementor-element-0259b0e.elementor-widget.elementor-widget-theme-post-content .elementor-widget-container p')->each(function (\Symfony\Component\DomCrawler\Crawler $pNode) {
                         return trim($pNode->text());
                     });
 
                     // Ajustar selector para fecha
-                    $date = $subCrawler->filter('div.elementor-widget-container .post-single .page_comments ul.inline li')->reduce(function (Crawler $node) {
+                    $date = $subCrawler->filter('div.elementor-widget-container .post-single .page_comments ul.inline li')->reduce(function (\Symfony\Component\DomCrawler\Crawler $node) {
                         return $node->text() !== '' && strpos($node->text(), ',') !== false;
                     })->text();
 
@@ -401,13 +461,11 @@ class ScrapperController extends Controller
             $linksAndSubtitles = array_filter($linksAndSubtitles);
 
             return $linksAndSubtitles;
-        })();
+        });
 
         return response()->json([
             'swimming_news' => $articles,
         ]);
     }
-
-
     
 }

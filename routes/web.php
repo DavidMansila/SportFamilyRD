@@ -32,6 +32,9 @@ Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
 Route::resource('/post', PostController::class);
 
 //configuracion
+Route::post('/config-update-value', [ConfigurationController::class, 'updateValue']);
+
+Route::put('/change-password', [ConfigurationController::class, 'changePassword']);
 Route::resource('config', ConfigurationController::class);
 
 // Comentarios

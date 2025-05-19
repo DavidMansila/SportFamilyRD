@@ -38,7 +38,7 @@
             </div>
           </div>
 
-          <button class="save-btn" @click="saveSettings">Guardar Cambios</button>
+          <button class="save-btn" @click="changePassword">Guardar Cambios</button>
         </div>
 
 
@@ -73,7 +73,7 @@
         <div v-if="activeTab === 'privacy'" class="tab-content" role="tabpanel" aria-labelledby="privacy-tab">
           <h2 class="privacy-heading">Configuración de Privacidad</h2>
 
-          <section class="privacy-section">
+          <!-- <section class="privacy-section">
             <h3 class="section-title">Preferencias de visibilidad</h3>
             <div class="privacy-options">
               <div class="privacy-item" v-for="option in privacyOptions" :key="option.id">
@@ -88,7 +88,16 @@
                 </label>
               </div>
             </div>
-          </section>
+          </section> -->
+
+          <div v-for="config in userConfigs" :key="config.id">
+            <label>{{ config.configuration }}</label>
+            <input
+              type="checkbox"
+              :checked="config.value === 'enabled'"
+              @change="toggleConfig(config)"
+            />
+          </div>
 
           <section class="data-section" aria-labelledby="data-heading">
             <h3 id="data-heading" class="section-title">Gestión de datos</h3>
@@ -160,9 +169,8 @@ export default {
         { id: 'notifications', label: 'Notificaciones' },
         { id: 'privacy', label: 'Privacidad' }
       ],
-      
-      user: {
-      },
+
+      user: [],
 
       security: {
         password: '',
@@ -188,7 +196,6 @@ export default {
       modalMessage: '',
       currentAction: null,
 
-
       privacyOptions: [
         {
           id: 'public-profile',
@@ -213,54 +220,40 @@ export default {
       showDeleteModal: false,
 
       loading: false,
-      error: null
+      error: null,
+
+      userConfigs: []
 
     }
   },
 
   methods: {
 
-    saveSettings(security) {
-      if (this.security.newPassword !== this.security.confirmPassword) {
-        this.showToast('Las nuevas contraseñas no coinciden', 'error');
-        return;
-      }
+ 
 
+   
+
+    async requestUserData() {
       this.loading = true;
-      axios.put('/user/security', {
-        currentPassword: this.security.password,
-        newPassword: this.security.newPassword
-      })
-        .then(response => {
-          this.showToast('Configuración guardada correctamente', 'success');
-          this.security = { password: '', newPassword: '', confirmPassword: '' };
-        })
-        .catch(error => {
-          this.handleApiError(error, 'Error al guardar la configuración');
-        })
-        .finally(() => {
-          this.loading = false;
+      try {
+        const response = await axios.get('/api/user/export', {
+          params: { format: this.dataFormat },
+          responseType: 'blob'
         });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `user-data.${this.dataFormat}`);
+        document.body.appendChild(link);
+        link.click();
+        this.showToast('Datos descargados exitosamente', 'success');
+      } catch (error) {
+        this.handleApiError(error, 'Error al solicitar datos');
+      } finally {
+        this.loading = false;
+      }
     },
-
-
-
-    deleteAccount() {
-      axios.delete('/api/user')
-        .then(() => {
-          this.showToast('Cuenta eliminada exitosamente', 'success');
-          localStorage.removeItem('authToken');
-          this.$router.push('/login');
-        })
-        .catch(error => {
-          this.handleApiError(error, 'Error al eliminar la cuenta');
-        })
-        .finally(() => {
-          this.showDeleteModal = false;
-        });
-    },
-
-
 
     confirmAction() {
       if (this.currentAction === 'deleteAccount') {
@@ -278,9 +271,7 @@ export default {
           });
       }
     },
-
-
-
+    
     handleApiError(error, defaultMessage) {
       const message = error.response?.data?.message || defaultMessage;
       const status = error.response?.status;
@@ -302,11 +293,11 @@ export default {
 
   },
 
-
-
   mounted() {
     document.title = 'Ajustes';
     this.user = JSON.parse(sessionStorage.getItem('user'));
+    this.fetchUserConfigs();
+   
   },
 }
 </script>
