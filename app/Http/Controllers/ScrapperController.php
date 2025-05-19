@@ -347,10 +347,10 @@ class ScrapperController extends Controller
         ]);
     }
 
+    //todo chequear si swimming tiene cache remenber
     public function swimmingNews()
     {
-        // Usar Cache::remember para almacenar los resultados en caché durante 30 días
-        $articles = Cache::remember('swimming_news', now()->addDays(30), function () {
+        $articles = (function () {
             $client = new Client([
                 'verify' => false,
             ]);
@@ -360,7 +360,7 @@ class ScrapperController extends Controller
             $crawler = new Crawler($html);
 
             // Extraer los enlaces y subtítulos
-            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post_gridlayoutstyle_2 div.single_post_text')->each(function (Crawler $node) use ($client) {
+            $linksAndSubtitles = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text')->each(function (Crawler $node) use ($client) {
                 try {
                     $link = $node->filter('h4 a')->attr('href'); // Extraer el enlace
 
@@ -372,7 +372,7 @@ class ScrapperController extends Controller
                     // Extraer datos desde la página del enlace
                     $title = $subCrawler->filter('div.elementor-widget-container h1.elementor-heading-title.elementor-size-default')->text();
                     $image = $subCrawler->filter('div.elementor-element.elementor-element-a663d17.elementor-widget.elementor-widget-theme-post-featured-image.elementor-widget-image div.elementor-widget-container img')->attr('src');
-                    $author = $subCrawler->filter('div.elementor-author-box .elementor-author-box_text .elementor-author-box_name')->text();
+                    $author = $subCrawler->filter('div.elementor-author-box .elementor-author-box__text .elementor-author-box__name')->text();
 
                     // Ajustar selector para descripción
                     $description = $subCrawler->filter('div.elementor-element.elementor-element-0259b0e.elementor-widget.elementor-widget-theme-post-content .elementor-widget-container p')->each(function (Crawler $pNode) {
@@ -401,10 +401,13 @@ class ScrapperController extends Controller
             $linksAndSubtitles = array_filter($linksAndSubtitles);
 
             return $linksAndSubtitles;
-        });
+        })();
 
         return response()->json([
             'swimming_news' => $articles,
         ]);
     }
+
+
+    
 }
