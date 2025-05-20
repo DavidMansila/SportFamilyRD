@@ -26,7 +26,7 @@
             <h3>Seguridad</h3>
             <div class="form-group">
               <label>Contraseña Actual</label>
-              <input type="password" v-model="security.password" placeholder="••••••••">
+              <input type="password" v-model="security.currentPassword" placeholder="••••••••">
             </div>
             <div class="form-group">
               <label>Nueva Contraseña</label>
@@ -38,6 +38,7 @@
             </div>
           </div>
 
+          <button class="save-btn" @click="changePassword">Guardar Cambios</button>
           <button class="save-btn" @click="changePassword">Guardar Cambios</button>
         </div>
 
@@ -74,6 +75,7 @@
           <h2 class="privacy-heading">Configuración de Privacidad</h2>
 
           <!-- <section class="privacy-section">
+          <!-- <section class="privacy-section">
             <h3 class="section-title">Preferencias de visibilidad</h3>
             <div class="privacy-options">
               <div class="privacy-item" v-for="option in privacyOptions" :key="option.id">
@@ -88,6 +90,16 @@
                 </label>
               </div>
             </div>
+          </section> -->
+
+          <div v-for="config in userConfigs" :key="config.id">
+            <label>{{ config.configuration }}</label>
+            <input
+              type="checkbox"
+              :checked="config.value === 'enabled'"
+              @change="toggleConfig(config)"
+            />
+          </div>
           </section> -->
 
           <div v-for="config in userConfigs" :key="config.id">
@@ -148,7 +160,6 @@
 </template>
 
 
-
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
@@ -172,8 +183,10 @@ export default {
 
       user: [],
 
+      user: [],
+
       security: {
-        password: '',
+        currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       },
@@ -217,9 +230,13 @@ export default {
         }
       ],
 
+      dataFormat: 'json',
       showDeleteModal: false,
 
       loading: false,
+      error: null,
+
+      userConfigs: []
       error: null,
 
       userConfigs: []
@@ -229,31 +246,11 @@ export default {
 
   methods: {
 
- 
 
-   
 
-    async requestUserData() {
-      this.loading = true;
-      try {
-        const response = await axios.get('/api/user/export', {
-          params: { format: this.dataFormat },
-          responseType: 'blob'
-        });
 
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `user-data.${this.dataFormat}`);
-        document.body.appendChild(link);
-        link.click();
-        this.showToast('Datos descargados exitosamente', 'success');
-      } catch (error) {
-        this.handleApiError(error, 'Error al solicitar datos');
-      } finally {
-        this.loading = false;
-      }
-    },
+
+
 
     confirmAction() {
       if (this.currentAction === 'deleteAccount') {
@@ -271,7 +268,7 @@ export default {
           });
       }
     },
-    
+
     handleApiError(error, defaultMessage) {
       const message = error.response?.data?.message || defaultMessage;
       const status = error.response?.status;
@@ -284,11 +281,68 @@ export default {
       console.error('API Error:', error);
     },
 
-
-
     showToast(message, type = 'info') {
       // Implementar lógica de toast con tipo (success, error, warning, info)
       alert(`${type.toUpperCase()}: ${message}`);
+    },
+
+    fetchUserConfigs() {
+      axios.get('/config', {
+        params: { user_id: this.user.id }
+      })
+      .then(response => {
+        this.userConfigs = response.data.config;
+      })
+      .catch(error => {
+        this.handleApiError(error, 'Error al cargar configuraciones');
+      });
+    },
+
+    changePassword() {
+
+      if (this.security.newPassword !== this.security.confirmPassword) {
+        this.showToast('Las nuevas contraseñas no coinciden', 'error');
+        return;
+      }
+
+      axios.post('/change-password', {
+        user_id: this.user.id,
+        password: this.security.newPassword
+      })
+      .then(response => {
+        this.showToast('Contraseña actualizada exitosamente', 'success');
+      })
+      .catch(error => {
+        this.handleApiError(error, 'Error al actualizar la contraseña');
+      });
+    },
+
+    deleteAccount() {
+      axios.delete(`/user/${this.user.id}`, )
+      .then(response => {
+        this.showToast('Cuenta eliminada exitosamente', 'success');
+        sessionStorage.removeItem('user');
+        this.$router.push('/login');
+      })
+      .catch(error => {
+        this.handleApiError(error, 'Error al eliminar la cuenta');
+      });
+    },
+
+    toggleConfig(config) {
+      config.value = config.value === 'enabled' ? 'disabled' : 'enabled';
+
+      axios.post('/config-update-value', {
+        user_id: this.user.id ,
+        configuration_id: config.id,
+        status: config.value
+      })
+      .then(response => {
+        this.showToast('Configuración actualizada correctamente', 'success');
+      })
+      .catch(error => {
+        this.handleApiError(error, 'Error al actualizar configuración');
+      });
     },
 
   },
@@ -297,10 +351,11 @@ export default {
     document.title = 'Ajustes';
     this.user = JSON.parse(sessionStorage.getItem('user'));
     this.fetchUserConfigs();
-   
+
   },
 }
 </script>
+ 
 
 
 
