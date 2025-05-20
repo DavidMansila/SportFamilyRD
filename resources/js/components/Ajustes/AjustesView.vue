@@ -39,7 +39,6 @@
           </div>
 
           <button class="save-btn" @click="changePassword">Guardar Cambios</button>
-          <button class="save-btn" @click="changePassword">Guardar Cambios</button>
         </div>
 
 
@@ -75,7 +74,6 @@
           <h2 class="privacy-heading">Configuración de Privacidad</h2>
 
           <!-- <section class="privacy-section">
-          <!-- <section class="privacy-section">
             <h3 class="section-title">Preferencias de visibilidad</h3>
             <div class="privacy-options">
               <div class="privacy-item" v-for="option in privacyOptions" :key="option.id">
@@ -94,21 +92,7 @@
 
           <div v-for="config in userConfigs" :key="config.id">
             <label>{{ config.configuration }}</label>
-            <input
-              type="checkbox"
-              :checked="config.value === 'enabled'"
-              @change="toggleConfig(config)"
-            />
-          </div>
-          </section> -->
-
-          <div v-for="config in userConfigs" :key="config.id">
-            <label>{{ config.configuration }}</label>
-            <input
-              type="checkbox"
-              :checked="config.value === 'enabled'"
-              @change="toggleConfig(config)"
-            />
+            <input type="checkbox" :checked="config.value === 'enabled'" @change="toggleConfig(config)" />
           </div>
 
           <section class="data-section" aria-labelledby="data-heading">
@@ -160,6 +144,7 @@
 </template>
 
 
+
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
@@ -180,8 +165,6 @@ export default {
         { id: 'notifications', label: 'Notificaciones' },
         { id: 'privacy', label: 'Privacidad' }
       ],
-
-      user: [],
 
       user: [],
 
@@ -237,9 +220,6 @@ export default {
       error: null,
 
       userConfigs: []
-      error: null,
-
-      userConfigs: []
 
     }
   },
@@ -290,12 +270,12 @@ export default {
       axios.get('/config', {
         params: { user_id: this.user.id }
       })
-      .then(response => {
-        this.userConfigs = response.data.config;
-      })
-      .catch(error => {
-        this.handleApiError(error, 'Error al cargar configuraciones');
-      });
+        .then(response => {
+          this.userConfigs = response.data.config;
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al cargar configuraciones');
+        });
     },
 
     changePassword() {
@@ -309,40 +289,40 @@ export default {
         user_id: this.user.id,
         password: this.security.newPassword
       })
-      .then(response => {
-        this.showToast('Contraseña actualizada exitosamente', 'success');
-      })
-      .catch(error => {
-        this.handleApiError(error, 'Error al actualizar la contraseña');
-      });
+        .then(response => {
+          this.showToast('Contraseña actualizada exitosamente', 'success');
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al actualizar la contraseña');
+        });
     },
 
     deleteAccount() {
-      axios.delete(`/user/${this.user.id}`, )
-      .then(response => {
-        this.showToast('Cuenta eliminada exitosamente', 'success');
-        sessionStorage.removeItem('user');
-        this.$router.push('/login');
-      })
-      .catch(error => {
-        this.handleApiError(error, 'Error al eliminar la cuenta');
-      });
+      axios.delete(`/user/${this.user.id}`,)
+        .then(response => {
+          this.showToast('Cuenta eliminada exitosamente', 'success');
+          sessionStorage.removeItem('user');
+          this.$router.push('/login');
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al eliminar la cuenta');
+        });
     },
 
     toggleConfig(config) {
       config.value = config.value === 'enabled' ? 'disabled' : 'enabled';
 
       axios.post('/config-update-value', {
-        user_id: this.user.id ,
+        user_id: this.user.id,
         configuration_id: config.id,
         status: config.value
       })
-      .then(response => {
-        this.showToast('Configuración actualizada correctamente', 'success');
-      })
-      .catch(error => {
-        this.handleApiError(error, 'Error al actualizar configuración');
-      });
+        .then(response => {
+          this.showToast('Configuración actualizada correctamente', 'success');
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al actualizar configuración');
+        });
     },
 
   },
@@ -355,7 +335,6 @@ export default {
   },
 }
 </script>
- 
 
 
 
