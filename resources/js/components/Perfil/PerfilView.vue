@@ -77,12 +77,10 @@
 
                     <template v-if="user.user_type === 'entrenador'">
                         <h2>Información de Entrenador</h2>
-                        <p class="profile-subtitle">Información del Entrenador</p>
                     </template>
 
                     <template v-else>
                         <h2>Información de Usuario</h2>
-                        <p class="profile-subtitle">Información del Usuario</p>
                     </template>
 
 

@@ -44,7 +44,7 @@
 
 
         <!-- Pestaña de Notificaciones -->
-        <div v-if="activeTab === 'notifications'" class="tab-content">
+        <!-- <div v-if="activeTab === 'notifications'" class="tab-content">
           <h3>Preferencias de Notificación</h3>
           <div class="toggle-group">
 
@@ -56,17 +56,17 @@
               </label>
             </div>
 
-            <!-- <div class="toggle-item">
+             <div class="toggle-item">
               <span>Notificaciones por Telefono</span>
               <label class="switch">
                 <input type="checkbox" v-model="notifications.push">
                 <span class="slider"></span>
               </label>
-            </div> -->
+            </div> 
 
           </div>
 
-        </div>
+        </div> -->
 
 
 
@@ -90,9 +90,18 @@
             </div>
           </section> -->
 
-          <div v-for="config in userConfigs" :key="config.id">
-            <label>{{ config.configuration }}</label>
-            <input type="checkbox" :checked="config.value === 'enabled'" @change="toggleConfig(config)" />
+          <div class="settings-container">
+            <div v-for="config in userConfigs" :key="config.id" class="setting-item">
+              <div class="setting-content">
+                <span class="setting-label">{{ config.configuration }}</span>
+                <span class="setting-description" v-if="config.description">{{ config.description }}</span>
+              </div>
+
+              <label class="modern-switch">
+                <input type="checkbox" :checked="config.value === 'enabled'" @change="toggleConfig(config)">
+                <span class="slider round"></span>
+              </label>
+            </div>
           </div>
 
           <section class="data-section" aria-labelledby="data-heading">
@@ -162,7 +171,7 @@ export default {
 
       tabs: [
         { id: 'account', label: 'Cuenta' },
-        { id: 'notifications', label: 'Notificaciones' },
+        // { id: 'notifications', label: 'Notificaciones' },
         { id: 'privacy', label: 'Privacidad' }
       ],
 

@@ -119,3 +119,196 @@
     padding-bottom: 80px;
   }
 }
+
+
+
+
+
+
+
+
+
+
+.store-header {
+  position: relative;
+  height: 400px;
+  background: linear-gradient(135deg, rgba(#1a237e, 0.9), rgba(#0d47a1, 0.9)),
+              url('/public/imagenes/tienda.jpg');
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  margin-bottom: 2rem;
+
+  .header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    color: white;
+  }
+
+  .store-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .store-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+    opacity: 0.9;
+  }
+
+  .search-wrapper {
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border-radius: 50px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 1.2rem 2rem;
+    border: none;
+    font-size: 1.1rem;
+    background: rgba(255,255,255,0.95);
+
+    &::placeholder {
+      color: #666;
+      opacity: 0.8;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #2196F3;
+    }
+  }
+
+  .search-btn {
+    padding: 0 2rem;
+    border: none;
+    background: #2196F3;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #1976D2;
+    }
+
+    .search-icon {
+      font-size: 1.2rem;
+    }
+  }
+
+  .header-deco-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+
+    .deco-circle {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-radius: 50%;
+      top: 20%;
+      left: 10%;
+      animation: float 6s infinite;
+    }
+
+    .deco-triangle {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 60px solid transparent;
+      border-right: 60px solid transparent;
+      border-bottom: 100px solid rgba(255,255,255,0.1);
+      right: 15%;
+      top: 40%;
+      transform: rotate(45deg);
+      animation: scalePulse 4s infinite;
+    }
+
+    .deco-wave {
+      position: absolute;
+      width: 200px;
+      height: 50px;
+      background: rgba(255,255,255,0.05);
+      bottom: 20%;
+      right: 5%;
+      border-radius: 10px;
+      animation: wave 5s infinite;
+    }
+  }
+}
+
+@keyframes floatTitle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes scalePulse {
+  0%, 100% { transform: rotate(45deg) scale(1); }
+  50% { transform: rotate(45deg) scale(1.1); }
+}
+
+@keyframes wave {
+  0% { transform: skew(0deg); }
+  50% { transform: skew(5deg); }
+  100% { transform: skew(0deg); }
+}
+
+@media (max-width: 768px) {
+  .store-header {
+    height: 300px;
+
+    .store-title {
+      font-size: 2.5rem;
+    }
+
+    .store-subtitle {
+      font-size: 1.2rem;
+    }
+
+    .search-input {
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+    }
+
+    .search-btn {
+      padding: 0 1.5rem;
+    }
+  }
+}

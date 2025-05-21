@@ -4,14 +4,28 @@
     <!-- Navbar -->
     <Navbar />
 
-    <!-- Barra de búsqueda -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Reemplaza el search-container existente con este nuevo header -->
+    <div class="store-header">
+      <div class="header-overlay">
+        <div class="header-content">
+          <h1 class="store-title">Bienvenido a SportShop</h1>
+          <p class="store-subtitle">Encuentra todo para tu rendimiento deportivo</p>
 
-    <div class="search-container">
-      <div class="search-wrapper">
-        <input type="text" v-model="busqueda" placeholder="Buscar productos..." @input="filtrarProductos"
-          class="search-input" />
-        <i class="fas fa-search search-icon"></i>
+          <!-- Barra de búsqueda mejorada -->
+          <div class="search-wrapper animated-search">
+            <input type="text" v-model="busqueda" placeholder="Buscar productos..." @input="filtrarProductos"
+              class="search-input" />
+            <button class="search-btn">
+              <i class="fas fa-search search-icon"></i>
+            </button>
+          </div>
+
+          <div class="header-deco-shapes">
+            <div class="deco-circle"></div>
+            <div class="deco-triangle"></div>
+            <div class="deco-wave"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -494,4 +508,5 @@ export default {
 @import '../../../scss/Tienda/tienda_responsive.scss';
 
 @import '../../../scss/Admin/Admin_tienda.scss';
+
 </style>
