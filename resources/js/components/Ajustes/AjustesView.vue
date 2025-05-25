@@ -234,13 +234,6 @@ export default {
   },
 
   methods: {
-
-
-
-
-
-
-
     confirmAction() {
       if (this.currentAction === 'deleteAccount') {
         this.deleteAccount()
@@ -279,14 +272,14 @@ export default {
       axios.get('/config', {
         params: { user_id: this.user.id }
       })
-        .then(response => {
-          this.userConfigs = response.data.config;
-        })
-        .catch(error => {
-          this.handleApiError(error, 'Error al cargar configuraciones');
-        });
+      .then(response => {
+        this.userConfigs = response.data.config;
+      })
+      .catch(error => {
+        this.handleApiError(error, 'Error al cargar configuraciones');
+      });
     },
-
+    
     changePassword() {
 
       if (this.security.newPassword !== this.security.confirmPassword) {
@@ -298,40 +291,40 @@ export default {
         user_id: this.user.id,
         password: this.security.newPassword
       })
-        .then(response => {
-          this.showToast('Contraseña actualizada exitosamente', 'success');
-        })
-        .catch(error => {
-          this.handleApiError(error, 'Error al actualizar la contraseña');
-        });
+      .then(response => {
+        this.showToast('Contraseña actualizada exitosamente', 'success');
+      })
+      .catch(error => {
+        this.handleApiError(error, 'Error al actualizar la contraseña');
+      });
     },
 
     deleteAccount() {
-      axios.delete(`/user/${this.user.id}`,)
-        .then(response => {
-          this.showToast('Cuenta eliminada exitosamente', 'success');
-          sessionStorage.removeItem('user');
-          this.$router.push('/login');
-        })
-        .catch(error => {
-          this.handleApiError(error, 'Error al eliminar la cuenta');
-        });
+      axios.delete(`/user/${this.user.id}`, )
+      .then(response => {
+        this.showToast('Cuenta eliminada exitosamente', 'success');
+        sessionStorage.removeItem('user');
+        this.$router.push('/login');
+      })
+      .catch(error => {
+        this.handleApiError(error, 'Error al eliminar la cuenta');
+      });
     },
 
     toggleConfig(config) {
       config.value = config.value === 'enabled' ? 'disabled' : 'enabled';
-
+    
       axios.post('/config-update-value', {
-        user_id: this.user.id,
+        user_id: this.user.id ,
         configuration_id: config.id,
         status: config.value
       })
-        .then(response => {
-          this.showToast('Configuración actualizada correctamente', 'success');
-        })
-        .catch(error => {
-          this.handleApiError(error, 'Error al actualizar configuración');
-        });
+      .then(response => {
+        this.showToast('Configuración actualizada correctamente', 'success');
+      })
+      .catch(error => {
+        this.handleApiError(error, 'Error al actualizar configuración');
+      });
     },
 
   },

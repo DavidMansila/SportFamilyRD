@@ -34,7 +34,7 @@ Route::resource('/post', PostController::class);
 //configuracion
 Route::post('/config-update-value', [ConfigurationController::class, 'updateValue']);
 
-Route::put('/change-password', [ConfigurationController::class, 'changePassword']);
+Route::post('/change-password', [ConfigurationController::class, 'changePassword']);
 Route::resource('config', ConfigurationController::class);
 
 // Comentarios
