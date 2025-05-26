@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trainer;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TrainerController extends Controller
@@ -56,10 +57,21 @@ class TrainerController extends Controller
         
         $trainer = Trainer::findOrFail($id);
         $trainer->status = $request->input('status');
+
+        $user = User::findOrFail($trainer->user_id);
+        
+        if ($trainer->status === 'approved') {
+            $user->user_type = 'entrenador';
+            $user->save();
+        } elseif ($trainer->status === 'rejected') {
+            $user->user_type = 'user';
+            $user->save();
+        }
         $trainer->save();
 
         return response()->json([
             'message' => 'Estado del entrenador actualizado exitosamente',
+            'user' => $user,
             'trainer' => $trainer
         ], 200);
     }

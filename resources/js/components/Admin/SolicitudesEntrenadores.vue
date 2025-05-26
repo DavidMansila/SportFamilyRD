@@ -79,10 +79,10 @@
 
                     <div class="card-footer">
                         <div class="estado-badge" :class="solicitud.status">
-                            {{ formatEstado(solicitud.estado) }}
+                            {{ formatEstado(solicitud.status) }}
                         </div>
 
-                        <<div v-if="solicitud.status === 'pending'">
+                        <div v-if="solicitud.status === 'pending'">
                             <button @click="aprobarSolicitud(solicitud.id)" class="btn-approve">
                                 Aprobar
                             </button>
@@ -107,6 +107,8 @@
         </main>
     </div>
 </template>
+
+
 
 <script>
 import axios from 'axios';
@@ -165,20 +167,21 @@ export default {
             return estados[status] || 'Desconocido';
         },
 
-        aprobarSolicitud(id) {
-            const solicitud = this.solicitudes.find(s => s.id === id);
-            if (solicitud) solicitud.status = 'approved';
+            aprobarSolicitud(id) {
+                const solicitud = this.solicitudes.find(s => s.id === id);
+                if (solicitud) solicitud.status = 'approved';
 
-            axios.post(`/update-status/${this.solicitud.user_id}`, { status: this.solicitud.status })
+                console.log('Aprobando solicitud:', solicitud);
+                axios.put(`/update-status/${solicitud.id}`, { status: solicitud.status })
                 .then(response => {
-                    console.log('Solicitud aprobada:', response.data);
+                    
                     this.getTrainers(); // Actualizar la lista de solicitudes
                 })
                 .catch(error => {
                     console.error('Error al aprobar la solicitud:', error);
                     alert('Error al aprobar la solicitud');
                 });
-        },
+            },
 
         rechazarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
