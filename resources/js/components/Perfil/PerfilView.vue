@@ -246,7 +246,7 @@
 
 
             </div>
-            
+
             <!-- Botones de acción en modo edición -->
             <div v-if="editMode" class="action-buttons">
                 <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
@@ -287,7 +287,8 @@ export default {
                 SolicitudesUsuarios: 0,
                 rating: 0
             },
-            originalUserData: null
+            originalUserData: null,
+            nuevaEspecialidad: '',
         }
     },
 
@@ -500,6 +501,25 @@ export default {
         },
 
 
+        agregarEspecialidad() {
+            if (this.nuevaEspecialidad.trim() &&
+                (!this.user.especialidades || !this.user.especialidades.includes(this.nuevaEspecialidad.trim()))) {
+
+                // Inicializar el array si no existe
+                if (!this.user.especialidades) {
+                    this.$set(this.user, 'especialidades', []);
+                }
+
+                this.user.especialidades.push(this.nuevaEspecialidad.trim());
+                this.nuevaEspecialidad = '';
+            }
+        },
+
+        eliminarEspecialidad(index) {
+            this.user.especialidades.splice(index, 1);
+        },
+
+
         // redirectToTrainersPage() {
         //     // Guardar los datos del perfil para usarlos en la página de entrenadores
         //     sessionStorage.setItem('DatosEntrenador', JSON.stringify(this.user));
@@ -688,6 +708,10 @@ export default {
     background: #4CAF50;
     color: white;
 }
+
+
+
+
 
 
 

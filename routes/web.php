@@ -7,6 +7,7 @@ use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\TrainerController;
 use App\Models\Configuration;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -62,6 +63,11 @@ Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
 Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
 Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
 Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
+
+
+// Rutas para el formulario de solicitud de entrenador
+Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
+
 
 
 
