@@ -691,7 +691,7 @@ export default {
 
 
 
-/* Ajusta estos estilos según necesites */
+/* MULTISELECT */
 .multiselect {
     width: 100%;
     max-width: 300px;

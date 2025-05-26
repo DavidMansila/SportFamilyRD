@@ -22,36 +22,52 @@
             <div class="solicitudes-list">
                 <!-- Solicitud Card -->
                 <div v-for="solicitud in solicitudesFiltradas" :key="solicitud.id" class="solicitud-card"
-                    :class="solicitud.estado">
+                    :class="solicitud.status">
                     <div class="card-header">
-                        <h3 class="entrenador-nombre">{{ solicitud.nombre }}</h3>
-                        <span class="fecha-solicitud">{{ formatFecha(solicitud.fechaSolicitud) }}</span>
+                        <h3 class="entrenador-nombre">{{ solicitud.name }}</h3>
+                        <span class="fecha-solicitud">{{ formatFecha(solicitud.created_at) }}</span>
                     </div>
 
                     <div class="card-body">
+
                         <div class="info-row">
-                            <span class="info-label">Certificaciones:</span>
-                            <span class="info-value">{{ solicitud.certificaciones }}</span>
+                            <span class="info-label">Ciudad/Region:</span>
+                            <span class="info-value">{{ solicitud.city_country }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Deporte:</span>
+                            <span class="info-value">{{ solicitud.sport_category }}</span>
                         </div>
 
                         <div class="info-row">
                             <span class="info-label">Experiencia:</span>
-                            <span class="info-value">{{ solicitud.experiencia }}</span>
+                            <span class="info-value">{{ solicitud.experience }}</span>
                         </div>
 
                         <div class="info-row">
-                            <span class="info-label">Especialidades:</span>
-                            <span class="info-value">{{ solicitud.especialidades }}</span>
+                            <span class="info-label">Logros:</span>
+                            <span class="info-value">{{ solicitud.archivements }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Certificaciones:</span>
+                            <span class="info-value">{{ solicitud.level_of_certifications }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Costo:</span>
+                            <span class="info-value">{{ solicitud.cost }}</span>
                         </div>
 
                         <div class="info-row">
                             <span class="info-label">Contacto:</span>
-                            <span class="info-value">{{ solicitud.email }} | {{ solicitud.telefono }}</span>
+                            <span class="info-value">{{ solicitud.email }} | {{ solicitud.phone }}</span>
                         </div>
 
                         <div class="info-row">
                             <span class="info-label">Declaración:</span>
-                            <p class="declaracion-text">{{ solicitud.mensaje }}</p>
+                            <p class="declaracion-text">{{ solicitud.certificates_linked }}</p>
                         </div>
 
                         <div v-if="solicitud.documentos" class="documentos-link">
@@ -62,11 +78,11 @@
                     </div>
 
                     <div class="card-footer">
-                        <div class="estado-badge" :class="solicitud.estado">
+                        <div class="estado-badge" :class="solicitud.status">
                             {{ formatEstado(solicitud.estado) }}
                         </div>
 
-                        <div v-if="solicitud.estado === 'pendiente'" class="acciones-buttons">
+                        <<div v-if="solicitud.status === 'pending'">
                             <button @click="aprobarSolicitud(solicitud.id)" class="btn-approve">
                                 Aprobar
                             </button>
@@ -81,77 +97,56 @@
                 <div v-if="solicitudesFiltradas.length === 0" class="empty-state">
                     <img src="/public/imagenes/no-news.png" alt="No hay solicitudes" class="empty-icon">
                     <h3>No hay solicitudes para mostrar</h3>
-                    <p v-if="filtroEstado !== 'todos'">Intenta cambiar los filtros de búsqueda</p>
+                    <p v-if="filtroEstado !== 'todos'"> Intenta cambiar los filtros de búsqueda </p>
                     <button v-if="filtroEstado !== 'todos'" @click="filtroEstado = 'todos'" class="btn-clear-filters">
                         Mostrar todas
                     </button>
                 </div>
+
             </div>
         </main>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 
 export default {
     name: 'SolicitudesEntrenadores',
-        components: {
+    components: {
         Navbar
     },
     data() {
         return {
             filtroEstado: 'todos',
-            solicitudes: [
-                {
-                    id: 1,
-                    nombre: "Carlos Martínez",
-                    experiencia: "5 años",
-                    certificaciones: "NSCA-CPT, ACE Fitness",
-                    especialidades: "Entrenamiento funcional, Pérdida de peso",
-                    email: "carlos.fit@example.com",
-                    telefono: "809-555-9876",
-                    mensaje: "Especializado en transformaciones corporales y nutrición deportiva. Mi enfoque es ayudar a los clientes a alcanzar sus metas de forma sostenible y saludable.",
-                    documentos: "/docs/certificaciones_carlos.pdf",
-                    fechaSolicitud: new Date(),
-                    estado: "pendiente"
-                },
-                {
-                    id: 2,
-                    nombre: "Ana Rodríguez",
-                    experiencia: "8 años",
-                    certificaciones: "ISSA, CrossFit L2",
-                    especialidades: "CrossFit, Halterofilia",
-                    email: "ana.crossfit@example.com",
-                    telefono: "829-555-6543",
-                    mensaje: "Entrenadora certificada con experiencia en competidores de CrossFit Games. He trabajado con atletas de todos los niveles, desde principiantes hasta élite.",
-                    documentos: "/docs/certificaciones_ana.pdf",
-                    fechaSolicitud: new Date('2024-03-01'),
-                    estado: "pendiente"
-                },
-                {
-                    id: 3,
-                    nombre: "Luis Fernández",
-                    experiencia: "10 años",
-                    certificaciones: "NASM, FMS Level 1",
-                    especialidades: "Rehabilitación deportiva, Movilidad",
-                    email: "luis.move@example.com",
-                    telefono: "849-555-3210",
-                    mensaje: "Especialista en corrección de movimientos y prevención de lesiones. Mi método se basa en la ciencia del movimiento humano.",
-                    documentos: "/docs/certificaciones_luis.pdf",
-                    fechaSolicitud: new Date('2024-02-15'),
-                    estado: "aprobado"
-                }
-            ]
+            solicitudes: []
         }
     },
     computed: {
         solicitudesFiltradas() {
             if (this.filtroEstado === 'todos') return this.solicitudes;
-            return this.solicitudes.filter(s => s.estado === this.filtroEstado);
+            return this.solicitudes.filter(s => s.status === this.filtroEstado);
         }
     },
     methods: {
+
+
+        getTrainers() {
+            axios.get('/trainer')
+                .then(response => {
+                    this.solicitudes = response.data.trainers;
+                    // this.solicitudes = response.data.map(solicitud => ({
+                    //     ...solicitud,
+                    //     created_at: solicitud.created_at || new Date().toISOString(),
+                    // }));
+                })
+                .catch(error => {
+                    console.error('Error al cargar solicitudes:', error);
+                    alert('Error al cargar las solicitudes');
+                });
+        },
+
         formatFecha(fecha) {
             return new Date(fecha).toLocaleDateString('es-ES', {
                 year: 'numeric',
@@ -161,31 +156,45 @@ export default {
                 minute: '2-digit'
             });
         },
-        formatEstado(estado) {
+        formatEstado(status) {
             const estados = {
-                pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
+                pending: 'Pendiente',
+                approved: 'Aprobado',
+                rejected: 'Rechazado'
             };
-            return estados[estado];
+            return estados[status] || 'Desconocido';
         },
+
         aprobarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
-            if (solicitud) solicitud.estado = 'aprobado';
+            if (solicitud) solicitud.status = 'approved';
+
+            axios.post(`/update-status/${this.solicitud.user_id}`, { status: this.solicitud.status })
+                .then(response => {
+                    console.log('Solicitud aprobada:', response.data);
+                    this.getTrainers(); // Actualizar la lista de solicitudes
+                })
+                .catch(error => {
+                    console.error('Error al aprobar la solicitud:', error);
+                    alert('Error al aprobar la solicitud');
+                });
         },
+
         rechazarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
-            if (solicitud) solicitud.estado = 'rechazado';
+            if (solicitud) solicitud.status = 'rejected';
+
+            // Aquí podrías agregar lógica para enviar el rechazo al backend
         }
     },
     mounted() {
+        this.getTrainers();
         document.title = 'Solicitudes Entrenadores';
     }
 }
 </script>
 
 <style scoped>
-
 @import '../../../scss/SolicitudUsuarios/SolicitudU_navbar.scss';
 
 
