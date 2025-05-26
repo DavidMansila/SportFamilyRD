@@ -65,7 +65,7 @@ Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
 Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
 
 
-// Rutas para el formulario de solicitud de entrenador
+// Trainer
 Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
 
 
