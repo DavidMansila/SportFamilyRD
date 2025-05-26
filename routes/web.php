@@ -67,7 +67,8 @@ Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
 
 // Trainer
 Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
-
+Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus']);
+Route::resource('/trainer', TrainerController::class);
 
 
 

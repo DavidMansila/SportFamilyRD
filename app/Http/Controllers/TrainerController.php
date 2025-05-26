@@ -13,6 +13,11 @@ class TrainerController extends Controller
     public function index()
     {
         //
+        $trainers = Trainer::where('status', 'pending')->get();
+        return response()->json([
+            'message' => 'solicitud de entrenador creada exitosamente',
+            'trainers' => $trainers
+        ], 200);
     }
 
     /**
@@ -48,7 +53,7 @@ class TrainerController extends Controller
         $request->validate([
             'status' => 'required|string'
         ]);
-
+        
         $trainer = Trainer::findOrFail($id);
         $trainer->status = $request->input('status');
         $trainer->save();
