@@ -9,6 +9,8 @@ class Trainer extends Model
     protected $table = 'trainer';
 
     protected $fillable = [
+        'user_id',
+        'status',
         'name',
         'email',
         'phone',

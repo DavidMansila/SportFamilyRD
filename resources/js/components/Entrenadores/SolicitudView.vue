@@ -74,7 +74,7 @@
               <option value="" disabled selected></option>
               <option value="Fútbol">Fútbol</option>
               <option value="Baloncesto">Baloncesto</option>
-              <option value="Tenis">Tenis</option>
+              <option value="Tenis">  </option>
               <option value="Natación">Natación</option>
               <option value="Ciclismo">Ciclismo</option>
               <option value="Atletismo">Atletismo</option>
@@ -244,6 +244,7 @@ export default {
   },
   data() {
     return {
+      user: null,
       pasoActual: 1,
       mostrarConfirmacion: false,
       diasSemana: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
@@ -256,6 +257,8 @@ export default {
         { value: 'internacional', label: 'Certificación internacional' }
       ],
       formulario: {
+        user_id: '',
+        status : 'pending',
         nombre: '',
         email: '',
         telefono: '',
@@ -400,6 +403,7 @@ export default {
         const formData = new FormData();
 
         // Datos básicos
+        formData.append('user_id', this.formulario.user_id);
         formData.append('name', this.formulario.nombre);
         formData.append('email', this.formulario.email);
         formData.append('phone', this.formulario.telefono);
@@ -409,6 +413,8 @@ export default {
         formData.append('level_of_certification', this.formulario.nivelCertificacion);
         formData.append('description', this.formulario.enfoque);
         formData.append('cost', this.formulario.tarifa);
+        formData.append('status', this.formulario.status);
+
 
         // Certificados
         this.formulario.certificados.forEach((file, index) => {
@@ -486,6 +492,11 @@ export default {
       this.mostrarConfirmacion = false
       this.$router.push('/Entrenadores')
     }
+  },
+  mounted() {
+    this.user = JSON.parse(sessionStorage.getItem('user') || null),
+    
+    this.formulario.user_id = this.user.id;
   }
 }
 </script>

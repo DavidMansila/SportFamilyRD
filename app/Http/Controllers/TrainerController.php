@@ -28,6 +28,10 @@ class TrainerController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
+        //todo agregar validacio
+        //todo agregar el add images
+        //todo 
         $trainer = Trainer::create($request->all());
 
         return response()->json([
