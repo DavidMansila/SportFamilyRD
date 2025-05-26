@@ -82,7 +82,7 @@
                             {{ formatEstado(solicitud.estado) }}
                         </div>
 
-                        <<div v-if="solicitud.status === 'pending'">
+                        <div v-if="solicitud.status === 'pending'">
                             <button @click="aprobarSolicitud(solicitud.id)" class="btn-approve">
                                 Aprobar
                             </button>
@@ -108,6 +108,8 @@
     </div>
 </template>
 
+
+
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
@@ -123,12 +125,20 @@ export default {
             solicitudes: []
         }
     },
+    
     computed: {
         solicitudesFiltradas() {
+            const estadosMap = {
+                'pendiente': 'pending',
+                'aprobado': 'approved',
+                'rechazado': 'rejected'
+            };
+
             if (this.filtroEstado === 'todos') return this.solicitudes;
-            return this.solicitudes.filter(s => s.status === this.filtroEstado);
+            return this.solicitudes.filter(s => s.status === estadosMap[this.filtroEstado]);
         }
     },
+
     methods: {
 
 
@@ -156,6 +166,7 @@ export default {
                 minute: '2-digit'
             });
         },
+
         formatEstado(status) {
             const estados = {
                 pending: 'Pendiente',
@@ -165,27 +176,25 @@ export default {
             return estados[status] || 'Desconocido';
         },
 
-        aprobarSolicitud(id) {
-            const solicitud = this.solicitudes.find(s => s.id === id);
-            if (solicitud) solicitud.status = 'approved';
-
-            axios.post(`/update-status/${this.solicitud.user_id}`, { status: this.solicitud.status })
-                .then(response => {
-                    console.log('Solicitud aprobada:', response.data);
-                    this.getTrainers(); // Actualizar la lista de solicitudes
-                })
-                .catch(error => {
-                    console.error('Error al aprobar la solicitud:', error);
-                    alert('Error al aprobar la solicitud');
-                });
+        async aprobarSolicitud(id) {
+            try {
+                await axios.put(`/trainer/${id}/status`, { status: 'approved' });
+                this.actualizarEstadoLocal(id, 'approved');
+            } catch (error) {
+                console.error('Error al aprobar:', error);
+                alert('Error al aprobar la solicitud');
+            }
         },
 
-        rechazarSolicitud(id) {
-            const solicitud = this.solicitudes.find(s => s.id === id);
-            if (solicitud) solicitud.status = 'rejected';
-
-            // Aquí podrías agregar lógica para enviar el rechazo al backend
-        }
+        async rechazarSolicitud(id) {
+            try {
+                await axios.put(`/trainer/${id}/status`, { status: 'rejected' });
+                this.actualizarEstadoLocal(id, 'rejected');
+            } catch (error) {
+                console.error('Error al rechazar:', error);
+                alert('Error al rechazar la solicitud');
+            }
+        },
     },
     mounted() {
         this.getTrainers();
