@@ -125,12 +125,20 @@ export default {
             solicitudes: []
         }
     },
+    
     computed: {
         solicitudesFiltradas() {
+            const estadosMap = {
+                'pendiente': 'pending',
+                'aprobado': 'approved',
+                'rechazado': 'rejected'
+            };
+
             if (this.filtroEstado === 'todos') return this.solicitudes;
-            return this.solicitudes.filter(s => s.status === this.filtroEstado);
+            return this.solicitudes.filter(s => s.status === estadosMap[this.filtroEstado]);
         }
     },
+
     methods: {
 
 
@@ -158,6 +166,7 @@ export default {
                 minute: '2-digit'
             });
         },
+
         formatEstado(status) {
             const estados = {
                 pending: 'Pendiente',
@@ -183,12 +192,15 @@ export default {
                 });
             },
 
-        rechazarSolicitud(id) {
-            const solicitud = this.solicitudes.find(s => s.id === id);
-            if (solicitud) solicitud.status = 'rejected';
-
-            // Aquí podrías agregar lógica para enviar el rechazo al backend
-        }
+        async rechazarSolicitud(id) {
+            try {
+                await axios.put(`/trainer/${id}/status`, { status: 'rejected' });
+                this.actualizarEstadoLocal(id, 'rejected');
+            } catch (error) {
+                console.error('Error al rechazar:', error);
+                alert('Error al rechazar la solicitud');
+            }
+        },
     },
     mounted() {
         this.getTrainers();
