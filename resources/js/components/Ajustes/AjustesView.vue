@@ -110,7 +110,7 @@
             <div class="data-option danger-zone">
               <h4>Eliminar cuenta</h4>
               <p>Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.</p>
-              <button class="btn btn-danger" @click="confirmDeletion" aria-describedby="delete-warning">
+              <button class="btn btn-danger" @click="deleteAccount" aria-describedby="delete-warning">
                 Eliminar Cuenta
               </button>
               <p id="delete-warning" class="warning-text">
@@ -234,6 +234,7 @@ export default {
   },
 
   methods: {
+
     confirmAction() {
       if (this.currentAction === 'deleteAccount') {
         this.deleteAccount()
@@ -304,7 +305,7 @@ export default {
       .then(response => {
         this.showToast('Cuenta eliminada exitosamente', 'success');
         sessionStorage.removeItem('user');
-        this.$router.push('/login');
+        this.$router.push('/signup');
       })
       .catch(error => {
         this.handleApiError(error, 'Error al eliminar la cuenta');

@@ -186,7 +186,7 @@
                   </svg>
                   Compartir
                 </button>
-                <button class="popup-save" @click.stop="toggleSave(noticiaSeleccionada)">
+                <button class="popup-save" @click.stop="toggleSave(noticiaSeleccionada)" v-if="user" >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path :fill="noticiaSeleccionada.saved ? 'currentColor' : 'none'" stroke="currentColor"
                       d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z" />
@@ -236,6 +236,7 @@ export default {
         { value: 'swimming', label: 'Natacion' },
       ],
       saved: false,
+      user: {}
     };
   },
   computed: {
@@ -596,9 +597,6 @@ export default {
         this.isLoading = false;
       }
     },
-
-
-
   },
   async mounted() {
     try {

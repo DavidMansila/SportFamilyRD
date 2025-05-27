@@ -74,7 +74,7 @@
             <i class="fas fa-shopping-cart"></i> Añadir
           </button>
 
-          <button v-if="user.user_type === 'admin'" @click.stop="abrirFormularioProducto(producto)" class="btn-editar">
+          <button v-if="user?.user_type === 'admin'" @click.stop="abrirFormularioProducto(producto)" class="btn-editar">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -82,7 +82,7 @@
             </svg>
           </button>
 
-          <button v-if="user.user_type === 'admin'" @click.stop="eliminarProducto(producto.id)" class="btn-eliminar">
+          <button v-if="user?.user_type === 'admin'" @click.stop="eliminarProducto(producto.id)" class="btn-eliminar">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"></polyline>
@@ -92,6 +92,13 @@
 
         </div>
       </div>
+    </div>
+
+    <!-- Agrega después de products-grid -->
+    <div v-if="productosFiltrados.length === 0 && !isLoading" class="no-products">
+      <img src="/imagenes/no-news.png" alt="Sin productos" />
+      <p>No se encontraron productos</p>
+      <button @click="resetFilters">Limpiar filtros</button>
     </div>
 
 
@@ -158,7 +165,7 @@
 
 
     <!-- Botón flotante admin -->
-    <button v-if="user.user_type === 'admin'" @click="abrirFormularioProducto" class="floating-admin-btn">
+    <button v-if="user?.user_type === 'admin'" @click="abrirFormularioProducto" class="floating-admin-btn">
       <i class="fas fa-plus"></i>
     </button>
 
@@ -286,7 +293,8 @@ export default {
       editingProduct: null,
       formProducto: this.resetForm(),
       categoriasFlat: [],
-      user: [],
+      user: {},
+      isLoading: true,
 
     };
   },
@@ -299,8 +307,8 @@ export default {
 
   methods: {
 
-
     getProducts() {
+      this.isLoading = true;
       axios.get('/products')
         .then(response => {
           this.productos = response.data.products.map(product => ({
@@ -314,7 +322,15 @@ export default {
           this.productosFiltrados = this.productos;
         })
         .catch(error => {
-          console.error('Error al cargar productos:', error);
+          console.error('Error:', error);
+          this.$notify({
+            title: 'Error',
+            text: 'No se pudieron cargar los productos',
+            type: 'error'
+          });
+        })
+        .finally(() => {
+          this.isLoading = false;
         });
     },
 
@@ -489,7 +505,7 @@ export default {
   mounted() {
     this.getProducts();
     window.addEventListener('keyup', this.handleKeyup);
-    this.user = JSON.parse(sessionStorage.getItem('user'));
+    this.user = JSON.parse(sessionStorage.getItem('user')) || {};
     this.generarCategoriasFlat()
     document.title = 'Tienda';
   },
@@ -508,5 +524,4 @@ export default {
 @import '../../../scss/Tienda/tienda_responsive.scss';
 
 @import '../../../scss/Admin/Admin_tienda.scss';
-
 </style>
