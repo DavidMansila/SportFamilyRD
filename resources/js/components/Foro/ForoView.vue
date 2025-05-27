@@ -12,7 +12,9 @@
       <div class="hero-content">
         <h1 class="titulo-foro">Comunidad Deportiva</h1>
         <p class="hero-subtitle">Conecta, comparte y aprende con otros apasionados del deporte</p>
-        <button @click="abrirModal" class="btn-crear-post hero-btn">Crear nuevo post</button>
+        <button @click="abrirModal" class="btn-crear-post hero-btn" v-if="user">
+          Crear nuevo post
+        </button>
       </div>
       <div class="hero-overlay"></div>
     </div>
@@ -195,14 +197,16 @@
 
                 <!-- EDITAR Y ELIMINAR POST | HAY QUE PONER QUE SI EL ID DEL USUARIO COINCIDE CON EL ID DEL USUARIO DEL POST PUES PUEDE EDITAR Y ELIMINAR DICHO POST-->
                 <div class="post-actions">
-                  <button v-if="isPostAuthor(postSeleccionado)" @click="abrirEditarModal(postSeleccionado)" class="edit-post-btn" title="Editar post">
+                  <button v-if="isPostAuthor(postSeleccionado)" @click="abrirEditarModal(postSeleccionado)"
+                    class="edit-post-btn" title="Editar post">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
                   </button>
-                  <button v-if="isPostAuthor(postSeleccionado) || user.user_type === 'admin'" @click="confirmarEliminarPost" class="delete-post-btn" title="Eliminar post">
+                  <button v-if="isPostAuthor(postSeleccionado) || user.user_type === 'admin'"
+                    @click="confirmarEliminarPost" class="delete-post-btn" title="Eliminar post">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="3 6 5 6 21 6"></polyline>
@@ -298,8 +302,8 @@
                           class="comment-action edit-btn">
                           Editar
                         </button>
-                        <button v-if="isCommentAuthor(comentario) || user.user_type === 'admin'" @click="eliminarComentario(comentario)"
-                          class="comment-action delete-btn">
+                        <button v-if="isCommentAuthor(comentario) || user.user_type === 'admin'"
+                          @click="eliminarComentario(comentario)" class="comment-action delete-btn">
                           Eliminar
                         </button>
 
@@ -371,8 +375,8 @@
                                 class="comment-action edit-btn">
                                 Editar
                               </button>
-                              <button v-if="isReplyAuthor(reply)|| user.user_type === 'admin'" @click="eliminarReply(reply)"
-                                class="comment-action delete-btn">
+                              <button v-if="isReplyAuthor(reply) || user.user_type === 'admin'"
+                                @click="eliminarReply(reply)" class="comment-action delete-btn">
                                 Eliminar
                               </button>
 
@@ -390,7 +394,7 @@
 
 
                 <!-- Formulario de comentario principal o respuesta -->
-                <div class="add-comment-form">
+                <div class="add-comment-form" v-if="user">
                   <div v-if="comentarioRespondiendo" class="replying-to">
                     Respondiendo a <strong>@Usuario{{ findCommentById(comentarioRespondiendo)?.user_id }}</strong>
                     <button @click="cancelarRespuesta" class="cancel-reply-btn">
@@ -414,6 +418,11 @@
                     </button>
                   </form>
                 </div>
+
+                <div v-else class="login-prompt">
+                  <p>Debes <router-link to="/login">iniciar sesión</router-link> para participar en la conversación</p>
+                </div>
+
               </div>
             </div>
           </div>
@@ -427,7 +436,7 @@
 
 
     <!-- Botón flotante para crear post -->
-    <button @click="abrirModal" class="floating-btn">
+    <button @click="abrirModal" class="floating-btn" v-if="user">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -597,6 +606,10 @@ export default {
   methods: {
     // Métodos de UI
     abrirModal() {
+      if (!this.user) {
+        alert('Debes iniciar sesión para crear publicaciones');
+        return;
+      }
       this.mostrarModal = true;
       document.body.style.overflow = 'hidden';
     },
@@ -783,11 +796,10 @@ export default {
 
       try {
 
-        // Verificar que el usuario está autenticado
-        // if (!this.user.id) {
-        //   alert('Debes iniciar sesión para comentar');
-        //   return;
-        // }
+        if (!this.user) {
+          alert('Debes iniciar sesión para comentar');
+          return;
+        }
 
         const endpoint = this.comentarioRespondiendo
           ? `/post/create-reply/${this.comentarioRespondiendo}`
@@ -862,6 +874,12 @@ export default {
     // METODOS PARA LIKES
 
     async likePost() {
+
+      if (!this.user) {
+        alert('Debes iniciar sesión para dar like');
+        return;
+      }
+
       try {
         const response = await axios.post(`/post/${this.postSeleccionado.id}/likes_quantity`); // Usar /post/ID/likes_quantity
         this.postSeleccionado.likes_quantity = response.data.likes_quantity;
@@ -872,6 +890,12 @@ export default {
     },
 
     async likeComentario(commentId) {
+
+      if (!this.user) {
+        alert('Debes iniciar sesión para dar like');
+        return;
+      }
+
       try {
         const comment = this.findCommentById(commentId);
         // Usar la ruta correcta para comentarios
@@ -1237,4 +1261,24 @@ export default {
 @import '../../../scss/Foro/foro_modal.scss';
 
 @import '../../../scss/Foro/foro_navbar.scss';
+
+
+.login-prompt {
+  padding: 1rem;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 1rem;
+  border: 1px solid #eee;
+}
+
+.login-prompt a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-prompt a:hover {
+  text-decoration: underline;
+}
 </style>
