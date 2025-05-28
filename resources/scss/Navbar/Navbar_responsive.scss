@@ -202,63 +202,6 @@
   }
 }
 
-/* Teléfonos pequeños - 320px-480px */
-@media (max-width: 480px) {
-  .navbar {
-    padding: 0.8rem;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    width: 140px;
-    height: 45px;
-  }
-
-  .nav-links {
-    gap: 0.5rem;
-    margin: 0.5rem 0;
-  }
-
-  .nav-link {
-    font-size: 0.8rem;
-  }
-
-  .Imagenes {
-    gap: 6px;
-    
-    a {
-      width: 30px;
-      height: 30px;
-      
-      img {
-        width: 16px;
-        height: 16px;
-      }
-    }
-  }
-  
-  .auth-alert {
-    top: 35px;
-    right: -10px;
-    font-size: 0.75rem;
-    padding: 0.5rem 0.8rem;
-  }
-  
-  .confirm-dialog {
-    padding: 1rem;
-    
-    h3 {
-      font-size: 1rem;
-      flex-direction: column;
-    }
-    
-    button {
-      padding: 0.6rem 1rem;
-      font-size: 0.9rem;
-    }
-  }
-}
-
 /* Teléfonos muy pequeños - hasta 320px */
 @media (max-width: 320px) {
   .navbar {
@@ -313,3 +256,149 @@
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Navbar responsive para teléfonos pequeños (320px-480px) - Sin hamburguesa */
+@media only screen and (max-width: 480px) {
+  .navbar {
+    padding: 0.8rem 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    order: 1; /* Logo primero */
+  }
+
+  .logo {
+    width: 150px;
+    height: 50px;
+  }
+
+  .nav-links {
+    order: 3; /* Enlaces al final */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    white-space: nowrap;
+  }
+
+  .Imagenes {
+    order: 2; /* Iconos en medio */
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    gap: 0.5rem;
+  }
+
+  /* Ajustes para los iconos */
+  .Imagenes a, 
+  .Imagenes .Carrito,
+  .Imagenes .Logout {
+    width: 36px;
+    height: 36px;
+    
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  /* Ajustes para el diálogo de confirmación */
+  .confirm-dialog {
+    padding: 1.5rem;
+    width: 90%;
+    
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .dialog-buttons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .confirm-btn, 
+  .cancel-btn {
+    padding: 0.8rem;
+    width: 100%;
+  }
+
+  /* Ajustes para el mensaje de autenticación */
+  .auth-alert {
+    top: 100%;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    width: auto;
+    max-width: 90%;
+  }
+
+  .auth-alert::before {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Ajuste para el badge del carrito */
+  .cart-badge {
+    width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
+    top: -3px;
+    right: -3px;
+  }
+}
+
+/* Ajustes adicionales para pantallas muy pequeñas */
+@media only screen and (max-width: 350px) {
+  .nav-links {
+    gap: 0.3rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .Imagenes a, 
+  .Imagenes .Carrito,
+  .Imagenes .Logout {
+    width: 32px;
+    height: 32px;
+    
+    img {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .logo {
+    width: 130px;
+    height: 45px;
+  }
+}
