@@ -12,7 +12,7 @@
 
                 <div class="filters-section">
                     <div class="select-wrapper">
-                        <select v-model="filtroEstado" class="estado-filter">
+                        <select v-model="filtroEstado" class="estado-filter" @change="getTrainers">
                             <option value="all">Todas las solicitudes</option>
                             <option value="pending">Pendientes</option>
                             <option value="approved">Aprobadas</option>
@@ -161,21 +161,26 @@ export default {
     },
     computed: {
         solicitudesFiltradas() {
-            if (this.filtroEstado === 'all') {
-                return this.solicitudes;
-            }
-            return this.solicitudes.filter(s => s.status === this.filtroEstado);
+            return this.solicitudes;
         }
     },
     methods: {
 
         getTrainers() {
-            axios.get('/trainer')
+            const status = this.filtroEstado === 'all' ? null : this.filtroEstado;
+
+            axios.get('/trainer', {
+                params: {
+                    status: status
+                }
+            })
                 .then(response => {
-                    this.solicitudes = response.data.trainers.map(trainer => ({
-                        ...trainer,
-                        status: trainer.status.toLowerCase()
-                    }));
+                    this.solicitudes = response.data.trainers
+                        .map(trainer => ({
+                            ...trainer,
+                            status: trainer.status.toLowerCase()
+                        }))
+                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 })
                 .catch(error => {
                     console.error('Error al cargar solicitudes:', error);
@@ -201,7 +206,7 @@ export default {
             };
             return estados[status] || 'Desconocido';
         },
-        
+
         formatCurrency(amount) {
             return new Intl.NumberFormat('es-ES', {
                 style: 'currency',
@@ -217,36 +222,53 @@ export default {
         },
         aprobarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
-            if (solicitud) solicitud.status = 'approved';
-
-            axios.post(`/update-status/${solicitud.user_id}`, { status: solicitud.status })
-                .then(response => {
-                    console.log('Solicitud aprobada:', response.data);
-                    this.getTrainers();
+            if (solicitud) {
+                axios.put(`/update-status/${solicitud.id}`, { // Cambiar a PUT y usar trainer.id
+                    status: 'approved'
                 })
-                .catch(error => {
-                    console.error('Error al aprobar la solicitud:', error);
-                    alert('Error al aprobar la solicitud');
-                });
+                    .then(response => {
+                        console.log('Solicitud aprobada:', response.data);
+                        // Actualizar estado localmente
+                        solicitud.status = 'approved';
+                        // Actualizar la lista completa
+                        this.getTrainers();
+                    })
+                    .catch(error => {
+                        console.error('Error al aprobar la solicitud:', error);
+                        alert('Error al aprobar la solicitud');
+                    });
+            }
         },
         rechazarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
-            if (solicitud) solicitud.status = 'rejected';
-
-            axios.post(`/update-status/${solicitud.user_id}`, { status: solicitud.status })
-                .then(response => {
-                    console.log('Solicitud rechazada:', response.data);
-                    this.getTrainers();
+            if (solicitud) {
+                axios.put(`/update-status/${solicitud.id}`, { // Cambiar a PUT y usar trainer.id
+                    status: 'rejected'
                 })
-                .catch(error => {
-                    console.error('Error al rechazar la solicitud:', error);
-                    alert('Error al rechazar la solicitud');
-                });
-        }
+                    .then(response => {
+                        console.log('Solicitud rechazada:', response.data);
+                        // Actualizar estado localmente
+                        solicitud.status = 'rejected';
+                        // Actualizar la lista completa
+                        this.getTrainers();
+                    })
+                    .catch(error => {
+                        console.error('Error al rechazar la solicitud:', error);
+                        alert('Error al rechazar la solicitud');
+                    });
+            }
+        },
+
     },
     mounted() {
         this.getTrainers();
         document.title = 'Solicitudes Entrenadores';
+        document.body.style.backgroundColor = '#f8f9fa';
+        document.body.style.paddingBottom = '10px';
+    },
+    beforeUnmount() {
+        document.body.style.backgroundColor = '';
+        document.body.style.paddingBottom = '';
     }
 }
 </script>

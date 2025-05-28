@@ -508,6 +508,8 @@ export default {
     this.user = JSON.parse(sessionStorage.getItem('user')) || {};
     this.generarCategoriasFlat()
     document.title = 'Tienda';
+    // document.body.style.backgroundColor = '#e9ecef';
+    // document.body.style.paddingBottom = '10px';
   },
   beforeDestroy() {
     window.removeEventListener('keyup', this.handleKeyup);

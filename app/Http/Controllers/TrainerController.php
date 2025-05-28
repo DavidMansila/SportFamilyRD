@@ -11,12 +11,20 @@ class TrainerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $trainers = Trainer::where('status', 'pending')->get();
+        $status = $request->query('status', 'all');
+
+        $query = Trainer::query();
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $trainers = $query->get();
+
         return response()->json([
-            'message' => 'solicitud de entrenador creada exitosamente',
+            'message' => 'Solicitudes obtenidas exitosamente',
             'trainers' => $trainers
         ], 200);
     }
@@ -54,12 +62,12 @@ class TrainerController extends Controller
         $request->validate([
             'status' => 'required|string'
         ]);
-        
+
         $trainer = Trainer::findOrFail($id);
         $trainer->status = $request->input('status');
 
         $user = User::findOrFail($trainer->user_id);
-        
+
         if ($trainer->status === 'approved') {
             $user->user_type = 'entrenador';
             $user->save();
