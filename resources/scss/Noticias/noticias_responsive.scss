@@ -257,3 +257,227 @@
         font-size: 1.1rem;
     }
 }
+
+
+
+
+
+/* noticias_responsive.scss */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+
+  .header-section {
+    margin-bottom: 20px;
+    
+    .page-title {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .page-subtitle {
+      font-size: 14px;
+    }
+  }
+
+  /* Filtros de deportes */
+  .filtro-deportes {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    white-space: nowrap;
+    display: flex;
+    -webkit-overflow-scrolling: touch;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .filtro-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+      margin-right: 8px;
+      flex: 0 0 auto;
+      
+      .deporte-icon {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  /* Grid de noticias */
+  .news-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .noticia-card {
+    height: auto;
+    
+    .noticia-image {
+      height: 180px;
+    }
+    
+    .noticia-content {
+      padding: 15px;
+      
+      .noticia-title {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      
+      .noticia-excerpt {
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+      
+      .noticia-meta {
+        font-size: 12px;
+      }
+    }
+  }
+
+  /* Popup de noticia */
+  .popup-overlay {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .popup-content {
+    width: 100%;
+    height: 100vh;
+    max-height: none;
+    border-radius: 0;
+    overflow-y: auto;
+    
+    .btn-cerrar {
+      top: 15px;
+      right: 15px;
+    }
+    
+    .popup-header {
+      padding: 60px 20px 20px;
+      
+      .popup-titulo {
+        font-size: 22px;
+      }
+      
+      .popup-author-date {
+        margin-top: 15px;
+      }
+    }
+    
+    .popup-image-container {
+      height: 200px;
+    }
+    
+    .popup-body {
+      padding: 20px;
+      
+      .popup-descripcion {
+        font-size: 15px;
+        line-height: 1.5;
+      }
+    }
+    
+    .popup-actions {
+      flex-direction: column;
+      gap: 10px;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  /* Botones de admin */
+  .floating-action {
+    bottom: 20px;
+    right: 20px;
+    
+    .btn-agregar {
+      width: 50px;
+      height: 50px;
+    }
+  }
+
+  .noticia-card {
+    .btn-editar, .btn-eliminar {
+      width: 30px;
+      height: 30px;
+      padding: 5px;
+    }
+  }
+
+  /* Estados */
+  .loading-container, .error-container, .no-news {
+    padding: 40px 20px;
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .loading-text, .error-text {
+      font-size: 16px;
+    }
+    
+    .retry-btn {
+      padding: 8px 16px;
+    }
+  }
+
+  /* Paginación */
+  .pagination {
+    margin-top: 30px;
+    
+    .page-item {
+      margin: 0 3px;
+      
+      .page-link {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .noticia-card {
+    .noticia-image {
+      height: 150px;
+    }
+    
+    .noticia-content {
+      .noticia-title {
+        font-size: 16px;
+      }
+      
+      .noticia-excerpt {
+        font-size: 13px;
+        padding-right: 20px;
+      }
+    }
+  }
+
+  .popup-content {
+    .popup-header {
+      .popup-titulo {
+        font-size: 20px;
+      }
+    }
+    
+    .popup-image-container {
+      height: 160px;
+    }
+    
+    .popup-body {
+      .popup-descripcion {
+        font-size: 14px;
+      }
+    }
+  }
+}
