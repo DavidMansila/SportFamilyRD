@@ -220,6 +220,7 @@ export default {
                 ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
                 : name.substring(0, 2).toUpperCase();
         },
+        
         aprobarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
             if (solicitud) {
@@ -239,6 +240,7 @@ export default {
                     });
             }
         },
+
         rechazarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
             if (solicitud) {

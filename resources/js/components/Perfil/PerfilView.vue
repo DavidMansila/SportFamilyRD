@@ -64,12 +64,13 @@
                 </button>
 
 
-                <!-- <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
-                    Subir Información
-                </button> -->
 
             </div>
 
+            <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
+                Subir Info. Entrenadores
+            </button>
+            
             <!-- Contenido del Perfil -->
             <div class="profile-content">
                 <!-- Sección de Información Básica -->
@@ -171,40 +172,12 @@
                                 </button>
                             </div>
                         </div>
-                        <button @click="agregarNuevaEspecialidad" class="btn-agregar-especialidad">
+                        <button v-if="editMode" @click="agregarEspecialidad" class="btn-agregar-especialidad">
                             + Añadir Nueva Especialidad
                         </button>
                     </div>
                 </div>
 
-
-                <!-- Sección de Redes Sociales -->
-                <div class="profile-section">
-                    <!-- <h2>Redes Sociales</h2>
-                    <div class="social-links">
-                        <div v-for="(social, index) in user.social_links" :key="index" class="social-item">
-                            <select v-model="social.platform" v-if="editMode">
-                                <option value="facebook">Facebook</option>
-                                <option value="twitter">Twitter</option>
-                                <option value="instagram">Instagram</option>
-                                <option value="linkedin">LinkedIn</option>
-                                <option value="youtube">YouTube</option>
-                            </select>
-                            <span v-else class="social-icon">
-                                <img :src="getSocialIcon(social.platform)" :alt="social.platform">
-                            </span>
-                            <input type="text" v-model="social.url" :placeholder="'Enlace de ' + social.platform"
-                                :readonly="!editMode">
-                            <button v-if="editMode" @click="removeSocialLink(index)" class="remove-social">
-                                ×
-                            </button>
-                        </div>
-                        <button v-if="editMode" @click="" class="add-social">
-                            + Añadir Red Social
-                        </button>
-                    </div> -->
-
-                </div>
 
                 <!-- Sección de Logros -->
                 <div class="profile-section" v-if="user.user_type === 'entrenador'">
@@ -232,13 +205,43 @@
                 </div>
 
 
+                <!-- Sección de Redes Sociales -->
+                <!-- <div class="profile-section">
+                    <h2>Redes Sociales</h2>
+                    <div class="social-links">
+                        <div v-for="(social, index) in user.social_links" :key="index" class="social-item">
+                            <select v-model="social.platform" v-if="editMode">
+                                <option value="facebook">Facebook</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                            <span v-else class="social-icon">
+                                <img :src="getSocialIcon(social.platform)" :alt="social.platform">
+                            </span>
+                            <input type="text" v-model="social.url" :placeholder="'Enlace de ' + social.platform"
+                                :readonly="!editMode">
+                            <button v-if="editMode" @click="removeSocialLink(index)" class="remove-social">
+                                ×
+                            </button>
+                        </div>
+                        <button v-if="editMode" @click="" class="add-social">
+                            + Añadir Red Social
+                        </button>
+                    </div>
+                </div> -->
+
+
+                <!-- Botones de acción en modo edición -->
+                <div v-if="editMode" class="action-buttons">
+                    <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
+                    <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
+                </div>
+
             </div>
 
-            <!-- Botones de acción en modo edición -->
-            <div v-if="editMode" class="action-buttons">
-                <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
-                <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
-            </div>
+
 
 
         </div>
@@ -320,7 +323,6 @@ export default {
                 .catch(error => {
                     this.handleError(error, 'Error al guardar perfil');
                 });
-
         },
 
         handleAvatarChange(event) {
@@ -329,7 +331,6 @@ export default {
                 this.$refs.avatarInput.click()
                 return
             }
-
             // Si es la selección de archivo
             const file = event.target.files[0]
             if (file) {
@@ -343,20 +344,16 @@ export default {
                 alert('Por favor selecciona un archivo de imagen válido')
                 return
             }
-
             // Validar tamaño (ejemplo: 2MB máximo)
             const maxSize = 2 * 1024 * 1024
             if (file.size > maxSize) {
                 alert('El tamaño máximo permitido es 2MB')
                 return
             }
-
             // Crear previsualización
             const reader = new FileReader()
             reader.onload = (e) => {
                 this.user.image = e.target.result
-
-
                 this.subirAvatarAlServidor(file)
             }
             reader.readAsDataURL(file)
@@ -379,7 +376,6 @@ export default {
                 .catch(error => {
                     this.handleError(error, 'Error al guardar perfil');
                 });
-
         },
 
         discardChanges() {
@@ -488,11 +484,12 @@ export default {
         },
 
 
-        agregarNuevaEspecialidad() {
+        agregarEspecialidad() {
             if (!this.user.especialidades) {
-                this.$set(this.user, 'especialidades', []);
+                this.user.especialidades = [];
             }
-            this.user.especialidades.push('');
+            this.user.especialidades.push(this.nuevaEspecialidad.trim());
+            this.nuevaEspecialidad = '';
         },
 
         eliminarEspecialidad(index) {
@@ -500,27 +497,12 @@ export default {
         },
 
 
-        // redirectToTrainersPage() {
-        //     // Guardar los datos del perfil para usarlos en la página de entrenadores
-        //     sessionStorage.setItem('DatosEntrenador', JSON.stringify(this.user));
-        //     // Redirigir a la página de entrenadores
-        //     this.$router.push('/entrenadores');
-        // },
-
-
-        // agregarEspecialidad() {
-        //     if (this.nuevaEspecialidad.trim() && !this.user.especialidades.includes(this.nuevaEspecialidad.trim())) {
-        //         if (!this.user.especialidades) {
-        //             this.user.especialidades = [];
-        //         }
-        //         this.user.especialidades.push(this.nuevaEspecialidad.trim());
-        //         this.nuevaEspecialidad = '';
-        //     }
-        // },
-
-        // eliminarEspecialidad(index) {
-        //     this.user.especialidades.splice(index, 1);
-        // },
+        //  redirectToTrainersPage() {
+        //      // Guardar los datos del perfil para usarlos en la página de entrenadores
+        //      sessionStorage.setItem('DatosEntrenador', JSON.stringify(this.user));
+        //      // Redirigir a la página de entrenadores
+        //      this.$router.push('/entrenadores');
+        //  },
 
 
     },
@@ -546,304 +528,4 @@ export default {
 @import '/resources/scss/Perfil/perfil_logros.scss';
 
 @import '/resources/scss/Perfil/perfil_responsive.scss';
-
-
-.profile-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.upload-info-btn {
-    background-color: #2196F3;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-.upload-info-btn:hover {
-    background-color: #0b7dda;
-}
-
-/* Estilos para logros */
-.achievement-item {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-}
-
-.achievement-display h3 {
-    margin: 0 0 5px 0;
-    color: #333;
-}
-
-.achievement-display p {
-    margin: 5px 0;
-    color: #666;
-}
-
-.achievement-date {
-    font-size: 0.9em;
-    color: #888;
-}
-
-/* Estilos para redes sociales */
-.social-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.social-icon img {
-    width: 24px;
-    height: 24px;
-}
-
-.add-social,
-.add-achievement {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.remove-social,
-.remove-achievement {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .profile-actions {
-        flex-direction: column;
-    }
-}
-
-/* Estilo para el botón Subir Información */
-.upload-info-btn {
-    background-color: #4CAF50;
-    /* Verde */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin-left: 11px;
-    /* Espacio del botón Editar Perfil */
-}
-
-.upload-info-btn:hover {
-    background-color: #45a049;
-    /* Verde más oscuro al pasar el mouse */
-}
-
-/* Estilos para móviles */
-@media (max-width: 768px) {
-    .profile-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .upload-info-btn {
-        margin-left: 0;
-        margin-top: 10px;
-        width: 100%;
-    }
-}
-
-
-
-
-
-/* MULTISELECT */
-.multiselect {
-    width: 100%;
-    max-width: 300px;
-    margin-top: 8px;
-}
-
-.multiselect__tags {
-    min-height: 40px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.multiselect__option--highlight {
-    background: #4CAF50;
-    color: white;
-}
-
-
-
-
-
-
-
-
-/* Estilos para la sección de especialidades */
-.especialidades-list {
-    margin-top: 15px;
-}
-
-.especialidades-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.especialidad-tag {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 0.9rem;
-    display: inline-block;
-}
-
-.no-especialidades {
-    color: #757575;
-    font-style: italic;
-}
-
-.especialidades-edit {
-    margin-top: 15px;
-}
-
-.especialidades-input-container {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.especialidad-input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.btn-agregar-especialidad {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 0 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.especialidades-edit-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.especialidad-edit-item {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    padding: 6px 12px 6px 12px;
-    border-radius: 16px;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.btn-eliminar-especialidad {
-    background: none;
-    border: none;
-    color: #f44336;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .especialidades-input-container {
-        flex-direction: column;
-    }
-
-    .btn-agregar-especialidad {
-        padding: 8px;
-    }
-}
-
-
-
-
-
-.especialidades-edit {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.especialidad-edit-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.especialidad-input-container {
-    flex: 1;
-    display: flex;
-    gap: 8px;
-}
-
-.especialidad-input-container input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.btn-eliminar-especialidad {
-    background: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-eliminar-especialidad:hover {
-    background: #cc0000;
-}
-
-.btn-agregar-especialidad {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    align-self: flex-start;
-    transition: background 0.3s;
-}
-
-.btn-agregar-especialidad:hover {
-    background: #45a049;
-}
 </style>

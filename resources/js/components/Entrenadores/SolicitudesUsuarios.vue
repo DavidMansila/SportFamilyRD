@@ -43,7 +43,7 @@
 
                         <div class="card-body">
                             <div class="sport-info">
-                                <span class="sport-tag">{{ solicitud.deporte }}</span>
+                                <span class="sport-tag">{{ solicitud.My_level }}</span>
                                 <div class="contact-info">
                                     <a :href="`mailto:${solicitud.email}`" class="email-link">
                                         📧 {{ solicitud.email }}
@@ -117,57 +117,12 @@ export default {
                     id: 1,
                     userName: "Juan Pérez",
                     edad: 25,
-                    deporte: "Baloncesto",
+                    My_level: "Basico",
                     email: "juan@example.com",
                     telefono: "809-555-1234",
                     mensaje: "Busco entrenamiento para mejorar mi tiro de 3 puntos",
                     fechaSolicitud: new Date(),
                     estado: "pendiente"
-                },
-                {
-                    id: 2,
-                    userName: "María García",
-                    edad: 18,
-                    deporte: "Voleibol",
-                    email: "maria@example.com",
-                    telefono: "829-555-5678",
-                    mensaje: "Quiero prepararme para pruebas universitarias",
-                    fechaSolicitud: new Date('2024-02-15'),
-                    estado: "aprobado"
-                },
-                {
-                    id: 3,
-                    userName: "Carlos Rodríguez",
-                    edad: 30,
-                    deporte: "Fútbol",
-                    email: "carlos@example.com",
-                    telefono: "849-555-9012",
-                    mensaje: "Necesito entrenamiento personalizado para mejorar mi resistencia",
-                    fechaSolicitud: new Date('2024-03-10'),
-                    estado: "rechazado"
-                }
-                ,
-                {
-                    id: 4,
-                    userName: "Carlos Rodríguez",
-                    edad: 30,
-                    deporte: "Fútbol",
-                    email: "carlos@example.com",
-                    telefono: "849-555-9012",
-                    mensaje: "Necesito entrenamiento personalizado para mejorar mi resistencia",
-                    fechaSolicitud: new Date('2024-03-10'),
-                    estado: "rechazado"
-                },
-                {
-                    id: 5,
-                    userName: "Carlos Rodríguez",
-                    edad: 30,
-                    deporte: "Fútbol",
-                    email: "carlos@example.com",
-                    telefono: "849-555-9012",
-                    mensaje: "Necesito entrenamiento personalizado para mejorar mi resistencia",
-                    fechaSolicitud: new Date('2024-03-10'),
-                    estado: "rechazado"
                 },
             ],
             mostrarToast: false,

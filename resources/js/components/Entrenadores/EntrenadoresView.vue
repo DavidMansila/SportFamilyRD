@@ -1,10 +1,7 @@
 <template>
-
   <div class="entrenadores-page">
-
     <!-- Navbar -->
     <Navbar />
-
 
     <!-- Hero Section -->
     <div class="hero-section">
@@ -14,9 +11,6 @@
         <p class="hero-subtitle">Entrenadores certificados para llevar tu rendimiento al siguiente nivel</p>
       </div>
     </div>
-
-
-
 
     <!-- Sección CTA -->
     <div class="cta-container">
@@ -34,9 +28,6 @@
         </router-link>
       </div>
     </div>
-
-
-
 
     <!-- Filtros y Búsqueda -->
     <div class="controls-section">
@@ -56,9 +47,6 @@
         </button>
       </div>
     </div>
-
-
-
 
     <!-- Lista de Entrenadores -->
     <div class="entrenadores-container">
@@ -95,9 +83,6 @@
         </div>
       </transition-group>
     </div>
-
-
-
 
     <!-- Modal de Perfil -->
     <transition name="modal">
@@ -169,62 +154,102 @@
         </div>
       </div>
     </transition>
-  </div>
+
+    <!-- Modal de Contacto -->
+    <transition name="modal">
+      <div v-if="mostrarFormularioContacto" class="contact-modal" @click.self="cerrarFormularioContacto">
+        <div class="modal-content">
+          <button class="close-modal" @click="cerrarFormularioContacto">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+
+          <h2 class="modal-title">Contactar a {{ contactoEntrenador.nombre.split(' ')[0] }}</h2>
+
+          <form @submit.prevent="enviarFormularioContacto" class="contact-form">
+            <div class="form-group">
+              <label for="edad">Edad</label>
+              <input type="number" id="edad" v-model="formularioContacto.edad" min="10" max="100" required>
+            </div>
+
+            <div class="form-group">
+              <label for="nivel">Nivel en el deporte</label>
+              <select id="nivel" v-model="formularioContacto.nivel" required>
+                <option value="" disabled selected>Selecciona tu nivel</option>
+                <option value="Principiante">Principiante</option>
+                <option value="Intermedio">Intermedio</option>
+                <option value="Avanzado">Avanzado</option>
+                <option value="Profesional">Profesional</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="objetivos">¿Qué buscas aprender o lograr?</label>
+              <textarea id="objetivos" v-model="formularioContacto.objetivos" rows="4"
+                placeholder="Ej: Mejorar mi técnica de tiro, prepararme para una competencia, perder peso..."
+                required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Enviar Solicitud</button>
+          </form>
+        </div>
+      </div>
+    </transition>
 
 
 
 
-  <!-- Burbuja de Mensajes Flotante -->
-  <div class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
-    <div class="message-icon">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
-    </div>
-
-    <div class="messages-container" v-if="mostrarMensajes">
-      <div class="messages-header">
-        <h3>Mensajes</h3>
-        <button class="close-btn" @click.stop="toggleMensajes">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-        </button>
+    <!-- Burbuja de Mensajes Flotante -->
+    <div class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
+      <div class="message-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
       </div>
 
-      <div class="messages-list">
-        <div v-for="(mensaje, index) in mensajes" :key="index" class="message-item">
-          <img :src="mensaje.entrenador.foto" :alt="mensaje.entrenador.nombre" class="message-avatar">
-          <div class="message-content">
-            <div class="message-header">
-              <span class="sender-name">{{ mensaje.entrenador.nombre }}</span>
-              <span class="message-time">{{ mensaje.hora }}</span>
+      <div class="messages-container" v-if="mostrarMensajes">
+        <div class="messages-header">
+          <h3>Mensajes</h3>
+          <button class="close-btn" @click.stop="toggleMensajes">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="messages-list">
+          <div v-for="(mensaje, index) in mensajes" :key="index" class="message-item">
+            <img :src="mensaje.entrenador.foto" :alt="mensaje.entrenador.nombre" class="message-avatar">
+            <div class="message-content">
+              <div class="message-header">
+                <span class="sender-name">{{ mensaje.entrenador.nombre }}</span>
+                <span class="message-time">{{ mensaje.hora }}</span>
+              </div>
+              <p class="message-text">{{ mensaje.texto }}</p>
             </div>
-            <p class="message-text">{{ mensaje.texto }}</p>
+          </div>
+
+          <div v-if="mensajes.length === 0" class="empty-messages">
+            No tienes mensajes nuevos
           </div>
         </div>
 
-        <div v-if="mensajes.length === 0" class="empty-messages">
-          No tienes mensajes nuevos
+        <div class="messages-footer">
+          <button class="view-all-btn" @click.stop="verTodosLosMensajes">
+            Ver todos los mensajes
+          </button>
         </div>
       </div>
-
-      <div class="messages-footer">
-        <button class="view-all-btn" @click.stop="verTodosLosMensajes">
-          Ver todos los mensajes
-        </button>
-      </div>
     </div>
+
   </div>
-
-
 </template>
-
-
 
 
 
@@ -245,6 +270,13 @@ export default {
       entrenadorSeleccionado: null,
       mostrarMensajes: false,
       nuevosMensajes: 2,
+      mostrarFormularioContacto: false,
+      contactoEntrenador: null,
+      formularioContacto: {
+        edad: '',
+        nivel: '',
+        objetivos: '',
+      },
       entrenadores: [
         {
           id: 1,
@@ -455,10 +487,11 @@ export default {
           hora: 'Ayer',
           leido: false
         }
-      ]
+      ],
     }
   },
   computed: {
+
     entrenadoresFiltrados() {
       let filtrados = this.entrenadores;
 
@@ -479,6 +512,7 @@ export default {
     }
   },
   methods: {
+
     filtrarPorDeporte(deporte) {
       this.deporteActivo = deporte;
     },
@@ -515,15 +549,59 @@ export default {
 
 
     contactarEntrenador(entrenador) {
-      alert(`Solicitud de contacto enviada a ${entrenador.nombre}. Te responderá pronto.`);
-      this.cerrarPerfil();
+      this.contactoEntrenador = entrenador;
+      this.mostrarFormularioContacto = true;
+
+      // Guardar posición actual del scroll antes de abrir el modal
+      this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+      // Deshabilitar scroll del body
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${this.scrollPosition}px`;
+      document.body.style.width = '100%';
     },
+
+    cerrarFormularioContacto() {
+      try {
+        // Habilitar scroll del body
+        document.body.style.overflow = 'auto';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+
+        // Restaurar posición del scroll
+        window.scrollTo(0, this.scrollPosition);
+      } finally {
+        this.mostrarFormularioContacto = false;
+        this.formularioContacto = {
+          edad: '',
+          nivel: '',
+          objetivos: ''
+        };
+      }
+    },
+
+
+    enviarFormularioContacto() {
+      alert(`Solicitud enviada a ${this.contactoEntrenador.nombre}:\n
+        Edad: ${this.formularioContacto.edad}\n
+        Nivel: ${this.formularioContacto.nivel}\n
+        Objetivos: ${this.formularioContacto.objetivos}`);
+
+      this.cerrarFormularioContacto();
+      this.cerrarPerfil(); // Cerrar también el modal de perfil si está abierto
+    },
+
+
     toggleMensajes() {
       this.mostrarMensajes = !this.mostrarMensajes;
       if (this.mostrarMensajes && this.nuevosMensajes > 0) {
         this.nuevosMensajes = 0; // Resetear notificaciones al abrir
       }
     },
+
+
     verTodosLosMensajes() {
       // Navegar a la página completa de mensajes
       this.$router.push('/Mensajes');
@@ -563,4 +641,118 @@ export default {
 @import '../../../scss/Entrenadores/entrenadores_navbar.scss';
 
 @import '../../../scss/Entrenadores/entrenadores_responsive.scss';
+
+
+/* Nuevos estilos para el modal de contacto */
+.contact-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.contact-modal .modal-content {
+  background-color: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-title {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.submit-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #2980b9;
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.close-modal:hover {
+  background-color: #f0f0f0;
+}
+
+.close-modal svg {
+  width: 20px;
+  height: 20px;
+}
+
 </style>
