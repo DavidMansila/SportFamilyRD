@@ -24,4 +24,19 @@ class Trainer extends Model
         'schedule',
         'cost',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function achievements()
+    {
+        return $this->hasMany(Achievement::class, 'trainer_id');
+    }
+
+    public function specialties()
+    {
+        return $this->hasMany(Specialty::class, 'trainer_id');
+    }
 }
