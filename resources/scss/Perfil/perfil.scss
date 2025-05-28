@@ -207,14 +207,13 @@ textarea:focus {
     color: white;
     border: none;
     padding: 15px 30px;
+    margin: 0;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     font-size: 1rem;
-    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
     gap: 8px;
 }
 

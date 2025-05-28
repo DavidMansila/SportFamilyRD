@@ -131,22 +131,8 @@
                                 placeholder="Selecciona un deporte" :allow-empty="false" required></multiselect>
                         </div>
 
-                    </div>
 
-                </div>
-
-
-                <!-- Sección de Biografía -->
-                <div class="profile-section">
-                    <h2>Biografía</h2>
-                    <p v-if="!editMode" class="profile-bio">{{ user.bio || 'Añade una breve biografía sobre ti...' }}
-                    </p>
-                    <textarea v-else v-model="user.bio" placeholder="Cuéntanos sobre ti, tus logros, experiencia..."
-                        rows="4"></textarea>
-                </div>
-
-
-
+                        
                 <!-- Sección de Especialidades -->
                 <div class="profile-section" v-if="user.user_type === 'entrenador'">
                     <h2>Mis Especialidades</h2>
@@ -178,7 +164,7 @@
                     </div>
                 </div>
 
-
+                
                 <!-- Sección de Logros -->
                 <div class="profile-section" v-if="user.user_type === 'entrenador'">
                     <h2>Mis Logros</h2>
@@ -203,6 +189,22 @@
                         </button>
                     </div>
                 </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- Sección de Biografía -->
+                <div class="profile-section">
+                    <h2>Biografía</h2>
+                    <p v-if="!editMode" class="profile-bio">{{ user.bio || 'Añade una breve biografía sobre ti...' }}
+                    </p>
+                    <textarea v-else v-model="user.bio" placeholder="Cuéntanos sobre ti, tus logros, experiencia..."
+                        rows="4"></textarea>
+                </div>
+
 
 
                 <!-- Sección de Redes Sociales -->
