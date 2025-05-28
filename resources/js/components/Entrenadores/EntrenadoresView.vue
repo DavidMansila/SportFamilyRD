@@ -19,7 +19,7 @@
           <h2>¿Tienes lo necesario para ser entrenador?</h2>
           <p>Únete a nuestra red de profesionales y comparte tu conocimiento</p>
         </div>
-        <router-link to="/Solicitud" class="cta-button">
+        <router-link v-if="user" to="/Solicitud" class="cta-button">
           Aplicar Ahora
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -69,7 +69,7 @@
             <p class="experiencia">{{ entrenador.experiencia }}</p>
             <!-- <p class="testimonio">"{{ entrenador.testimonio }}"</p> -->
 
-            <div class="card-footer">
+            <div v-if="user" class="card-footer">
               <button class="contact-btn" @click.stop="contactarEntrenador(entrenador)">
                 <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -147,7 +147,7 @@
 
           </div>
 
-          <div class="modal-footer">
+          <div v-if="user" class="modal-footer">
             <button class="primary-btn" @click="contactarEntrenador(entrenadorSeleccionado)">
               Contactar a {{ entrenadorSeleccionado.nombre.split(' ')[0] }}
             </button>
@@ -203,7 +203,7 @@
 
 
     <!-- Burbuja de Mensajes Flotante -->
-    <div class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
+    <div v-if="user" class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
       <div class="message-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -264,6 +264,7 @@ export default {
   },
   data() {
     return {
+      user: [],
       scrollPosition: 0,
       busqueda: '',
       deporteActivo: 'Todos',
@@ -621,6 +622,7 @@ export default {
 
   },
   mounted() {
+    this.user = JSON.parse(sessionStorage.getItem('user'));
     document.title = 'Entrenadores';
   }
 };
@@ -755,5 +757,4 @@ export default {
   width: 20px;
   height: 20px;
 }
-
 </style>

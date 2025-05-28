@@ -45,11 +45,11 @@
         </transition>
       </div>
 
-      <router-link to="/ajustes" class="Ajustes">
+      <router-link v-if= "user" to="/ajustes" class="Ajustes">
         <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
       </router-link>
 
-      <router-link to="/perfil" class="Perfil">
+      <router-link v-if= "user" to="/perfil" class="Perfil">
         <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
       </router-link>
 
