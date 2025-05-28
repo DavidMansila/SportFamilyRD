@@ -187,14 +187,13 @@ textarea:focus {
     color: white;
     border: none;
     padding: 15px 30px;
+    margin: 0;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     font-size: 1rem;
     box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
     gap: 8px;
 }
 
@@ -321,4 +320,207 @@ select:focus {
 .language-level {
     color: #718096;
     font-size: 0.9rem;
+}
+
+
+
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+
+
+
+/* MULTISELECT */
+.multiselect {
+    width: 100%;
+    max-width: 300px;
+    margin-top: 8px;
+}
+
+.multiselect__tags {
+    min-height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.multiselect__option--highlight {
+    background: #4CAF50;
+    color: white;
+}
+
+
+
+
+
+/* Botón Subir Información */
+.upload-info-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 15px;
+}
+
+.upload-info-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+}
+
+.header-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ESPECIALIDADES
+
+/* Estilos para la sección de especialidades */
+.especialidades-list {
+    margin-top: 15px;
+}
+
+.especialidades-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.especialidad-tag {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.no-especialidades {
+    color: #757575;
+    font-style: italic;
+}
+
+.especialidades-edit {
+    margin-top: 15px;
+}
+
+.especialidades-input-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.especialidad-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.especialidades-edit-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.especialidad-edit-item {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 6px 12px 6px 12px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .especialidades-input-container {
+        flex-direction: column;
+    }
+
+    .btn-agregar-especialidad {
+        padding: 8px;
+    }
+}
+
+.especialidades-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.especialidad-edit-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.especialidad-input-container {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+}
+
+.especialidad-input-container input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn-eliminar-especialidad {
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.btn-eliminar-especialidad:hover {
+    background: #cc0000;
+}
+
+.btn-agregar-especialidad {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background 0.3s;
+}
+
+.btn-agregar-especialidad:hover {
+    background: #45a049;
 }
