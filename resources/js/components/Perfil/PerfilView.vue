@@ -145,9 +145,10 @@
                 </div>
 
 
+
+                <!-- Sección de Especialidades -->
                 <div class="profile-section" v-if="user.user_type === 'entrenador'">
                     <h2>Mis Especialidades</h2>
-
                     <div v-if="!editMode" class="especialidades-list">
                         <div v-if="user.especialidades && user.especialidades.length > 0"
                             class="especialidades-container">
@@ -160,33 +161,19 @@
                     </div>
 
                     <div v-else class="especialidades-edit">
-                        <div class="especialidades-input-container">
-                            <input type="text" v-model="nuevaEspecialidad" @keydown.enter.prevent="agregarEspecialidad"
-                                placeholder="Escribe una especialidad y presiona Enter" class="especialidad-input">
-                            <button @click="agregarEspecialidad" class="btn-agregar-especialidad">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div class="especialidades-edit-list">
-                            <div v-for="(especialidad, index) in user.especialidades" :key="index"
-                                class="especialidad-edit-item">
-                                <span>{{ especialidad }}</span>
+                        <div v-for="(especialidad, index) in user.especialidades" :key="index"
+                            class="especialidad-edit-item">
+                            <div class="especialidad-input-container">
+                                <input type="text" v-model="user.especialidades[index]"
+                                    placeholder="Escribe una especialidad">
                                 <button @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
+                                    ×
                                 </button>
                             </div>
                         </div>
+                        <button @click="agregarNuevaEspecialidad" class="btn-agregar-especialidad">
+                            + Añadir Nueva Especialidad
+                        </button>
                     </div>
                 </div>
 
@@ -501,18 +488,11 @@ export default {
         },
 
 
-        agregarEspecialidad() {
-            if (this.nuevaEspecialidad.trim() &&
-                (!this.user.especialidades || !this.user.especialidades.includes(this.nuevaEspecialidad.trim()))) {
-
-                // Inicializar el array si no existe
-                if (!this.user.especialidades) {
-                    this.$set(this.user, 'especialidades', []);
-                }
-
-                this.user.especialidades.push(this.nuevaEspecialidad.trim());
-                this.nuevaEspecialidad = '';
+        agregarNuevaEspecialidad() {
+            if (!this.user.especialidades) {
+                this.$set(this.user, 'especialidades', []);
             }
+            this.user.especialidades.push('');
         },
 
         eliminarEspecialidad(index) {
@@ -807,5 +787,63 @@ export default {
     .btn-agregar-especialidad {
         padding: 8px;
     }
+}
+
+
+
+
+
+.especialidades-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.especialidad-edit-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.especialidad-input-container {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+}
+
+.especialidad-input-container input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn-eliminar-especialidad {
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-eliminar-especialidad:hover {
+    background: #cc0000;
+}
+
+.btn-agregar-especialidad {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background 0.3s;
+}
+
+.btn-agregar-especialidad:hover {
+    background: #45a049;
 }
 </style>
