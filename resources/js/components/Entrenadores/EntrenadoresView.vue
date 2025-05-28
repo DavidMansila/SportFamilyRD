@@ -67,7 +67,7 @@
             </div>
 
             <p class="experiencia">{{ entrenador.experiencia }}</p>
-            <p class="testimonio">"{{ entrenador.testimonio }}"</p>
+            <!-- <p class="testimonio">"{{ entrenador.testimonio }}"</p> -->
 
             <div class="card-footer">
               <button class="contact-btn" @click.stop="contactarEntrenador(entrenador)">
@@ -135,7 +135,7 @@
               </ul>
             </div>
 
-            <div class="section">
+            <!-- <div class="section">
               <h3>Testimonios</h3>
               <div class="testimonios">
                 <div v-for="(testimonio, index) in entrenadorSeleccionado.testimonios" :key="index" class="testimonio">
@@ -143,7 +143,8 @@
                   <span class="autor">- {{ testimonio.autor }}</span>
                 </div>
               </div>
-            </div>
+            </div> -->
+
           </div>
 
           <div class="modal-footer">
