@@ -68,10 +68,10 @@
           <h3 class="product-name">{{ producto.name }}</h3>
           <div class="product-price-container">
             <span class="product-price">{{ producto.price }} RD$</span>
-            <span class="product-old-price" v-if="producto.oldPrice">{{ producto.oldPrice }} RD$</span>
+            <!-- <span class="product-old-price" v-if="producto.oldPrice">{{ producto.oldPrice }} RD$</span> -->
           </div>
-          <button class="add-to-cart-btn" @click.stop="agregarAlCarrito(producto)">
-            <i class="fas fa-shopping-cart"></i> Añadir
+          <button v-if="user" class="add-to-cart-btn" @click.stop="agregarAlCarrito(producto)">
+            <i class="fas fa-shopping-cart">Agregar</i>
           </button>
 
           <button v-if="user?.user_type === 'admin'" @click.stop="abrirFormularioProducto(producto)" class="btn-editar">
@@ -146,16 +146,17 @@
 
             <p class="product-description">{{ productoSeleccionado.description }}</p>
 
-            <div class="product-actions">
+            <div v-if="user" class="product-actions">
               <div class="quantity-selector">
                 <button @click="decrementQuantity">-</button>
                 <span>{{ quantity }}</span>
                 <button @click="incrementQuantity">+</button>
               </div>
 
-              <button class="add-to-cart" @click="addToCartFromModal">
-                <i class="fas fa-shopping-cart"></i> Añadir al carrito
+              <button v-if="user" class="add-to-cart" @click="addToCartFromModal">
+                <i class="fas fa-shopping-cart"></i> Agregar al carrito
               </button>
+
             </div>
           </div>
         </div>
@@ -295,7 +296,7 @@ export default {
       categoriasFlat: [],
       user: {},
       isLoading: true,
-
+      user: []
     };
   },
 
@@ -505,7 +506,7 @@ export default {
   mounted() {
     this.getProducts();
     window.addEventListener('keyup', this.handleKeyup);
-    this.user = JSON.parse(sessionStorage.getItem('user')) || {};
+    this.user = JSON.parse(sessionStorage.getItem('user'));
     this.generarCategoriasFlat()
     document.title = 'Tienda';
     // document.body.style.backgroundColor = '#e9ecef';
