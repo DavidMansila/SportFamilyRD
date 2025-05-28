@@ -49,13 +49,7 @@
     }
 }
 
-// /* Teléfonos grandes - 576px-767px */
-@media (max-width: 767px) and (min-width: 576px) {
-    .profile-avatar {
-        width: 120px;
-        height: 120px;
-    }
-}
+
 
 // /* Teléfonos medianos - 481px-575px */
 @media (max-width: 575px) and (min-width: 481px) {
@@ -82,3 +76,293 @@
         padding: 20px;
     }
 }
+
+
+
+
+
+
+/* ================= RESPONSIVE PARA MÓVILES ================= */
+@media (max-width: 992px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.5rem 1rem;
+    }
+    
+    .avatar-container {
+        margin-right: 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .profile-info {
+        width: 100%;
+    }
+    
+    .profile-name {
+        font-size: 1.6rem;
+    }
+    
+    .profile-stats {
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .stat-item {
+        min-width: 80px;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .edit-profile-btn {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-top: 1.5rem;
+        width: 100%;
+        padding: 0.8rem;
+    }
+    
+    .upload-info-btn {
+        width: 90%;
+        margin: 1.5rem auto;
+        padding: 0.8rem;
+    }
+    
+    .profile-content {
+        padding: 1.2rem;
+    }
+    
+    .profile-section h2 {
+        font-size: 1.3rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+}
+
+// @media (max-width: 768px) {
+//     .profile-avatar {
+//         width: 120px;
+//         height: 120px;
+//     }
+    
+//     .profile-name {
+//         font-size: 1.5rem;
+//     }
+    
+//     .profile-role {
+//         font-size: 0.95rem;
+//     }
+    
+//     .profile-stats {
+//         gap: 0.8rem;
+//     }
+    
+//     .stat-item {
+//         min-width: 70px;
+//     }
+    
+//     .stat-number {
+//         font-size: 1.2rem;
+//     }
+    
+//     .stat-label {
+//         font-size: 0.85rem;
+//     }
+    
+//     .profile-section {
+//         margin-bottom: 2rem;
+//     }
+    
+//     .info-value, input, textarea {
+//         font-size: 0.95rem;
+//     }
+    
+//     .especialidad-tag {
+//         font-size: 0.85rem;
+//         padding: 0.3rem 0.7rem;
+//     }
+    
+//     .achievement-display h3 {
+//         font-size: 1.05rem;
+//     }
+    
+//     .achievement-date {
+//         font-size: 0.8rem;
+//     }
+// }
+
+@media (max-width: 480px) {
+
+    
+    .profile-header {
+        padding: 1.2rem 0.8rem;
+        border-radius: 12px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-width: 3px;
+    }
+    
+    .edit-avatar {
+        width: 30px;
+        height: 30px;
+        bottom: 5px;
+        right: 5px;
+    }
+    
+    .profile-name {
+        font-size: 1.4rem;
+    }
+    
+    .profile-role {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-stats {
+        gap: 0.5rem;
+    }
+    
+    .stat-item {
+        min-width: 65px;
+    }
+    
+    .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .edit-profile-btn {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .upload-info-btn {
+        font-size: 0.95rem;
+        padding: 0.7rem;
+    }
+    
+    .profile-content {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+    
+    .profile-section h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-value, input, textarea {
+        font-size: 0.92rem;
+    }
+    
+    textarea {
+        min-height: 90px;
+        padding: 0.7rem;
+    }
+    
+    .especialidad-input-container input {
+        padding: 0.5rem;
+        font-size: 0.92rem;
+    }
+    
+    .btn-eliminar-especialidad {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+    }
+    
+    .btn-agregar-especialidad {
+        font-size: 0.92rem;
+        padding: 0.5rem 0.8rem;
+    }
+    
+    .achievement-item {
+        padding: 0.8rem;
+    }
+    
+    .achievement-display h3 {
+        font-size: 1rem;
+    }
+    
+    .achievement-edit input, .achievement-edit textarea {
+        padding: 0.5rem;
+        font-size: 0.92rem;
+    }
+    
+    .remove-achievement {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.7rem;
+    }
+    
+    .add-achievement {
+        font-size: 0.92rem;
+        padding: 0.5rem 0.8rem;
+    }
+    
+    .action-buttons button {
+        padding: 0.7rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .profile-avatar {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .profile-name {
+        font-size: 1.3rem;
+    }
+    
+    .stat-item {
+        min-width: 60px;
+    }
+    
+    .stat-number {
+        font-size: 1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .profile-section h2 {
+        font-size: 1.15rem;
+    }
+    
+    .info-value, input, textarea {
+        font-size: 0.9rem;
+    }
+    
+    .especialidad-tag {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.6rem;
+    }
+    
+    .achievement-display h3 {
+        font-size: 0.95rem;
+    }
+    
+    .achievement-date {
+        font-size: 0.75rem;
+    }
+}
+
