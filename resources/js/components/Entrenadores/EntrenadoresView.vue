@@ -19,7 +19,7 @@
           <h2>¿Tienes lo necesario para ser entrenador?</h2>
           <p>Únete a nuestra red de profesionales y comparte tu conocimiento</p>
         </div>
-        <router-link to="/Solicitud" class="cta-button">
+        <router-link v-if="user" to="/Solicitud" class="cta-button">
           Aplicar Ahora
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -67,9 +67,9 @@
             </div>
 
             <p class="experiencia">{{ entrenador.experiencia }}</p>
-            <p class="testimonio">"{{ entrenador.testimonio }}"</p>
+            <!-- <p class="testimonio">"{{ entrenador.testimonio }}"</p> -->
 
-            <div class="card-footer">
+            <div v-if="user" class="card-footer">
               <button class="contact-btn" @click.stop="contactarEntrenador(entrenador)">
                 <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -135,7 +135,7 @@
               </ul>
             </div>
 
-            <div class="section">
+            <!-- <div class="section">
               <h3>Testimonios</h3>
               <div class="testimonios">
                 <div v-for="(testimonio, index) in entrenadorSeleccionado.testimonios" :key="index" class="testimonio">
@@ -143,10 +143,11 @@
                   <span class="autor">- {{ testimonio.autor }}</span>
                 </div>
               </div>
-            </div>
+            </div> -->
+
           </div>
 
-          <div class="modal-footer">
+          <div v-if="user" class="modal-footer">
             <button class="primary-btn" @click="contactarEntrenador(entrenadorSeleccionado)">
               Contactar a {{ entrenadorSeleccionado.nombre.split(' ')[0] }}
             </button>
@@ -199,10 +200,8 @@
     </transition>
 
 
-
-
     <!-- Burbuja de Mensajes Flotante -->
-    <div class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
+    <div v-if="user" class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
       <div class="message-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -263,6 +262,7 @@ export default {
   },
   data() {
     return {
+      user: [],
       scrollPosition: 0,
       busqueda: '',
       deporteActivo: 'Todos',
@@ -440,33 +440,6 @@ export default {
             }
           ]
         },
-        {
-          id: 7,
-          nombre: 'David López',
-          deporte: 'Artes Marciales',
-          experiencia: '14 años enseñando artes marciales tradicionales y modernas.',
-          foto: '/imagenes/Entrenador7.png',
-          testimonio: 'Más que golpes, enseño valores y crecimiento personal',
-          rating: 5,
-          reseñas: 36,
-          biografia: 'Cinturón negro 5° Dan en Karate, 3° Dan en Judo. Campeón mundial de formas en 2015.',
-          especialidades: ['Defensa personal', 'Katas tradicionales', 'Preparación para competencia'],
-          logros: [
-            '15 campeones nacionales',
-            'Premio Excelencia en Artes Marciales 2019',
-            'Desarrollo del programa "Artes Marciales para la Paz"'
-          ],
-          testimonios: [
-            {
-              texto: 'David no solo me enseñó a pelear, sino a vivir con honor',
-              autor: 'Miguel Ángel Soto'
-            },
-            {
-              texto: 'El mejor sensei que he tenido en 20 años de práctica',
-              autor: 'Patricia Navarro'
-            }
-          ]
-        }
       ],
       mensajes: [
         {
@@ -546,10 +519,11 @@ export default {
       }
     },
 
-
-
     contactarEntrenador(entrenador) {
-      this.contactoEntrenador = entrenador;
+      this.contactoEntrenador = {
+        id: entrenador.id,
+        nombre: entrenador.nombre
+      };
       this.mostrarFormularioContacto = true;
 
       // Guardar posición actual del scroll antes de abrir el modal
@@ -582,18 +556,6 @@ export default {
       }
     },
 
-
-    enviarFormularioContacto() {
-      alert(`Solicitud enviada a ${this.contactoEntrenador.nombre}:\n
-        Edad: ${this.formularioContacto.edad}\n
-        Nivel: ${this.formularioContacto.nivel}\n
-        Objetivos: ${this.formularioContacto.objetivos}`);
-
-      this.cerrarFormularioContacto();
-      this.cerrarPerfil(); // Cerrar también el modal de perfil si está abierto
-    },
-
-
     toggleMensajes() {
       this.mostrarMensajes = !this.mostrarMensajes;
       if (this.mostrarMensajes && this.nuevosMensajes > 0) {
@@ -601,25 +563,56 @@ export default {
       }
     },
 
-
     verTodosLosMensajes() {
       // Navegar a la página completa de mensajes
       this.$router.push('/Mensajes');
+    },
+
+    enviarFormularioContacto() {
+      // Verificar que el usuario está autenticado
+      if (!this.user || !this.user.id) {
+        alert('Debes iniciar sesión para contactar a un entrenador');
+        return;
+      }
+
+      // Preparar los datos para enviar
+      const formData = {
+        user_id: this.user.id, // ID 
+        trainer_id: this.contactoEntrenador.id, // ID del entrenador
+        age: this.formularioContacto.edad,
+        sport_level: this.formularioContacto.nivel,
+        description: this.formularioContacto.objetivos,
+        status: 'pending' // Estado
+      };
+
+      axios.post('/training', formData)
+        .then(response => {
+          if (response.status === 201) {
+            alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
+            this.cerrarFormularioContacto();
+            this.cerrarPerfil();
+          }
+        })
+        .catch(error => {
+          if (error.response?.status === 422) {
+            const errors = error.response.data.errors;
+            let errorMsg = Object.values(errors).flat().join('\n');
+            alert(`Error de validación:\n${errorMsg}`);
+          } else {
+            // Otros errores
+            console.error('Error completo:', error);
+            alert('Error al enviar la solicitud');
+          }
+        });
+    },
+
+    mostrarFeedbackExito() {
+      console.log('Solicitud enviada con éxito');
     }
-
-
-
-
-
-    // FUNCIONES PARA ADMINISTRADOR
-
-    // ELIMINAR ENTRENADOR
-    // AGREGAR ENTRENADOR
-
-
 
   },
   mounted() {
+    this.user = JSON.parse(sessionStorage.getItem('user'));
     document.title = 'Entrenadores';
   }
 };
@@ -754,5 +747,4 @@ export default {
   width: 20px;
   height: 20px;
 }
-
 </style>

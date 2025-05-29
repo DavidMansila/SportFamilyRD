@@ -6,14 +6,14 @@
     <Navbar />
 
     <!-- Botón flotante para agregar noticia -- v-if="user_type === 'admin'" -->
-    <div v-if="user_type === 'admin'" class="floating-action">
+    <!-- <div v-if="user_type === 'admin'" class="floating-action">
       <button class="btn-agregar" @click="agregarNoticia">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 5V19" stroke="white" stroke-width="2" stroke-linecap="round" />
           <path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" />
         </svg>
       </button>
-    </div>
+    </div> -->
 
     <!-- Contenido principal -->
     <div class="container">
@@ -71,6 +71,7 @@
                 </svg>
               </div>
 
+              <div v-if= "user">
               <!-- ADMIN -->
               <button v-if="user.user_type === 'admin'" class="btn-editar" @click.stop="editarNoticia(noticia)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -94,7 +95,7 @@
                   <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" />
                 </svg>
               </button>
-
+            </div>
 
             </div>
           </div>
@@ -236,7 +237,7 @@ export default {
         { value: 'swimming', label: 'Natacion' },
       ],
       saved: false,
-      user: {}
+      user: []
     };
   },
   computed: {
@@ -598,6 +599,7 @@ export default {
       }
     },
   },
+  
   async mounted() {
     try {
       // Cargar savedNews primero para tenerlos disponibles

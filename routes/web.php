@@ -71,6 +71,9 @@ Route::resource('/trainer', TrainerController::class);
 
 //training
 Route::resource('/training', TrainingController::class);
+Route::get('/training/{id}', [TrainingController::class, 'show']);
+
+
 
 
 // Ruta catch-all para SPA

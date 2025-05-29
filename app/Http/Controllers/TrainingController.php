@@ -10,10 +10,20 @@ class TrainingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $trainings = Training::all();
-        return response()->json($trainings);
+        $request->validate([
+            'trainer_id' => 'nullable|integer',
+            'page' => 'sometimes|integer'
+        ]);
+
+        $query = Training::with('user'); // Carga la relación
+
+        if ($request->has('trainer_id')) {
+            $query->where('trainer_id', $request->trainer_id);
+        }
+
+        return $query->paginate(10);
     }
 
     /**
@@ -31,13 +41,13 @@ class TrainingController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'age' => 'required|integer',
-            'sport_level' => 'required',
-            'description' => 'nullable|string',
-            'status' => 'required',
+            'trainer_id' => 'required|exists:users,id',
+            'age' => 'required|integer|min:10|max:100',
+            'sport_level' => 'required|in:Principiante,Intermedio,Avanzado,Profesional',
+            'description' => 'required|string|max:500',
+            'status' => 'required|in:pending,accepted,rejected'
         ]);
 
-        
         $training = Training::create($validated);
         return response()->json($training, 201);
     }
@@ -47,7 +57,12 @@ class TrainingController extends Controller
      */
     public function show($id)
     {
-        $training = Training::findOrFail($id);
+        $training = Training::find($id);
+
+        if (!$training) {
+            return response()->json(['message' => 'Training not found'], 404);
+        }
+
         return response()->json($training);
     }
 
@@ -84,5 +99,17 @@ class TrainingController extends Controller
         $training = Training::findOrFail($id);
         $training->delete();
         return response()->json(null, 204);
+    }
+
+    /**
+     * Get all training requests made by a user.
+     */
+    public function getReceivedTrainings($trainerId)
+    {
+        $trainings = Training::with('user')
+            ->where('trainer_id', $trainerId)
+            ->get();
+
+        return response()->json($trainings);
     }
 }

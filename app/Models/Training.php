@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\User;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ class Training extends Model
 
     protected $fillable = [
         'user_id',
+        'trainer_id',
         'age',
         'sport_level',
         'description',
