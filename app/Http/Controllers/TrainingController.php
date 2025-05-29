@@ -13,14 +13,17 @@ class TrainingController extends Controller
     public function index(Request $request)
     {
         $request->validate([
-            'trainer_id' => 'required|integer|exists:users,id'
+            'trainer_id' => 'nullable|integer',
+            'page' => 'sometimes|integer'
         ]);
 
-        $trainings = Training::where('trainer_id', $request->trainer_id)
-            ->with('user')
-            ->paginate(9);
+        $query = Training::with('user'); // Carga la relación
 
-        return response()->json($trainings);
+        if ($request->has('trainer_id')) {
+            $query->where('trainer_id', $request->trainer_id);
+        }
+
+        return $query->paginate(10);
     }
 
     /**

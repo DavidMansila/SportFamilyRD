@@ -122,7 +122,7 @@ export default {
             mostrarToast: false,
             toastMessage: '',
             colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'],
-            user: []
+            user: null
         }
     },
     computed: {
@@ -137,24 +137,37 @@ export default {
         async cargarSolicitudes() {
             this.isLoading = true;
             try {
-                const trainerId = this.user_id;
+                // 1. Verificar que el usuario existe
+                if (!this.user) {
+                    throw new Error("Usuario no autenticado");
+                }
 
-                const response = await axios.get(`/training?trainer_id=${trainerId}&page=1`);
-                // Procesar la respuesta
-                this.solicitudes = response.data.map(s => ({
+                // 2. Usar this.user.id en lugar de this.user_id
+                const trainerId = this.user.id;
+
+                // 3. Usar parámetros de axios en lugar de interpolación
+                const response = await axios.get('/training', {
+                    params: {
+                        trainer_id: trainerId,
+                        page: 1
+                    }
+                });
+
+                // 4. Acceder a response.data.data (estructura paginada)
+                this.solicitudes = response.data.data.map(s => ({
                     id: s.id,
-                    userName: s.user.name,
+                    userName: s.user?.name || 'Nombre no disponible',
                     edad: s.age,
                     My_level: s.sport_level,
-                    email: s.user.email,
-                    telefono: s.user.phone,
+                    email: s.user?.email || '',
+                    telefono: s.user?.phone || '',
                     mensaje: s.description,
                     estado: this.mapStatus(s.status),
                     fechaSolicitud: s.created_at
                 }));
             } catch (error) {
                 console.error('Error al cargar solicitudes:', error);
-                this.mostrarNotificacion('Error cargando solicitudes');
+                this.mostrarNotificacion('Error cargando solicitudes: ' + error.message);
             } finally {
                 this.isLoading = false;
             }
@@ -238,7 +251,13 @@ export default {
         }
     },
     async mounted() {
-        this.user = JSON.parse(sessionStorage.getItem('user'));
+        const userData = sessionStorage.getItem('user');
+        if (userData) {
+            this.user = JSON.parse(userData);
+        } else {
+            console.error("No se encontró usuario en sessionStorage");
+        }
+
         await this.cargarSolicitudes();
         document.title = 'Solicitudes Usuarios';
     }

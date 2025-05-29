@@ -585,37 +585,24 @@ export default {
         status: 'pending' // Estado
       };
 
-      // Enviar solicitud usando promesas
       axios.post('/training', formData)
         .then(response => {
           if (response.status === 201) {
             alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
             this.cerrarFormularioContacto();
             this.cerrarPerfil();
-          } else {
-            throw new Error(`Respuesta inesperada: ${response.status}`);
           }
         })
         .catch(error => {
-          if (error.response) {
-            const status = error.response.status;
-            if (status === 401) {
-              alert('Sesión expirada. Por favor inicia sesión nuevamente.');
-            } else if (status === 422) {
-              alert('Datos inválidos: ' + Object.values(error.response.data.errors).join(', '));
-            } else {
-              alert(`Error del servidor (${status}): ${error.response.data.message}`);
-            }
-          } else if (error.request) {
-            alert('Error de conexión. Por favor verifica tu conexión a internet.');
+          if (error.response?.status === 422) {
+            const errors = error.response.data.errors;
+            let errorMsg = Object.values(errors).flat().join('\n');
+            alert(`Error de validación:\n${errorMsg}`);
           } else {
-            alert('Error al enviar la solicitud: ' + error.message);
+            // Otros errores
+            console.error('Error completo:', error);
+            alert('Error al enviar la solicitud');
           }
-
-          console.error('Detalles del error:', error);
-        })
-        .finally(() => {
-          this.isSubmitting = false;
         });
     },
 
