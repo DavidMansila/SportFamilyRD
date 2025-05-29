@@ -35,6 +35,14 @@ class TrainerController extends Controller
             ->where('status', 'approved')
             ->get();
 
+        $approvedTrainers->transform(function ($trainer) {
+            $trainer->image = optional($trainer->user)->image;
+            $trainer->image = $trainer->image
+                ? url('storage/users/' . $trainer->user_id . '/' . $trainer->image)
+                : url('storage/users/Perfil-Icon.png');
+            return $trainer;
+        });
+
         return response()->json([
             'message' => 'Entrenadores aprobados obtenidos exitosamente',
             'trainers' => $approvedTrainers
