@@ -1,6 +1,5 @@
 <template>
     <div class="solicitudes-container">
-
         <!-- Navbar -->
         <Navbar />
 
@@ -78,14 +77,19 @@
                     </article>
                 </transition-group>
 
-                <div v-if="!solicitudes.length" class="empty-state">
-                    <img src="/public/imagenes/no-news.png" alt="No hay solicitudes" class="empty-image">
+                <div v-if="isLoading" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Cargando solicitudes...</p>
+                </div>
+
+                <div v-else-if="!solicitudes.length" class="empty-state">
+                    <img src="/imagenes/no-news.png" alt="No hay solicitudes" class="empty-image">
                     <h3>No hay solicitudes disponibles</h3>
                     <p>Actualmente no hay solicitudes de entrenamiento para mostrar.</p>
                 </div>
 
                 <div v-else-if="!solicitudesFiltradas.length" class="empty-filter-state">
-                    <img src="/public/imagenes/no-news.png" alt="No hay resultados" class="empty-image">
+                    <img src="/imagenes/no-news.png" alt="No hay resultados" class="empty-image">
                     <h3>No hay coincidencias</h3>
                     <p>No se encontraron solicitudes con el filtro aplicado.</p>
                     <button @click="filtroEstado = 'todos'" class="btn-clear-filter">Limpiar filtros</button>
@@ -103,6 +107,7 @@
 
 <script>
 import Navbar from '../navbarComponent.vue';
+import axios from 'axios';
 
 export default {
     name: 'SolicitudesEntrenamientos',
@@ -112,22 +117,12 @@ export default {
     data() {
         return {
             filtroEstado: 'todos',
-            solicitudes: [
-                {
-                    id: 1,
-                    userName: "Juan Pérez",
-                    edad: 25,
-                    My_level: "Basico",
-                    email: "juan@example.com",
-                    telefono: "809-555-1234",
-                    mensaje: "Busco entrenamiento para mejorar mi tiro de 3 puntos",
-                    fechaSolicitud: new Date(),
-                    estado: "pendiente"
-                },
-            ],
+            solicitudes: [],
+            isLoading: true,
             mostrarToast: false,
             toastMessage: '',
-            colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8']
+            colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'],
+            user: []
         }
     },
     computed: {
@@ -138,40 +133,87 @@ export default {
         }
     },
     methods: {
+
         async cargarSolicitudes() {
+            this.isLoading = true;
             try {
-                // Simulación de carga de datos
-                this.mostrarNotificacion('Solicitudes actualizadas');
+                const trainerId = this.user_id;
+
+                const response = await axios.get(`/training?trainer_id=${trainerId}&page=1`);
+                // Procesar la respuesta
+                this.solicitudes = response.data.map(s => ({
+                    id: s.id,
+                    userName: s.user.name,
+                    edad: s.age,
+                    My_level: s.sport_level,
+                    email: s.user.email,
+                    telefono: s.user.phone,
+                    mensaje: s.description,
+                    estado: this.mapStatus(s.status),
+                    fechaSolicitud: s.created_at
+                }));
             } catch (error) {
+                console.error('Error al cargar solicitudes:', error);
                 this.mostrarNotificacion('Error cargando solicitudes');
-                console.error(error);
+            } finally {
+                this.isLoading = false;
             }
         },
+
+        mapStatus(status) {
+            const statusMap = {
+                'pending': 'pendiente',
+                'accepted': 'aprobado',
+                'rejected': 'rechazado'
+            };
+            return statusMap[status] || 'pendiente';
+        },
+
         async manejarAccion(id, accion) {
             try {
-                // Simulación de API
+                // Mapear acción local a estado de API
+                const statusMap = {
+                    'aprobado': 'accepted',
+                    'rechazado': 'rejected'
+                };
+                const apiStatus = statusMap[accion];
+
+                if (!apiStatus) {
+                    throw new Error('Acción no válida');
+                }
+
+                // Actualizar el estado en la API
+                await axios.put(`/training/${id}`, {
+                    status: apiStatus
+                });
+
+                // Actualizar el estado local
                 const index = this.solicitudes.findIndex(s => s.id === id);
                 if (index !== -1) {
                     this.solicitudes[index].estado = accion;
                     this.mostrarNotificacion(`Solicitud ${accion === 'aprobado' ? 'aprobada' : 'rechazada'} correctamente`);
                 }
             } catch (error) {
+                console.error('Error actualizando estado:', error);
                 this.mostrarNotificacion('Error actualizando estado');
-                console.error(error);
             }
         },
+
         mostrarNotificacion(mensaje) {
             this.toastMessage = mensaje;
             this.mostrarToast = true;
             setTimeout(() => this.mostrarToast = false, 3000);
         },
+
         getInitials(nombre) {
             return nombre.split(' ').map(p => p[0]).join('').toUpperCase().substring(0, 2);
         },
+
         getAvatarColor(nombre) {
             const hash = nombre.split('').reduce((acc, char) => char.charCodeAt(0) + acc, 0);
             return this.colors[hash % this.colors.length];
         },
+
         formatFecha(fecha) {
             return new Date(fecha).toLocaleDateString('es-ES', {
                 year: 'numeric',
@@ -181,6 +223,7 @@ export default {
                 minute: '2-digit'
             });
         },
+
         getEstadoTexto(estado) {
             const estados = {
                 pendiente: 'Pendiente',
@@ -189,22 +232,92 @@ export default {
             };
             return estados[estado];
         },
+
         actualizarFiltros() {
             // Puedes añadir lógica adicional aquí si necesitas
         }
     },
-    mounted() {
-        this.cargarSolicitudes();
+    async mounted() {
+        this.user = JSON.parse(sessionStorage.getItem('user'));
+        await this.cargarSolicitudes();
         document.title = 'Solicitudes Usuarios';
     }
 }
 </script>
 
-
-
 <style scoped>
 @import '../../../scss/SolicitudUsuarios/SolicitudU.scss';
-
 @import '../../../scss/SolicitudUsuarios/SolicitudU_navbar.scss';
 
+/* Estilos adicionales */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.toast-message {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: fadeInOut 3s ease;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        bottom: 0;
+    }
+
+    10% {
+        opacity: 1;
+        bottom: 20px;
+    }
+
+    90% {
+        opacity: 1;
+        bottom: 20px;
+    }
+
+    100% {
+        opacity: 0;
+        bottom: 0;
+    }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
 </style>

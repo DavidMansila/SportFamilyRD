@@ -200,8 +200,6 @@
     </transition>
 
 
-
-
     <!-- Burbuja de Mensajes Flotante -->
     <div v-if="user" class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
       <div class="message-icon">
@@ -442,33 +440,6 @@ export default {
             }
           ]
         },
-        {
-          id: 7,
-          nombre: 'David López',
-          deporte: 'Artes Marciales',
-          experiencia: '14 años enseñando artes marciales tradicionales y modernas.',
-          foto: '/imagenes/Entrenador7.png',
-          testimonio: 'Más que golpes, enseño valores y crecimiento personal',
-          rating: 5,
-          reseñas: 36,
-          biografia: 'Cinturón negro 5° Dan en Karate, 3° Dan en Judo. Campeón mundial de formas en 2015.',
-          especialidades: ['Defensa personal', 'Katas tradicionales', 'Preparación para competencia'],
-          logros: [
-            '15 campeones nacionales',
-            'Premio Excelencia en Artes Marciales 2019',
-            'Desarrollo del programa "Artes Marciales para la Paz"'
-          ],
-          testimonios: [
-            {
-              texto: 'David no solo me enseñó a pelear, sino a vivir con honor',
-              autor: 'Miguel Ángel Soto'
-            },
-            {
-              texto: 'El mejor sensei que he tenido en 20 años de práctica',
-              autor: 'Patricia Navarro'
-            }
-          ]
-        }
       ],
       mensajes: [
         {
@@ -548,10 +519,11 @@ export default {
       }
     },
 
-
-
     contactarEntrenador(entrenador) {
-      this.contactoEntrenador = entrenador;
+      this.contactoEntrenador = {
+        id: entrenador.id,
+        nombre: entrenador.nombre
+      };
       this.mostrarFormularioContacto = true;
 
       // Guardar posición actual del scroll antes de abrir el modal
@@ -584,18 +556,6 @@ export default {
       }
     },
 
-
-    enviarFormularioContacto() {
-      alert(`Solicitud enviada a ${this.contactoEntrenador.nombre}:\n
-        Edad: ${this.formularioContacto.edad}\n
-        Nivel: ${this.formularioContacto.nivel}\n
-        Objetivos: ${this.formularioContacto.objetivos}`);
-
-      this.cerrarFormularioContacto();
-      this.cerrarPerfil(); // Cerrar también el modal de perfil si está abierto
-    },
-
-
     toggleMensajes() {
       this.mostrarMensajes = !this.mostrarMensajes;
       if (this.mostrarMensajes && this.nuevosMensajes > 0) {
@@ -603,22 +563,65 @@ export default {
       }
     },
 
-
     verTodosLosMensajes() {
       // Navegar a la página completa de mensajes
       this.$router.push('/Mensajes');
+    },
+
+    enviarFormularioContacto() {
+      // Verificar que el usuario está autenticado
+      if (!this.user || !this.user.id) {
+        alert('Debes iniciar sesión para contactar a un entrenador');
+        return;
+      }
+
+      // Preparar los datos para enviar
+      const formData = {
+        user_id: this.user.id, // ID 
+        trainer_id: this.contactoEntrenador.id, // ID del entrenador
+        age: this.formularioContacto.edad,
+        sport_level: this.formularioContacto.nivel,
+        description: this.formularioContacto.objetivos,
+        status: 'pending' // Estado
+      };
+
+      // Enviar solicitud usando promesas
+      axios.post('/training', formData)
+        .then(response => {
+          if (response.status === 201) {
+            alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
+            this.cerrarFormularioContacto();
+            this.cerrarPerfil();
+          } else {
+            throw new Error(`Respuesta inesperada: ${response.status}`);
+          }
+        })
+        .catch(error => {
+          if (error.response) {
+            const status = error.response.status;
+            if (status === 401) {
+              alert('Sesión expirada. Por favor inicia sesión nuevamente.');
+            } else if (status === 422) {
+              alert('Datos inválidos: ' + Object.values(error.response.data.errors).join(', '));
+            } else {
+              alert(`Error del servidor (${status}): ${error.response.data.message}`);
+            }
+          } else if (error.request) {
+            alert('Error de conexión. Por favor verifica tu conexión a internet.');
+          } else {
+            alert('Error al enviar la solicitud: ' + error.message);
+          }
+
+          console.error('Detalles del error:', error);
+        })
+        .finally(() => {
+          this.isSubmitting = false;
+        });
+    },
+
+    mostrarFeedbackExito() {
+      console.log('Solicitud enviada con éxito');
     }
-
-
-
-
-
-    // FUNCIONES PARA ADMINISTRADOR
-
-    // ELIMINAR ENTRENADOR
-    // AGREGAR ENTRENADOR
-
-
 
   },
   mounted() {
