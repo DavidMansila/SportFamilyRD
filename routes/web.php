@@ -8,10 +8,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TrainerController;
+use App\Http\Controllers\TrainingController;
 use App\Models\Configuration;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
-
 
 
 //Rutas para funciones en el back
@@ -49,13 +49,11 @@ Route::post('/post/create-reply/{commentId}', [PostController::class, 'createRep
 Route::put('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
 Route::delete('/post/destroy-reply/{replyId}', [PostController::class, 'destroyReply']);
 
-
 // Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);
 
 // Rutas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
-
 
 //scraper
 Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
@@ -68,8 +66,11 @@ Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
 // Trainer
 Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
 Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus']);
+Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
 Route::resource('/trainer', TrainerController::class);
 
+//training
+Route::resource('/training', TrainingController::class);
 
 
 // Ruta catch-all para SPA
