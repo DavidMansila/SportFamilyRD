@@ -29,6 +29,18 @@ class TrainerController extends Controller
         ], 200);
     }
 
+      public function getAprovedTrainers()
+    {
+        $approvedTrainers = Trainer::with(['achievements', 'specialties'])
+            ->where('status', 'approved')
+            ->get();
+
+        return response()->json([
+            'message' => 'Entrenadores aprobados obtenidos exitosamente',
+            'trainers' => $approvedTrainers
+        ], 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -70,6 +82,7 @@ class TrainerController extends Controller
 
         if ($trainer->status === 'approved') {
             $user->user_type = 'entrenador';
+            $user->category = $trainer->sport_category;
             $user->save();
         } elseif ($trainer->status === 'rejected') {
             $user->user_type = 'user';
@@ -115,4 +128,9 @@ class TrainerController extends Controller
     {
         //
     }
+
+    /**
+     * Get approved trainers with their achievements and specialties.
+     */
+  
 }

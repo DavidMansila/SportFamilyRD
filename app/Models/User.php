@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Models;
+use App\Models\Trainer;
+use App\Models\Achievement;
+use App\Models\Specialty;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,6 +35,35 @@ class User extends Authenticatable
         
     ];
 
+    public function trainer()
+    {
+        return $this->hasOne(Trainer::class);
+    }
+
+    public function achievements()
+    {
+        return $this->hasManyThrough(
+            Achievement::class,
+            Trainer::class,
+            'user_id',    // Foreign key en la tabla Trainer 
+            'trainer_id', // Foreign key en la tabla Achievement 
+            'id',         // Local key en tabla User 
+            'id'          // Local key en tabla Trainer 
+        );
+    }
+
+    public function specialties()
+    {
+        return $this->hasManyThrough(
+            Specialty::class,
+            Trainer::class,
+            'user_id',    // Foreign key en la tabla Trainer
+            'trainer_id', // Foreign key en la tabla  Specialty 
+            'id',         //Local key en tabla User
+            'id'          //Local key en tabla Trainer
+        );
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -54,4 +86,5 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
 }
