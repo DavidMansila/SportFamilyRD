@@ -62,17 +62,58 @@ class TrainerController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-        //todo agregar validacio
-        //todo agregar el add images
-        //todo 
-        $trainer = Trainer::create($request->all());
+       $data = $request->all();
+        $achievements = $data['achievements'] ?? [];
+        unset($data['achievements']);
+        $specialties = $data['specialties'] ?? [];
+        unset($data['specialties']);
+
+        if (isset($data['cost']) && ($data['cost'] === 'null' || $data['cost'] === '')) {
+            $data['cost'] = null;
+        }
+
+        $trainer = Trainer::create($data);
+
+        if (is_string($achievements)) {
+            $achievements = json_decode($achievements, true) ?? [];
+        }
+        
+        $achievements = array_map(function ($item) {
+            if (is_string($item)) {
+                $decoded = json_decode($item, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return $item;
+        }, $achievements);
+        if (!empty($achievements)) {
+            $trainer->achievements()->createMany($achievements);
+        }
+
+        
+        if (is_string($specialties)) {
+            $specialties = json_decode($specialties, true) ?? [];
+        }
+        $specialties = array_map(function ($item) {
+            if (is_string($item)) {
+                $decoded = json_decode($item, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return $item;
+        }, $specialties);
+        if (!empty($specialties)) {
+            $trainer->specialties()->createMany($specialties);
+        }
 
         return response()->json([
-            'message' => 'solicitud de entrenador creada exitosamente',
-            'product' => $trainer
+            'message' => 'solicitud de entrenador creada exitosamente (con achievements y specialties)',
+            'product' => $trainer->load(['achievements', 'specialties'])
         ], 200);
     }
+
+    /**
+     * Store a newly created resource in storage (con manejo de achievements relacional).
+     */
+    
 
     /**
      * Update the status of the specified trainer.
