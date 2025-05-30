@@ -20,7 +20,6 @@ class Trainer extends Model
         'level_of_certification',
         'certificates_linked',
         'description',
-        'achievements',
         'schedule',
         'cost',
     ];
