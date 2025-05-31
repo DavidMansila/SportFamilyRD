@@ -122,17 +122,21 @@
             <div class="section">
               <h3>Especialidades</h3>
               <div class="especialidades">
-                <span v-for="(especialidad, index) in entrenadorSeleccionado.especialidades" :key="index">
-                  {{ especialidad }}
+                <span v-for="(esp, i) in entrenadorSeleccionado.especialidades" :key="i" class="especialidad-tag">
+                  {{ esp }}
                 </span>
               </div>
             </div>
 
             <div class="section">
               <h3>Logros</h3>
-              <ul class="logros">
-                <li v-for="(logro, index) in entrenadorSeleccionado.logros" :key="index">{{ logro }}</li>
-              </ul>
+              <div class="logros">
+                <ul class="logros">
+                  <li v-for="(logro, index) in entrenadorSeleccionado.logros" :key="index">
+                    {{logro}}
+                  </li>
+                </ul>
+              </div>
             </div>
 
             <!-- <div class="section">
@@ -460,8 +464,8 @@ export default {
             rating: trainer.rating || 5,
             reseñas: trainer.reviews || 0,
             biografia: trainer.biography || '',
-            especialidades: trainer.specialties ? trainer.specialties.map(e => e.name) : [],
-            logros: trainer.achievements ? trainer.achievements.map(a => a.title) : []
+            especialidades: trainer.specialties ? trainer.specialties.map(e => e.description || e.name) : [],
+            logros: trainer.achievements ? trainer.achievements.map(a => `${a.title}${a.date ? ` (${a.date})` : ''}`) : []
           }));
         })
         .catch(error => {

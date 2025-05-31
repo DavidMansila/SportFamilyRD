@@ -267,7 +267,6 @@ export default {
     data() {
         return {
             editMode: false,
-            // nuevaEspecialidad: '',
             deportes: ['Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
             user: {
                 categoria: '',
