@@ -74,7 +74,7 @@
               <option value="" disabled selected></option>
               <option value="Fútbol">Fútbol</option>
               <option value="Baloncesto">Baloncesto</option>
-              <option value="Tenis">  </option>
+              <option value="Tenis">Tenis</option>
               <option value="Natación">Natación</option>
               <option value="Ciclismo">Ciclismo</option>
               <option value="Atletismo">Atletismo</option>
@@ -148,22 +148,42 @@
               rows="4" required></textarea>
           </div>
 
-          <div class="form-group">
-            <label class="custom-label">Logros destacados</label>
-            <div class="multi-input">
-              <div v-for="(logro, index) in formulario.logros" :key="index" class="input-with-action">
-                <input type="text" v-model="formulario.logros[index]" placeholder="Ejemplo: 'Campeón regional 2020'" />
-                <button type="button" @click="eliminarLogro(index)" class="remove-item">
-                  &times;
+          <!-- Sección de Logros -->
+          <div class="profile-section">
+            <h2>Mis Logros</h2>
+            <div class="achievements">
+              <div v-for="(logro, index) in formulario.logros" :key="index" class="achievement-item">
+                <div class="achievement-edit">
+                  <input type="text" v-model="logro.title" placeholder="Título del logro" required>
+                  <textarea v-model="logro.description" placeholder="Descripción del logro" rows="2"
+                    required></textarea>
+                  <input type="date" v-model="logro.date" required>
+                  <button type="button" @click="removeAchievement(index)" class="remove-achievement">Eliminar</button>
+                </div>
+              </div>
+              <button type="button" @click="addAchievement" class="add-achievement">+ Añadir Logro</button>
+            </div>
+          </div>
+
+          <!-- Sección de Especialidades -->
+          <div class="profile-section">
+            <h2>Mis Especialidades</h2>
+            <div class="especialidades-list">
+              <div v-for="(especialidad, index) in formulario.especialidades" :key="index"
+                class="especialidad-edit-item">
+                <input type="text" v-model="especialidad.description" placeholder="Ejemplo: Técnica de Carrera" required>
+                <button type="button" @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
+                  ×
                 </button>
               </div>
-              <button type="button" @click="agregarLogro" class="add-item">
-                + Añadir otro logro
+              <button type="button" @click="agregarEspecialidad" class="btn-agregar-especialidad">
+                + Añadir Especialidad
               </button>
             </div>
           </div>
 
-          <div class="form-group">
+
+          <!-- <div class="form-group">
             <label class="custom-label">Disponibilidad</label>
             <div class="availability-grid">
               <div v-for="dia in diasSemana" :key="dia" class="availability-day">
@@ -183,7 +203,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <div class="form-group">
             <label class="custom-label">Tarifa por sesión (opcional)</label>
@@ -258,7 +278,7 @@ export default {
       ],
       formulario: {
         user_id: '',
-        status : 'pending',
+        status: 'pending',
         nombre: '',
         email: '',
         telefono: '',
@@ -268,7 +288,12 @@ export default {
         nivelCertificacion: '',
         certificados: [],
         enfoque: '',
-        logros: [''],
+        logros: [
+          { title: '', description: '', date: '' }
+        ],
+        especialidades: [
+          { description: '' }
+        ],
         disponibilidad: {
           Lunes: false,
           Martes: false,
@@ -415,14 +440,21 @@ export default {
         formData.append('cost', this.formulario.tarifa);
         formData.append('status', this.formulario.status);
 
-
         // Certificados
         this.formulario.certificados.forEach((file, index) => {
           formData.append(`certificates[${index}]`, file);
         });
 
-        // Logros
-        formData.append('achievements', JSON.stringify(this.formulario.logros.filter(l => l.trim() !== '')));
+        const logrosValidos = this.formulario.logros.filter(logro =>
+          logro.title.trim() !== '' && logro.description.trim() !== '' && logro.date
+        );
+        formData.append('achievements', JSON.stringify(logrosValidos));
+
+        // Especialidades
+        const especialidadesValidas = this.formulario.especialidades
+          .filter(e => e.description.trim() !== '')
+
+        formData.append('specialties', JSON.stringify(especialidadesValidas));
 
         // Horarios
         const schedule = {};
@@ -464,7 +496,12 @@ export default {
         nivelCertificacion: '',
         certificados: [],
         enfoque: '',
-        logros: [''],
+        logros: [
+          { title: '', description: '', date: '' }
+        ],
+        especialidades: [
+          { name: '' }
+        ],
         disponibilidad: {
           Lunes: false,
           Martes: false,
@@ -487,16 +524,39 @@ export default {
       }
       this.pasoActual = 1
     },
-    
+
     cerrarModal() {
       this.mostrarConfirmacion = false
       this.$router.push('/Entrenadores')
-    }
+    },
+
+    addAchievement() {
+      this.formulario.logros.push({
+        title: '',
+        description: '',
+        date: new Date().toISOString().split('T')[0]
+      });
+    },
+
+    removeAchievement(index) {
+      this.formulario.logros.splice(index, 1);
+    },
+
+
+    agregarEspecialidad() {
+      this.formulario.especialidades.push({ description: '' });
+    },
+
+    eliminarEspecialidad(index) {
+      this.formulario.especialidades.splice(index, 1);
+    },
+
+
   },
   mounted() {
     this.user = JSON.parse(sessionStorage.getItem('user') || null),
-    
-    this.formulario.user_id = this.user.id;
+
+      this.formulario.user_id = this.user.id;
   }
 }
 </script>
@@ -507,4 +567,5 @@ export default {
 <style scoped>
 @import '../../../scss/Entrenadores/entrenadores_navbar.scss';
 @import '../../../scss/Entrenadores/solicitud.scss';
+@import '/resources/scss/Perfil/perfil_logros.scss';
 </style>

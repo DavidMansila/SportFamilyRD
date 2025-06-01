@@ -168,7 +168,6 @@ export default {
 
         getTrainers() {
             const status = this.filtroEstado === 'all' ? null : this.filtroEstado;
-
             axios.get('/trainer', {
                 params: {
                     status: status
@@ -213,6 +212,7 @@ export default {
                 currency: 'EUR'
             }).format(amount || 0);
         },
+
         getInitials(name) {
             if (!name) return 'NN';
             const parts = name.split(' ');

@@ -67,10 +67,10 @@
 
             </div>
 
-            <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
+            <!-- <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
                 Subir Info. Entrenadores
-            </button>
-            
+            </button> -->
+
             <!-- Contenido del Perfil -->
             <div class="profile-content">
                 <!-- Sección de Información Básica -->
@@ -132,63 +132,65 @@
                         </div>
 
 
-                        
-                <!-- Sección de Especialidades -->
-                <div class="profile-section" v-if="user.user_type === 'entrenador'">
-                    <h2>Mis Especialidades</h2>
-                    <div v-if="!editMode" class="especialidades-list">
-                        <div v-if="user.especialidades && user.especialidades.length > 0"
-                            class="especialidades-container">
-                            <span v-for="(especialidad, index) in user.especialidades" :key="index"
-                                class="especialidad-tag">
-                                {{ especialidad }}
-                            </span>
-                        </div>
-                        <p v-else class="no-especialidades">No has agregado especialidades aún</p>
-                    </div>
 
-                    <div v-else class="especialidades-edit">
-                        <div v-for="(especialidad, index) in user.especialidades" :key="index"
-                            class="especialidad-edit-item">
-                            <div class="especialidad-input-container">
-                                <input type="text" v-model="user.especialidades[index]"
-                                    placeholder="Escribe una especialidad">
-                                <button @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
-                                    ×
+                        <!-- Sección de Especialidades -->
+                        <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                            <h2>Mis Especialidades</h2>
+                            <div v-if="!editMode" class="especialidades-list">
+                                <div v-if="user.especialidades && user.especialidades.length > 0"
+                                    class="especialidades-container">
+                                    <span v-for="(especialidad, index) in user.especialidades" :key="index"
+                                        class="especialidad-tag">
+                                        {{ especialidad }}
+                                    </span>
+                                </div>
+                                <p v-else class="no-especialidades">No has agregado especialidades aún</p>
+                            </div>
+
+                            <div v-else class="especialidades-edit">
+                                <div v-for="(especialidad, index) in user.especialidades" :key="index"
+                                    class="especialidad-edit-item">
+                                    <div class="especialidad-input-container">
+                                        <input type="text" v-model="user.especialidades[index]"
+                                            placeholder="Escribe una especialidad">
+                                        <button @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+                                <button v-if="editMode" @click="agregarEspecialidad" class="btn-agregar-especialidad">
+                                    + Añadir Nueva Especialidad
                                 </button>
                             </div>
                         </div>
-                        <button v-if="editMode" @click="agregarEspecialidad" class="btn-agregar-especialidad">
-                            + Añadir Nueva Especialidad
-                        </button>
-                    </div>
-                </div>
 
-                
-                <!-- Sección de Logros -->
-                <div class="profile-section" v-if="user.user_type === 'entrenador'">
-                    <h2>Mis Logros</h2>
-                    <div class="achievements">
-                        <div v-for="(achievement, index) in user.achievements" :key="index" class="achievement-item">
-                            <div v-if="!editMode" class="achievement-display">
-                                <h3>{{ achievement.title }}</h3>
-                                <p>{{ achievement.description }}</p>
-                                <span class="achievement-date">{{ achievement.date }}</span>
-                            </div>
-                            <div v-else class="achievement-edit">
-                                <input type="text" v-model="achievement.title" placeholder="Título del logro">
-                                <textarea v-model="achievement.description" placeholder="Descripción"></textarea>
-                                <input type="date" v-model="achievement.date">
-                                <button @click="removeAchievement(index)" class="remove-achievement">
-                                    Eliminar
+
+                        <!-- Sección de Logros -->
+                        <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                            <h2>Mis Logros</h2>
+                            <div class="achievements">
+                                <div v-for="(achievement, index) in user.achievements" :key="index"
+                                    class="achievement-item">
+                                    <div v-if="!editMode" class="achievement-display">
+                                        <h3>{{ achievement.title }}</h3>
+                                        <p>{{ achievement.description }}</p>
+                                        <span class="achievement-date">{{ achievement.date }}</span>
+                                    </div>
+                                    <div v-else class="achievement-edit">
+                                        <input type="text" v-model="achievement.title" placeholder="Título del logro">
+                                        <textarea v-model="achievement.description"
+                                            placeholder="Descripción"></textarea>
+                                        <input type="date" v-model="achievement.date">
+                                        <button @click="removeAchievement(index)" class="remove-achievement">
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                                <button v-if="editMode" @click="addAchievement" class="add-achievement">
+                                    + Añadir Logro
                                 </button>
                             </div>
                         </div>
-                        <button v-if="editMode" @click="addAchievement" class="add-achievement">
-                            + Añadir Logro
-                        </button>
-                    </div>
-                </div>
 
 
                     </div>
@@ -267,11 +269,21 @@ export default {
     data() {
         return {
             editMode: false,
-            // nuevaEspecialidad: '',
+            entrenadores: [],
+            trainer: null,
             deportes: ['Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
             user: {
+                name: '',
+                email: '',
+                phone: '',
+                location: '',
+                birthdate: '',
+                bio: '',
+                image: '',
+                user_type: '',
                 categoria: '',
-                // especialidades: []
+                especialidades: [],
+                achievements: []
             },
             stats: {
                 posts: 0,
@@ -280,52 +292,91 @@ export default {
                 rating: 0
             },
             originalUserData: null,
+            originalTrainerData: null,
             nuevaEspecialidad: '',
         }
     },
 
     methods: {
 
-        async saveProfile() {
-
-            const formData = new FormData();
-
-            // Agregar campos básicos
-            formData.append('_method', 'PUT');
-            formData.append('name', this.user.name);
-            formData.append('email', this.user.email);
-            formData.append('phone', this.user.phone);
-            formData.append('location', this.user.location);
-            formData.append('birthdate', this.user.birthdate);
-            formData.append('bio', this.user.bio);
-
-            // formData.append('categoria', this.user.categoria);
-
-            // Agregar imagen si existe
-            if (this.$refs.avatarInput.files[0]) {
-                formData.append('image', this.$refs.avatarInput.files[0]);
-            }
-
-            // if (this.user.especialidades) {
-            //     formData.append('especialidades', this.user.especialidades.join(','));
-            // }
-
-            // Enviar solicitud PUT
-            axios.post(`/user/${this.user.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
+        cargarEntrenadores() {
+            axios.get('/trainer/approved')
                 .then(response => {
-                    // Actualizar datos locales
-                    this.user = response.data.user;
-                    sessionStorage.setItem('user', JSON.stringify(response.data.user));
-                    this.editMode = false;
-                    alert('¡Perfil actualizado correctamente!');
-
+                    this.entrenadores = response.data.trainers;
+                    this.filtroEntrenadores();
                 })
                 .catch(error => {
-                    this.handleError(error, 'Error al guardar perfil');
+                    console.error('Error al cargar entrenadores:', error);
                 });
         },
+
+        filtroEntrenadores() {
+            // Buscar entrenador con el mismo ID de usuario
+            const entrenador = this.entrenadores.find(e => e.user_id === this.user.id);
+
+            if (entrenador) {
+                this.trainer = { ...entrenador };
+                this.originalTrainerData = JSON.parse(JSON.stringify(entrenador));
+
+                // Asignar propiedades específicas de entrenador al objeto de visualización
+                this.user.categoria = this.trainer.sport_category;
+                this.user.especialidades = this.trainer.specialties ?
+                    this.trainer.specialties.map(s => s.description) : [];
+                this.user.achievements = this.trainer.achievements ?
+                    [...this.trainer.achievements] : [];
+            }
+        },
+
+
+        async saveProfile() {
+            try {
+                // 1. Actualizar datos básicos del usuario
+                const userFormData = new FormData();
+                userFormData.append('_method', 'PUT');
+                userFormData.append('name', this.user.name);
+                userFormData.append('email', this.user.email);
+                userFormData.append('phone', this.user.phone);
+                userFormData.append('location', this.user.location);
+                userFormData.append('birthdate', this.user.birthdate);
+                userFormData.append('bio', this.user.bio);
+
+                if (this.$refs.avatarInput.files[0]) {
+                    userFormData.append('image', this.$refs.avatarInput.files[0]);
+                }
+
+                const userResponse = await axios.post(`/user/${this.user.id}`, userFormData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+
+                // Actualizar datos básicos del usuario
+                this.user = { ...this.user, ...userResponse.data.user };
+                sessionStorage.setItem('user', JSON.stringify(this.user));
+
+                // 2. Si es entrenador, actualizar datos específicos
+                if (this.user.user_type === 'entrenador' && this.trainer) {
+                    const trainerData = {
+                        sport_category: this.user.categoria,
+                        specialties: this.user.especialidades.map(e => ({ description: e })),
+                        achievements: [...this.user.achievements]
+                    };
+
+                    const trainerResponse = await axios.put(`/trainer/${this.trainer.id}`, trainerData);
+                    this.trainer = trainerResponse.data.trainer;
+
+                    // Recargar datos de entrenadores para actualizar la vista
+                    await this.cargarEntrenadores();
+                }
+
+                this.editMode = false;
+                alert('¡Perfil actualizado correctamente!');
+
+            } catch (error) {
+                this.handleError(error, 'Error al guardar perfil');
+            }
+        },
+
+
+
 
         handleAvatarChange(event) {
             // Si es el clic en el botón
@@ -499,19 +550,17 @@ export default {
         },
 
 
-        //  redirectToTrainersPage() {
-        //      // Guardar los datos del perfil para usarlos en la página de entrenadores
-        //      sessionStorage.setItem('DatosEntrenador', JSON.stringify(this.user));
-        //      // Redirigir a la página de entrenadores
-        //      this.$router.push('/entrenadores');
-        //  },
-
-
     },
     mounted() {
-        // Cargar datos iniciales
         this.user = JSON.parse(sessionStorage.getItem('user'));
         document.title = 'Perfil de ' + this.user.name;
+
+        if (this.user.user_type === 'entrenador') {
+            this.cargarEntrenadores();
+        }
+
+        // Guardar copia de seguridad para descartar cambios
+        this.originalUserData = JSON.parse(JSON.stringify(this.user));
     }
 }
 </script>
