@@ -67,9 +67,9 @@
 
             </div>
 
-            <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
+            <!-- <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
                 Subir Info. Entrenadores
-            </button>
+            </button> -->
 
             <!-- Contenido del Perfil -->
             <div class="profile-content">
@@ -270,7 +270,7 @@ export default {
         return {
             editMode: false,
             entrenadores: [],
-            trainer: [],
+            trainer: null,
             deportes: ['Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
             user: {
                 name: '',
@@ -292,6 +292,7 @@ export default {
                 rating: 0
             },
             originalUserData: null,
+            originalTrainerData: null,
             nuevaEspecialidad: '',
         }
     },
@@ -301,21 +302,7 @@ export default {
         cargarEntrenadores() {
             axios.get('/trainer/approved')
                 .then(response => {
-                    this.entrenadores = response.data.trainers.map(trainer => ({
-                        id: trainer.id,
-                        nombre: trainer.name,
-                        deporte: trainer.sport_category,
-                        foto: trainer.image,
-                        especialidades: trainer.specialties ?
-                            trainer.specialties.map(e => e.description || e.name) : [],
-                        logros: trainer.achievements ?
-                            trainer.achievements.map(a => ({
-                                title: a.title,
-                                description: a.description || '',
-                                date: a.date || ''
-                            })) : []
-                    }));
-
+                    this.entrenadores = response.data.trainers;
                     this.filtroEntrenadores();
                 })
                 .catch(error => {
@@ -324,61 +311,72 @@ export default {
         },
 
         filtroEntrenadores() {
-            // 1. Buscar entrenador con el mismo ID que el usuario
-            const entrenador = this.entrenadores.find(e => e.id === this.user.id);
+            // Buscar entrenador con el mismo ID de usuario
+            const entrenador = this.entrenadores.find(e => e.user_id === this.user.id);
 
             if (entrenador) {
-                // 2. Fusionar datos específicos del entrenador
-                this.user = {
-                    ...this.user, // Mantener datos básicos del usuario
-                    categoria: entrenador.deporte,
-                    especialidades: [...entrenador.especialidades],
-                    achievements: [...entrenador.logros],
-                    image: entrenador.foto || this.user.image
-                };
+                this.trainer = { ...entrenador };
+                this.originalTrainerData = JSON.parse(JSON.stringify(entrenador));
+
+                // Asignar propiedades específicas de entrenador al objeto de visualización
+                this.user.categoria = this.trainer.sport_category;
+                this.user.especialidades = this.trainer.specialties ?
+                    this.trainer.specialties.map(s => s.description) : [];
+                this.user.achievements = this.trainer.achievements ?
+                    [...this.trainer.achievements] : [];
             }
         },
+
 
         async saveProfile() {
+            try {
+                // 1. Actualizar datos básicos del usuario
+                const userFormData = new FormData();
+                userFormData.append('_method', 'PUT');
+                userFormData.append('name', this.user.name);
+                userFormData.append('email', this.user.email);
+                userFormData.append('phone', this.user.phone);
+                userFormData.append('location', this.user.location);
+                userFormData.append('birthdate', this.user.birthdate);
+                userFormData.append('bio', this.user.bio);
 
-            const formData = new FormData();
+                if (this.$refs.avatarInput.files[0]) {
+                    userFormData.append('image', this.$refs.avatarInput.files[0]);
+                }
 
-            // Agregar campos básicos
-            formData.append('_method', 'PUT');
-            formData.append('name', this.user.name);
-            formData.append('email', this.user.email);
-            formData.append('phone', this.user.phone);
-            formData.append('location', this.user.location);
-            formData.append('birthdate', this.user.birthdate);
-            formData.append('bio', this.user.bio);
-
-            // formData.append('categoria', this.user.categoria);
-
-            // Agregar imagen si existe
-            if (this.$refs.avatarInput.files[0]) {
-                formData.append('image', this.$refs.avatarInput.files[0]);
-            }
-
-            // if (this.user.especialidades) {
-            //     formData.append('especialidades', this.user.especialidades.join(','));
-            // }
-
-            // Enviar solicitud PUT
-            axios.post(`/user/${this.user.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
-                .then(response => {
-                    // Actualizar datos locales
-                    this.user = response.data.user;
-                    sessionStorage.setItem('user', JSON.stringify(response.data.user));
-                    this.editMode = false;
-                    alert('¡Perfil actualizado correctamente!');
-
-                })
-                .catch(error => {
-                    this.handleError(error, 'Error al guardar perfil');
+                const userResponse = await axios.post(`/user/${this.user.id}`, userFormData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
                 });
+
+                // Actualizar datos básicos del usuario
+                this.user = { ...this.user, ...userResponse.data.user };
+                sessionStorage.setItem('user', JSON.stringify(this.user));
+
+                // 2. Si es entrenador, actualizar datos específicos
+                if (this.user.user_type === 'entrenador' && this.trainer) {
+                    const trainerData = {
+                        sport_category: this.user.categoria,
+                        specialties: this.user.especialidades.map(e => ({ description: e })),
+                        achievements: [...this.user.achievements]
+                    };
+
+                    const trainerResponse = await axios.put(`/trainer/${this.trainer.id}`, trainerData);
+                    this.trainer = trainerResponse.data.trainer;
+
+                    // Recargar datos de entrenadores para actualizar la vista
+                    await this.cargarEntrenadores();
+                }
+
+                this.editMode = false;
+                alert('¡Perfil actualizado correctamente!');
+
+            } catch (error) {
+                this.handleError(error, 'Error al guardar perfil');
+            }
         },
+
+
+
 
         handleAvatarChange(event) {
             // Si es el clic en el botón
@@ -557,10 +555,12 @@ export default {
         this.user = JSON.parse(sessionStorage.getItem('user'));
         document.title = 'Perfil de ' + this.user.name;
 
-        // Solo cargar entrenadores si es un entrenador
         if (this.user.user_type === 'entrenador') {
             this.cargarEntrenadores();
         }
+
+        // Guardar copia de seguridad para descartar cambios
+        this.originalUserData = JSON.parse(JSON.stringify(this.user));
     }
 }
 </script>

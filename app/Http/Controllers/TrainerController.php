@@ -29,7 +29,7 @@ class TrainerController extends Controller
         ], 200);
     }
 
-      public function getAprovedTrainers()
+    public function getAprovedTrainers()
     {
         $approvedTrainers = Trainer::with(['achievements', 'specialties'])
             ->where('status', 'approved')
@@ -62,7 +62,7 @@ class TrainerController extends Controller
      */
     public function store(Request $request)
     {
-       $data = $request->all();
+        $data = $request->all();
         $achievements = $data['achievements'] ?? [];
         unset($data['achievements']);
         $specialties = $data['specialties'] ?? [];
@@ -77,7 +77,7 @@ class TrainerController extends Controller
         if (is_string($achievements)) {
             $achievements = json_decode($achievements, true) ?? [];
         }
-        
+
         $achievements = array_map(function ($item) {
             if (is_string($item)) {
                 $decoded = json_decode($item, true);
@@ -89,7 +89,7 @@ class TrainerController extends Controller
             $trainer->achievements()->createMany($achievements);
         }
 
-        
+
         if (is_string($specialties)) {
             $specialties = json_decode($specialties, true) ?? [];
         }
@@ -113,7 +113,7 @@ class TrainerController extends Controller
     /**
      * Store a newly created resource in storage (con manejo de achievements relacional).
      */
-    
+
 
     /**
      * Update the status of the specified trainer.
@@ -165,9 +165,31 @@ class TrainerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $trainer = Trainer::findOrFail($id);
+
+        $trainer->sport_category = $request->input('sport_category');
+
+        // Sincronizar especialidades
+        $trainer->specialties()->delete();
+        foreach ($request->input('specialties') as $specialty) {
+            $trainer->specialties()->create(['description' => $specialty['description']]);
+        }
+
+        // Sincronizar logros
+        $trainer->achievements()->delete();
+        foreach ($request->input('achievements') as $achievement) {
+            $trainer->achievements()->create([
+                'title' => $achievement['title'],
+                'description' => $achievement['description'],
+                'date' => $achievement['date'] ?? null
+            ]);
+        }
+
+        $trainer->save();
+
+        return response()->json(['trainer' => $trainer]);
     }
 
     /**
@@ -181,5 +203,4 @@ class TrainerController extends Controller
     /**
      * Get approved trainers with their achievements and specialties.
      */
-  
 }
