@@ -70,7 +70,7 @@
             <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
                 Subir Info. Entrenadores
             </button>
-            
+
             <!-- Contenido del Perfil -->
             <div class="profile-content">
                 <!-- Sección de Información Básica -->
@@ -132,63 +132,65 @@
                         </div>
 
 
-                        
-                <!-- Sección de Especialidades -->
-                <div class="profile-section" v-if="user.user_type === 'entrenador'">
-                    <h2>Mis Especialidades</h2>
-                    <div v-if="!editMode" class="especialidades-list">
-                        <div v-if="user.especialidades && user.especialidades.length > 0"
-                            class="especialidades-container">
-                            <span v-for="(especialidad, index) in user.especialidades" :key="index"
-                                class="especialidad-tag">
-                                {{ especialidad }}
-                            </span>
-                        </div>
-                        <p v-else class="no-especialidades">No has agregado especialidades aún</p>
-                    </div>
 
-                    <div v-else class="especialidades-edit">
-                        <div v-for="(especialidad, index) in user.especialidades" :key="index"
-                            class="especialidad-edit-item">
-                            <div class="especialidad-input-container">
-                                <input type="text" v-model="user.especialidades[index]"
-                                    placeholder="Escribe una especialidad">
-                                <button @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
-                                    ×
+                        <!-- Sección de Especialidades -->
+                        <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                            <h2>Mis Especialidades</h2>
+                            <div v-if="!editMode" class="especialidades-list">
+                                <div v-if="user.especialidades && user.especialidades.length > 0"
+                                    class="especialidades-container">
+                                    <span v-for="(especialidad, index) in user.especialidades" :key="index"
+                                        class="especialidad-tag">
+                                        {{ especialidad }}
+                                    </span>
+                                </div>
+                                <p v-else class="no-especialidades">No has agregado especialidades aún</p>
+                            </div>
+
+                            <div v-else class="especialidades-edit">
+                                <div v-for="(especialidad, index) in user.especialidades" :key="index"
+                                    class="especialidad-edit-item">
+                                    <div class="especialidad-input-container">
+                                        <input type="text" v-model="user.especialidades[index]"
+                                            placeholder="Escribe una especialidad">
+                                        <button @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+                                <button v-if="editMode" @click="agregarEspecialidad" class="btn-agregar-especialidad">
+                                    + Añadir Nueva Especialidad
                                 </button>
                             </div>
                         </div>
-                        <button v-if="editMode" @click="agregarEspecialidad" class="btn-agregar-especialidad">
-                            + Añadir Nueva Especialidad
-                        </button>
-                    </div>
-                </div>
 
-                
-                <!-- Sección de Logros -->
-                <div class="profile-section" v-if="user.user_type === 'entrenador'">
-                    <h2>Mis Logros</h2>
-                    <div class="achievements">
-                        <div v-for="(achievement, index) in user.achievements" :key="index" class="achievement-item">
-                            <div v-if="!editMode" class="achievement-display">
-                                <h3>{{ achievement.title }}</h3>
-                                <p>{{ achievement.description }}</p>
-                                <span class="achievement-date">{{ achievement.date }}</span>
-                            </div>
-                            <div v-else class="achievement-edit">
-                                <input type="text" v-model="achievement.title" placeholder="Título del logro">
-                                <textarea v-model="achievement.description" placeholder="Descripción"></textarea>
-                                <input type="date" v-model="achievement.date">
-                                <button @click="removeAchievement(index)" class="remove-achievement">
-                                    Eliminar
+
+                        <!-- Sección de Logros -->
+                        <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                            <h2>Mis Logros</h2>
+                            <div class="achievements">
+                                <div v-for="(achievement, index) in user.achievements" :key="index"
+                                    class="achievement-item">
+                                    <div v-if="!editMode" class="achievement-display">
+                                        <h3>{{ achievement.title }}</h3>
+                                        <p>{{ achievement.description }}</p>
+                                        <span class="achievement-date">{{ achievement.date }}</span>
+                                    </div>
+                                    <div v-else class="achievement-edit">
+                                        <input type="text" v-model="achievement.title" placeholder="Título del logro">
+                                        <textarea v-model="achievement.description"
+                                            placeholder="Descripción"></textarea>
+                                        <input type="date" v-model="achievement.date">
+                                        <button @click="removeAchievement(index)" class="remove-achievement">
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                                <button v-if="editMode" @click="addAchievement" class="add-achievement">
+                                    + Añadir Logro
                                 </button>
                             </div>
                         </div>
-                        <button v-if="editMode" @click="addAchievement" class="add-achievement">
-                            + Añadir Logro
-                        </button>
-                    </div>
-                </div>
 
 
                     </div>
@@ -267,10 +269,21 @@ export default {
     data() {
         return {
             editMode: false,
+            entrenadores: [],
+            trainer: [],
             deportes: ['Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
             user: {
+                name: '',
+                email: '',
+                phone: '',
+                location: '',
+                birthdate: '',
+                bio: '',
+                image: '',
+                user_type: '',
                 categoria: '',
-                // especialidades: []
+                especialidades: [],
+                achievements: []
             },
             stats: {
                 posts: 0,
@@ -284,6 +297,47 @@ export default {
     },
 
     methods: {
+
+        cargarEntrenadores() {
+            axios.get('/trainer/approved')
+                .then(response => {
+                    this.entrenadores = response.data.trainers.map(trainer => ({
+                        id: trainer.id,
+                        nombre: trainer.name,
+                        deporte: trainer.sport_category,
+                        foto: trainer.image,
+                        especialidades: trainer.specialties ?
+                            trainer.specialties.map(e => e.description || e.name) : [],
+                        logros: trainer.achievements ?
+                            trainer.achievements.map(a => ({
+                                title: a.title,
+                                description: a.description || '',
+                                date: a.date || ''
+                            })) : []
+                    }));
+
+                    this.filtroEntrenadores();
+                })
+                .catch(error => {
+                    console.error('Error al cargar entrenadores:', error);
+                });
+        },
+
+        filtroEntrenadores() {
+            // 1. Buscar entrenador con el mismo ID que el usuario
+            const entrenador = this.entrenadores.find(e => e.id === this.user.id);
+
+            if (entrenador) {
+                // 2. Fusionar datos específicos del entrenador
+                this.user = {
+                    ...this.user, // Mantener datos básicos del usuario
+                    categoria: entrenador.deporte,
+                    especialidades: [...entrenador.especialidades],
+                    achievements: [...entrenador.logros],
+                    image: entrenador.foto || this.user.image
+                };
+            }
+        },
 
         async saveProfile() {
 
@@ -498,19 +552,15 @@ export default {
         },
 
 
-        //  redirectToTrainersPage() {
-        //      // Guardar los datos del perfil para usarlos en la página de entrenadores
-        //      sessionStorage.setItem('DatosEntrenador', JSON.stringify(this.user));
-        //      // Redirigir a la página de entrenadores
-        //      this.$router.push('/entrenadores');
-        //  },
-
-
     },
     mounted() {
-        // Cargar datos iniciales
         this.user = JSON.parse(sessionStorage.getItem('user'));
         document.title = 'Perfil de ' + this.user.name;
+
+        // Solo cargar entrenadores si es un entrenador
+        if (this.user.user_type === 'entrenador') {
+            this.cargarEntrenadores();
+        }
     }
 }
 </script>

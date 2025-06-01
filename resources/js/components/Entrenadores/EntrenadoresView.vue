@@ -458,12 +458,12 @@ export default {
           this.entrenadores = response.data.trainers.map(trainer => ({
             id: trainer.id,
             nombre: trainer.name,
-            deporte: trainer.sport,
+            deporte: trainer.sport_category,
             experiencia: trainer.experience,
             foto: trainer.image,
             rating: trainer.rating || 5,
             reseñas: trainer.reviews || 0,
-            biografia: trainer.biography || '',
+            biografia: trainer.description || '',
             especialidades: trainer.specialties ? trainer.specialties.map(e => e.description || e.name) : [],
             logros: trainer.achievements ? trainer.achievements.map(a => `${a.title}${a.date ? ` (${a.date})` : ''}`) : []
           }));
