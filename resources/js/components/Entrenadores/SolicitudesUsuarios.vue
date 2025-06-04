@@ -137,37 +137,31 @@ export default {
         async cargarSolicitudes() {
             this.isLoading = true;
             try {
-                // 1. Verificar que el usuario existe
                 if (!this.user) {
                     throw new Error("Usuario no autenticado");
                 }
 
-                // 2. Usar this.user.id en lugar de this.user_id
                 const trainerId = this.user.id;
+                console.log("Buscando solicitudes para trainer_id:", trainerId);
 
-                // 3. Usar parámetros de axios en lugar de interpolación
-                const response = await axios.get('/training', {
-                    params: {
-                        trainer_id: trainerId,
-                        page: 1
-                    }
+                const response = await axios.get('/training-request', {
+                    params: { trainer_id: trainerId }
                 });
 
-                // 4. Acceder a response.data.data (estructura paginada)
-                this.solicitudes = response.data.data.map(s => ({
-                    id: s.id,
-                    userName: s.user?.name || 'Nombre no disponible',
-                    edad: s.age,
-                    My_level: s.sport_level,
-                    email: s.user?.email || '',
-                    telefono: s.user?.phone || '',
-                    mensaje: s.description,
-                    estado: this.mapStatus(s.status),
-                    fechaSolicitud: s.created_at
-                }));
+                console.log("Respuesta completa de la API:", response);
+
+                // Verifica la estructura de los datos
+                if (Array.isArray(response.data)) {
+                    console.log("Número de solicitudes recibidas:", response.data.length);
+                } else {
+                    console.error("La respuesta no es un array:", typeof response.data);
+                }
+
+                // ... resto del código ...
             } catch (error) {
-                console.error('Error al cargar solicitudes:', error);
-                this.mostrarNotificacion('Error cargando solicitudes: ' + error.message);
+                console.error('Error completo:', error);
+                console.error('Respuesta de error:', error.response);
+                this.mostrarNotificacion('Error: ' + (error.response?.data?.message || error.message));
             } finally {
                 this.isLoading = false;
             }
@@ -184,33 +178,50 @@ export default {
 
         async manejarAccion(id, accion) {
             try {
-                // Mapear acción local a estado de API
                 const statusMap = {
                     'aprobado': 'accepted',
                     'rechazado': 'rejected'
                 };
                 const apiStatus = statusMap[accion];
 
-                if (!apiStatus) {
-                    throw new Error('Acción no válida');
-                }
-
-                // Actualizar el estado en la API
-                await axios.put(`/training/${id}`, {
+                const response = await axios.put(`/training/${id}`, {
                     status: apiStatus
                 });
 
-                // Actualizar el estado local
+                // Actualizar el estado localmente
                 const index = this.solicitudes.findIndex(s => s.id === id);
                 if (index !== -1) {
                     this.solicitudes[index].estado = accion;
-                    this.mostrarNotificacion(`Solicitud ${accion === 'aprobado' ? 'aprobada' : 'rechazada'} correctamente`);
                 }
+
+                this.mostrarNotificacion(`Solicitud ${accion} correctamente`);
             } catch (error) {
                 console.error('Error actualizando estado:', error);
-                this.mostrarNotificacion('Error actualizando estado');
+                this.mostrarNotificacion('Error: ' + error.response?.data?.message || error.message);
             }
         },
+
+        // async crearChat(training) {
+        //     try {
+        //         const chatData = {
+        //             user_id: training.user_id,
+        //             trainer_id: training.trainer_id,
+        //             training_id: training.id
+        //         };
+
+        //         const response = await axios.post('/chats', chatData);
+        //         console.log('Chat creado:', response.data);
+        //         this.mostrarNotificacion('Chat creado con éxito');
+        //     } catch (error) {
+        //         console.error('Error creando chat:', error);
+
+        //         if (error.response?.status === 409) {
+        //             this.mostrarNotificacion('Ya existe un chat para esta solicitud');
+        //         } else {
+        //             this.mostrarNotificacion('Error creando chat: ' + error.message);
+        //         }
+        //     }
+        // },
 
         mostrarNotificacion(mensaje) {
             this.toastMessage = mensaje;
@@ -239,9 +250,9 @@ export default {
 
         getEstadoTexto(estado) {
             const estados = {
-                pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
+                pendiente: 'pendiente',
+                aprobado: 'aprobado',
+                rechazado: 'rechazado'
             };
             return estados[estado];
         },
@@ -254,8 +265,16 @@ export default {
         const userData = sessionStorage.getItem('user');
         if (userData) {
             this.user = JSON.parse(userData);
+            console.log("Usuario cargado:", this.user);
+
+            // Verificar si es entrenador
+            if (this.user.user_type !== 'entrenador') {
+                this.mostrarNotificacion("Solo los entrenadores pueden ver solicitudes");
+                return;
+            }
         } else {
             console.error("No se encontró usuario en sessionStorage");
+            this.mostrarNotificacion("Debes iniciar sesión");
         }
 
         await this.cargarSolicitudes();

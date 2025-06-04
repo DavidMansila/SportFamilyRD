@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\ChatController;
 use App\Models\Configuration;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -72,6 +73,17 @@ Route::resource('/trainer', TrainerController::class);
 //training
 Route::resource('/training', TrainingController::class);
 Route::get('/training/{id}', [TrainingController::class, 'show']);
+
+
+
+//chats
+Route::post('/chats', [ChatController::class, 'store']);
+Route::get('/chats', [ChatController::class, 'getUserChats']);
+Route::get('/chats/{chat}/messages', [ChatController::class, 'getMessages']);
+Route::post('/chats/{chat}/messages', [ChatController::class, 'sendMessage']);
+Route::put('/chats/{chat}/read', [ChatController::class, 'markAsRead']);
+Route::post('/chats', [ChatController::class, 'createChat']);
+
 
 
 

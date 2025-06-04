@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('role')->default('usuario'); // Rol predeterminado: 'usuario'
-            $table->date('date');
+            $table->string('user_type')->default('user'); // Rol predeterminado: 'usuario'
+            // $table->date('date');
             // $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

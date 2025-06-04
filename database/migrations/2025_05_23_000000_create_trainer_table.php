@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone');
             $table->string('city_country');
-            $table->enum('sport_category', ['futbol', 'basket', 'tenis', 'natacion', 'otro']);
+            $table->enum('sport_category', ['Fútbol', 'Baloncesto', 'Tenis', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales']);
             $table->string('experience');
-            $table->enum('level_of_certification', ['basico', 'intermedio', 'avanzado', 'experto']);
+            $table->enum('level_of_certification', ['ninguna', 'basica', 'intermedia', 'avanzada', 'nacional', 'internacional']);
             $table->string('certificates_linked')->nullable();
             $table->text('description')->nullable();
             $table->text('achievements')->nullable();
@@ -34,7 +34,6 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
-
     /**
      * Reverse the migrations.
      *
