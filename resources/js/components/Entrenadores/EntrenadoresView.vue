@@ -133,7 +133,7 @@
               <div class="logros">
                 <ul class="logros">
                   <li v-for="(logro, index) in entrenadorSeleccionado.logros" :key="index">
-                    {{logro}}
+                    {{ logro }}
                   </li>
                 </ul>
               </div>
@@ -204,9 +204,11 @@
     </transition>
 
 
+
+
     <!-- Burbuja de Mensajes Flotante -->
-    <div v-if="user" class="message-bubble" :class="{ 'expanded': mostrarMensajes }" @click="toggleMensajes">
-      <div class="message-icon">
+    <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
+      <div class="message-icon" @click="toggleMensajes">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
@@ -215,10 +217,10 @@
         <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
       </div>
 
-      <div class="messages-container" v-if="mostrarMensajes">
+      <div v-if="mostrarMensajes" class="messages-container">
         <div class="messages-header">
-          <h3>Mensajes</h3>
-          <button class="close-btn" @click.stop="toggleMensajes">
+          <h3>Chats</h3>
+          <button class="close-btn" @click="toggleMensajes">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                 stroke-linejoin="round" />
@@ -226,30 +228,35 @@
           </button>
         </div>
 
-        <div class="messages-list">
-          <div v-for="(mensaje, index) in mensajes" :key="index" class="message-item">
-            <img :src="mensaje.entrenador.foto" :alt="mensaje.entrenador.nombre" class="message-avatar">
+        <div v-if="!activeChat">
+          <!-- Lista de chats -->
+          <div v-for="chat in chats" :key="chat.id" class="contact-item" @click="openChat(chat)">
+            <img :src="user.role === 'user' ? chat.trainer.foto : chat.user.foto" class="message-avatar">
             <div class="message-content">
               <div class="message-header">
-                <span class="sender-name">{{ mensaje.entrenador.nombre }}</span>
-                <span class="message-time">{{ mensaje.hora }}</span>
+                <span class="sender-name">
+                  {{ user.role === 'user' ? chat.trainer.name : chat.user.name }}
+                </span>
+                <span v-if="chat.unread" class="unread-badge">{{ chat.unread }}</span>
               </div>
-              <p class="message-text">{{ mensaje.texto }}</p>
+              <p v-if="chat.last_message" class="message-preview">
+                {{ chat.last_message.message }}
+              </p>
             </div>
           </div>
 
-          <div v-if="mensajes.length === 0" class="empty-messages">
-            No tienes mensajes nuevos
-          </div>
+
         </div>
 
-        <div class="messages-footer">
-          <button class="view-all-btn" @click.stop="verTodosLosMensajes">
-            Ver todos los mensajes
-          </button>
-        </div>
+        <!-- Componente de chat activo -->
+        <ChatComponent v-else :active-chat="activeChat" :user="user" @close-chat="activeChat = null" />
       </div>
+
     </div>
+
+
+
+
 
   </div>
 </template>
@@ -258,11 +265,13 @@
 
 <script>
 import Navbar from '../navbarComponent.vue';
+import ChatComponent from '../ChatComponent.vue';
 
 export default {
   name: 'Entrenadores',
   components: {
-    Navbar
+    Navbar,
+    ChatComponent
   },
   data() {
     return {
@@ -273,7 +282,6 @@ export default {
       deportes: ['Todos', 'Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
       entrenadorSeleccionado: null,
       mostrarMensajes: false,
-      nuevosMensajes: 2,
       mostrarFormularioContacto: false,
       contactoEntrenador: null,
       formularioContacto: {
@@ -282,26 +290,11 @@ export default {
         objetivos: '',
       },
       entrenadores: [],
-      mensajes: [
-        {
-          entrenador: {
-            nombre: 'Carlos Pérez',
-            foto: '/imagenes/Entrenador1.png'
-          },
-          texto: 'Hola, estoy interesado en tus servicios. ¿Podríamos hablar?',
-          hora: '10:30 AM',
-          leido: false
-        },
-        {
-          entrenador: {
-            nombre: 'Ana Gómez',
-            foto: '/imagenes/Entrenador2.png'
-          },
-          texto: 'Confirmado el entrenamiento para el viernes a las 5pm',
-          hora: 'Ayer',
-          leido: false
-        }
-      ],
+
+      chats: [],
+      activeChat: null,
+      nuevosMensajes: 0,
+      pollingInterval: null
     }
   },
   computed: {
@@ -404,10 +397,6 @@ export default {
       }
     },
 
-    verTodosLosMensajes() {
-      // Navegar a la página completa de mensajes
-      this.$router.push('/Mensajes');
-    },
 
     enviarFormularioContacto() {
       // Verificar que el usuario está autenticado
@@ -426,7 +415,7 @@ export default {
         status: 'pending' // Estado
       };
 
-      axios.post('/training', formData)
+        axios.post('/training-requests', formData)
         .then(response => {
           if (response.status === 201) {
             alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
@@ -445,10 +434,6 @@ export default {
             alert('Error al enviar la solicitud');
           }
         });
-    },
-
-    mostrarFeedbackExito() {
-      console.log('Solicitud enviada con éxito');
     },
 
 
@@ -474,15 +459,86 @@ export default {
         });
     },
 
+
+
+
+
+    // async loadChats() {
+    //   // Solo cargar si hay usuario
+    //   if (!this.user) return;
+
+    //   try {
+    //     const response = await axios.get('/chats');
+    //     this.chats = response.data.filter(chat => chat.status === 'accepted');
+
+    //     // Detener el polling si no hay chats
+    //     if (this.chats.length === 0 && this.pollingInterval) {
+    //       clearInterval(this.pollingInterval);
+    //       this.pollingInterval = null;
+    //     } else {
+    //       this.calculateUnreadMessages();
+    //     }
+    //   } catch (error) {
+    //     console.error('Error loading chats', error);
+    //   }
+    // },
+
+
+    // calculateUnreadMessages() {
+    //   this.nuevosMensajes = this.chats.reduce((total, chat) => {
+    //     return total + (parseInt(chat.unread) || 0);
+    //   }, 0);
+    // },
+
+    // async openChat(chat) {
+    //   this.activeChat = chat;
+    //   await this.markMessagesAsRead(chat.id);
+    //   this.loadChats();
+    // },
+
+    // async markMessagesAsRead(chatId) {
+    //   try {
+    //     await axios.put(`/chats/${chatId}/read`);
+    //     this.loadChats();
+    //   } catch (error) {
+    //     console.error('Error marking messages as read', error);
+    //   }
+    // },
+
+    // startChatPolling() {
+    //   // Solo inicia el polling si hay usuario
+    //   if (this.user) {
+    //     this.pollingInterval = setInterval(() => {
+    //       this.loadChats();
+    //     }, 10000);
+    //   }
+    // },
+
+    // mostrarNotificacion(mensaje) {
+    //   alert(mensaje);
+    // },
+
   },
   mounted() {
+
     this.user = JSON.parse(sessionStorage.getItem('user'));
     document.title = 'Entrenadores';
     this.cargarEntrenadores();
-  }
+
+    // if (this.user) {
+    //   this.loadChats();
+    //   this.startChatPolling();
+    // }
+  },
+
+  // beforeUnmount() {
+  //   // Limpiar el intervalo cuando el componente se destruye
+  //   if (this.pollingInterval) {
+  //     clearInterval(this.pollingInterval);
+  //   }
+  // }
 };
 </script>
-
 
 
 
@@ -611,5 +667,92 @@ export default {
 .close-modal svg {
   width: 20px;
   height: 20px;
+}
+
+
+
+/* Estilos adicionales para la lista de chats */
+.contact-item {
+  display: flex;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.contact-item:hover {
+  background-color: #f9f9f9;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sender-name {
+  font-weight: bold;
+}
+
+.message-preview {
+  color: #666;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.unread-badge {
+  background: #3498db;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+}
+
+.requests-section {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.request-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.request-info {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.request-actions button {
+  margin-left: 5px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.request-actions button:first-child {
+  background: #4CAF50;
+  color: white;
+}
+
+.request-actions button:last-child {
+  background: #f44336;
+  color: white;
 }
 </style>
