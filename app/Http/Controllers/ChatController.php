@@ -9,139 +9,105 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
-
+    // 1. Crear o recuperar un chat entre usuario y entrenador
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'trainer_id' => 'required|exists:users,id',
-            'training_id' => 'required|exists:trainings,id',
-            'status' => 'required|in:pending,accepted,rejected'
+            'trainer_id' => 'required|exists:users,id'
         ]);
 
-        // Verificar que no exista ya un chat para este training
-        $existingChat = Chat::where('training_id', $request->training_id)->first();
-        if ($existingChat) {
-            return response()->json(['message' => 'Ya existe un chat para este entrenamiento'], 409);
-        }
+        $userId = Auth::id();
 
-        $chat = Chat::create($request->all());
+        $chat = Chat::firstOrCreate(
+            ['user_id' => $userId, 'trainer_id' => $request->trainer_id],
+            ['status' => 'pending']
+        );
 
         return response()->json($chat, 201);
     }
 
-
-    public function createChat(Request $request)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'trainer_id' => 'required|exists:users,id',
-            'training_id' => 'required|exists:training_requests,id', // Cambiado a training_requests
-            'status' => 'required|in:pending,accepted,rejected'
-        ]);
-
-        // Verificar que no exista ya un chat para este training
-        $existingChat = Chat::where('training_id', $request->training_id)->first();
-        if ($existingChat) {
-            return response()->json(['message' => 'Ya existe un chat para este entrenamiento'], 409);
-        }
-
-        $chat = Chat::create([
-            'user_id' => $request->user_id,
-            'trainer_id' => $request->trainer_id,
-            'training_id' => $request->training_id,
-            'status' => $request->status
-        ]);
-
-        return response()->json($chat, 201);
-    }
-
-    // Obtener chats del usuario
-    public function getUserChats()
-    {
-        $user = Auth::user();
-
-        $chats = Chat::where(function ($query) use ($user) {
-            $query->where('user_id', $user->id)
-                ->orWhere('trainer_id', $user->id);
-        })
-            ->where('status', 'accepted')
-            ->with(['user', 'trainer'])
-            ->get();
-
-        return response()->json($chats);
-    }
-
-    // Obtener mensajes de un chat
-    public function getMessages($chatId)
+    // 2. Entrenador acepta el chat
+    public function accept($chatId)
     {
         $chat = Chat::findOrFail($chatId);
 
-        // Verificar que el usuario pertenece al chat
-        if (Auth::id() !== $chat->user_id && Auth::id() !== $chat->trainer_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if (Auth::id() !== $chat->trainer_id) {
+            return response()->json(['error' => 'No autorizado'], 403);
         }
 
-        $messages = Message::where('chat_id', $chatId)
-            ->orderBy('created_at', 'asc')
-            ->get();
+        $chat->status = 'accepted';
+        $chat->save();
 
-        return response()->json($messages);
+        return response()->json(['message' => 'Chat aceptado']);
     }
 
-    // Enviar mensaje
-    public function sendMessage(Request $request, $chatId)
+    // 3. Entrenador rechaza el chat
+    public function reject($chatId)
+    {
+        $chat = Chat::findOrFail($chatId);
+
+        if (Auth::id() !== $chat->trainer_id) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+
+        $chat->status = 'rejected';
+        $chat->save();
+
+        return response()->json(['message' => 'Chat rechazado']);
+    }
+
+    // 4. Enviar mensaje
+    public function sendMessage(Request $request)
     {
         $request->validate([
+            'chat_id' => 'required|exists:chats,id',
             'message' => 'required|string'
         ]);
 
-        $chat = Chat::findOrFail($chatId);
+        $chat = Chat::findOrFail($request->chat_id);
+        $userId = Auth::id();
 
-        // Verificar que el usuario pertenece al chat
-        if (Auth::id() !== $chat->user_id && Auth::id() !== $chat->trainer_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        // Solo participantes pueden enviar
+        if (!in_array($userId, [$chat->user_id, $chat->trainer_id]) || $chat->status !== 'accepted') {
+            return response()->json(['error' => 'No autorizado'], 403);
         }
 
         $message = Message::create([
-            'chat_id' => $chatId,
-            'sender_id' => Auth::id(),
-            'message' => $request->message
+            'chat_id' => $chat->id,
+            'sender_id' => $userId,
+            'message' => $request->message,
+            'read' => false
         ]);
 
         return response()->json($message);
     }
 
-    // Aceptar solicitud de chat
-    public function acceptRequest($chatId)
+    // 5. Obtener mensajes de un chat
+    public function getMessages($chatId)
     {
         $chat = Chat::findOrFail($chatId);
+        $userId = Auth::id();
 
-        // Solo el entrenador puede aceptar
-        if (Auth::id() !== $chat->trainer_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if (!in_array($userId, [$chat->user_id, $chat->trainer_id])) {
+            return response()->json(['error' => 'No autorizado'], 403);
         }
 
-        $chat->update(['status' => 'accepted']);
+        $messages = $chat->messages()->with('sender')->orderBy('created_at')->get();
 
-        return response()->json($chat);
+        return response()->json($messages);
     }
 
-
-    // Marcar mensajes como leídos
-    public function markAsRead($chatId)
+    // 6. Ver todos los chats del usuario autenticado
+    public function index()
     {
-        $chat = Chat::findOrFail($chatId);
+        $userId = Auth::id();
 
-        // Verificar que el usuario pertenece al chat
-        if (Auth::id() !== $chat->user_id && Auth::id() !== $chat->trainer_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        $chats = Chat::where('user_id', $userId)
+            ->orWhere('trainer_id', $userId)
+            ->with(['client', 'trainer'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
-        Message::where('chat_id', $chatId)
-            ->where('sender_id', '!=', Auth::id())
-            ->update(['read' => true]);
-
-        return response()->json(['success' => true]);
+        return response()->json($chats);
     }
 }

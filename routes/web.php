@@ -77,12 +77,13 @@ Route::get('/training/{id}', [TrainingController::class, 'show']);
 
 
 //chats
+Route::get('/chats', [ChatController::class, 'index']);
 Route::post('/chats', [ChatController::class, 'store']);
-Route::get('/chats', [ChatController::class, 'getUserChats']);
-Route::get('/chats/{chat}/messages', [ChatController::class, 'getMessages']);
-Route::post('/chats/{chat}/messages', [ChatController::class, 'sendMessage']);
-Route::put('/chats/{chat}/read', [ChatController::class, 'markAsRead']);
-Route::post('/chats', [ChatController::class, 'createChat']);
+Route::post('/chats/{chatId}/accept', [ChatController::class, 'accept']);
+Route::post('/chats/{chatId}/reject', [ChatController::class, 'reject']);
+
+Route::post('/messages/send', [ChatController::class, 'sendMessage']);
+Route::get('/chats/{chatId}/messages', [ChatController::class, 'getMessages']);
 
 
 

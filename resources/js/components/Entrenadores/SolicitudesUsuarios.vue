@@ -1,113 +1,113 @@
-<template>
-    <div class="solicitudes-container">
-        <!-- Navbar -->
-        <Navbar />
+    <template>
+        <div class="solicitudes-container">
+            <!-- Navbar -->
+            <Navbar />
 
-        <main class="solicitudes-main">
-            <header class="page-header">
-                <h1 class="title">Solicitudes de Entrenamiento</h1>
+            <main class="solicitudes-main">
+                <header class="page-header">
+                    <h1 class="title">Solicitudes de Entrenamiento</h1>
 
-                <div class="filters-container">
-                    <select v-model="filtroEstado" class="filter-select" @change="actualizarFiltros">
-                        <option value="todos">Todas las solicitudes</option>
-                        <option value="pendiente">Pendientes</option>
-                        <option value="aprobado">Aprobadas</option>
-                        <option value="rechazado">Rechazadas</option>
-                    </select>
+                    <div class="filters-container">
+                        <select v-model="filtroEstado" class="filter-select">
+                            <option value="todos">Todas las solicitudes</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="aprobado">Aprobadas</option>
+                            <option value="rechazado">Rechazadas</option>
+                        </select>
 
-                    <button class="btn-refresh" @click="cargarSolicitudes" aria-label="Recargar solicitudes">
-                        🔄
-                    </button>
-                </div>
-            </header>
+                        <button class="btn-refresh" @click="cargarSolicitudes" aria-label="Recargar solicitudes">
+                            🔄
+                        </button>
+                    </div>
+                </header>
 
-            <section class="solicitudes-grid">
-                <transition-group name="list" tag="div" class="solicitudes-list">
-                    <article v-for="solicitud in solicitudesFiltradas" :key="solicitud.id" class="solicitud-card"
-                        :class="solicitud.estado">
-                        <div class="card-header">
-                            <div class="avatar-container">
-                                <img v-if="solicitud.userImage" :src="solicitud.userImage" alt="Imagen de perfil"
-                                    class="user-avatar">
-                                <div v-else class="avatar"
-                                    :style="{ backgroundColor: getAvatarColor(solicitud.userName) }">
-                                    {{ getInitials(solicitud.userName) }}
+                <section class="solicitudes-grid">
+                    <transition-group name="list" tag="div" class="solicitudes-list">
+                        <article v-for="solicitud in solicitudesFiltradas" :key="solicitud.id" class="solicitud-card"
+                            :class="solicitud.estado">
+                            <div class="card-header">
+                                <div class="avatar-container">
+                                    <img :src="solicitud.userImage || '/storage/users/Perfil-Icon.png'" alt="Imagen"
+                                        class="user-avatar">
+                                    <!-- <div v-else class="avatar"
+                                        :style="{ backgroundColor: getAvatarColor(solicitud.userName) }">
+                                        {{ getInitials(solicitud.userName) }}
+                                    </div> -->
+                                    <div class="user-info">
+                                        <p class="user-name">{{ solicitud.userName }}</p>
+                                    </div>
+                                    <p class="user-age">Edad: {{ solicitud.edad }}</p>
                                 </div>
-                                <div class="user-info">
-                                    <p class="user-name">{{ solicitud.userName }}</p>
+
+                                <time class="request-date">
+                                    {{ formatFecha(solicitud.fechaSolicitud) }}
+                                </time>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="sport-info">
+                                    <span class="sport-tag">{{ solicitud.My_level }}</span>
+                                    <div class="contact-info">
+                                        <a :href="`mailto:${solicitud.email}`" class="email-link">
+                                            📧 {{ solicitud.email }}
+                                        </a>
+                                        <a :href="`tel:${solicitud.telefono}`" class="phone-link">
+                                            📱 {{ solicitud.telefono }}
+                                        </a>
+                                    </div>
                                 </div>
-                                <p class="user-age">Edad: {{ solicitud.edad }}</p>
-                            </div>
 
-                            <time class="request-date">
-                                {{ formatFecha(solicitud.fechaSolicitud) }}
-                            </time>
-                        </div>
-
-                        <div class="card-body">
-                            <div class="sport-info">
-                                <span class="sport-tag">{{ solicitud.My_level }}</span>
-                                <div class="contact-info">
-                                    <a :href="`mailto:${solicitud.email}`" class="email-link">
-                                        📧 {{ solicitud.email }}
-                                    </a>
-                                    <a :href="`tel:${solicitud.telefono}`" class="phone-link">
-                                        📱 {{ solicitud.telefono }}
-                                    </a>
+                                <div class="message-container">
+                                    <p class="user-message">"{{ solicitud.mensaje }}"</p>
                                 </div>
                             </div>
 
-                            <div class="message-container">
-                                <p class="user-message">"{{ solicitud.mensaje }}"</p>
+                            <div class="card-actions">
+                                <span class="status-badge" :class="solicitud.estado">
+                                    {{ getEstadoTexto(solicitud.estado) }}
+                                </span>
+
+                                <div v-if="solicitud.estado === 'pendiente'" class="action-buttons">
+                                    <button @click="manejarAccion(solicitud.id, 'aprobado')" class="btn-success"
+                                        title="Aprobar solicitud">
+                                        ✅ Aceptar
+                                    </button>
+                                    <button @click="manejarAccion(solicitud.id, 'rechazado')" class="btn-danger"
+                                        title="Rechazar solicitud">
+                                        ❌ Rechazar
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </article>
+                    </transition-group>
 
-                        <div class="card-actions">
-                            <span class="status-badge" :class="solicitud.estado">
-                                {{ getEstadoTexto(solicitud.estado) }}
-                            </span>
+                    <div v-if="isLoading" class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Cargando solicitudes...</p>
+                    </div>
 
-                            <div v-if="solicitud.estado === 'pendiente'" class="action-buttons">
-                                <button @click="manejarAccion(solicitud.id, 'aprobado')" class="btn-success"
-                                    title="Aprobar solicitud">
-                                    ✅ Aceptar
-                                </button>
-                                <button @click="manejarAccion(solicitud.id, 'rechazado')" class="btn-danger"
-                                    title="Rechazar solicitud">
-                                    ❌ Rechazar
-                                </button>
-                            </div>
-                        </div>
-                    </article>
-                </transition-group>
+                    <div v-else-if="!solicitudes.length" class="empty-state">
+                        <img src="/imagenes/no-news.png" alt="No hay solicitudes" class="empty-image">
+                        <h3>No hay solicitudes disponibles</h3>
+                        <p>Actualmente no hay solicitudes de entrenamiento para mostrar.</p>
+                    </div>
 
-                <div v-if="isLoading" class="loading-state">
-                    <div class="spinner"></div>
-                    <p>Cargando solicitudes...</p>
+                    <div v-else-if="!solicitudesFiltradas.length" class="empty-filter-state">
+                        <img src="/imagenes/no-news.png" alt="No hay resultados" class="empty-image">
+                        <h3>No hay coincidencias</h3>
+                        <p>No se encontraron solicitudes con el filtro aplicado.</p>
+                        <button @click="filtroEstado = 'todos'" class="btn-clear-filter">Limpiar filtros</button>
+                    </div>
+                </section>
+            </main>
+
+            <transition name="fade">
+                <div v-if="mostrarToast" class="toast-message">
+                    {{ toastMessage }}
                 </div>
-
-                <div v-else-if="!solicitudes.length" class="empty-state">
-                    <img src="/imagenes/no-news.png" alt="No hay solicitudes" class="empty-image">
-                    <h3>No hay solicitudes disponibles</h3>
-                    <p>Actualmente no hay solicitudes de entrenamiento para mostrar.</p>
-                </div>
-
-                <div v-else-if="!solicitudesFiltradas.length" class="empty-filter-state">
-                    <img src="/imagenes/no-news.png" alt="No hay resultados" class="empty-image">
-                    <h3>No hay coincidencias</h3>
-                    <p>No se encontraron solicitudes con el filtro aplicado.</p>
-                    <button @click="filtroEstado = 'todos'" class="btn-clear-filter">Limpiar filtros</button>
-                </div>
-            </section>
-        </main>
-
-        <transition name="fade">
-            <div v-if="mostrarToast" class="toast-message">
-                {{ toastMessage }}
-            </div>
-        </transition>
-    </div>
-</template>
+            </transition>
+        </div>
+    </template>
 
 <script>
 import Navbar from '../navbarComponent.vue';
@@ -149,49 +149,20 @@ export default {
 
                 console.log("Respuesta completa:", response);
 
-                // Verifica si la respuesta es un array
                 let datos = response.data;
 
-                // Si no es array, intenta extraer los datos
-                if (!Array.isArray(datos)) {
-                    // Intenta obtener datos de posibles estructuras comunes
-                    if (datos.data && Array.isArray(datos.data)) {
-                        datos = datos.data;  // Para respuestas tipo {data: [...]}
-                    } else if (datos.trainings && Array.isArray(datos.trainings)) {
-                        datos = datos.trainings;  // Para respuestas tipo {trainings: [...]}
-                    } else {
-                        // Si no es array ni tiene estructura conocida, crea un array vacío
-                        console.error("La respuesta no es un array:", datos);
-                        datos = [];
-                    }
+                if (Array.isArray(response.data)) {
+                    datos = response.data;
+                } else if (Array.isArray(response.data?.data)) {
+                    datos = response.data.data;
+                } else if (Array.isArray(response.data?.trainings)) {
+                    datos = response.data.trainings;
+                } else {
+                    console.warn('Estructura de datos no esperada:', response.data);
+                    datos = [];
                 }
 
-                // Mapear datos de la API al formato esperado
-                this.solicitudes = datos.map(item => {
-                    // Usa valores por defecto para evitar errores
-                    const userName = item.user?.full_name ||
-                        item.athlete?.full_name ||
-                        item.user_name ||
-                        item.name ||
-                        'Usuario desconocido';
-                    const email = item.user?.email || item.athlete?.email || '';
-                    const phone = item.user?.phone || item.athlete?.phone || '';
-                    const userImage = item.user?.image_url || item.athlete?.image_url || null;
-
-                    return {
-                        id: item.id || 0,
-                        userId: item.user_id || item.athlete?.id || 0,
-                        userName: userName,
-                        edad: item.age || 0,
-                        email: email,
-                        telefono: phone,
-                        My_level: item.sport_level || 'N/A',
-                        mensaje: item.description || 'Sin mensaje',
-                        estado: this.mapStatus(item.status || 'pending'),
-                        fechaSolicitud: item.created_at || new Date().toISOString(),
-                        userImage: userImage
-                    };
-                });
+                this.solicitudes = datos.map(this.mapearSolicitud);
 
                 console.log("Solicitudes mapeadas:", this.solicitudes);
 
@@ -210,6 +181,24 @@ export default {
             }
         },
 
+        mapearSolicitud(item) {
+            const user = item.user || item.athlete || {};
+
+            return {
+                id: item.id ?? 0,
+                userId: item.user_id ?? user.id ?? 0,
+                userName: item.user?.name || user.full_name || item.user_name || item.name || 'Usuario desconocido',
+                edad: item.age ?? 0,
+                email: user.email || 'Desconocido',
+                telefono: user.phone || 'Desconocido',
+                My_level: item.sport_level || 'N/A',
+                mensaje: item.description || 'Sin mensaje',
+                estado: this.mapStatus(item.status || 'pending'),
+                fechaSolicitud: this.validarFecha(item.created_at) || new Date().toISOString(),
+                userImage: user.image || 'public/storage/users/Perfil-Icon.png'
+            };
+        },
+
         mapStatus(status) {
             const statusMap = {
                 'pending': 'pendiente',
@@ -226,22 +215,23 @@ export default {
                     'rechazado': 'rejected'
                 };
 
-                // Usar la ruta correcta con el ID
-                await axios.put(`/training/${id}`, {
-                    status: statusMap[accion]
-                });
+                await axios.put(`/training/${id}`, { status: statusMap[accion] });
 
-                // Actualizar estado localmente
-                const index = this.solicitudes.findIndex(s => s.id === id);
-                if (index !== -1) {
-                    // Actualizar solo el estado, mantener los demás datos
-                    this.solicitudes[index].estado = accion;
+                const solicitud = this.solicitudes.find(s => s.id == id);
 
-                    // Forzar la reactividad de Vue
-                    this.solicitudes = [...this.solicitudes];
+                if (!solicitud) {
+                    console.warn(`No se encontró solicitud con ID ${id} en this.solicitudes`);
+                    return;
                 }
 
+                solicitud.estado = accion;
+
                 this.mostrarNotificacion(`Solicitud ${accion} correctamente`);
+
+                if (accion === 'aprobado') {
+                    await this.crearChat(id);
+                }
+
             } catch (error) {
                 console.error("Error en manejarAccion:", error);
                 const errorMsg = error.response?.data?.message || error.message;
@@ -249,23 +239,23 @@ export default {
             }
         },
 
-        // async crearChat(trainingId) {
-        //     try {
-        //         const solicitud = this.solicitudes.find(s => s.id === trainingId);
+        async crearChat(trainingId) {
+            try {
+                const solicitud = this.solicitudes.find(s => s.id === trainingId);
 
-        //         await axios.post('/api/chats', {
-        //             user_id: solicitud.userId, // Asegúrate de tener este campo
-        //             trainer_id: this.user.id,
-        //             training_id: trainingId
-        //         });
+                await axios.post('/chats', {
+                    user_id: solicitud.userId,
+                    trainer_id: this.user.id,
+                    // training_id: trainingId
+                });
 
-        //     } catch (error) {
-        //         console.error('Error creando chat:', error);
-        //         if (error.response?.status !== 409) { // 409 = chat ya existe
-        //             this.mostrarNotificacion('Error creando chat: ' + error.message);
-        //         }
-        //     }
-        // },
+            } catch (error) {
+                console.error('Error creando chat:', error);
+                if (error.response?.status !== 409) {
+                    this.mostrarNotificacion('Error creando chat: ' + error.message);
+                }
+            }
+        },
 
         mostrarNotificacion(mensaje) {
             this.toastMessage = mensaje;
@@ -301,9 +291,23 @@ export default {
             return estados[estado];
         },
 
-        actualizarFiltros() {
-            // Puedes añadir lógica adicional aquí si necesitas
-        }
+        // actualizarFiltros() {
+        //     this.solicitudesFiltradas = this.solicitudes.filter(solicitud => {
+        //         const coincideEstado = this.filtroEstado === '' || solicitud.estado === this.filtroEstado;
+        //         const coincideNombre = this.filtroNombre === '' || solicitud.nombre.toLowerCase().includes(this.filtroNombre.toLowerCase());
+
+        //         return coincideEstado && coincideNombre;
+        //     });
+        // },
+
+
+        validarFecha(fecha) {
+            return fecha && !isNaN(new Date(fecha).getTime()) ? fecha : null;
+        },
+
+        // onImageError(event) {
+        //     event.target.src = 'public/storage/users/Perfil-Icon.png';
+        // }
     },
     async mounted() {
         const userData = sessionStorage.getItem('user');
@@ -432,15 +436,12 @@ export default {
 
 
 .user-name {
-padding-top: 10px;
-padding-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .user-age {
     padding-bottom: 10px;
 
 }
-
-
-
 </style>

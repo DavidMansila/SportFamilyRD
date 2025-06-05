@@ -8,9 +8,9 @@ class Chat extends Model
 {
     protected $fillable = ['user_id', 'trainer_id', 'status'];
 
-    public function user()
+    public function client()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function trainer()
