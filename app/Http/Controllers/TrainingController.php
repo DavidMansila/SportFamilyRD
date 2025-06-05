@@ -104,6 +104,7 @@ class TrainingController extends Controller
     /**
      * Get all training requests made by a user.
      */
+    // En TrainingController.php
     public function getReceivedTrainings(Request $request)
     {
         $request->validate([
@@ -112,30 +113,31 @@ class TrainingController extends Controller
 
         $trainerId = $request->input('trainer_id');
 
-        $trainings = Training::with(['athlete', 'trainer'])
+        $trainings = Training::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'phone', 'image');
+        }])
             ->where('trainer_id', $trainerId)
             ->get();
 
         return $trainings->map(function ($training) {
+            // Construir la URL completa de la imagen
+            $imageUrl = $training->user && $training->user->image
+                ? asset('storage/users/' . $training->user->id . '/' . $training->user->image)
+                : asset('storage/users/Perfil-Icon.png'); // Imagen por defecto
+
             return [
                 'id' => $training->id,
+                'user_id' => $training->user_id,
                 'age' => $training->age,
                 'sport_level' => $training->sport_level,
                 'description' => $training->description,
                 'status' => $training->status,
                 'created_at' => $training->created_at,
-
-                // Información del atleta (usuario que solicita)
-                'athlete' => $training->athlete ? [
-                    'name' => $training->athlete->name,
-                    'email' => $training->athlete->email,
-                    'phone' => $training->athlete->phone
-                ] : null,
-
-                // Información del entrenador
-                'trainer' => $training->trainer ? [
-                    'name' => $training->trainer->name,
-                    'email' => $training->trainer->email
+                'user' => $training->user ? [
+                    'name' => $training->user->name,
+                    'email' => $training->user->email,
+                    'phone' => $training->user->phone,
+                    'image_url' => $imageUrl
                 ] : null
             ];
         });

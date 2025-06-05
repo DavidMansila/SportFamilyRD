@@ -26,15 +26,19 @@
                     <article v-for="solicitud in solicitudesFiltradas" :key="solicitud.id" class="solicitud-card"
                         :class="solicitud.estado">
                         <div class="card-header">
-                            <div class="user-info">
-                                <div class="avatar" :style="{ backgroundColor: getAvatarColor(solicitud.userName) }">
+                            <div class="avatar-container">
+                                <img v-if="solicitud.userImage" :src="solicitud.userImage" alt="Imagen de perfil"
+                                    class="user-avatar">
+                                <div v-else class="avatar"
+                                    :style="{ backgroundColor: getAvatarColor(solicitud.userName) }">
                                     {{ getInitials(solicitud.userName) }}
                                 </div>
-                                <div>
-                                    <h3 class="user-name">{{ solicitud.userName }}</h3>
-                                    <p class="user-age">Edad: {{ solicitud.edad }}</p>
+                                <div class="user-info">
+                                    <p class="user-name">{{ solicitud.userName }}</p>
                                 </div>
+                                <p class="user-age">Edad: {{ solicitud.edad }}</p>
                             </div>
+
                             <time class="request-date">
                                 {{ formatFecha(solicitud.fechaSolicitud) }}
                             </time>
@@ -165,9 +169,14 @@ export default {
                 // Mapear datos de la API al formato esperado
                 this.solicitudes = datos.map(item => {
                     // Usa valores por defecto para evitar errores
-                    const userName = item.user?.name || item.athlete?.name || 'Usuario desconocido';
+                    const userName = item.user?.full_name ||
+                        item.athlete?.full_name ||
+                        item.user_name ||
+                        item.name ||
+                        'Usuario desconocido';
                     const email = item.user?.email || item.athlete?.email || '';
                     const phone = item.user?.phone || item.athlete?.phone || '';
+                    const userImage = item.user?.image_url || item.athlete?.image_url || null;
 
                     return {
                         id: item.id || 0,
@@ -179,7 +188,8 @@ export default {
                         My_level: item.sport_level || 'N/A',
                         mensaje: item.description || 'Sin mensaje',
                         estado: this.mapStatus(item.status || 'pending'),
-                        fechaSolicitud: item.created_at || new Date().toISOString()
+                        fechaSolicitud: item.created_at || new Date().toISOString(),
+                        userImage: userImage
                     };
                 });
 
@@ -387,4 +397,50 @@ export default {
 .fade-leave-to {
     opacity: 0;
 }
+
+
+
+/* Nuevos estilos para la imagen de perfil */
+.avatar-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    /* overflow: hidden; */
+    margin-right: 15px;
+    padding-bottom: 110px;
+}
+
+.user-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar {
+    /* Mantén los estilos existentes para el avatar de respaldo */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 15px;
+}
+
+
+.user-name {
+padding-top: 10px;
+padding-bottom: 10px;
+}
+
+.user-age {
+    padding-bottom: 10px;
+
+}
+
+
+
 </style>
