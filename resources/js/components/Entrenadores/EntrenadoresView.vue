@@ -207,19 +207,24 @@
 
 
     <!-- Burbuja de Mensajes Flotante -->
+    <!-- Burbuja de Mensajes Flotante (versión mejorada) -->
     <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
-      <div class="message-icon" @click="toggleMensajes">
-        <!-- icono y badge -->
+      <div class="message-icon-container" @click="toggleMensajes">
+        <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
         <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
       </div>
 
       <div v-if="mostrarMensajes" class="messages-container">
         <div class="messages-header">
           <h3>Chats</h3>
-          <button class="close-btn" @click="toggleMensajes">X</button>
+          <button class="close-btn" @click="toggleMensajes">×</button>
         </div>
 
-        <div v-if="!activeChat">
+        <div v-if="!activeChat" class="contact-list">
           <div v-for="chat in chatsAprobados" :key="chat.id" class="contact-item" @click="openChat(chat)">
             <img :src="user.role === 'user' ? chat.trainer.foto : chat.user.foto" class="message-avatar" />
             <div class="message-content">
@@ -227,7 +232,10 @@
                 <span class="sender-name">{{ user.role === 'user' ? chat.trainer.name : chat.user.name }}</span>
                 <span v-if="chat.unread" class="unread-badge">{{ chat.unread }}</span>
               </div>
-              <p v-if="chat.last_message" class="message-preview">{{ chat.last_message.message }}</p>
+              <p v-if="chat.last_message" class="message-preview">
+                <span v-if="chat.last_message.sender === user.id">Tú: </span>
+                {{ chat.last_message.message }}
+              </p>
             </div>
           </div>
         </div>
@@ -235,6 +243,7 @@
         <ChatComponent v-else :active-chat="activeChat" :user="user" @close-chat="cerrarChat" />
       </div>
     </div>
+
 
 
 
@@ -263,7 +272,6 @@ export default {
       deporteActivo: 'Todos',
       deportes: ['Todos', 'Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
       entrenadorSeleccionado: null,
-      mostrarMensajes: false,
       mostrarFormularioContacto: false,
       contactoEntrenador: null,
       formularioContacto: {
@@ -275,9 +283,10 @@ export default {
 
       chats: [],
       // chatsAprobados: [],
-      activeChat: null,
+      mostrarMensajes: false,
       nuevosMensajes: 0,
-      pollingInterval: null
+      activeChat: null,
+      pollingInterval: null,
     }
   },
   computed: {
@@ -652,92 +661,5 @@ export default {
 .close-modal svg {
   width: 20px;
   height: 20px;
-}
-
-
-
-/* Estilos adicionales para la lista de chats */
-.contact-item {
-  display: flex;
-  padding: 10px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-}
-
-.contact-item:hover {
-  background-color: #f9f9f9;
-}
-
-.message-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.message-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.sender-name {
-  font-weight: bold;
-}
-
-.message-preview {
-  color: #666;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
-}
-
-.unread-badge {
-  background: #3498db;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-}
-
-.requests-section {
-  margin-top: 20px;
-  border-top: 1px solid #eee;
-  padding-top: 10px;
-}
-
-.request-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-}
-
-.request-info {
-  flex: 1;
-  margin-left: 10px;
-}
-
-.request-actions button {
-  margin-left: 5px;
-  padding: 5px 10px;
-  font-size: 0.8rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.request-actions button:first-child {
-  background: #4CAF50;
-  color: white;
-}
-
-.request-actions button:last-child {
-  background: #f44336;
-  color: white;
 }
 </style>

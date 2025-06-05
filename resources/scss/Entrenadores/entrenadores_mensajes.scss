@@ -462,3 +462,91 @@
 .message-text {
     color: #5d4037 !important;
 }
+
+
+
+
+/* Estilos adicionales para la lista de chats */
+.contact-item {
+  display: flex;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.contact-item:hover {
+  background-color: #f9f9f9;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sender-name {
+  font-weight: bold;
+}
+
+.message-preview {
+  color: #666;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.unread-badge {
+  background: #3498db;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+}
+
+.requests-section {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.request-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.request-info {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.request-actions button {
+  margin-left: 5px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.request-actions button:first-child {
+  background: #4CAF50;
+  color: white;
+}
+
+.request-actions button:last-child {
+  background: #f44336;
+  color: white;
+}

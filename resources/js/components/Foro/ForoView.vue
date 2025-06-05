@@ -19,7 +19,7 @@
       <div class="hero-overlay"></div>
     </div>
 
-    
+
     <!-- Filtros y búsqueda -->
     <div class="filtros-container">
       <div class="search-bar">
@@ -1279,10 +1279,4 @@ export default {
 .login-prompt a:hover {
   text-decoration: underline;
 }
-
-
-
-
-
-
 </style>
