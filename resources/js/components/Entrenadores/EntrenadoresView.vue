@@ -207,7 +207,7 @@
 
 
     <!-- Burbuja de Mensajes Flotante -->
-    <div v-if="user && chatsAprobados.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
+    <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
       <div class="message-icon" @click="toggleMensajes">
         <!-- icono y badge -->
         <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
@@ -274,20 +274,19 @@ export default {
       entrenadores: [],
 
       chats: [],
+      // chatsAprobados: [],
       activeChat: null,
       nuevosMensajes: 0,
       pollingInterval: null
     }
   },
   computed: {
-
     entrenadoresFiltrados() {
       let filtrados = this.entrenadores;
 
       if (this.deporteActivo !== 'Todos') {
         filtrados = filtrados.filter(e => e.deporte === this.deporteActivo);
       }
-
       if (this.busqueda) {
         const term = this.busqueda.toLowerCase();
         filtrados = filtrados.filter(e =>
@@ -296,23 +295,16 @@ export default {
           e.especialidades.some(esp => esp.toLowerCase().includes(term))
         );
       }
-
       return filtrados;
     },
-
-
-    chatsAprobados() {
-      return this.chats.filter(chat => chat.approved && (
-        chat.user.id === this.user.id || chat.trainer.id === this.user.id
-      ));
-    },
-  },
-  watch: {
-    chatsAprobados(newChats) {
-      this.nuevosMensajes = newChats.reduce((acc, chat) => acc + (chat.unread || 0), 0);
-    }
   },
   methods: {
+
+    // async obtenerChats() {
+    //   const res = await axios.get('/chats', { params: { user_id: this.user.id } });
+    //   this.chats = res.data;
+    //   this.chatsAprobados = this.chats.filter(chat => chat.estado === 'aprobado');
+    // },
 
     filtrarPorDeporte(deporte) {
       this.deporteActivo = deporte;
@@ -459,7 +451,9 @@ export default {
       if (!this.user) return;
 
       try {
-        const response = await axios.get('/chats');
+        const response = await axios.get('/chats', {
+          params: { user_id: this.user.id }
+        });
         this.chats = response.data.filter(chat => chat.status === 'accepted');
 
         // Detener el polling si no hay chats
@@ -516,10 +510,12 @@ export default {
     document.title = 'Entrenadores';
     this.cargarEntrenadores();
 
-    // if (this.user) {
-    //   this.loadChats();
-    //   this.startChatPolling();
-    // }
+    if (this.user) {
+      this.loadChats();
+      // this.startChatPolling();
+    }
+
+    // this.obtenerChats();
   },
 
   // beforeUnmount() {
@@ -530,8 +526,6 @@ export default {
   // }
 };
 </script>
-
-
 
 
 <style scoped>

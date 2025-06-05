@@ -98,9 +98,13 @@ class ChatController extends Controller
     }
 
     // 6. Ver todos los chats del usuario autenticado
-    public function index()
+    public function index(Request $request)
     {
-        $userId = Auth::id();
+        $userId = $request->query('user_id');
+
+        if (!$userId) {
+            return response()->json(['error' => 'Falta el parámetro user_id'], 400);
+        }
 
         $chats = Chat::where('user_id', $userId)
             ->orWhere('trainer_id', $userId)

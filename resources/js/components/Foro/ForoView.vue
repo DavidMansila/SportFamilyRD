@@ -19,9 +19,7 @@
       <div class="hero-overlay"></div>
     </div>
 
-
-
-
+    
     <!-- Filtros y búsqueda -->
     <div class="filtros-container">
       <div class="search-bar">
