@@ -227,6 +227,11 @@ export default {
                 solicitud.estado = accion;
 
                 this.mostrarNotificacion(`Solicitud ${accion} correctamente`);
+
+                if (accion === 'aprobado') {
+                    await this.crearChat(id);
+                }
+
             } catch (error) {
                 console.error("Error en manejarAccion:", error);
                 const errorMsg = error.response?.data?.message || error.message;
@@ -234,23 +239,23 @@ export default {
             }
         },
 
-        // async crearChat(trainingId) {
-        //     try {
-        //         const solicitud = this.solicitudes.find(s => s.id === trainingId);
+        async crearChat(trainingId) {
+            try {
+                const solicitud = this.solicitudes.find(s => s.id === trainingId);
 
-        //         await axios.post('/api/chats', {
-        //             user_id: solicitud.userId, // Asegúrate de tener este campo
-        //             trainer_id: this.user.id,
-        //             training_id: trainingId
-        //         });
+                await axios.post('/chats', {
+                    user_id: solicitud.userId,
+                    trainer_id: this.user.id,
+                    // training_id: trainingId
+                });
 
-        //     } catch (error) {
-        //         console.error('Error creando chat:', error);
-        //         if (error.response?.status !== 409) { // 409 = chat ya existe
-        //             this.mostrarNotificacion('Error creando chat: ' + error.message);
-        //         }
-        //     }
-        // },
+            } catch (error) {
+                console.error('Error creando chat:', error);
+                if (error.response?.status !== 409) {
+                    this.mostrarNotificacion('Error creando chat: ' + error.message);
+                }
+            }
+        },
 
         mostrarNotificacion(mensaje) {
             this.toastMessage = mensaje;
