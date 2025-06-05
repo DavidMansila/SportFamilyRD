@@ -149,18 +149,14 @@ export default {
 
                 console.log("Respuesta completa:", response);
 
-                // Verifica si la respuesta es un array
                 let datos = response.data;
 
-                // Si no es array, intenta extraer los datos
                 if (!Array.isArray(datos)) {
-                    // Intenta obtener datos de posibles estructuras comunes
                     if (datos.data && Array.isArray(datos.data)) {
-                        datos = datos.data;  // Para respuestas tipo {data: [...]}
+                        datos = datos.data;
                     } else if (datos.trainings && Array.isArray(datos.trainings)) {
-                        datos = datos.trainings;  // Para respuestas tipo {trainings: [...]}
+                        datos = datos.trainings; 
                     } else {
-                        // Si no es array ni tiene estructura conocida, crea un array vacío
                         console.error("La respuesta no es un array:", datos);
                         datos = [];
                     }
@@ -224,20 +220,16 @@ export default {
                     'rechazado': 'rejected'
                 };
 
-                // Usar la ruta correcta con el ID
-                await axios.put(`/training/${id}`, {
-                    status: statusMap[accion]
-                });
+                await axios.put(`/training/${id}`, { status: statusMap[accion] });
 
-                // Actualizar estado localmente
-                const index = this.solicitudes.findIndex(s => s.id === id);
-                if (index !== -1) {
-                    // Actualizar solo el estado, mantener los demás datos
-                    this.solicitudes[index].estado = accion;
+                const solicitud = this.solicitudes.find(s => s.id == id);
 
-                    // Forzar la reactividad de Vue
-                    this.solicitudes = [...this.solicitudes];
+                if (!solicitud) {
+                    console.warn(`No se encontró solicitud con ID ${id} en this.solicitudes`);
+                    return;
                 }
+
+                solicitud.estado = accion;
 
                 this.mostrarNotificacion(`Solicitud ${accion} correctamente`);
             } catch (error) {
@@ -300,7 +292,12 @@ export default {
         },
 
         actualizarFiltros() {
-            // Puedes añadir lógica adicional aquí si necesitas
+            this.solicitudesFiltradas = this.solicitudes.filter(solicitud => {
+                const coincideEstado = this.filtroEstado === '' || solicitud.estado === this.filtroEstado;
+                const coincideNombre = this.filtroNombre === '' || solicitud.nombre.toLowerCase().includes(this.filtroNombre.toLowerCase());
+
+                return coincideEstado && coincideNombre;
+            });
         }
     },
     async mounted() {
@@ -430,15 +427,12 @@ export default {
 
 
 .user-name {
-padding-top: 10px;
-padding-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .user-age {
     padding-bottom: 10px;
 
 }
-
-
-
 </style>
