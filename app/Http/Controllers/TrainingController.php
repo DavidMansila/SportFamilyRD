@@ -104,12 +104,40 @@ class TrainingController extends Controller
     /**
      * Get all training requests made by a user.
      */
-    public function getReceivedTrainings($trainerId)
+    public function getReceivedTrainings(Request $request)
     {
-        $trainings = Training::with('user')
+        $request->validate([
+            'trainer_id' => 'required|integer'
+        ]);
+
+        $trainerId = $request->input('trainer_id');
+
+        $trainings = Training::with(['athlete', 'trainer'])
             ->where('trainer_id', $trainerId)
             ->get();
 
-        return response()->json($trainings);
+        return $trainings->map(function ($training) {
+            return [
+                'id' => $training->id,
+                'age' => $training->age,
+                'sport_level' => $training->sport_level,
+                'description' => $training->description,
+                'status' => $training->status,
+                'created_at' => $training->created_at,
+
+                // Información del atleta (usuario que solicita)
+                'athlete' => $training->athlete ? [
+                    'name' => $training->athlete->name,
+                    'email' => $training->athlete->email,
+                    'phone' => $training->athlete->phone
+                ] : null,
+
+                // Información del entrenador
+                'trainer' => $training->trainer ? [
+                    'name' => $training->trainer->name,
+                    'email' => $training->trainer->email
+                ] : null
+            ];
+        });
     }
 }

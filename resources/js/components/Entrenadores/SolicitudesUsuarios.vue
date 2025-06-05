@@ -137,31 +137,64 @@ export default {
         async cargarSolicitudes() {
             this.isLoading = true;
             try {
-                if (!this.user) {
-                    throw new Error("Usuario no autenticado");
-                }
+                if (!this.user) throw new Error("Usuario no autenticado");
 
-                const trainerId = this.user.id;
-                console.log("Buscando solicitudes para trainer_id:", trainerId);
-
-                const response = await axios.get('/training-request', {
-                    params: { trainer_id: trainerId }
+                const response = await axios.get('/training', {
+                    params: { trainer_id: this.user.id }
                 });
 
-                console.log("Respuesta completa de la API:", response);
+                console.log("Respuesta completa:", response);
 
-                // Verifica la estructura de los datos
-                if (Array.isArray(response.data)) {
-                    console.log("Número de solicitudes recibidas:", response.data.length);
-                } else {
-                    console.error("La respuesta no es un array:", typeof response.data);
+                // Verifica si la respuesta es un array
+                let datos = response.data;
+
+                // Si no es array, intenta extraer los datos
+                if (!Array.isArray(datos)) {
+                    // Intenta obtener datos de posibles estructuras comunes
+                    if (datos.data && Array.isArray(datos.data)) {
+                        datos = datos.data;  // Para respuestas tipo {data: [...]}
+                    } else if (datos.trainings && Array.isArray(datos.trainings)) {
+                        datos = datos.trainings;  // Para respuestas tipo {trainings: [...]}
+                    } else {
+                        // Si no es array ni tiene estructura conocida, crea un array vacío
+                        console.error("La respuesta no es un array:", datos);
+                        datos = [];
+                    }
                 }
 
-                // ... resto del código ...
+                // Mapear datos de la API al formato esperado
+                this.solicitudes = datos.map(item => {
+                    // Usa valores por defecto para evitar errores
+                    const userName = item.user?.name || item.athlete?.name || 'Usuario desconocido';
+                    const email = item.user?.email || item.athlete?.email || '';
+                    const phone = item.user?.phone || item.athlete?.phone || '';
+
+                    return {
+                        id: item.id || 0,
+                        userId: item.user_id || item.athlete?.id || 0,
+                        userName: userName,
+                        edad: item.age || 0,
+                        email: email,
+                        telefono: phone,
+                        My_level: item.sport_level || 'N/A',
+                        mensaje: item.description || 'Sin mensaje',
+                        estado: this.mapStatus(item.status || 'pending'),
+                        fechaSolicitud: item.created_at || new Date().toISOString()
+                    };
+                });
+
+                console.log("Solicitudes mapeadas:", this.solicitudes);
+
             } catch (error) {
-                console.error('Error completo:', error);
-                console.error('Respuesta de error:', error.response);
-                this.mostrarNotificacion('Error: ' + (error.response?.data?.message || error.message));
+                console.error("Error completo:", error);
+                let errorMessage = 'Error cargando solicitudes';
+
+                if (error.response) {
+                    console.error("Respuesta de error:", error.response);
+                    errorMessage = error.response.data?.message || errorMessage;
+                }
+
+                this.mostrarNotificacion(errorMessage);
             } finally {
                 this.isLoading = false;
             }
@@ -182,42 +215,43 @@ export default {
                     'aprobado': 'accepted',
                     'rechazado': 'rejected'
                 };
-                const apiStatus = statusMap[accion];
 
-                const response = await axios.put(`/training/${id}`, {
-                    status: apiStatus
+                // Usar la ruta correcta con el ID
+                await axios.put(`/training/${id}`, {
+                    status: statusMap[accion]
                 });
 
-                // Actualizar el estado localmente
+                // Actualizar estado localmente
                 const index = this.solicitudes.findIndex(s => s.id === id);
                 if (index !== -1) {
+                    // Actualizar solo el estado, mantener los demás datos
                     this.solicitudes[index].estado = accion;
+
+                    // Forzar la reactividad de Vue
+                    this.solicitudes = [...this.solicitudes];
                 }
 
                 this.mostrarNotificacion(`Solicitud ${accion} correctamente`);
             } catch (error) {
-                console.error('Error actualizando estado:', error);
-                this.mostrarNotificacion('Error: ' + error.response?.data?.message || error.message);
+                console.error("Error en manejarAccion:", error);
+                const errorMsg = error.response?.data?.message || error.message;
+                this.mostrarNotificacion('Error: ' + errorMsg);
             }
         },
 
-        // async crearChat(training) {
+        // async crearChat(trainingId) {
         //     try {
-        //         const chatData = {
-        //             user_id: training.user_id,
-        //             trainer_id: training.trainer_id,
-        //             training_id: training.id
-        //         };
+        //         const solicitud = this.solicitudes.find(s => s.id === trainingId);
 
-        //         const response = await axios.post('/chats', chatData);
-        //         console.log('Chat creado:', response.data);
-        //         this.mostrarNotificacion('Chat creado con éxito');
+        //         await axios.post('/api/chats', {
+        //             user_id: solicitud.userId, // Asegúrate de tener este campo
+        //             trainer_id: this.user.id,
+        //             training_id: trainingId
+        //         });
+
         //     } catch (error) {
         //         console.error('Error creando chat:', error);
-
-        //         if (error.response?.status === 409) {
-        //             this.mostrarNotificacion('Ya existe un chat para esta solicitud');
-        //         } else {
+        //         if (error.response?.status !== 409) { // 409 = chat ya existe
         //             this.mostrarNotificacion('Error creando chat: ' + error.message);
         //         }
         //     }
@@ -265,19 +299,14 @@ export default {
         const userData = sessionStorage.getItem('user');
         if (userData) {
             this.user = JSON.parse(userData);
-            console.log("Usuario cargado:", this.user);
-
-            // Verificar si es entrenador
             if (this.user.user_type !== 'entrenador') {
                 this.mostrarNotificacion("Solo los entrenadores pueden ver solicitudes");
                 return;
             }
+            await this.cargarSolicitudes();
         } else {
-            console.error("No se encontró usuario en sessionStorage");
             this.mostrarNotificacion("Debes iniciar sesión");
         }
-
-        await this.cargarSolicitudes();
         document.title = 'Solicitudes Usuarios';
     }
 }

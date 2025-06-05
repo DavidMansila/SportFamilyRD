@@ -415,7 +415,7 @@ export default {
         status: 'pending' // Estado
       };
 
-        axios.post('/training-requests', formData)
+        axios.post('/training', formData)
         .then(response => {
           if (response.status === 201) {
             alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
