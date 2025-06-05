@@ -166,17 +166,15 @@ export default {
                     }
                 }
 
-                // Mapear datos de la API al formato esperado
                 this.solicitudes = datos.map(item => {
-                    // Usa valores por defecto para evitar errores
-                    const userName = item.user?.full_name ||
+                    const userName = item.user?.name ||
                         item.athlete?.full_name ||
                         item.user_name ||
                         item.name ||
                         'Usuario desconocido';
-                    const email = item.user?.email || item.athlete?.email || '';
-                    const phone = item.user?.phone || item.athlete?.phone || '';
-                    const userImage = item.user?.image_url || item.athlete?.image_url || null;
+                    const email = item.user?.email || item.athlete?.email || 'Desconocido';
+                    const phone = item.user?.phone || item.athlete?.phone || 'Desconocido';
+                    const userImage = item.user?.image || item.athlete?.image_url || null;
 
                     return {
                         id: item.id || 0,
