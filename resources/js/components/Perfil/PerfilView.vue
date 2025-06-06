@@ -174,7 +174,7 @@
                         <p v-else class="no-schedule">No has establecido tu horario disponible aún.</p>
                     </div>
 
-                    <!-- Editar horario - Versión mejorada -->
+                    <!-- Editar horario -->
                     <div v-else class="schedule-edit">
                         <div class="schedule-grid">
                             <div v-for="dia in diasSemana" :key="dia" class="availability-day">
@@ -376,17 +376,6 @@ export default {
         hasSchedule() {
             return this.user.schedule && Object.keys(this.user.schedule).length > 0 &&
                 Object.values(this.user.schedule).some(day => day && day.start);
-        }
-    },
-    watch: {
-        // Observar cambios en el horario para recargar el formulario
-        'user.schedule': {
-            deep: true,
-            handler() {
-                if (this.editMode) {
-                    this.loadScheduleIntoForm();
-                }
-            }
         }
     },
     methods: {
@@ -696,21 +685,23 @@ export default {
 
 
         // Cargar horario existente en el formulario
+        // Cargar horario existente en el formulario
         loadScheduleIntoForm() {
             this.diasSemana.forEach(dia => {
                 const diaSchedule = this.user.schedule[dia];
-                const hasSchedule = diaSchedule && diaSchedule.available;
 
-                // Actualizar disponibilidad
-                this.formulario.disponibilidad[dia] = !!hasSchedule;
+                // Verificar si el día tiene horario definido (start y end)
+                const hasSchedule = diaSchedule && diaSchedule.start && diaSchedule.end;
 
-                // Actualizar horarios si existen
-                if (hasSchedule && diaSchedule.hours) {
+                // Si tiene horario, cargar los tiempos
+                if (hasSchedule) {
                     this.formulario.horarios[dia] = {
-                        start: diaSchedule.hours.desde,
-                        end: diaSchedule.hours.hasta
+                        start: diaSchedule.start,
+                        end: diaSchedule.end
                     };
+                    this.formulario.disponibilidad[dia] = true;
                 } else {
+                    // Si no tiene horario, limpiar los campos
                     this.formulario.horarios[dia] = { start: '', end: '' };
                 }
             });
@@ -720,6 +711,7 @@ export default {
         getScheduleToSave() {
             const schedule = {};
             this.diasSemana.forEach(dia => {
+                // Crear estructura que espera el backend
                 schedule[dia] = {
                     available: this.formulario.disponibilidad[dia],
                     hours: {
@@ -732,6 +724,7 @@ export default {
                     const start = this.formulario.horarios[dia].start;
                     const end = this.formulario.horarios[dia].end;
 
+                    // Formatear horas (quitar segundos si existen)
                     schedule[dia].hours.desde = start ? start.substring(0, 5) : '';
                     schedule[dia].hours.hasta = end ? end.substring(0, 5) : '';
                 }
