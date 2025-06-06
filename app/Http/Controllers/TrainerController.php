@@ -170,6 +170,7 @@ class TrainerController extends Controller
         $trainer = Trainer::findOrFail($id);
 
         $trainer->sport_category = $request->input('sport_category');
+        $trainer->schedule = $request->input('schedule');
 
         // Sincronizar especialidades
         $trainer->specialties()->delete();

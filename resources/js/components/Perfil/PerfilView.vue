@@ -485,6 +485,13 @@ export default {
 
                 // 2. Si es entrenador, actualizar datos específicos
                 if (this.user.user_type === 'entrenador' && this.trainer) {
+                    // Obtener horario para guardar
+                    const scheduleToSave = this.getScheduleToSave();
+                    console.log("Horario a guardar:", scheduleToSave);
+
+                    // Convertir a JSON string
+                    const scheduleString = JSON.stringify(scheduleToSave);
+                    console.log("Horario como string:", scheduleString);
 
                     const trainerData = {
                         sport_category: this.user.categoria,
@@ -493,15 +500,15 @@ export default {
                         schedule: scheduleString  // Guardar como string JSON
                     };
 
+                    console.log("Datos a enviar:", trainerData);
+
                     const trainerResponse = await axios.put(`/trainer/${this.trainer.id}`, trainerData);
+                    console.log("Respuesta del servidor:", trainerResponse.data);
+
                     this.trainer = trainerResponse.data.trainer;
 
-
-                    const scheduleToSave = this.getScheduleToSave();
-                    console.log("Horario a guardar:", scheduleToSave); // Agregar este log
-
-                    // Convertir el horario a JSON string para guardar
-                    const scheduleString = JSON.stringify(scheduleToSave);
+                    // Actualizar el horario en el objeto de usuario
+                    this.user.schedule = this.parseSchedule(trainerResponse.data.trainer.schedule);
                 }
 
                 this.editMode = false;
@@ -691,14 +698,14 @@ export default {
         // Cargar horario existente en el formulario
         loadScheduleIntoForm() {
             this.diasSemana.forEach(dia => {
-                // Verificar si hay horario para este día
-                const diaSchedule = this.user.schedule && this.user.schedule[dia];
+                const diaSchedule = this.user.schedule[dia];
+                const hasSchedule = diaSchedule && diaSchedule.available;
 
-                // Usar la disponibilidad directa del schedule
-                const disponible = diaSchedule && diaSchedule.available;
-                this.formulario.disponibilidad[dia] = !!disponible;
+                // Actualizar disponibilidad
+                this.formulario.disponibilidad[dia] = !!hasSchedule;
 
-                if (disponible) {
+                // Actualizar horarios si existen
+                if (hasSchedule && diaSchedule.hours) {
                     this.formulario.horarios[dia] = {
                         start: diaSchedule.hours.desde,
                         end: diaSchedule.hours.hasta
@@ -713,21 +720,27 @@ export default {
         getScheduleToSave() {
             const schedule = {};
             this.diasSemana.forEach(dia => {
+                schedule[dia] = {
+                    available: this.formulario.disponibilidad[dia],
+                    hours: {
+                        desde: '',
+                        hasta: ''
+                    }
+                };
+
                 if (this.formulario.disponibilidad[dia]) {
-                    schedule[dia] = {
-                        available: true,
-                        hours: {
-                            desde: this.formulario.horarios[dia].start.substring(0, 5),
-                            hasta: this.formulario.horarios[dia].end.substring(0, 5)
-                        }
-                    };
+                    const start = this.formulario.horarios[dia].start;
+                    const end = this.formulario.horarios[dia].end;
+
+                    schedule[dia].hours.desde = start ? start.substring(0, 5) : '';
+                    schedule[dia].hours.hasta = end ? end.substring(0, 5) : '';
                 }
             });
             return schedule;
         },
 
 
-        
+
 
         // Formatear hora para visualización (HH:MM)
         formatTime(time) {
