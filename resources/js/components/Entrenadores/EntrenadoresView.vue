@@ -139,6 +139,30 @@
               </div>
             </div>
 
+
+            <div class="section" v-if="entrenadorSeleccionado && entrenadorSeleccionado.horario">
+              <h3 class="horario-titulo">🗓️ Horario Disponible</h3>
+              <div class="horario-grid">
+                <div v-for="(diaAbrev, index) in ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']" :key="index"
+                  class="horario-dia"
+                  :class="{ disponible: isDisponible(diaAbrev), noDisponible: !isDisponible(diaAbrev) }">
+                  <span class="dia-nombre">{{ diaAbrev }}</span>
+                  <span class="estado-icono">
+                    <template v-if="isDisponible(diaAbrev)">
+                      ✅ Disponible
+                      <br />
+                      <small>{{ getHorario(diaAbrev).desde }} - {{ getHorario(diaAbrev).hasta }}</small>
+                    </template>
+                    <template v-else>
+                      ❌ No Disponible
+                    </template>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+
+
             <!-- <div class="section">
               <h3>Testimonios</h3>
               <div class="testimonios">
@@ -207,7 +231,6 @@
 
 
     <!-- Burbuja de Mensajes Flotante -->
-    <!-- Burbuja de Mensajes Flotante (versión mejorada) -->
     <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
       <div class="message-icon-container" @click="toggleMensajes">
         <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -270,6 +293,7 @@ export default {
       scrollPosition: 0,
       busqueda: '',
       deporteActivo: 'Todos',
+      dias: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
       deportes: ['Todos', 'Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
       entrenadorSeleccionado: null,
       mostrarFormularioContacto: false,
@@ -441,6 +465,7 @@ export default {
             rating: trainer.rating || 5,
             reseñas: trainer.reviews || 0,
             biografia: trainer.description || '',
+            horario: trainer.schedule,
             especialidades: trainer.specialties ? trainer.specialties.map(e => e.description || e.name) : [],
             logros: trainer.achievements ? trainer.achievements.map(a => `${a.title}${a.date ? ` (${a.date})` : ''}`) : []
           }));
@@ -449,6 +474,59 @@ export default {
           console.error('Error al cargar entrenadores aprobados:', error);
           alert('Error al cargar entrenadores aprobados.');
         });
+    },
+
+
+    diaCompleto(diaAbrev) {
+      const mapaDias = {
+        'Lun': 'Lunes',
+        'Mar': 'Martes',
+        'Mié': 'Miércoles',
+        'Jue': 'Jueves',
+        'Vie': 'Viernes',
+        'Sáb': 'Sábado',
+        'Dom': 'Domingo'
+      };
+      return mapaDias[diaAbrev] || diaAbrev;
+    },
+
+    // Devuelve true si el día está disponible
+    isDisponible(diaAbrev) {
+      if (!this.entrenadorSeleccionado || !this.entrenadorSeleccionado.horario) return false;
+      try {
+        const horario = typeof this.entrenadorSeleccionado.horario === 'string'
+          ? JSON.parse(this.entrenadorSeleccionado.horario)
+          : this.entrenadorSeleccionado.horario;
+
+        const dia = this.diaCompleto(diaAbrev);
+        return horario[dia]?.available === true;
+      } catch (error) {
+        console.error('Error parseando horario:', error);
+        return false;
+      }
+    },
+
+    // Devuelve objeto {desde, hasta} con horas para ese día o vacíos si no disponible
+    getHorario(diaAbrev) {
+      if (!this.entrenadorSeleccionado || !this.entrenadorSeleccionado.horario) return { desde: '', hasta: '' };
+      try {
+        const horario = typeof this.entrenadorSeleccionado.horario === 'string'
+          ? JSON.parse(this.entrenadorSeleccionado.horario)
+          : this.entrenadorSeleccionado.horario;
+
+        const dia = this.diaCompleto(diaAbrev);
+        if (horario[dia]?.available) {
+          return {
+            desde: horario[dia].hours?.desde || '',
+            hasta: horario[dia].hours?.hasta || ''
+          };
+        } else {
+          return { desde: '', hasta: '' };
+        }
+      } catch (error) {
+        console.error('Error parseando horario:', error);
+        return { desde: '', hasta: '' };
+      }
     },
 
 
@@ -662,4 +740,55 @@ export default {
   width: 20px;
   height: 20px;
 }
+
+
+
+
+.horario-titulo {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.horario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.horario-dia {
+  padding: 0.75rem;
+  border-radius: 10px;
+  background-color: #f1f1f1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: 0.3s ease;
+}
+
+.horario-dia.disponible {
+  background-color: #e6ffec;
+  border: 1px solid #8de4a3;
+}
+
+.horario-dia:not(.disponible) {
+  background-color: #ffeaea;
+  border: 1px solid #f5a8a8;
+}
+
+.dia-nombre {
+  font-weight: bold;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.estado-icono {
+  font-size: 0.9rem;
+}
+
+
+
 </style>

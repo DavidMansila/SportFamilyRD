@@ -241,6 +241,7 @@ export default {
 
         async crearChat(trainingId) {
             try {
+
                 const solicitud = this.solicitudes.find(s => s.id === trainingId);
 
                 await axios.post('/chats', {
@@ -248,6 +249,7 @@ export default {
                     trainer_id: this.user.id,
                     // training_id: trainingId
                 });
+console.log('userId:', solicitud.userId);
 
             } catch (error) {
                 console.error('Error creando chat:', error);

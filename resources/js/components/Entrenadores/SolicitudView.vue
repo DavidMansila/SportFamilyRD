@@ -171,7 +171,8 @@
             <div class="especialidades-list">
               <div v-for="(especialidad, index) in formulario.especialidades" :key="index"
                 class="especialidad-edit-item">
-                <input type="text" v-model="especialidad.description" placeholder="Ejemplo: Técnica de Carrera" required>
+                <input type="text" v-model="especialidad.description" placeholder="Ejemplo: Técnica de Carrera"
+                  required>
                 <button type="button" @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
                   ×
                 </button>
@@ -183,7 +184,7 @@
           </div>
 
 
-          <!-- <div class="form-group">
+          <div class="form-group">
             <label class="custom-label">Disponibilidad</label>
             <div class="availability-grid">
               <div v-for="dia in diasSemana" :key="dia" class="availability-day">
@@ -203,7 +204,7 @@
                 </div>
               </div>
             </div>
-          </div> -->
+          </div>
 
           <div class="form-group">
             <label class="custom-label">Tarifa por sesión (opcional)</label>
@@ -466,6 +467,7 @@ export default {
             };
           }
         });
+        
         formData.append('schedule', JSON.stringify(schedule));
 
         // Enviar a Laravel

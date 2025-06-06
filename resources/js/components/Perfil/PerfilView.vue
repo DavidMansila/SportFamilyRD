@@ -59,7 +59,7 @@
 
                 </div>
 
-                <button class="edit-profile-btn" @click="editMode = !editMode">
+                <button class="edit-profile-btn" @click="toggleEditMode">
                     {{ editMode ? 'Cancelar' : 'Editar Perfil' }}
                 </button>
 
@@ -132,67 +132,6 @@
                         </div>
 
 
-
-                        <!-- Sección de Especialidades -->
-                        <div class="profile-section" v-if="user.user_type === 'entrenador'">
-                            <h2>Mis Especialidades</h2>
-                            <div v-if="!editMode" class="especialidades-list">
-                                <div v-if="user.especialidades && user.especialidades.length > 0"
-                                    class="especialidades-container">
-                                    <span v-for="(especialidad, index) in user.especialidades" :key="index"
-                                        class="especialidad-tag">
-                                        {{ especialidad }}
-                                    </span>
-                                </div>
-                                <p v-else class="no-especialidades">No has agregado especialidades aún</p>
-                            </div>
-
-                            <div v-else class="especialidades-edit">
-                                <div v-for="(especialidad, index) in user.especialidades" :key="index"
-                                    class="especialidad-edit-item">
-                                    <div class="especialidad-input-container">
-                                        <input type="text" v-model="user.especialidades[index]"
-                                            placeholder="Escribe una especialidad">
-                                        <button @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
-                                            ×
-                                        </button>
-                                    </div>
-                                </div>
-                                <button v-if="editMode" @click="agregarEspecialidad" class="btn-agregar-especialidad">
-                                    + Añadir Nueva Especialidad
-                                </button>
-                            </div>
-                        </div>
-
-
-                        <!-- Sección de Logros -->
-                        <div class="profile-section" v-if="user.user_type === 'entrenador'">
-                            <h2>Mis Logros</h2>
-                            <div class="achievements">
-                                <div v-for="(achievement, index) in user.achievements" :key="index"
-                                    class="achievement-item">
-                                    <div v-if="!editMode" class="achievement-display">
-                                        <h3>{{ achievement.title }}</h3>
-                                        <p>{{ achievement.description }}</p>
-                                        <span class="achievement-date">{{ achievement.date }}</span>
-                                    </div>
-                                    <div v-else class="achievement-edit">
-                                        <input type="text" v-model="achievement.title" placeholder="Título del logro">
-                                        <textarea v-model="achievement.description"
-                                            placeholder="Descripción"></textarea>
-                                        <input type="date" v-model="achievement.date">
-                                        <button @click="removeAchievement(index)" class="remove-achievement">
-                                            Eliminar
-                                        </button>
-                                    </div>
-                                </div>
-                                <button v-if="editMode" @click="addAchievement" class="add-achievement">
-                                    + Añadir Logro
-                                </button>
-                            </div>
-                        </div>
-
-
                     </div>
 
                 </div>
@@ -208,6 +147,121 @@
                 </div>
 
 
+                <!-- Sección de Horario Mejorada -->
+                <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                    <h2>Horario Disponible</h2>
+
+                    <!-- Mostrar horario - Versión mejorada -->
+                    <div v-if="!editMode" class="schedule-display">
+                        <div v-if="hasSchedule" class="schedule-grid">
+                            <div v-for="dia in diasSemana" :key="dia" class="schedule-day-card"
+                                :class="{ 'available': user.schedule[dia] && user.schedule[dia].start }">
+                                <div class="day-header">
+                                    <span>{{ dia }}</span>
+                                    <span v-if="user.schedule[dia] && user.schedule[dia].start"
+                                        class="available-indicator"></span>
+                                    <span v-else class="unavailable-indicator"></span>
+                                </div>
+                                <div v-if="user.schedule[dia] && user.schedule[dia].start" class="time-slot">
+                                    {{ formatTime(user.schedule[dia].start) }} - {{ formatTime(user.schedule[dia].end)
+                                    }}
+                                </div>
+                                <div v-else class="time-slot unavailable">
+                                    No disponible
+                                </div>
+                            </div>
+                        </div>
+                        <p v-else class="no-schedule">No has establecido tu horario disponible aún.</p>
+                    </div>
+
+                    <!-- Editar horario - Versión mejorada -->
+                    <div v-else class="schedule-edit">
+                        <div class="schedule-grid">
+                            <div v-for="dia in diasSemana" :key="dia" class="availability-day">
+                                <div class="day-header">
+                                    <label>
+                                        <input type="checkbox" v-model="formulario.disponibilidad[dia]" />
+                                        {{ dia }}
+                                    </label>
+                                </div>
+
+                                <div v-if="formulario.disponibilidad[dia]" class="time-slots">
+                                    <div class="time-slot">
+                                        <label>De</label>
+                                        <input type="time" v-model="formulario.horarios[dia].start" :min="minTime"
+                                            :max="maxTime" />
+                                    </div>
+                                    <div class="time-slot">
+                                        <label>A</label>
+                                        <input type="time" v-model="formulario.horarios[dia].end" :min="minTime"
+                                            :max="maxTime" />
+                                    </div>
+                                </div>
+                                <div v-else class="time-slot unavailable">
+                                    No disponible
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Sección de Especialidades -->
+                <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                    <h2>Mis Especialidades</h2>
+                    <div v-if="!editMode" class="especialidades-list">
+                        <div v-if="user.especialidades && user.especialidades.length > 0"
+                            class="especialidades-container">
+                            <span v-for="(especialidad, index) in user.especialidades" :key="index"
+                                class="especialidad-tag">
+                                {{ especialidad }}
+                            </span>
+                        </div>
+                        <p v-else class="no-especialidades">No has agregado especialidades aún</p>
+                    </div>
+
+                    <div v-else class="especialidades-edit">
+                        <div v-for="(especialidad, index) in user.especialidades" :key="index"
+                            class="especialidad-edit-item">
+                            <div class="especialidad-input-container">
+                                <input type="text" v-model="user.especialidades[index]"
+                                    placeholder="Escribe una especialidad">
+                                <button @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                        <button v-if="editMode" @click="agregarEspecialidad" class="btn-agregar-especialidad">
+                            + Añadir Nueva Especialidad
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- Sección de Logros -->
+                <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                    <h2>Mis Logros</h2>
+                    <div class="achievements">
+                        <div v-for="(achievement, index) in user.achievements" :key="index" class="achievement-item">
+                            <div v-if="!editMode" class="achievement-display">
+                                <h3>{{ achievement.title }}</h3>
+                                <p>{{ achievement.description }}</p>
+                                <span class="achievement-date">{{ achievement.date }}</span>
+                            </div>
+                            <div v-else class="achievement-edit">
+                                <input type="text" v-model="achievement.title" placeholder="Título del logro">
+                                <textarea v-model="achievement.description" placeholder="Descripción"></textarea>
+                                <input type="date" v-model="achievement.date">
+                                <button @click="removeAchievement(index)" class="remove-achievement">
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                        <button v-if="editMode" @click="addAchievement" class="add-achievement">
+                            + Añadir Logro
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Sección de Redes Sociales -->
                 <!-- <div class="profile-section">
@@ -236,15 +290,13 @@
                     </div>
                 </div> -->
 
-
-                <!-- Botones de acción en modo edición -->
-                <div v-if="editMode" class="action-buttons">
-                    <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
-                    <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
-                </div>
-
             </div>
 
+            <!-- Botones de acción en modo edición -->
+            <div v-if="editMode" class="action-buttons">
+                <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
+                <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
+            </div>
 
 
 
@@ -283,7 +335,8 @@ export default {
                 user_type: '',
                 categoria: '',
                 especialidades: [],
-                achievements: []
+                achievements: [],
+                schedule: {},
             },
             stats: {
                 posts: 0,
@@ -294,9 +347,48 @@ export default {
             originalUserData: null,
             originalTrainerData: null,
             nuevaEspecialidad: '',
+            diasSemana: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+            minTime: "06:00",
+            maxTime: "22:00",
+            formulario: {
+                disponibilidad: {
+                    Lunes: false,
+                    Martes: false,
+                    Miércoles: false,
+                    Jueves: false,
+                    Viernes: false,
+                    Sábado: false,
+                    Domingo: false,
+                },
+                horarios: {
+                    Lunes: { start: '', end: '' },
+                    Martes: { start: '', end: '' },
+                    Miércoles: { start: '', end: '' },
+                    Jueves: { start: '', end: '' },
+                    Viernes: { start: '', end: '' },
+                    Sábado: { start: '', end: '' },
+                    Domingo: { start: '', end: '' },
+                },
+            }
         }
     },
-
+    computed: {
+        hasSchedule() {
+            return this.user.schedule && Object.keys(this.user.schedule).length > 0 &&
+                Object.values(this.user.schedule).some(day => day && day.start);
+        }
+    },
+    watch: {
+        // Observar cambios en el horario para recargar el formulario
+        'user.schedule': {
+            deep: true,
+            handler() {
+                if (this.editMode) {
+                    this.loadScheduleIntoForm();
+                }
+            }
+        }
+    },
     methods: {
 
         cargarEntrenadores() {
@@ -318,13 +410,52 @@ export default {
                 this.trainer = { ...entrenador };
                 this.originalTrainerData = JSON.parse(JSON.stringify(entrenador));
 
-                // Asignar propiedades específicas de entrenador al objeto de visualización
+                // Asignar propiedades específicas de entrenador
                 this.user.categoria = this.trainer.sport_category;
-                this.user.especialidades = this.trainer.specialties ?
-                    this.trainer.specialties.map(s => s.description) : [];
-                this.user.achievements = this.trainer.achievements ?
-                    [...this.trainer.achievements] : [];
+
+                // Manejar especialidades
+                this.user.especialidades = this.trainer.specialties
+                    ? this.trainer.specialties.map(s => s.description)
+                    : [];
+
+                // Manejar logros
+                this.user.achievements = this.trainer.achievements
+                    ? [...this.trainer.achievements]
+                    : [];
+
+                // Manejar horario - ¡CORRECCIÓN CLAVE AQUÍ!
+                this.user.schedule = this.parseSchedule(this.trainer.schedule);
             }
+        },
+
+        // Nuevo método para parsear el horario
+        parseSchedule(scheduleData) {
+            if (!scheduleData) return {};
+
+            let parsedSchedule;
+            if (typeof scheduleData === 'string') {
+                try {
+                    parsedSchedule = JSON.parse(scheduleData);
+                } catch (e) {
+                    console.error('Error parsing schedule JSON:', e);
+                    return {};
+                }
+            } else {
+                parsedSchedule = scheduleData;
+            }
+
+            // Convertir estructura del backend a formato frontend
+            const transformedSchedule = {};
+            for (const dia in parsedSchedule) {
+                if (parsedSchedule[dia].available && parsedSchedule[dia].hours) {
+                    transformedSchedule[dia] = {
+                        start: parsedSchedule[dia].hours.desde,
+                        end: parsedSchedule[dia].hours.hasta
+                    };
+                }
+            }
+
+            return transformedSchedule;
         },
 
 
@@ -354,24 +485,31 @@ export default {
 
                 // 2. Si es entrenador, actualizar datos específicos
                 if (this.user.user_type === 'entrenador' && this.trainer) {
+
                     const trainerData = {
                         sport_category: this.user.categoria,
                         specialties: this.user.especialidades.map(e => ({ description: e })),
-                        achievements: [...this.user.achievements]
+                        achievements: [...this.user.achievements],
+                        schedule: scheduleString  // Guardar como string JSON
                     };
 
                     const trainerResponse = await axios.put(`/trainer/${this.trainer.id}`, trainerData);
                     this.trainer = trainerResponse.data.trainer;
 
-                    // Recargar datos de entrenadores para actualizar la vista
-                    await this.cargarEntrenadores();
+
+                    const scheduleToSave = this.getScheduleToSave();
+                    console.log("Horario a guardar:", scheduleToSave); // Agregar este log
+
+                    // Convertir el horario a JSON string para guardar
+                    const scheduleString = JSON.stringify(scheduleToSave);
                 }
 
                 this.editMode = false;
                 alert('¡Perfil actualizado correctamente!');
 
             } catch (error) {
-                this.handleError(error, 'Error al guardar perfil');
+                console.error('Error al guardar perfil:', error);
+                alert('Error al guardar los cambios. Por favor intenta nuevamente.');
             }
         },
 
@@ -550,6 +688,73 @@ export default {
         },
 
 
+        // Cargar horario existente en el formulario
+        loadScheduleIntoForm() {
+            this.diasSemana.forEach(dia => {
+                // Verificar si hay horario para este día
+                const diaSchedule = this.user.schedule && this.user.schedule[dia];
+
+                // Usar la disponibilidad directa del schedule
+                const disponible = diaSchedule && diaSchedule.available;
+                this.formulario.disponibilidad[dia] = !!disponible;
+
+                if (disponible) {
+                    this.formulario.horarios[dia] = {
+                        start: diaSchedule.hours.desde,
+                        end: diaSchedule.hours.hasta
+                    };
+                } else {
+                    this.formulario.horarios[dia] = { start: '', end: '' };
+                }
+            });
+        },
+
+        // Construir objeto de horario para guardar
+        getScheduleToSave() {
+            const schedule = {};
+            this.diasSemana.forEach(dia => {
+                if (this.formulario.disponibilidad[dia]) {
+                    schedule[dia] = {
+                        available: true,
+                        hours: {
+                            desde: this.formulario.horarios[dia].start.substring(0, 5),
+                            hasta: this.formulario.horarios[dia].end.substring(0, 5)
+                        }
+                    };
+                }
+            });
+            return schedule;
+        },
+
+
+        
+
+        // Formatear hora para visualización (HH:MM)
+        formatTime(time) {
+            if (!time) return '';
+            // Si el tiempo tiene segundos, los quitamos
+            if (time.includes(':') && time.length > 5) {
+                return time.substring(0, 5);
+            }
+            return time;
+        },
+
+        // Formatear hora para guardar (asegurar formato correcto)
+        formatTimeForSave(time) {
+            return this.formatTime(time);
+        },
+
+        // Al activar/desactivar el modo edición
+        toggleEditMode() {
+            this.editMode = !this.editMode;
+            if (this.editMode) {
+                this.loadScheduleIntoForm();
+            }
+        },
+
+
+
+
     },
     mounted() {
         this.user = JSON.parse(sessionStorage.getItem('user'));
@@ -579,4 +784,105 @@ export default {
 @import '/resources/scss/Perfil/perfil_logros.scss';
 
 @import '/resources/scss/Perfil/perfil_responsive.scss';
+
+/* Estilos mejorados para el horario */
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.schedule-day-card,
+.availability-day {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-day-card.available {
+    border-left: 4px solid #4CAF50;
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+}
+
+.available-indicator,
+.unavailable-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.available-indicator {
+    background-color: #4CAF50;
+}
+
+.unavailable-indicator {
+    background-color: #f44336;
+}
+
+.time-slot {
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.time-slot.unavailable {
+    color: #999;
+    font-style: italic;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.time-slots .time-slot {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-slots label {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.time-slots input[type="time"] {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.no-schedule {
+    color: #777;
+    font-style: italic;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* Estilo para días seleccionados en modo edición */
+.availability-day {
+    border-left: 4px solid #2196F3;
+}
+
+/* Transiciones para una mejor experiencia */
+.schedule-day-card:hover,
+.availability-day:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 </style>
