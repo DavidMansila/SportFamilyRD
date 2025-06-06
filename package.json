@@ -20,6 +20,8 @@
         "vue": "^3.5.13"
     },
     "dependencies": {
+        "laravel-echo": "^2.1.5",
+        "pusher-js": "^8.4.0",
         "vue-awesome-paginate": "^1.2.0",
         "vue-multiselect": "^3.2.0",
         "vue-router": "^4.5.0",

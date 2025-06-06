@@ -76,14 +76,13 @@ Route::get('/training/{id}', [TrainingController::class, 'show']);
 
 
 
-//chats
-Route::get('/chats', [ChatController::class, 'index']);
-Route::post('/chats', [ChatController::class, 'store']);
-Route::post('/chats/{chatId}/accept', [ChatController::class, 'accept']);
-Route::post('/chats/{chatId}/reject', [ChatController::class, 'reject']);
+Route::prefix('chats')->controller(ChatController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::get('{chatId}/messages', 'getMessages');
+});
 
 Route::post('/messages/send', [ChatController::class, 'sendMessage']);
-Route::get('/chats/{chatId}/messages', [ChatController::class, 'getMessages']);
 
 
 

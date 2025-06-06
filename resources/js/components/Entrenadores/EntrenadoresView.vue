@@ -139,6 +139,30 @@
               </div>
             </div>
 
+
+            <div class="section" v-if="entrenadorSeleccionado && entrenadorSeleccionado.horario">
+              <h3 class="horario-titulo">🗓️ Horario Disponible</h3>
+              <div class="horario-grid">
+                <div v-for="(diaAbrev, index) in ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']" :key="index"
+                  class="horario-dia"
+                  :class="{ disponible: isDisponible(diaAbrev), noDisponible: !isDisponible(diaAbrev) }">
+                  <span class="dia-nombre">{{ diaAbrev }}</span>
+                  <span class="estado-icono">
+                    <template v-if="isDisponible(diaAbrev)">
+                      ✅ Disponible
+                      <br />
+                      <small>{{ getHorario(diaAbrev).desde }} - {{ getHorario(diaAbrev).hasta }}</small>
+                    </template>
+                    <template v-else>
+                      ❌ No Disponible
+                    </template>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+
+
             <!-- <div class="section">
               <h3>Testimonios</h3>
               <div class="testimonios">
@@ -207,19 +231,23 @@
 
 
     <!-- Burbuja de Mensajes Flotante -->
-    <div v-if="user && chatsAprobados.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
-      <div class="message-icon" @click="toggleMensajes">
-        <!-- icono y badge -->
+    <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
+      <div class="message-icon-container" @click="toggleMensajes">
+        <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
         <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
       </div>
 
       <div v-if="mostrarMensajes" class="messages-container">
         <div class="messages-header">
           <h3>Chats</h3>
-          <button class="close-btn" @click="toggleMensajes">X</button>
+          <button class="close-btn" @click="toggleMensajes">×</button>
         </div>
 
-        <div v-if="!activeChat">
+        <div v-if="!activeChat" class="contact-list">
           <div v-for="chat in chatsAprobados" :key="chat.id" class="contact-item" @click="openChat(chat)">
             <img :src="user.role === 'user' ? chat.trainer.foto : chat.user.foto" class="message-avatar" />
             <div class="message-content">
@@ -227,7 +255,10 @@
                 <span class="sender-name">{{ user.role === 'user' ? chat.trainer.name : chat.user.name }}</span>
                 <span v-if="chat.unread" class="unread-badge">{{ chat.unread }}</span>
               </div>
-              <p v-if="chat.last_message" class="message-preview">{{ chat.last_message.message }}</p>
+              <p v-if="chat.last_message" class="message-preview">
+                <span v-if="chat.last_message.sender === user.id">Tú: </span>
+                {{ chat.last_message.message }}
+              </p>
             </div>
           </div>
         </div>
@@ -235,6 +266,7 @@
         <ChatComponent v-else :active-chat="activeChat" :user="user" @close-chat="cerrarChat" />
       </div>
     </div>
+
 
 
 
@@ -261,9 +293,9 @@ export default {
       scrollPosition: 0,
       busqueda: '',
       deporteActivo: 'Todos',
+      dias: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
       deportes: ['Todos', 'Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
       entrenadorSeleccionado: null,
-      mostrarMensajes: false,
       mostrarFormularioContacto: false,
       contactoEntrenador: null,
       formularioContacto: {
@@ -274,20 +306,20 @@ export default {
       entrenadores: [],
 
       chats: [],
-      activeChat: null,
+      // chatsAprobados: [],
+      mostrarMensajes: false,
       nuevosMensajes: 0,
-      pollingInterval: null
+      activeChat: null,
+      pollingInterval: null,
     }
   },
   computed: {
-
     entrenadoresFiltrados() {
       let filtrados = this.entrenadores;
 
       if (this.deporteActivo !== 'Todos') {
         filtrados = filtrados.filter(e => e.deporte === this.deporteActivo);
       }
-
       if (this.busqueda) {
         const term = this.busqueda.toLowerCase();
         filtrados = filtrados.filter(e =>
@@ -296,23 +328,16 @@ export default {
           e.especialidades.some(esp => esp.toLowerCase().includes(term))
         );
       }
-
       return filtrados;
     },
-
-
-    chatsAprobados() {
-      return this.chats.filter(chat => chat.approved && (
-        chat.user.id === this.user.id || chat.trainer.id === this.user.id
-      ));
-    },
-  },
-  watch: {
-    chatsAprobados(newChats) {
-      this.nuevosMensajes = newChats.reduce((acc, chat) => acc + (chat.unread || 0), 0);
-    }
   },
   methods: {
+
+    // async obtenerChats() {
+    //   const res = await axios.get('/chats', { params: { user_id: this.user.id } });
+    //   this.chats = res.data;
+    //   this.chatsAprobados = this.chats.filter(chat => chat.estado === 'aprobado');
+    // },
 
     filtrarPorDeporte(deporte) {
       this.deporteActivo = deporte;
@@ -440,6 +465,7 @@ export default {
             rating: trainer.rating || 5,
             reseñas: trainer.reviews || 0,
             biografia: trainer.description || '',
+            horario: trainer.schedule,
             especialidades: trainer.specialties ? trainer.specialties.map(e => e.description || e.name) : [],
             logros: trainer.achievements ? trainer.achievements.map(a => `${a.title}${a.date ? ` (${a.date})` : ''}`) : []
           }));
@@ -451,6 +477,59 @@ export default {
     },
 
 
+    diaCompleto(diaAbrev) {
+      const mapaDias = {
+        'Lun': 'Lunes',
+        'Mar': 'Martes',
+        'Mié': 'Miércoles',
+        'Jue': 'Jueves',
+        'Vie': 'Viernes',
+        'Sáb': 'Sábado',
+        'Dom': 'Domingo'
+      };
+      return mapaDias[diaAbrev] || diaAbrev;
+    },
+
+    // Devuelve true si el día está disponible
+    isDisponible(diaAbrev) {
+      if (!this.entrenadorSeleccionado || !this.entrenadorSeleccionado.horario) return false;
+      try {
+        const horario = typeof this.entrenadorSeleccionado.horario === 'string'
+          ? JSON.parse(this.entrenadorSeleccionado.horario)
+          : this.entrenadorSeleccionado.horario;
+
+        const dia = this.diaCompleto(diaAbrev);
+        return horario[dia]?.available === true;
+      } catch (error) {
+        console.error('Error parseando horario:', error);
+        return false;
+      }
+    },
+
+    // Devuelve objeto {desde, hasta} con horas para ese día o vacíos si no disponible
+    getHorario(diaAbrev) {
+      if (!this.entrenadorSeleccionado || !this.entrenadorSeleccionado.horario) return { desde: '', hasta: '' };
+      try {
+        const horario = typeof this.entrenadorSeleccionado.horario === 'string'
+          ? JSON.parse(this.entrenadorSeleccionado.horario)
+          : this.entrenadorSeleccionado.horario;
+
+        const dia = this.diaCompleto(diaAbrev);
+        if (horario[dia]?.available) {
+          return {
+            desde: horario[dia].hours?.desde || '',
+            hasta: horario[dia].hours?.hasta || ''
+          };
+        } else {
+          return { desde: '', hasta: '' };
+        }
+      } catch (error) {
+        console.error('Error parseando horario:', error);
+        return { desde: '', hasta: '' };
+      }
+    },
+
+
 
 
 
@@ -459,7 +538,9 @@ export default {
       if (!this.user) return;
 
       try {
-        const response = await axios.get('/chats');
+        const response = await axios.get('/chats', {
+          params: { user_id: this.user.id }
+        });
         this.chats = response.data.filter(chat => chat.status === 'accepted');
 
         // Detener el polling si no hay chats
@@ -516,10 +597,12 @@ export default {
     document.title = 'Entrenadores';
     this.cargarEntrenadores();
 
-    // if (this.user) {
-    //   this.loadChats();
-    //   this.startChatPolling();
-    // }
+    if (this.user) {
+      this.loadChats();
+      // this.startChatPolling();
+    }
+
+    // this.obtenerChats();
   },
 
   // beforeUnmount() {
@@ -530,8 +613,6 @@ export default {
   // }
 };
 </script>
-
-
 
 
 <style scoped>
@@ -662,88 +743,52 @@ export default {
 
 
 
-/* Estilos adicionales para la lista de chats */
-.contact-item {
+
+.horario-titulo {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #333;
   display: flex;
-  padding: 10px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.contact-item:hover {
-  background-color: #f9f9f9;
+.horario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
 }
 
-.message-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
+.horario-dia {
+  padding: 0.75rem;
+  border-radius: 10px;
+  background-color: #f1f1f1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: 0.3s ease;
 }
 
-.message-header {
-  display: flex;
-  justify-content: space-between;
+.horario-dia.disponible {
+  background-color: #e6ffec;
+  border: 1px solid #8de4a3;
 }
 
-.sender-name {
+.horario-dia:not(.disponible) {
+  background-color: #ffeaea;
+  border: 1px solid #f5a8a8;
+}
+
+.dia-nombre {
   font-weight: bold;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 0.25rem;
 }
 
-.message-preview {
-  color: #666;
+.estado-icono {
   font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
 }
 
-.unread-badge {
-  background: #3498db;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-}
 
-.requests-section {
-  margin-top: 20px;
-  border-top: 1px solid #eee;
-  padding-top: 10px;
-}
 
-.request-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-}
-
-.request-info {
-  flex: 1;
-  margin-left: 10px;
-}
-
-.request-actions button {
-  margin-left: 5px;
-  padding: 5px 10px;
-  font-size: 0.8rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.request-actions button:first-child {
-  background: #4CAF50;
-  color: white;
-}
-
-.request-actions button:last-child {
-  background: #f44336;
-  color: white;
-}
 </style>

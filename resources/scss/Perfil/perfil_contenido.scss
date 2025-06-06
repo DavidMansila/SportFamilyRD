@@ -1,10 +1,10 @@
 /* Contenido de perfil */
 
 .profile-content {
-    padding: 50px;
+    padding: 30px;
     display: grid;
     grid-template-columns: 1fr 300px;
-    gap: 40px;
+    gap: 25px;
 }
 
 .profile-section {
@@ -59,8 +59,181 @@
     font-weight: 500;
 }
 
-.profile-bio {
-    line-height: 1.7;
-    color: #4a5568;
-    font-size: 1.05rem;
+/* Estilos mejorados para la biografía */
+.bio-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  color: #1e293b;
+  font-weight: 600;
+  margin: 0;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: #3b82f6;
+}
+
+/* Vista normal */
+.bio-content {
+  padding: 0.25rem;
+}
+
+.bio-text {
+  line-height: 1.6;
+  color: #334155;
+  white-space: pre-line;
+}
+
+.bio-text p {
+  margin: 0;
+}
+
+.empty-bio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: #64748b;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.edit-hint {
+  margin-left: auto;
+}
+
+.hint-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hint-btn:hover {
+  background: #e2e8f0;
+}
+
+.hint-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Modo edición */
+.bio-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.editor-container {
+  position: relative;
+}
+
+.bio-textarea {
+  width: 85%;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+  resize: vertical;
+  min-height: 150px;
+}
+
+.bio-textarea:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+  background: #ffffff;
+}
+
+.char-counter {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.char-counter.limit-reached {
+  color: #dc2626;
+}
+
+.formatting-tips {
+  background: #f0f9ff;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
+}
+
+.formatting-tips p {
+  font-weight: 500;
+  color: #1e40af;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.formatting-tips ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #334155;
+}
+
+.formatting-tips li {
+  margin-bottom: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .bio-section {
+    padding: 1.25rem;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+  
+  .bio-textarea {
+    min-height: 120px;
+  }
 }
