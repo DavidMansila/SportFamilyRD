@@ -112,127 +112,172 @@
 
 // ESPECIALIDADES
 
-/* Estilos para la sección de especialidades */
-.especialidades-list {
-    margin-top: 15px;
+.specialties-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+  width: 85%;
 }
 
-.especialidades-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
 }
 
-.especialidad-tag {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 0.9rem;
-    display: inline-block;
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  color: #1e293b;
+  font-weight: 600;
+  margin: 0;
 }
 
-.no-especialidades {
-    color: #757575;
-    font-style: italic;
+.icon {
+  width: 24px;
+  height: 24px;
+  color: #3b82f6;
 }
 
-.especialidades-edit {
-    margin-top: 15px;
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 10px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.especialidades-input-container {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
+.add-btn:hover {
+  background: #2563eb;
 }
 
-.especialidad-input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+.add-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
-.especialidades-edit-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+/* Vista normal */
+.specialties-view {
+  padding: 0.25rem;
 }
 
-.especialidad-edit-item {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    padding: 6px 12px 6px 12px;
-    border-radius: 16px;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.specialties-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
+.specialty-tag {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: #1e40af;
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  border-left: 3px solid #3b82f6;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+/* Modo edición */
+.specialties-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.edit-item {
+  position: relative;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.specialty-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+}
+
+.specialty-input:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+  background: #ffffff;
+}
+
+.delete-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #fecaca;
+}
+
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
-    .especialidades-input-container {
-        flex-direction: column;
-    }
-
-    .btn-agregar-especialidad {
-        padding: 8px;
-    }
-}
-
-.especialidades-edit {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.especialidad-edit-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.especialidad-input-container {
-    flex: 1;
-    display: flex;
-    gap: 8px;
-}
-
-.especialidad-input-container input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.btn-eliminar-especialidad {
-    background: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    cursor: pointer;
-}
-
-.btn-eliminar-especialidad:hover {
-    background: #cc0000;
-}
-
-.btn-agregar-especialidad {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    align-self: flex-start;
-    transition: background 0.3s;
-}
-
-.btn-agregar-especialidad:hover {
-    background: #45a049;
+  .specialties-section {
+    padding: 1.25rem;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+  
+  .specialty-tag {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
 }

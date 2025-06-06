@@ -148,37 +148,117 @@
               rows="4" required></textarea>
           </div>
 
-          <!-- Sección de Logros -->
-          <div class="profile-section">
-            <h2>Mis Logros</h2>
-            <div class="achievements">
-              <div v-for="(logro, index) in formulario.logros" :key="index" class="achievement-item">
-                <div class="achievement-edit">
-                  <input type="text" v-model="logro.title" placeholder="Título del logro" required>
-                  <textarea v-model="logro.description" placeholder="Descripción del logro" rows="2"
-                    required></textarea>
-                  <input type="date" v-model="logro.date" required>
-                  <button type="button" @click="removeAchievement(index)" class="remove-achievement">Eliminar</button>
+          <!-- Sección de Logros - Versión Modernizada -->
+          <div class="achievements-section">
+            <h2 class="section-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M16 8V16M8 8V16M12 6V18M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Mis Logros
+            </h2>
+
+            <div class="achievements-form">
+              <div class="form-description">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M12 16V12M12 8H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <p>Destaca tus logros más relevantes como entrenador (competencias, certificaciones, logros con alumnos)
+                </p>
+              </div>
+
+              <div class="achievements-list">
+                <div v-for="(logro, index) in formulario.logros" :key="index" class="achievement-card">
+                  <div class="achievement-form">
+                    <div class="form-group">
+                      <label class="input-label">Título del logro</label>
+                      <input type="text" v-model="logro.title" placeholder="Ej: Campeonato Regional de Tenis 2023"
+                        class="achievement-input" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="input-label">Descripción</label>
+                      <textarea v-model="logro.description"
+                        placeholder="Describe el logro, su importancia y tu contribución" class="achievement-textarea"
+                        rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label class="input-label">Fecha</label>
+                        <input type="date" v-model="logro.date" class="achievement-date" required>
+                      </div>
+
+                      <button @click="removeAchievement(index)" class="delete-achievement-btn" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7M10 11V17M14 11V17M15 7V4C15 3.44772 14.5523 3 14 3H10C9.44772 3 9 3.44772 9 4V7M4 7H20"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <button type="button" @click="addAchievement" class="add-achievement">+ Añadir Logro</button>
+
+              <button @click="addAchievement" class="add-achievement-btn" type="button">
+                <svg class="add-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+                Añadir nuevo logro
+              </button>
             </div>
           </div>
 
           <!-- Sección de Especialidades -->
-          <div class="profile-section">
-            <h2>Mis Especialidades</h2>
-            <div class="especialidades-list">
-              <div v-for="(especialidad, index) in formulario.especialidades" :key="index"
-                class="especialidad-edit-item">
-                <input type="text" v-model="especialidad.description" placeholder="Ejemplo: Técnica de Carrera"
-                  required>
-                <button type="button" @click="eliminarEspecialidad(index)" class="btn-eliminar-especialidad">
-                  ×
-                </button>
+          <div class="specialties-section">
+            <h2 class="section-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M9 12L11 14L15 10M19.5 9.5L18.7906 7.02746C18.5157 6.06826 18.3783 5.58866 18.0978 5.20151C17.818 4.8156 17.4378 4.5183 17 4.34294C16.5614 4.16721 16.0413 4.12571 15 4.04271L12 3.75M4.5 9.5L5.20938 7.02746C5.48426 6.06826 5.6217 5.58866 5.90221 5.20151C6.18199 4.8156 6.56216 4.5183 7 4.34294C7.43862 4.16721 7.95866 4.12571 9 4.04271L12 3.75M12 3.75V2.75M12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12C15 13.6569 13.6569 15 12 15Z"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Mis Especialidades
+            </h2>
+
+            <div class="specialties-form">
+              <div class="form-description">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M12 16V12M12 8H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <p>Agrega tus áreas de especialización o habilidades únicas como entrenador</p>
               </div>
-              <button type="button" @click="agregarEspecialidad" class="btn-agregar-especialidad">
-                + Añadir Especialidad
+
+              <div class="specialties-list">
+                <div v-for="(especialidad, index) in formulario.especialidades" :key="index" class="specialty-item">
+                  <div class="specialty-input-group">
+                    <input type="text" v-model="especialidad.description"
+                      placeholder="Ejemplo: Entrenamiento funcional para adultos mayores" class="specialty-input"
+                      required>
+                    <button @click="eliminarEspecialidad(index)" class="delete-btn" type="button"
+                      aria-label="Eliminar especialidad">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button @click="agregarEspecialidad" class="add-specialty-btn" type="button">
+                <svg class="add-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+                Añadir otra especialidad
               </button>
             </div>
           </div>
@@ -467,7 +547,7 @@ export default {
             };
           }
         });
-        
+
         formData.append('schedule', JSON.stringify(schedule));
 
         // Enviar a Laravel
@@ -569,5 +649,5 @@ export default {
 <style scoped>
 @import '../../../scss/Entrenadores/entrenadores_navbar.scss';
 @import '../../../scss/Entrenadores/solicitud.scss';
-@import '/resources/scss/Perfil/perfil_logros.scss';
+@import '/resources/scss/Entrenadores/solicitud_logrosyespecialidades.scss';
 </style>
