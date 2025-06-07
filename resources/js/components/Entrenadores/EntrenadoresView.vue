@@ -546,9 +546,9 @@ export default {
 
     getChatAvatar(chat) {
       if (this.user.role === 'user') {
-        return chat.trainer?.foto || '/img/default-avatar.png';
+        return chat.trainer?.image || '/img/default-avatar.png';
       }
-      return chat.user?.foto || '/img/default-avatar.png';
+      return chat.user?.image || '/img/default-avatar.png';
     },
 
     getChatName(chat) {
@@ -580,19 +580,28 @@ export default {
     async loadChats() {
       if (!this.user) return;
       try {
-        // Elimina el parámetro user_id
-        const response = await axios.get('/chats');
-        this.chats = response.data;
+        const response = await axios.get('/chats', {
+          params: {
+            with: ['user', 'trainer', 'lastMessage']
+          }
+        });
+
+        this.chats = response.data.map(chat => ({
+          ...chat,
+          unread: chat.messages_count || 0,
+          last_message: chat.last_message || null,
+          user_id: chat.user || {},
+          trainer_id: chat.trainer || {}
+        }));
+
         this.calculateUnreadMessages();
       } catch (error) {
         console.error('Error cargando chats', error);
+        // Manejar error apropiadamente
+        if (error.response?.status === 401) {
+          // No autorizado, redirigir a login
+        }
       }
-    },
-
-    calculateUnreadMessages() {
-      this.nuevosMensajes = this.chatsAprobados.reduce((total, chat) => {
-        return total + (parseInt(chat.unread) || 0);
-      }, 0);
     },
 
     async markMessagesAsRead(chatId) {
