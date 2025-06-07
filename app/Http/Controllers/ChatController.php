@@ -30,6 +30,38 @@ class ChatController extends Controller
         return response()->json($chats);
     }
 
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'trainer_id' => 'required|exists:users,id',
+        ]);
+
+        // Verificar si ya existe un chat
+        $existingChat = Chat::where('user_id', $request->user_id)
+            ->where('trainer_id', $request->trainer_id)
+            ->first();
+
+        if ($existingChat) {
+            return response()->json([
+                'message' => 'Ya existe un chat entre estos usuarios',
+                'chat' => $existingChat
+            ], 200);
+        }
+
+        $chat = Chat::create([
+            'user_id' => $request->user_id,
+            'trainer_id' => $request->trainer_id,
+            'status' => 'accepted'
+        ]);
+
+        return response()->json([
+            'message' => 'Chat creado exitosamente',
+            'chat' => $chat
+        ], 201);
+    }
+
     public function show($id)
     {
         $chat = Chat::with(['messages.sender', 'user', 'trainer'])

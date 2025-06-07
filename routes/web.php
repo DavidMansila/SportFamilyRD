@@ -76,6 +76,8 @@ Route::get('/training/{id}', [TrainingController::class, 'show']);
 
 
 //Chats
+
+Route::post('/chats', [ChatController::class, 'store']);
 Route::get('/chats', [ChatController::class, 'index']);
 Route::get('/chats/{id}', [ChatController::class, 'show']);
 Route::post('/chats/{chatId}/messages', [ChatController::class, 'storeMessage']);

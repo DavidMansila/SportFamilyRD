@@ -38,4 +38,12 @@ class Chat extends Model
     {
         return $query->where('status', 'accepted');
     }
+
+    public function getUnreadCountAttribute()
+    {
+        return $this->messages()
+            ->where('read', false)
+            ->where('sender_id', '!=', \Illuminate\Support\Facades\Auth::user()->id)
+            ->count();
+    }
 }

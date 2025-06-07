@@ -70,11 +70,21 @@
                                 <div v-if="solicitud.estado === 'pendiente'" class="action-buttons">
                                     <button @click="manejarAccion(solicitud.id, 'aprobado')" class="btn-success"
                                         title="Aprobar solicitud">
-                                        ✅ Aceptar
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z" />
+                                        </svg>
+                                        Aceptar
                                     </button>
                                     <button @click="manejarAccion(solicitud.id, 'rechazado')" class="btn-danger"
                                         title="Rechazar solicitud">
-                                        ❌ Rechazar
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                        </svg>
+                                        Rechazar
                                     </button>
                                 </div>
                             </div>
@@ -87,23 +97,27 @@
                     </div>
 
                     <div v-else-if="!solicitudes.length" class="empty-state">
-                        <img src="/imagenes/no-news.png" alt="No hay solicitudes" class="empty-image">
+                        <div class="center-wrapper">
+                            <img src="/imagenes/no-news.png" class="empty-image" alt="No hay imagen" />
+                        </div>
                         <h3>No hay solicitudes disponibles</h3>
                         <p>Actualmente no hay solicitudes de entrenamiento para mostrar.</p>
                     </div>
 
-                    <div v-else-if="!solicitudesFiltradas.length" class="empty-filter-state">
+                    <!-- <div v-else-if="!solicitudesFiltradas.length" class="empty-filter-state">
                         <img src="/imagenes/no-news.png" alt="No hay resultados" class="empty-image">
                         <h3>No hay coincidencias</h3>
                         <p>No se encontraron solicitudes con el filtro aplicado.</p>
                         <button @click="filtroEstado = 'todos'" class="btn-clear-filter">Limpiar filtros</button>
-                    </div>
+                    </div> -->
+
                 </section>
 
                 <!-- Paginación -->
-                <paginatorComponent v-model="currentPage" :total-items="solicitudesFiltradas.length"
-                    :items-per-page="itemsPerPage" :max-pages-shown="5" />
-
+                <div v-if="solicitudes.length">
+                    <paginatorComponent v-model="currentPage" :total-items="solicitudesFiltradas.length"
+                        :items-per-page="itemsPerPage" :max-pages-shown="5" />
+                </div>
             </main>
 
             <transition name="fade">
@@ -260,20 +274,23 @@ export default {
 
         async crearChat(trainingId) {
             try {
-
                 const solicitud = this.solicitudes.find(s => s.id === trainingId);
 
-                await axios.post('/chats', {
+                const response = await axios.post('/chats', {
                     user_id: solicitud.userId,
-                    trainer_id: this.user.id,
-                    // training_id: trainingId
+                    trainer_id: this.user.id
                 });
-                console.log('userId:', solicitud.userId);
+
+                console.log('Chat creado:', response.data);
+                this.mostrarNotificacion('Chat creado exitosamente');
 
             } catch (error) {
                 console.error('Error creando chat:', error);
-                if (error.response?.status !== 409) {
-                    this.mostrarNotificacion('Error creando chat: ' + error.message);
+
+                if (error.response?.status === 200 && error.response.data?.message === 'Ya existe un chat entre estos usuarios') {
+                    this.mostrarNotificacion('Ya existe un chat con este usuario');
+                } else {
+                    this.mostrarNotificacion('Error creando chat: ' + (error.response?.data?.message || error.message));
                 }
             }
         },

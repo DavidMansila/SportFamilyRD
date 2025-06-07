@@ -71,31 +71,31 @@
                 </svg>
               </div>
 
-              <div v-if= "user">
-              <!-- ADMIN -->
-              <button v-if="user.user_type === 'admin'" class="btn-editar" @click.stop="editarNoticia(noticia)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M13.945 5.23997L3.87503 15.31C3.70599 15.479 3.58707 15.6913 3.53203 15.923L2.72203 19.447C2.65321 19.735 2.74074 20.0382 2.95403 20.25C3.1489 20.444 3.41422 20.5486 3.68803 20.539L7.19503 20.458C7.42676 20.4494 7.6493 20.3744 7.83803 20.242L17.906 10.172"
-                    stroke="currentColor" />
-                  <path
-                    d="M12.945 6.23999L16.766 2.41799C17.546 1.63899 18.812 1.63899 19.592 2.41799L21.592 4.41799C22.372 5.19799 22.372 6.46399 21.592 7.24399L17.846 10.99"
-                    stroke="currentColor" />
-                </svg>
-              </button>
+              <div v-if="user">
+                <!-- ADMIN -->
+                <button v-if="user.user_type === 'admin'" class="btn-editar" @click.stop="editarNoticia(noticia)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M13.945 5.23997L3.87503 15.31C3.70599 15.479 3.58707 15.6913 3.53203 15.923L2.72203 19.447C2.65321 19.735 2.74074 20.0382 2.95403 20.25C3.1489 20.444 3.41422 20.5486 3.68803 20.539L7.19503 20.458C7.42676 20.4494 7.6493 20.3744 7.83803 20.242L17.906 10.172"
+                      stroke="currentColor" />
+                    <path
+                      d="M12.945 6.23999L16.766 2.41799C17.546 1.63899 18.812 1.63899 19.592 2.41799L21.592 4.41799C22.372 5.19799 22.372 6.46399 21.592 7.24399L17.846 10.99"
+                      stroke="currentColor" />
+                  </svg>
+                </button>
 
-              <!-- ADMIN -->
-              <button v-if="user.user_type === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M4 7H20" stroke="currentColor" stroke-width="2" />
-                  <path d="M10 11V17" stroke="currentColor" />
-                  <path d="M14 11V17" stroke="currentColor" />
-                  <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7"
-                    stroke="currentColor" />
-                  <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" />
-                </svg>
-              </button>
-            </div>
+                <!-- ADMIN -->
+                <button v-if="user.user_type === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 7H20" stroke="currentColor" stroke-width="2" />
+                    <path d="M10 11V17" stroke="currentColor" />
+                    <path d="M14 11V17" stroke="currentColor" />
+                    <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7"
+                      stroke="currentColor" />
+                    <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" />
+                  </svg>
+                </button>
+              </div>
 
             </div>
           </div>
@@ -109,8 +109,12 @@
 
 
       <!-- Paginación -->
-      <paginatorComponent v-model="currentPage" :total-items="noticiasFiltradas.length" :items-per-page="itemsPerPage"
-        :max-pages-shown="5" />
+      <div v-if="!errorMessage">
+        <paginatorComponent v-model="currentPage" :total-items="noticiasFiltradas.length" :items-per-page="itemsPerPage"
+          :max-pages-shown="5" />
+      </div>
+
+
     </div>
 
 
@@ -187,7 +191,7 @@
                   </svg>
                   Compartir
                 </button>
-                <button class="popup-save" @click.stop="toggleSave(noticiaSeleccionada)" v-if="user" >
+                <button class="popup-save" @click.stop="toggleSave(noticiaSeleccionada)" v-if="user">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path :fill="noticiaSeleccionada.saved ? 'currentColor' : 'none'" stroke="currentColor"
                       d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z" />
@@ -599,7 +603,7 @@ export default {
       }
     },
   },
-  
+
   async mounted() {
     try {
       // Cargar savedNews primero para tenerlos disponibles
