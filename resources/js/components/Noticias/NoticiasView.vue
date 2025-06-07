@@ -659,23 +659,20 @@ export default {
 
 .saved-indicator {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: -190px;
+  left: 10px;
   z-index: 3;
-  /* Asegurar que está por encima de todo */
   background: rgba(255, 255, 255, 0.95);
   padding: 6px;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
 }
-
-
 
 
 .noticia-excerpt {
@@ -685,5 +682,16 @@ export default {
   max-height: 4.2em;
   /* Limitar altura basado en línea */
   overflow: hidden;
+}
+
+.noticia-title {
+  font-size: large;
+  padding-bottom: 10px;
+  font-weight: 700;
+  color: #2c3e50;
+  background: black;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 </style>
