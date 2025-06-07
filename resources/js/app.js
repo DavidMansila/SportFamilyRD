@@ -25,6 +25,7 @@ import store from './cartStore';
 import VueAwesomePaginate from "vue-awesome-paginate";
 import "vue-awesome-paginate/dist/style.css";
 
+
 // Configuración del router
 const router = createRouter({
   history: createWebHistory(),

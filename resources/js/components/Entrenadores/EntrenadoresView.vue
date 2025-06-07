@@ -229,9 +229,8 @@
 
 
 
-
     <!-- Burbuja de Mensajes Flotante -->
-    <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
+    <div v-if="user" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
       <div class="message-icon-container" @click="toggleMensajes">
         <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -249,23 +248,32 @@
 
         <div v-if="!activeChat" class="contact-list">
           <div v-for="chat in chatsAprobados" :key="chat.id" class="contact-item" @click="openChat(chat)">
-            <img :src="user.role === 'user' ? chat.trainer.foto : chat.user.foto" class="message-avatar" />
+            <img :src="getChatAvatar(chat)" class="message-avatar" />
             <div class="message-content">
               <div class="message-header">
-                <span class="sender-name">{{ user.role === 'user' ? chat.trainer.name : chat.user.name }}</span>
+                <span class="sender-name">{{ getChatName(chat) }}</span>
                 <span v-if="chat.unread" class="unread-badge">{{ chat.unread }}</span>
               </div>
               <p v-if="chat.last_message" class="message-preview">
-                <span v-if="chat.last_message.sender === user.id">Tú: </span>
-                {{ chat.last_message.message }}
+                <span v-if="chat.last_message.sender_id === user.id">Tú: </span>
+                {{ truncateText(chat.last_message.message, 30) }}
               </p>
+              <p v-else class="no-messages">No hay mensajes aún</p>
             </div>
+          </div>
+
+          <div v-if="chatsAprobados.length === 0" class="empty-chats">
+            <p>No tienes chats activos</p>
           </div>
         </div>
 
-        <ChatComponent v-else :active-chat="activeChat" :user="user" @close-chat="cerrarChat" />
+        <div v-else class="active-chat-container">
+          <ChatComponent :active-chat="activeChat" :user="user" @close-chat="cerrarChat" />
+        </div>
       </div>
     </div>
+
+
 
 
 
@@ -306,11 +314,11 @@ export default {
       entrenadores: [],
 
       chats: [],
-      // chatsAprobados: [],
       mostrarMensajes: false,
       nuevosMensajes: 0,
       activeChat: null,
-      pollingInterval: null,
+      echoListener: null,
+      presenceListener: null
     }
   },
   computed: {
@@ -330,6 +338,9 @@ export default {
       }
       return filtrados;
     },
+    chatsAprobados() {
+      return this.chats.filter(chat => chat.status === 'accepted');
+    }
   },
   methods: {
 
@@ -407,10 +418,6 @@ export default {
           objetivos: ''
         };
       }
-    },
-
-    toggleMensajes() {
-      this.mostrarMensajes = !this.mostrarMensajes;
     },
 
 
@@ -530,42 +537,63 @@ export default {
     },
 
 
-
-
-
-    async loadChats() {
-      // Solo cargar si hay usuario
-      if (!this.user) return;
-
-      try {
-        const response = await axios.get('/chats', {
-          params: { user_id: this.user.id }
-        });
-        this.chats = response.data.filter(chat => chat.status === 'accepted');
-
-        // Detener el polling si no hay chats
-        if (this.chats.length === 0 && this.pollingInterval) {
-          clearInterval(this.pollingInterval);
-          this.pollingInterval = null;
-        } else {
-          this.calculateUnreadMessages();
-        }
-      } catch (error) {
-        console.error('Error loading chats', error);
+    toggleMensajes() {
+      this.mostrarMensajes = !this.mostrarMensajes;
+      if (this.mostrarMensajes) {
+        this.loadChats();
       }
     },
 
+    getChatAvatar(chat) {
+      if (this.user.role === 'user') {
+        return chat.trainer?.foto || '/img/default-avatar.png';
+      }
+      return chat.user?.foto || '/img/default-avatar.png';
+    },
 
-    calculateUnreadMessages() {
-      this.nuevosMensajes = this.chats.reduce((total, chat) => {
-        return total + (parseInt(chat.unread) || 0);
-      }, 0);
+    getChatName(chat) {
+      if (this.user.role === 'user') {
+        return chat.trainer?.name || 'Entrenador';
+      }
+      return chat.user?.name || 'Usuario';
+    },
+
+    truncateText(text, maxLength) {
+      if (!text) return '';
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + '...';
     },
 
     async openChat(chat) {
       this.activeChat = chat;
       await this.markMessagesAsRead(chat.id);
+      this.setupChatChannel(chat.id);
       this.loadChats();
+    },
+
+    cerrarChat() {
+      this.leaveChatChannel();
+      this.activeChat = null;
+      this.loadChats();
+    },
+
+    async loadChats() {
+      if (!this.user) return;
+      try {
+        const response = await axios.get('/chats', {
+          params: { user_id: this.user.id }
+        });
+        this.chats = response.data;
+        this.calculateUnreadMessages();
+      } catch (error) {
+        console.error('Error cargando chats', error);
+      }
+    },
+
+    calculateUnreadMessages() {
+      this.nuevosMensajes = this.chatsAprobados.reduce((total, chat) => {
+        return total + (parseInt(chat.unread) || 0);
+      }, 0);
     },
 
     async markMessagesAsRead(chatId) {
@@ -573,44 +601,96 @@ export default {
         await axios.put(`/chats/${chatId}/read`);
         this.loadChats();
       } catch (error) {
-        console.error('Error marking messages as read', error);
+        console.error('Error marcando mensajes como leídos', error);
       }
     },
 
-    startChatPolling() {
-      // Solo inicia el polling si hay usuario
-      if (this.user) {
-        this.pollingInterval = setInterval(() => {
+    setupChatChannel(chatId) {
+      // Limpiar cualquier listener previo
+      this.leaveChatChannel();
+
+      // Suscribirse al canal del chat
+      this.echoListener = window.Echo.private(`chat.${chatId}`)
+        .listen('NewMessage', (data) => {
+          // Si estamos en este chat, actualizar los mensajes
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.handleNewMessage(data);
+          }
+          // Actualizar lista de chats
           this.loadChats();
-        }, 10000);
+        })
+        .listen('MessageRead', (data) => {
+          // Actualizar estado de mensajes leídos
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.updateReadStatus(data);
+          }
+        });
+
+      // Canal de presencia para estado en línea
+      this.presenceListener = window.Echo.join(`presence-chat.${chatId}`)
+        .here((users) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.updateOnlineStatus(users);
+          }
+        })
+        .joining((user) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.userJoined(user);
+          }
+        })
+        .leaving((user) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.userLeft(user);
+          }
+        });
+    },
+
+    leaveChatChannel() {
+      if (this.echoListener) {
+        window.Echo.leave(`chat.${this.activeChat?.id}`);
+        this.echoListener = null;
+      }
+      if (this.presenceListener) {
+        window.Echo.leave(`presence-chat.${this.activeChat?.id}`);
+        this.presenceListener = null;
       }
     },
 
-    mostrarNotificacion(mensaje) {
-      alert(mensaje);
-    },
+    setupGlobalListeners() {
+      if (typeof window.Echo === 'undefined') {
+        console.error('Laravel Echo no está inicializado');
+        return;
+      }
 
+      if (this.user) {
+        window.Echo.private(`user.${this.user.id}`)
+          .listen('NewChat', (data) => {
+            this.loadChats();
+          });
+      }
+    }
   },
   mounted() {
-
     this.user = JSON.parse(sessionStorage.getItem('user'));
-    document.title = 'Entrenadores';
-    this.cargarEntrenadores();
-
     if (this.user) {
+      this.cargarEntrenadores();
       this.loadChats();
-      // this.startChatPolling();
+
+      // Esperar a que Echo esté disponible
+      if (window.Echo) {
+        this.setupGlobalListeners();
+      } else {
+        console.warn('Echo no está disponible');
+      }
     }
-
-    // this.obtenerChats();
   },
+  beforeUnmount() {
+    this.leaveChatChannel();
 
-  // beforeUnmount() {
-  //   // Limpiar el intervalo cuando el componente se destruye
-  //   if (this.pollingInterval) {
-  //     clearInterval(this.pollingInterval);
-  //   }
-  // }
+    if (window.Echo && this.user) {
+      window.Echo.leave(`user.${this.user.id}`);
+    }
+  }
 };
 </script>
 
@@ -788,7 +868,4 @@ export default {
 .estado-icono {
   font-size: 0.9rem;
 }
-
-
-
 </style>

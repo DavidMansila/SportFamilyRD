@@ -2,116 +2,72 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewChat;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Events\NewChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
-    // 1. Crear o recuperar un chat entre usuario y entrenador
-    public function store(Request $request)
+    public function index(Request $request)
     {
-        $request->validate([
-            'trainer_id' => 'required|exists:users,id'
-        ]);
-
         $userId = Auth::id();
 
-        $chat = Chat::firstOrCreate(
-            ['user_id' => $userId, 'trainer_id' => $request->trainer_id],
-            ['status' => 'pending']
-        );
+        $chats = Chat::with(['user', 'trainer', 'lastMessage'])
+            ->forUser($userId)
+            ->accepted()
+            ->get()
+            ->map(function ($chat) use ($userId) {
+                $chat->unread = $chat->messages()
+                    ->where('sender_id', '!=', $userId)
+                    ->where('read', false)
+                    ->count();
+                return $chat;
+            });
 
-        return response()->json($chat, 201);
+        return response()->json($chats);
     }
 
-    // 2. Entrenador acepta el chat
-    public function accept($chatId)
+    public function show($id)
     {
-        $chat = Chat::findOrFail($chatId);
+        $chat = Chat::with(['messages.sender', 'user', 'trainer'])
+            ->findOrFail($id);
 
-        if (Auth::id() !== $chat->trainer_id) {
-            return response()->json(['error' => 'No autorizado'], 403);
-        }
+        // Marcar mensajes como leídos
+        Message::where('chat_id', $id)
+            ->where('sender_id', '!=', Auth::id())
+            ->update(['read' => true]);
 
-        $chat->status = 'accepted';
-        $chat->save();
-
-        return response()->json(['message' => 'Chat aceptado']);
+        return response()->json($chat);
     }
 
-    // 3. Entrenador rechaza el chat
-    public function reject($chatId)
-    {
-        $chat = Chat::findOrFail($chatId);
-
-        if (Auth::id() !== $chat->trainer_id) {
-            return response()->json(['error' => 'No autorizado'], 403);
-        }
-
-        $chat->status = 'rejected';
-        $chat->save();
-
-        return response()->json(['message' => 'Chat rechazado']);
-    }
-
-    // 4. Enviar mensaje
-    public function sendMessage(Request $request)
+    public function storeMessage(Request $request, $chatId)
     {
         $request->validate([
-            'chat_id' => 'required|exists:chats,id',
             'message' => 'required|string'
         ]);
 
-        $chat = Chat::findOrFail($request->chat_id);
-        $userId = Auth::id();
-
-        // Solo participantes pueden enviar
-        if (!in_array($userId, [$chat->user_id, $chat->trainer_id]) || $chat->status !== 'accepted') {
-            return response()->json(['error' => 'No autorizado'], 403);
-        }
-
         $message = Message::create([
-            'chat_id' => $chat->id,
-            'sender_id' => $userId,
-            'message' => $request->message,
-            'read' => false
+            'chat_id' => $chatId,
+            'sender_id' => Auth::id(),
+            'message' => $request->message
         ]);
+
+        $chat = Chat::findOrFail($chatId);
+        $recipientId = Auth::id() == $chat->user_id ? $chat->trainer_id : $chat->user_id;
+
+        broadcast(new NewChat($message, $recipientId))->toOthers();
 
         return response()->json($message);
     }
 
-    // 5. Obtener mensajes de un chat
-    public function getMessages($chatId)
+    public function acceptChat(Request $request, $id)
     {
-        $chat = Chat::findOrFail($chatId);
-        $userId = Auth::id();
+        $chat = Chat::findOrFail($id);
+        $chat->update(['status' => 'accepted']);
 
-        if (!in_array($userId, [$chat->user_id, $chat->trainer_id])) {
-            return response()->json(['error' => 'No autorizado'], 403);
-        }
-
-        $messages = $chat->messages()->with('sender')->orderBy('created_at')->get();
-
-        return response()->json($messages);
-    }
-
-    // 6. Ver todos los chats del usuario autenticado
-    public function index(Request $request)
-    {
-        $userId = $request->query('user_id');
-
-        if (!$userId) {
-            return response()->json(['error' => 'Falta el parámetro user_id'], 400);
-        }
-
-        $chats = Chat::where('user_id', $userId)
-            ->orWhere('trainer_id', $userId)
-            ->with(['client', 'trainer'])
-            ->orderBy('updated_at', 'desc')
-            ->get();
-
-        return response()->json($chats);
+        return response()->json($chat);
     }
 }

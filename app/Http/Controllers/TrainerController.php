@@ -174,23 +174,35 @@ class TrainerController extends Controller
 
         // Sincronizar especialidades
         $trainer->specialties()->delete();
-        foreach ($request->input('specialties') as $specialty) {
-            $trainer->specialties()->create(['description' => $specialty['description']]);
+        $specialties = $request->input('specialties', []);
+        foreach ($specialties as $specialty) {
+            $trainer->specialties()->create([
+                'description' => $specialty['description']
+            ]);
         }
 
         // Sincronizar logros
         $trainer->achievements()->delete();
-        foreach ($request->input('achievements') as $achievement) {
+        $achievements = $request->input('achievements', []);
+
+        foreach ($achievements as $achievement) {
+            $date = isset($achievement['achievement_date'])
+                ? $achievement['achievement_date']
+                : null;
+
             $trainer->achievements()->create([
                 'title' => $achievement['title'],
                 'description' => $achievement['description'],
-                'date' => $achievement['date'] ?? null
+                'achievement_date' => $date
             ]);
         }
 
         $trainer->save();
 
-        return response()->json(['trainer' => $trainer]);
+        return response()->json([
+            'message' => 'Entrenador actualizado correctamente',
+            'trainer' => $trainer->load(['achievements', 'specialties'])
+        ]);
     }
 
     /**

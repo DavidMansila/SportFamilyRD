@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('trainer_id')->constrained('users');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('trainer_id')->constrained('users')->onDelete('cascade');
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();
+
+            $table->unique(['user_id', 'trainer_id']);
         });
     }
 

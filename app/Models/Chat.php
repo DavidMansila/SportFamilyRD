@@ -8,7 +8,7 @@ class Chat extends Model
 {
     protected $fillable = ['user_id', 'trainer_id', 'status'];
 
-    public function client()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -21,5 +21,21 @@ class Chat extends Model
     public function messages()
     {
         return $this->hasMany(Message::class);
+    }
+
+    public function lastMessage()
+    {
+        return $this->hasOne(Message::class)->latest();
+    }
+
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('user_id', $userId)
+            ->orWhere('trainer_id', $userId);
+    }
+
+    public function scopeAccepted($query)
+    {
+        return $query->where('status', 'accepted');
     }
 }

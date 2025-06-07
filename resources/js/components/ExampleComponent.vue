@@ -1,7 +1,6 @@
 <template>
-  <div>
-
-    <router-view></router-view>
+  <div class="app-container">
+    <router-view />
   </div>
 </template>
 
@@ -9,11 +8,11 @@
 import axios from 'axios';
 
 export default {
-
+  name: 'App',
   data() {
     return {
-      user: '',
-    }
+      user: null,
+    };
   },
   async created() {
     await this.loadUser();
@@ -21,37 +20,53 @@ export default {
   methods: {
     async loadUser() {
       try {
-        // Intenta cargar usuario desde localStorage
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-          this.user = JSON.parse(storedUser);
+          try {
+            this.user = JSON.parse(storedUser);
+          } catch (e) {
+            console.error('Failed to parse stored user:', e);
+            localStorage.removeItem('user');
+          }
         }
-        
-        // Verifica con el backend
-        const response = await this.$axios.get('/current-user');
-        this.user = response.data;
-        localStorage.setItem('user', JSON.stringify(response.data));
+
+        const response = await axios.get('/current-user');
+        if (response.data) {
+          this.user = response.data;
+          localStorage.setItem('user', JSON.stringify(response.data));
+        }
       } catch (error) {
-        // Si hay error, limpia los datos
-        this.user = null;
-        localStorage.removeItem('user');
+        console.error('Error loading user:', error);
+        this.handleAuthError(error);
       }
     },
 
-  }
-}
+    handleAuthError(error) {
+      if (error.response?.status === 401) {
+        this.user = null;
+        localStorage.removeItem('user');
+        this.$router.push('/login');
+      }
+    },
+  },
+};
 </script>
 
 <style lang="scss">
+/* Base Styles */
+:root {
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-size-base: 14px;
+  --line-height-base: 1.6;
+}
 
-/* Estilos base responsivos */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-primary);
   margin: 0;
   padding: 0;
-  line-height: 1.6;
-  font-size: 14px; /* Tamaño base más pequeño para móviles */
-  -webkit-text-size-adjust: 100%; /* Evita zoom automático en iOS */
+  line-height: var(--line-height-base);
+  font-size: var(--font-size-base);
+  -webkit-text-size-adjust: 100%;
 }
 
 .app-container {
@@ -63,65 +78,40 @@ body {
   overflow-x: hidden;
 }
 
-/* Media queries para móviles pequeños */
-@media only screen and (max-width: 480px) {
-  html {
-    font-size: 14px;
+/* Responsive Breakpoints */
+@media (max-width: 480px) {
+  :root {
+    --font-size-base: 13px;
   }
-  
-  body {
-    font-size: 0.9rem;
-  }
-  
-  /* Asegura que los elementos no excedan el ancho de la pantalla */
-  img, video, iframe, table, canvas {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  /* Contenedores principales */
-  .container, .content-wrapper, .page-container {
-    width: 100%;
-    padding: 0 12px;
-    box-sizing: border-box;
-  }
-  
-  /* Ajustes generales para elementos comunes */
+
+  /* Typography */
   h1 { font-size: 1.6rem; }
   h2 { font-size: 1.4rem; }
   h3 { font-size: 1.2rem; }
-  
-  /* Botones y elementos interactivos */
-  button, .btn, a.button {
-    padding: 8px 12px;
+
+  /* Form Elements */
+  input,
+  textarea,
+  select,
+  button,
+  .btn {
     font-size: 0.9rem;
-    min-width: auto;
+    padding: 8px 12px;
     min-height: 36px;
   }
-  
-  /* Forms */
-  input, textarea, select {
-    font-size: 1rem;
-    padding: 8px;
+
+  /* Layout Utilities */
+  .container, 
+  .content-wrapper {
+    padding: 0 12px;
   }
-  
-  /* Grids y layouts */
+
   .grid-container {
     grid-template-columns: 1fr;
   }
-  
+
   .flex-container {
     flex-direction: column;
   }
-  
-  /* Margenes y paddings reducidos */
-  .section {
-    padding: 1rem 0;
-  }
-  
-  .card {
-    margin-bottom: 1rem;
-  }
 }
-
 </style>

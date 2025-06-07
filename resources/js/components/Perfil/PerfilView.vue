@@ -9,7 +9,8 @@
             <!-- Header del Perfil -->
             <div class="profile-header">
                 <div class="avatar-container">
-                    <img :src="user.image" alt="Avatar" class="profile-avatar">
+                    <img :src="user.image ? `${user.image}` : '/storage/users/Perfil-Icon.png'" alt=""
+                        class="profile-avatar" />
                     <button class="edit-avatar" @click="handleAvatarChange">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -285,7 +286,7 @@
                         </svg>
                         Añadir
                     </button>
-                    
+
                     <!-- Vista normal -->
                     <div v-if="!editMode" class="specialties-view">
                         <div v-if="user.especialidades && user.especialidades.length > 0" class="specialties-grid">
@@ -332,12 +333,12 @@
                             <div v-if="!editMode" class="achievement-display">
                                 <h3>{{ achievement.title }}</h3>
                                 <p>{{ achievement.description }}</p>
-                                <span class="achievement-date">{{ achievement.date }}</span>
+                                <span class="achievement-date">{{ achievement.achievement_date }}</span>
                             </div>
                             <div v-else class="achievement-edit">
                                 <input type="text" v-model="achievement.title" placeholder="Título del logro">
                                 <textarea v-model="achievement.description" placeholder="Descripción"></textarea>
-                                <input type="date" v-model="achievement.date">
+                                <input type="date" v-model="achievement.achievement_date" required>
                                 <button @click="removeAchievement(index)" class="remove-achievement">
                                     Eliminar
                                 </button>
@@ -571,8 +572,12 @@ export default {
                     const trainerData = {
                         sport_category: this.user.categoria,
                         specialties: this.user.especialidades.map(e => ({ description: e })),
-                        achievements: [...this.user.achievements],
-                        schedule: scheduleString  // Guardar como string JSON
+                        achievements: this.user.achievements.map(ach => ({
+                            title: ach.title,
+                            description: ach.description,
+                            achievement_date: ach.achievement_date
+                        })),
+                        schedule: scheduleString
                     };
 
                     console.log("Datos a enviar:", trainerData);
@@ -666,8 +671,6 @@ export default {
             return changes;
         },
 
-
-
         formatPhone(number) {
             if (!number) return '';
             // Eliminar todos los caracteres que no sean dígitos
@@ -695,35 +698,30 @@ export default {
             this.user.phone = formatted;
         },
 
-        getSocialIcon(platform) {
-            const icons = {
-                facebook: 'facebook-icon.svg',
-                twitter: 'twitter-icon.svg',
-                instagram: 'instagram-icon.svg',
-                linkedin: 'linkedin-icon.svg',
-                youtube: 'youtube-icon.svg'
-            };
-            return `/imagenes/social/${icons[platform] || 'default-social-icon.svg'}`;
-        },
+        // getSocialIcon(platform) {
+        //     const icons = {
+        //         facebook: 'facebook-icon.svg',
+        //         twitter: 'twitter-icon.svg',
+        //         instagram: 'instagram-icon.svg',
+        //         linkedin: 'linkedin-icon.svg',
+        //         youtube: 'youtube-icon.svg'
+        //     };
+        //     return `/imagenes/social/${icons[platform] || 'default-social-icon.svg'}`;
+        // },
 
+        // addSocialLink() {
+        //     this.user.social_links.push({ platform: '', url: '' });
+        // },
 
-
-        addSocialLink() {
-            this.user.social_links.push({ platform: '', url: '' });
-        },
-
-        removeSocialLink(index) {
-            this.user.social_links.splice(index, 1);
-        },
+        // removeSocialLink(index) {
+        //     this.user.social_links.splice(index, 1);
+        // },
 
         addAchievement() {
-            if (!this.user.achievements) {
-                this.user.achievements = []; // Inicializar si no existe
-            }
             this.user.achievements.push({
                 title: '',
                 description: '',
-                date: new Date().toISOString().split('T')[0]
+                achievement_date: new Date().toISOString().split('T')[0] // Fecha actual por defecto
             });
         },
 
