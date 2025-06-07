@@ -816,9 +816,6 @@ export default {
             return schedule;
         },
 
-
-
-
         // Formatear hora para visualización (HH:MM)
         formatTime(time) {
             if (!time) return '';
