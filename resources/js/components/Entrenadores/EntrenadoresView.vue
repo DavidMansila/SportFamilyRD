@@ -580,9 +580,8 @@ export default {
     async loadChats() {
       if (!this.user) return;
       try {
-        const response = await axios.get('/chats', {
-          params: { user_id: this.user.id }
-        });
+        // Elimina el parámetro user_id
+        const response = await axios.get('/chats');
         this.chats = response.data;
         this.calculateUnreadMessages();
       } catch (error) {
