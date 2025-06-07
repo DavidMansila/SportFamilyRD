@@ -23,7 +23,7 @@
 
                 <section class="solicitudes-grid">
                     <transition-group name="list" tag="div" class="solicitudes-list">
-                        <article v-for="solicitud in solicitudesFiltradas" :key="solicitud.id" class="solicitud-card"
+                        <article v-for="solicitud in solicitudesPaginadas" :key="solicitud.id" class="solicitud-card"
                             :class="solicitud.estado">
                             <div class="card-header">
                                 <div class="avatar-container">
@@ -99,6 +99,11 @@
                         <button @click="filtroEstado = 'todos'" class="btn-clear-filter">Limpiar filtros</button>
                     </div>
                 </section>
+
+                <!-- Paginación -->
+                <paginatorComponent v-model="currentPage" :total-items="solicitudesFiltradas.length"
+                    :items-per-page="itemsPerPage" :max-pages-shown="5" />
+
             </main>
 
             <transition name="fade">
@@ -111,15 +116,19 @@
 
 <script>
 import Navbar from '../navbarComponent.vue';
+import paginatorComponent from '@/components/paginatorComponent.vue';
 import axios from 'axios';
 
 export default {
     name: 'SolicitudesEntrenamientos',
     components: {
-        Navbar
+        Navbar,
+        paginatorComponent,
     },
     data() {
         return {
+            currentPage: 1,
+            itemsPerPage: 9,
             filtroEstado: 'todos',
             solicitudes: [],
             isLoading: true,
@@ -133,7 +142,12 @@ export default {
         solicitudesFiltradas() {
             return this.solicitudes
                 .filter(s => this.filtroEstado === 'todos' || s.estado === this.filtroEstado)
-                .sort((a, b) => new Date(b.fechaSolicitud) - new Date(a.fechaSolicitud))
+                .sort((a, b) => new Date(b.fechaSolicitud) - new Date(a.fechaSolicitud));
+        },
+        solicitudesPaginadas() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.solicitudesFiltradas.slice(start, end);
         }
     },
     methods: {
@@ -144,7 +158,12 @@ export default {
                 if (!this.user) throw new Error("Usuario no autenticado");
 
                 const response = await axios.get('/training', {
-                    params: { trainer_id: this.user.id }
+                    params: {
+                        trainer_id: this.user.id,
+                        page: this.currentPage,
+                        per_page: this.itemsPerPage,
+                        status: this.filtroEstado === 'todos' ? null : this.filtroEstado
+                    }
                 });
 
                 console.log("Respuesta completa:", response);
@@ -249,7 +268,7 @@ export default {
                     trainer_id: this.user.id,
                     // training_id: trainingId
                 });
-console.log('userId:', solicitud.userId);
+                console.log('userId:', solicitud.userId);
 
             } catch (error) {
                 console.error('Error creando chat:', error);

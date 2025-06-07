@@ -26,7 +26,7 @@
 
 /* ESTILOS DEL FORO MEJORADOS */
 .foro-page {
-    margin: 0 auto;
+    margin: 0;
     background-color: var(--white);
     box-shadow: var(--shadow-md);
     position: relative;
@@ -251,33 +251,6 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
 /* ------------------- RESPONSIVE DESIGN ------------------ */
 
-/* Pantallas grandes (más de 1600px) */
-@media (min-width: 1600px) {
-    .hero-section {
-        height: 600px;
-    }
-
-    .titulo-foro {
-        font-size: 5rem;
-    }
-}
-
-/* Tablets en horizontal y pantallas pequeñas (entre 768px y 1024px) */
-@media (max-width: 1024px) {
-    .hero-section {
-        height: 450px;
-        clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
-    }
-
-    .titulo-foro {
-        font-size: 3.5rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.3rem;
-    }
-}
-
 /* Contenedor principal - Grid completo */
 .no-posts-container {
     display: grid;
@@ -360,10 +333,6 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 .no-posts-btn:hover::after {
     opacity: 0;
 }
-
-
-
-
 
 
 

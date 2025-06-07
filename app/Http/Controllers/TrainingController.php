@@ -17,13 +17,13 @@ class TrainingController extends Controller
             'page' => 'sometimes|integer'
         ]);
 
-        $query = Training::with('user'); // Carga la relación
+        $query = Training::with('user');
 
         if ($request->has('trainer_id')) {
             $query->where('trainer_id', $request->trainer_id);
         }
 
-        return $query->paginate(10);
+        return $query->get();
     }
 
     /**
