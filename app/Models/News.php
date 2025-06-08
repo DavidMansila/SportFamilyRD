@@ -7,14 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class News extends Model
 {
+
+    protected $table = 'newsscrapping';
     //  
     use HasFactory;
     protected $fillable = [
         'title',
-        'content',
+        'description',
         'author',
         'source',
         'url',
-        'published_at',
+        'image',
+        'category',
+        'published_at'
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at'
+    ];
+
+    protected $casts = [
+        'published_at' => 'datetime',
     ];
 }

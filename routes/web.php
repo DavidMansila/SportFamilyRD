@@ -14,6 +14,10 @@ use App\Models\Configuration;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
 
+use App\Models\News;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
 
 //Rutas para funciones en el back
 
@@ -22,8 +26,8 @@ Route::resource('/user', UserController::class);
 Route::get('/user-stats/{user}', [UserController::class, 'stats']);
 Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
 
-//Noticias
-Route::resource('/news', NewsController::class);
+// //Noticias
+// Route::resource('/news', NewsController::class);
 
 //productos
 Route::resource('/products', ProductController::class);
@@ -62,6 +66,58 @@ Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
 Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
 Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
 Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
+
+Route::get('/news', function () {
+    $news = News::orderBy('published_at', 'desc')
+        ->get()
+        ->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'title' => $item->title,
+                'description' => $item->description,
+                'image' => $item->image,
+                'author' => $item->author,
+                'published_at' => $item->published_at->toIso8601String(),
+                'category' => $item->category,
+            ];
+        });
+
+    return response()->json($news);
+});
+
+Route::put('/news/{id}', function (Request $request, $id) {
+    $validator = Validator::make($request->all(), [
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'author' => 'required|string|max:100',
+        'published_at' => 'required|date',
+        'categoria' => 'required|string|max:50'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
+
+    $noticia = News::findOrFail($id);
+
+    $noticia->update([
+        'title' => $request->title,
+        'description' => $request->description,
+        'author' => $request->author,
+        'published_at' => $request->published_at,
+        'category' => $request->categoria
+    ]);
+
+    return response()->json($noticia);
+});
+
+Route::delete('/news/{id}', function ($id) {
+    $noticia = News::findOrFail($id);
+    $noticia->delete();
+
+    return response()->json(['message' => 'Noticia eliminada']);
+});
+
 
 
 // Trainer
