@@ -157,8 +157,9 @@
                 <span v-else class="popup-author">Por {{ noticiaSeleccionada.author }}</span>
 
                 <!-- Fecha editable -->
-                <input v-if="noticiaSeleccionada.isEditing" type="date" v-model="noticiaSeleccionada.parsedDate"
-                  class="edit-date">
+                <input v-if="noticiaSeleccionada.isEditing" type="date"
+                  :value="formatDateForAPI(noticiaSeleccionada.parsedDate)"
+                  @input="noticiaSeleccionada.parsedDate = new Date($event.target.value)" class="edit-date">
                 <span v-else class="popup-date">{{ formatDateForDisplay(noticiaSeleccionada.parsedDate) }}</span>
               </div>
             </div>
@@ -248,45 +249,48 @@ export default {
     paginatedNews() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.noticiasFiltradas.slice(start, end);
+
+      const sortedNews = [...this.noticiasFiltradas].sort((a, b) => {
+        if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
+        return b.saved - a.saved; // Noticias guardadas primero
+      });
+
+      return sortedNews.slice(start, end);
     },
+    dateInput: {
+      get() {
+        return this.formatDateForAPI(this.noticiaSeleccionada.parsedDate);
+      },
+      set(value) {
+        this.noticiaSeleccionada.parsedDate = new Date(value);
+      }
+    }
   },
+
   methods: {
-
-    // generateStableId(title, date) {
-    //   const str = `${title}-${date}`;
-
-    //   if (typeof TextEncoder !== 'undefined') {
-    //     const utf8Bytes = new TextEncoder().encode(str);
-    //     const base64 = btoa(String.fromCharCode(...new Uint8Array(utf8Bytes)));
-    //     return base64.replace(/[+/=]/g, '').substr(0, 12);
-    //   }
-
-    //   // Fallback para navegadores antiguos
-    //   return btoa(unescape(encodeURIComponent(str)))
-    //     .replace(/[+/=]/g, '')
-    //     .substr(0, 12);
-    // },
-
 
     async cargarNoticias() {
       this.isLoading = true;
       this.errorMessage = '';
       try {
-        const response = await axios.get('/news');
-        this.noticias = response.data.map(noticia => {
-          return {
-            id: noticia.id,
-            title: noticia.title,
-            description: noticia.description,
-            image: noticia.image || '/imagenes/noticia-default.jpg',
-            author: noticia.author || 'Autor desconocido',
-            date: noticia.published_at,
-            categoria: noticia.category,
-            saved: false,
-            parsedDate: new Date(noticia.published_at)
-          };
-        });
+        // Cargar noticias
+        const newsResponse = await axios.get('/news');
+        this.noticias = newsResponse.data.map(noticia => ({
+          id: noticia.id,
+          title: noticia.title,
+          description: noticia.description,
+          image: noticia.image || '/imagenes/noticia-default.jpg',
+          author: noticia.author || 'Autor desconocido',
+          date: noticia.published_at,
+          categoria: noticia.category,
+          saved: false,
+          parsedDate: new Date(noticia.published_at)
+        }));
+
+        // Cargar noticias guardadas si el usuario está autenticado
+        if (this.user) {
+          await this.cargarNoticiasGuardadas();
+        }
 
         this.noticias.sort((a, b) => b.parsedDate - a.parsedDate);
         this.filtrarNoticias();
@@ -299,12 +303,32 @@ export default {
       }
     },
 
+
+    async cargarNoticiasGuardadas() {
+      const userData = sessionStorage.getItem('user');
+      if (!userData) return;
+
+      try {
+        const user = JSON.parse(userData);
+        const response = await axios.get(`/saved-news?user_id=${user.id}`);
+
+        const savedIds = response.data.map(item => item.news_id);
+
+        this.noticias = this.noticias.map(noticia => ({
+          ...noticia,
+          saved: savedIds.includes(noticia.id)
+        }));
+      } catch (error) {
+        console.error('Error al cargar guardadas:', error);
+      }
+    },
+
+
     filtrarNoticias() {
       this.noticiasFiltradas = this.deporteSeleccionado === 'todos'
         ? [...this.noticias]
         : this.noticias.filter(noticia => noticia.categoria === this.deporteSeleccionado);
 
-      this.ordenarNoticiasGuardadas();
       this.currentPage = 1;
     },
 
@@ -446,53 +470,92 @@ export default {
     },
 
 
-    
+
 
     // FUNCIONES DE GUARDADO
 
-    toggleSave(noticia) {
-      noticia.saved = !noticia.saved;
-      this.guardarEnLocalStorage(noticia);
-      this.ordenarNoticiasGuardadas();
-      this.noticiaSeleccionada = { ...this.noticiaSeleccionada };
-    },
-
-    guardarEnLocalStorage(noticia) {
-      const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
-      if (noticia.saved) {
-        savedNews[noticia.id] = true;
-      } else {
-        delete savedNews[noticia.id];
+    async toggleSave(noticia) {
+      if (!this.user || !this.user.id) {
+        alert('Debes iniciar sesión para guardar noticias');
+        return;
       }
-      sessionStorage.setItem('savedNews', JSON.stringify(savedNews));
 
-      this.noticias = this.noticias.map(n =>
-        n.id === noticia.id ? { ...n, saved: noticia.saved } : n
-      );
+      try {
+        const response = await axios.post(
+          `/news/${noticia.id}/toggle-save`,
+          {}, // Cuerpo vacío
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          }
+        );
+
+        if (response.status === 410) {
+          alert('Esta noticia ya no está disponible');
+          await this.cargarNoticias();
+          return;
+        }
+
+        noticia.saved = response.data.saved;
+        this.mostrarFeedbackGuardado(noticia);
+
+      } catch (error) {
+        if (error.response?.status === 410) {
+          alert('Esta noticia ya no está disponible');
+          await this.cargarNoticias();
+        } else {
+          console.error('Error al guardar noticia:', error);
+          alert('Error al guardar la noticia');
+        }
+      }
     },
 
-    ordenarNoticiasGuardadas() {
-      this.noticiasFiltradas.sort((a, b) => {
-        if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
-        return b.saved - a.saved;
-      });
-    },
 
     mostrarFeedbackGuardado(noticia) {
-      this.toastMessage = noticia.saved ? 'Noticia guardada' : 'Noticia eliminada de guardados';
-      this.mostrarToast = true;
-      setTimeout(() => this.mostrarToast = false, 2000);
+      const message = noticia.saved
+        ? 'Noticia guardada en tus favoritos'
+        : 'Noticia eliminada de favoritos';
+
+      // Aquí puedes implementar un sistema de notificaciones
+      alert(message);
     },
 
-    cargarGuardados() {
-      const savedNews = JSON.parse(sessionStorage.getItem('savedNews')) || {};
-      this.noticias = this.noticias.map(noticia => ({
-        ...noticia,
-        saved: savedNews[noticia.id] || false
-      }));
-    },
+    // guardarEnLocalStorage(noticia) {
+    //   const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
+    //   if (noticia.saved) {
+    //     savedNews[noticia.id] = true;
+    //   } else {
+    //     delete savedNews[noticia.id];
+    //   }
+    //   sessionStorage.setItem('savedNews', JSON.stringify(savedNews));
 
+    //   this.noticias = this.noticias.map(n =>
+    //     n.id === noticia.id ? { ...n, saved: noticia.saved } : n
+    //   );
+    // },
 
+    // ordenarNoticiasGuardadas() {
+    //   this.noticiasFiltradas.sort((a, b) => {
+    //     if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
+    //     return b.saved - a.saved;
+    //   });
+    // },
+
+    // mostrarFeedbackGuardado(noticia) {
+    //   this.toastMessage = noticia.saved ? 'Noticia guardada' : 'Noticia eliminada de guardados';
+    //   this.mostrarToast = true;
+    //   setTimeout(() => this.mostrarToast = false, 2000);
+    // },
+
+    // cargarGuardados() {
+    //   const savedNews = JSON.parse(sessionStorage.getItem('savedNews')) || {};
+    //   this.noticias = this.noticias.map(noticia => ({
+    //     ...noticia,
+    //     saved: savedNews[noticia.id] || false
+    //   }));
+    // },
 
 
 
@@ -536,20 +599,30 @@ export default {
       try {
         this.isLoading = true;
 
-        // Enviar los cambios con los nombres correctos
-        await axios.put(`/news/${this.noticiaSeleccionada.id}`, {
+        // Preparar los datos para enviar
+        const datosActualizados = {
           title: this.noticiaSeleccionada.title,
           description: this.noticiaSeleccionada.description,
           author: this.noticiaSeleccionada.author,
-          published_at: this.noticiaSeleccionada.parsedDate,
-          category: this.noticiaSeleccionada.categoria
-        });
+          categoria: this.noticiaSeleccionada.categoria,
+          // Asegúrate de formatear correctamente la fecha para el backend
+          published_at: this.formatDateForAPI(this.noticiaSeleccionada.parsedDate)
+        };
 
+        // Enviar los cambios
+        const response = await axios.put(`/news/${this.noticiaSeleccionada.id}`, datosActualizados);
+
+        // Actualizar la noticia en el frontend
         const index = this.noticias.findIndex(n => n.id === this.noticiaSeleccionada.id);
         if (index !== -1) {
-          this.noticias[index] = { ...this.noticiaSeleccionada, isEditing: false };
+          this.noticias[index] = {
+            ...this.noticiaSeleccionada,
+            isEditing: false,
+            parsedDate: new Date(this.noticiaSeleccionada.parsedDate)
+          };
         }
 
+        this.filtrarNoticias();
         this.cerrarNoticia();
         alert('Cambios guardados exitosamente');
       } catch (error) {
@@ -560,25 +633,29 @@ export default {
       }
     },
 
+    formatDateForAPI(dateObj) {
+      if (!dateObj || !(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
+        return '';
+      }
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
 
   },
 
   async mounted() {
-    try {
-      const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
-      this.cargarGuardados();
-      await this.cargarNoticias();
-
-      this.noticias = this.noticias.map(noticia => ({
-        ...noticia,
-        saved: savedNews[noticia.id] || false
-      }));
-
-      this.filtrarNoticias();
-      this.user = JSON.parse(sessionStorage.getItem('user'));
-    } catch (error) {
-      console.error('Error al cargar noticias:', error);
+    // Cargar usuario
+    const userData = sessionStorage.getItem('user');
+    if (userData) {
+      this.user = JSON.parse(userData);
     }
+
+    // Cargar noticias
+    await this.cargarNoticias();
+
     document.title = 'Noticias';
   }
 };

@@ -10,6 +10,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\SavedNewsController;
 use App\Models\Configuration;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -60,13 +61,16 @@ Route::delete('/post/destroy-reply/{replyId}', [PostController::class, 'destroyR
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
-//scraper
+
+// SCRAPPER
 Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
 Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
 Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
 Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
 Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
 
+
+// NOTICIAS
 Route::get('/news', function () {
     $news = News::orderBy('published_at', 'desc')
         ->get()
@@ -118,6 +122,10 @@ Route::delete('/news/{id}', function ($id) {
     return response()->json(['message' => 'Noticia eliminada']);
 });
 
+
+// NOTICIAS GUARDADAS
+Route::post('/news/{newsId}/toggle-save', [SavedNewsController::class, 'toggleSave']);
+Route::get('/news/{id}', [NewsController::class, 'show']);
 
 
 // Trainer
