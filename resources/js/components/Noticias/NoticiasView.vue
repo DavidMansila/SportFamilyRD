@@ -157,9 +157,10 @@
                 <span v-else class="popup-author">Por {{ noticiaSeleccionada.author }}</span>
 
                 <!-- Fecha editable -->
-                <input v-if="noticiaSeleccionada.isEditing" type="date" v-model="noticiaSeleccionada.date"
-                  class="edit-date">
-                <span v-else class="popup-date">{{ noticiaSeleccionada.date }}</span>
+                <input v-if="noticiaSeleccionada.isEditing" type="date"
+                  :value="formatDateForAPI(noticiaSeleccionada.parsedDate)"
+                  @input="noticiaSeleccionada.parsedDate = new Date($event.target.value)" class="edit-date">
+                <span v-else class="popup-date">{{ formatDateForDisplay(noticiaSeleccionada.parsedDate) }}</span>
               </div>
             </div>
           </div>
@@ -236,7 +237,7 @@ export default {
         { value: 'todos', label: 'Todos' },
         { value: 'futbol', label: 'Fútbol' },
         { value: 'baloncesto', label: 'Baloncesto' },
-        { value: 'beisbol', label: 'Béisbol' },
+        { value: 'baseball', label: 'Béisbol' },
         { value: 'volleyball', label: 'Volleyball' },
         { value: 'swimming', label: 'Natacion' },
       ],
@@ -248,79 +249,52 @@ export default {
     paginatedNews() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.noticiasFiltradas.slice(start, end);
+
+      const sortedNews = [...this.noticiasFiltradas].sort((a, b) => {
+        if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
+        return b.saved - a.saved; // Noticias guardadas primero
+      });
+
+      return sortedNews.slice(start, end);
     },
-  },
-  methods: {
-
-    generateStableId(title, date) {
-      const str = `${title}-${date}`;
-
-      if (typeof TextEncoder !== 'undefined') {
-        const utf8Bytes = new TextEncoder().encode(str);
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(utf8Bytes)));
-        return base64.replace(/[+/=]/g, '').substr(0, 12);
+    dateInput: {
+      get() {
+        return this.formatDateForAPI(this.noticiaSeleccionada.parsedDate);
+      },
+      set(value) {
+        this.noticiaSeleccionada.parsedDate = new Date(value);
       }
+    }
+  },
 
-      // Fallback para navegadores antiguos
-      return btoa(unescape(encodeURIComponent(str)))
-        .replace(/[+/=]/g, '')
-        .substr(0, 12);
-    },
-
+  methods: {
 
     async cargarNoticias() {
       this.isLoading = true;
       this.errorMessage = '';
       try {
-        const [futbol, baloncesto, beisbol, volleyball, swimming] = await Promise.all([
-          axios.get('/futbol_news'),
-          axios.get('/basketball_news'),
-          axios.get('/baseball_news'),
-          axios.get('/volleyball_news'),
-          axios.get('/swimming_news')
-        ]);
+        // Cargar noticias
+        const newsResponse = await axios.get('/news');
+        this.noticias = newsResponse.data.map(noticia => ({
+          id: noticia.id,
+          title: noticia.title,
+          description: noticia.description,
+          image: noticia.image || '/imagenes/noticia-default.jpg',
+          author: noticia.author || 'Autor desconocido',
+          date: noticia.published_at,
+          categoria: noticia.category,
+          saved: false,
+          parsedDate: new Date(noticia.published_at)
+        }));
 
-        // Procesar cada categoría con debug
-        const processCategory = (news, category) => {
-          return news.map(n => {
-            const parsedDate = this.parseDate(n.date, category);
-            return {
-              ...n,
-              id: n.id || this.generateStableId(n.title, n.date),
-              saved: false,
-              categoria: category,
-              parsedDate: parsedDate
-            };
-          });
-        };
+        // Cargar noticias guardadas si el usuario está autenticado
+        if (this.user) {
+          await this.cargarNoticiasGuardadas();
+        }
 
-        this.noticias = [
-          ...processCategory(futbol.data.futbol_news, 'futbol'),
-          ...processCategory(baloncesto.data.basketball_news, 'baloncesto'),
-          ...processCategory(beisbol.data.baseball_news, 'beisbol'),
-          ...processCategory(volleyball.data.volleyball_news, 'volleyball'),
-          ...processCategory(swimming.data.swimming_news, 'swimming'),
-        ];
-
-        // Debug antes de ordenar
-        console.log("Noticias antes de ordenar:", this.noticias.map(n => ({
-          title: n.title,
-          originalDate: n.date,
-          parsedDate: n.parsedDate,
-          formatted: this.formatDateForDisplay(n.parsedDate)
-        })));
-
-        // Ordenar por fecha (más reciente primero)
         this.noticias.sort((a, b) => b.parsedDate - a.parsedDate);
-
-        // Debug después de ordenar
-        console.log("Noticias después de ordenar:", this.noticias.map(n => ({
-          title: n.title,
-          formattedDate: this.formatDateForDisplay(n.parsedDate)
-        })));
-
         this.filtrarNoticias();
+
       } catch (error) {
         console.error('Error al cargar noticias:', error);
         this.errorMessage = 'Error al cargar noticias. Por favor, inténtalo de nuevo más tarde.';
@@ -329,12 +303,32 @@ export default {
       }
     },
 
+
+    async cargarNoticiasGuardadas() {
+      const userData = sessionStorage.getItem('user');
+      if (!userData) return;
+
+      try {
+        const user = JSON.parse(userData);
+        const response = await axios.get(`/saved-news?user_id=${user.id}`);
+
+        const savedIds = response.data.map(item => item.news_id);
+
+        this.noticias = this.noticias.map(noticia => ({
+          ...noticia,
+          saved: savedIds.includes(noticia.id)
+        }));
+      } catch (error) {
+        console.error('Error al cargar guardadas:', error);
+      }
+    },
+
+
     filtrarNoticias() {
       this.noticiasFiltradas = this.deporteSeleccionado === 'todos'
         ? [...this.noticias]
         : this.noticias.filter(noticia => noticia.categoria === this.deporteSeleccionado);
 
-      this.ordenarNoticiasGuardadas();
       this.currentPage = 1;
     },
 
@@ -371,6 +365,7 @@ export default {
       return name.split(' ').map(n => n[0]).join('').toUpperCase();
     },
 
+
     formatDescription(desc) {
       return desc
         .replace(/\n/g, '<br>')
@@ -378,90 +373,91 @@ export default {
     },
 
 
-    parseDate(dateStr, category) {
-      if (!dateStr) return new Date(0); // Fecha mínima si no hay fecha
+    // parseDate(dateStr, category) {
+    //   if (!dateStr) return new Date(0); // Fecha mínima si no hay fecha
 
-      // Limpiar la cadena de fecha
-      dateStr = dateStr.trim();
+    //   // Limpiar la cadena de fecha
+    //   dateStr = dateStr.trim();
 
-      try {
-        switch (category) {
-          case 'futbol': // "7 de enero de 2025"
-            const partsFutbol = dateStr.split(' de ');
-            if (partsFutbol.length !== 3) return new Date(0);
-            const dayFutbol = parseInt(partsFutbol[0]);
-            const monthFutbol = this.getMonthNumber(partsFutbol[1]);
-            const yearFutbol = parseInt(partsFutbol[2]);
-            if (isNaN(dayFutbol)) return new Date(0);
-            return new Date(yearFutbol, monthFutbol, dayFutbol);
+    //   try {
+    //     switch (category) {
+    //       case 'futbol': // "7 de enero de 2025"
+    //         const partsFutbol = dateStr.split(' de ');
+    //         if (partsFutbol.length !== 3) return new Date(0);
+    //         const dayFutbol = parseInt(partsFutbol[0]);
+    //         const monthFutbol = this.getMonthNumber(partsFutbol[1]);
+    //         const yearFutbol = parseInt(partsFutbol[2]);
+    //         if (isNaN(dayFutbol)) return new Date(0);
+    //         return new Date(yearFutbol, monthFutbol, dayFutbol);
 
-          case 'baloncesto': // "domingo 04 mayo, 2025"
-            const partsBaloncesto = dateStr.split(' ');
-            if (partsBaloncesto.length < 4) return new Date(0);
-            const dayBaloncesto = parseInt(partsBaloncesto[1]);
-            const monthBaloncesto = this.getMonthNumber(partsBaloncesto[2].replace(',', ''));
-            const yearBaloncesto = parseInt(partsBaloncesto[3]);
-            if (isNaN(dayBaloncesto)) return new Date(0);
-            return new Date(yearBaloncesto, monthBaloncesto, dayBaloncesto);
+    //       case 'baloncesto': // "domingo 04 mayo, 2025"
+    //         const partsBaloncesto = dateStr.split(' ');
+    //         if (partsBaloncesto.length < 4) return new Date(0);
+    //         const dayBaloncesto = parseInt(partsBaloncesto[1]);
+    //         const monthBaloncesto = this.getMonthNumber(partsBaloncesto[2].replace(',', ''));
+    //         const yearBaloncesto = parseInt(partsBaloncesto[3]);
+    //         if (isNaN(dayBaloncesto)) return new Date(0);
+    //         return new Date(yearBaloncesto, monthBaloncesto, dayBaloncesto);
 
-          case 'beisbol': // "06/05/2025   ·   01:31 PM"
-            const [datePart] = dateStr.split('·').map(s => s.trim());
-            const datePartsBeisbol = datePart.split('/');
-            if (datePartsBeisbol.length !== 3) return new Date(0);
-            const dayBeisbol = parseInt(datePartsBeisbol[0]);
-            const monthBeisbol = parseInt(datePartsBeisbol[1]) - 1;
-            const yearBeisbol = parseInt(datePartsBeisbol[2]);
-            if (isNaN(dayBeisbol) || isNaN(monthBeisbol)) return new Date(0);
-            return new Date(yearBeisbol, monthBeisbol, dayBeisbol);
+    //       case 'baseball': // "06/05/2025   ·   01:31 PM"
+    //         const [datePart] = dateStr.split('·').map(s => s.trim());
+    //         const datePartsBeisbol = datePart.split('/');
+    //         if (datePartsBeisbol.length !== 3) return new Date(0);
+    //         const dayBeisbol = parseInt(datePartsBeisbol[0]);
+    //         const monthBeisbol = parseInt(datePartsBeisbol[1]) - 1;
+    //         const yearBeisbol = parseInt(datePartsBeisbol[2]);
+    //         if (isNaN(dayBeisbol) || isNaN(monthBeisbol)) return new Date(0);
+    //         return new Date(yearBeisbol, monthBeisbol, dayBeisbol);
 
-          case 'volleyball': // "May 5, 2025"
-            const partsVolleyball = dateStr.split(' ');
-            if (partsVolleyball.length < 3) return new Date(0);
-            const monthVolleyball = this.getMonthNumber(partsVolleyball[0]);
-            const dayVolleyball = parseInt(partsVolleyball[1].replace(',', ''));
-            const yearVolleyball = parseInt(partsVolleyball[2]);
-            if (isNaN(dayVolleyball)) return new Date(0);
-            return new Date(yearVolleyball, monthVolleyball, dayVolleyball);
+    //       case 'volleyball': // "May 5, 2025"
+    //         const partsVolleyball = dateStr.split(' ');
+    //         if (partsVolleyball.length < 3) return new Date(0);
+    //         const monthVolleyball = this.getMonthNumber(partsVolleyball[0]);
+    //         const dayVolleyball = parseInt(partsVolleyball[1].replace(',', ''));
+    //         const yearVolleyball = parseInt(partsVolleyball[2]);
+    //         if (isNaN(dayVolleyball)) return new Date(0);
+    //         return new Date(yearVolleyball, monthVolleyball, dayVolleyball);
 
-          case 'swimming': // "agosto 22, 2024"
-            const partsSwimming = dateStr.split(' ');
-            if (partsSwimming.length < 3) return new Date(0);
-            const monthSwimming = this.getMonthNumber(partsSwimming[0]);
-            const daySwimming = parseInt(partsSwimming[1].replace(',', ''));
-            const yearSwimming = parseInt(partsSwimming[2]);
-            if (isNaN(daySwimming)) return new Date(0);
-            return new Date(yearSwimming, monthSwimming, daySwimming);
+    //       case 'swimming': // "agosto 22, 2024"
+    //         const partsSwimming = dateStr.split(' ');
+    //         if (partsSwimming.length < 3) return new Date(0);
+    //         const monthSwimming = this.getMonthNumber(partsSwimming[0]);
+    //         const daySwimming = parseInt(partsSwimming[1].replace(',', ''));
+    //         const yearSwimming = parseInt(partsSwimming[2]);
+    //         if (isNaN(daySwimming)) return new Date(0);
+    //         return new Date(yearSwimming, monthSwimming, daySwimming);
 
-          default:
-            return new Date(dateStr) || new Date(0);
-        }
-      } catch (e) {
-        console.error(`Error parsing date (${category}): "${dateStr}"`, e);
-        return new Date(0);
-      }
-    },
+    //       default:
+    //         return new Date(dateStr) || new Date(0);
+    //     }
+    //   } catch (e) {
+    //     console.error(`Error parsing date (${category}): "${dateStr}"`, e);
+    //     return new Date(0);
+    //   }
+    // },
 
-    getMonthNumber(monthName) {
-      if (!monthName) return 0;
+    // getMonthNumber(monthName) {
+    //   if (!monthName) return 0;
 
-      const months = {
-        'enero': 0, 'january': 0, 'jan': 0,
-        'febrero': 1, 'february': 1, 'feb': 1,
-        'marzo': 2, 'march': 2, 'mar': 2,
-        'abril': 3, 'april': 3, 'apr': 3,
-        'mayo': 4, 'may': 4,
-        'junio': 5, 'june': 5, 'jun': 5,
-        'julio': 6, 'july': 6, 'jul': 6,
-        'agosto': 7, 'august': 7, 'aug': 7,
-        'septiembre': 8, 'september': 8, 'sep': 8, 'setiembre': 8,
-        'octubre': 9, 'october': 9, 'oct': 9,
-        'noviembre': 10, 'november': 10, 'nov': 10,
-        'diciembre': 11, 'december': 11, 'dec': 11
-      };
+    //   const months = {
+    //     'enero': 0, 'january': 0, 'jan': 0,
+    //     'febrero': 1, 'february': 1, 'feb': 1,
+    //     'marzo': 2, 'march': 2, 'mar': 2,
+    //     'abril': 3, 'april': 3, 'apr': 3,
+    //     'mayo': 4, 'may': 4,
+    //     'junio': 5, 'june': 5, 'jun': 5,
+    //     'julio': 6, 'july': 6, 'jul': 6,
+    //     'agosto': 7, 'august': 7, 'aug': 7,
+    //     'septiembre': 8, 'september': 8, 'sep': 8, 'setiembre': 8,
+    //     'octubre': 9, 'october': 9, 'oct': 9,
+    //     'noviembre': 10, 'november': 10, 'nov': 10,
+    //     'diciembre': 11, 'december': 11, 'dec': 11
+    //   };
 
-      const normalizedMonth = monthName.toLowerCase().replace(',', '').trim();
-      return months[normalizedMonth] ?? 0;
-    },
+    //   const normalizedMonth = monthName.toLowerCase().replace(',', '').trim();
+    //   return months[normalizedMonth] ?? 0;
+    // },
+
 
     formatDateForDisplay(dateObj) {
       if (!dateObj || !(dateObj instanceof Date)) return 'Fecha desconocida';
@@ -478,57 +474,88 @@ export default {
 
     // FUNCIONES DE GUARDADO
 
-    toggleSave(noticia) {
-      noticia.saved = !noticia.saved;
-      this.guardarEnLocalStorage(noticia);
-      this.ordenarNoticiasGuardadas();
-
-      // Forzar actualización del DOM para el popup
-      this.noticiaSeleccionada = { ...this.noticiaSeleccionada };
-    },
-
-    guardarEnLocalStorage(noticia) {
-      const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
-      if (noticia.saved) {
-        savedNews[noticia.id] = true;
-      } else {
-        delete savedNews[noticia.id];
+    async toggleSave(noticia) {
+      if (!this.user || !this.user.id) {
+        alert('Debes iniciar sesión para guardar noticias');
+        return;
       }
-      sessionStorage.setItem('savedNews', JSON.stringify(savedNews));
 
-      // Actualizar la lista completa de noticias
-      this.noticias = this.noticias.map(n =>
-        n.id === noticia.id ? { ...n, saved: noticia.saved } : n
-      );
+      try {
+        const response = await axios.post(
+          `/news/${noticia.id}/toggle-save`,
+          {}, // Cuerpo vacío
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          }
+        );
+
+        if (response.status === 410) {
+          alert('Esta noticia ya no está disponible');
+          await this.cargarNoticias();
+          return;
+        }
+
+        noticia.saved = response.data.saved;
+        this.mostrarFeedbackGuardado(noticia);
+
+      } catch (error) {
+        if (error.response?.status === 410) {
+          alert('Esta noticia ya no está disponible');
+          await this.cargarNoticias();
+        } else {
+          console.error('Error al guardar noticia:', error);
+          alert('Error al guardar la noticia');
+        }
+      }
     },
 
-    ordenarNoticiasGuardadas() {
-      this.noticiasFiltradas.sort((a, b) => {
-        if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
-        return b.saved - a.saved;
-      });
-    },
 
     mostrarFeedbackGuardado(noticia) {
-      this.toastMessage = noticia.saved ? 'Noticia guardada' : 'Noticia eliminada de guardados';
-      this.mostrarToast = true;
-      setTimeout(() => this.mostrarToast = false, 2000);
+      const message = noticia.saved
+        ? 'Noticia guardada en tus favoritos'
+        : 'Noticia eliminada de favoritos';
+
+      // Aquí puedes implementar un sistema de notificaciones
+      alert(message);
     },
 
-    cargarGuardados() {
-      const savedNews = JSON.parse(sessionStorage.getItem('savedNews')) || {};
-      this.noticias = this.noticias.map(noticia => ({
-        ...noticia,
-        saved: savedNews[noticia.id] || false
-      }));
-    },
+    // guardarEnLocalStorage(noticia) {
+    //   const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
+    //   if (noticia.saved) {
+    //     savedNews[noticia.id] = true;
+    //   } else {
+    //     delete savedNews[noticia.id];
+    //   }
+    //   sessionStorage.setItem('savedNews', JSON.stringify(savedNews));
 
+    //   this.noticias = this.noticias.map(n =>
+    //     n.id === noticia.id ? { ...n, saved: noticia.saved } : n
+    //   );
+    // },
 
+    // ordenarNoticiasGuardadas() {
+    //   this.noticiasFiltradas.sort((a, b) => {
+    //     if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
+    //     return b.saved - a.saved;
+    //   });
+    // },
 
+    // mostrarFeedbackGuardado(noticia) {
+    //   this.toastMessage = noticia.saved ? 'Noticia guardada' : 'Noticia eliminada de guardados';
+    //   this.mostrarToast = true;
+    //   setTimeout(() => this.mostrarToast = false, 2000);
+    // },
 
-
-
-
+    // cargarGuardados() {
+    //   const savedNews = JSON.parse(sessionStorage.getItem('savedNews')) || {};
+    //   this.noticias = this.noticias.map(noticia => ({
+    //     ...noticia,
+    //     saved: savedNews[noticia.id] || false
+    //   }));
+    // },
 
 
 
@@ -540,18 +567,27 @@ export default {
     },
 
     editarNoticia(noticia) {
-      // Abre la noticia en modo edición
       this.noticiaSeleccionada = {
         ...noticia,
-        isEditing: true // Añadimos un flag para indicar que estamos editando
+        isEditing: true
       };
       document.body.style.overflow = 'hidden';
     },
 
-    eliminarNoticia(noticia) {
-      // Lógica para eliminar noticia
+    async eliminarNoticia(noticia) {
       if (confirm(`¿Estás seguro de eliminar "${noticia.title}"?`)) {
-        console.log('Eliminar noticia:', noticia);
+        try {
+          await axios.delete(`/news/${noticia.id}`);
+
+          // Eliminar de la lista local
+          this.noticias = this.noticias.filter(n => n.id !== noticia.id);
+          this.filtrarNoticias();
+
+          alert('Noticia eliminada correctamente');
+        } catch (error) {
+          console.error('Error al eliminar noticia:', error);
+          alert('Error al eliminar noticia. Por favor intente nuevamente.');
+        }
       }
     },
 
@@ -563,38 +599,32 @@ export default {
       try {
         this.isLoading = true;
 
-        // Determinar el endpoint basado en la categoría
-        let endpoint = '';
-        switch (this.noticiaSeleccionada.categoria) {
-          case 'futbol': endpoint = '/update_futbol_news'; break;
-          case 'baloncesto': endpoint = '/update_basketball_news'; break;
-          case 'beisbol': endpoint = '/update_baseball_news'; break;
-          case 'volleyball': endpoint = '/update_volleyball_news'; break;
-          case 'swimming': endpoint = '/update_swimming_news'; break;
-        }
-
-        // Enviar los cambios al servidor
-        const response = await axios.put(endpoint, {
-          id: this.noticiaSeleccionada.id,
+        // Preparar los datos para enviar
+        const datosActualizados = {
           title: this.noticiaSeleccionada.title,
-          author: this.noticiaSeleccionada.author,
           description: this.noticiaSeleccionada.description,
-          date: this.noticiaSeleccionada.date,
-          // image: this.noticiaSeleccionada.image (manejaría esto aparte si cambió)
-        });
+          author: this.noticiaSeleccionada.author,
+          categoria: this.noticiaSeleccionada.categoria,
+          // Asegúrate de formatear correctamente la fecha para el backend
+          published_at: this.formatDateForAPI(this.noticiaSeleccionada.parsedDate)
+        };
 
-        // Actualizar la noticia en la lista local
+        // Enviar los cambios
+        const response = await axios.put(`/news/${this.noticiaSeleccionada.id}`, datosActualizados);
+
+        // Actualizar la noticia en el frontend
         const index = this.noticias.findIndex(n => n.id === this.noticiaSeleccionada.id);
         if (index !== -1) {
-          this.noticias[index] = { ...this.noticiaSeleccionada, isEditing: false };
+          this.noticias[index] = {
+            ...this.noticiaSeleccionada,
+            isEditing: false,
+            parsedDate: new Date(this.noticiaSeleccionada.parsedDate)
+          };
         }
 
-        // Cerrar el popup
+        this.filtrarNoticias();
         this.cerrarNoticia();
-
-        // Mostrar feedback
         alert('Cambios guardados exitosamente');
-
       } catch (error) {
         console.error('Error al guardar cambios:', error);
         alert('Error al guardar cambios. Por favor intente nuevamente.');
@@ -602,25 +632,30 @@ export default {
         this.isLoading = false;
       }
     },
+
+    formatDateForAPI(dateObj) {
+      if (!dateObj || !(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
+        return '';
+      }
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+
   },
 
   async mounted() {
-    try {
-      // Cargar savedNews primero para tenerlos disponibles
-      const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
-      await this.cargarNoticias();
-
-      // Aplicar savedNews después de cargar
-      this.noticias = this.noticias.map(noticia => ({
-        ...noticia,
-        saved: savedNews[noticia.id] || false
-      }));
-
-      this.filtrarNoticias();
-      this.user = JSON.parse(sessionStorage.getItem('user'));
-    } catch (error) {
-      console.error('Error al cargar noticias:', error);
+    // Cargar usuario
+    const userData = sessionStorage.getItem('user');
+    if (userData) {
+      this.user = JSON.parse(userData);
     }
+
+    // Cargar noticias
+    await this.cargarNoticias();
+
     document.title = 'Noticias';
   }
 };

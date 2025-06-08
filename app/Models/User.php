@@ -1,14 +1,17 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\Trainer;
 use App\Models\Achievement;
 use App\Models\Specialty;
+use App\Models\SavedNews;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -24,7 +27,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'user_type',	
+        'user_type',
         'image',
         'phone',
         'location',
@@ -32,7 +35,7 @@ class User extends Authenticatable
         'bio',
         'social_links',
         'achivements',
-        
+
     ];
 
     public function trainer()
@@ -87,4 +90,9 @@ class User extends Authenticatable
         ];
     }
 
+
+    public function savedNews()
+    {
+        return $this->hasMany(SavedNews::class);
+    }
 }
