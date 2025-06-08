@@ -9,51 +9,43 @@ use Illuminate\Support\Facades\Auth;
 
 class SavedNewsController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        return $user->savedNews()
-            ->with('news')
-            ->get()
-            ->pluck('news');
-    }
-
     public function toggleSave($newsId)
     {
         $user = Auth::user();
-        if (!$user) {
+        $userId = $user ? $user->id : null;
+
+        if (!$userId) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        // Verificar si la noticia existe en la tabla correcta
-        $newsExists = News::where('id', $newsId)->exists();
-
-        if (!$newsExists) {
-            return response()->json([
-                'message' => 'La noticia ya no existe',
-                'saved' => false
-            ], 410);
-        }
-
-        $savedNews = SavedNews::where('user_id', $user->id)
+        $saved = SavedNews::where('user_id', $userId)
             ->where('news_id', $newsId)
             ->first();
 
-        if ($savedNews) {
-            $savedNews->delete();
+        if ($saved) {
+            $saved->delete();
             return response()->json(['saved' => false]);
+        } else {
+            SavedNews::create([
+                'user_id' => $userId,
+                'news_id' => $newsId
+            ]);
+            return response()->json(['saved' => true]);
+        }
+    }
+
+    public function index(Request $request)
+    {
+        $userId = $request->header('X-User-ID');
+
+        if (!$userId) {
+            return response()->json(['message' => 'User ID required'], 400);
         }
 
-        // Crear usando el nombre de tabla correcto
-        SavedNews::create([
-            'user_id' => $user->id,
-            'news_id' => $newsId
-        ]);
+        $savedNewsIds = SavedNews::where('user_id', $userId)
+            ->pluck('news_id')
+            ->toArray();
 
-        return response()->json(['saved' => true]);
+        return response()->json($savedNewsIds);
     }
 }

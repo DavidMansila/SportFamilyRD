@@ -132,7 +132,7 @@
           </button>
 
           <div class="popup-header">
-            <!-- Selector de categoría (solo en edición) -->
+            <!-- Selector de categoría -->
             <select v-if="noticiaSeleccionada.isEditing" v-model="noticiaSeleccionada.categoria" class="edit-select">
               <option v-for="deporte in deportes.filter(d => d.value !== 'todos')" :key="deporte.value"
                 :value="deporte.value">
@@ -210,8 +210,6 @@
 </template>
 
 
-
-
 <script>
 import axios from 'axios';
 import paginatorComponent from '@/components/paginatorComponent.vue';
@@ -248,8 +246,11 @@ export default {
   computed: {
     paginatedNews() {
       const sortedNews = [...this.noticiasFiltradas].sort((a, b) => {
-        if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
-        return b.saved - a.saved;
+        // Primero: noticias guardadas
+        if (a.saved !== b.saved) return b.saved - a.saved;
+
+        // Segundo: noticias más recientes
+        return b.parsedDate - a.parsedDate;
       });
 
       const start = (this.currentPage - 1) * this.itemsPerPage;
@@ -286,7 +287,7 @@ export default {
           parsedDate: new Date(noticia.published_at)
         }));
 
-        // Cargar noticias guardadas si el usuario está autenticado
+        // Después de cargar las noticias
         if (this.user) {
           await this.cargarNoticiasGuardadas();
         }
@@ -307,25 +308,22 @@ export default {
 
       try {
         const response = await axios.get('/saved-news', {
-          headers: {
-            'X-User-ID': this.user.id
-          }
+          headers: { 'X-User-ID': this.user.id }
         });
 
-        // Asegurarnos que tenemos un array de IDs
-        const savedIds = response.data.map(item => item.news_id);
-        console.log('Noticias guardadas:', savedIds); // Para depuración
+        // Asegurarse de que los IDs sean números
+        const savedIds = response.data.map(id => Number(id));
 
-        // Actualizar estado local de noticias guardadas
-        this.noticias = this.noticias.map(noticia => ({
-          ...noticia,
-          // Usar Number() para asegurar comparación numérica
-          saved: savedIds.includes(Number(noticia.id))
-        }));
+        // Actualizar estado de guardado
+        this.noticias.forEach(noticia => {
+          noticia.saved = savedIds.includes(Number(noticia.id));
+        });
 
-        this.filtrarNoticias();
+        // Forzar actualización de la vista
+        this.$forceUpdate();
+
       } catch (error) {
-        console.error('Error al cargar guardadas:', error);
+        console.error('Error al cargar noticias guardadas:', error);
       }
     },
 
@@ -404,37 +402,14 @@ export default {
           { headers: { 'X-User-ID': this.user.id } }
         );
 
-        if (response.status === 410) {
-          alert('Esta noticia ya no está disponible');
-          await this.cargarNoticias();
-          return;
-        }
-
         noticia.saved = response.data.saved;
 
+        // Actualizar lista de guardados
         await this.cargarNoticiasGuardadas();
 
-        this.mostrarFeedbackGuardado(noticia);
-
       } catch (error) {
-        if (error.response?.status === 410) {
-          alert('Esta noticia ya no está disponible');
-          await this.cargarNoticias();
-        } else {
-          console.error('Error al guardar noticia:', error);
-          alert('Error al guardar la noticia');
-        }
+        console.error('Error al guardar noticia:', error);
       }
-    },
-
-
-    mostrarFeedbackGuardado(noticia) {
-      const message = noticia.saved
-        ? 'Noticia guardada en tus favoritos'
-        : 'Noticia eliminada de favoritos';
-
-      // Aquí puedes implementar un sistema de notificaciones
-      alert(message);
     },
 
 
@@ -535,10 +510,10 @@ export default {
       this.user = JSON.parse(userData);
     }
 
-    // Primero cargar noticias
+    // Cargar noticias
     await this.cargarNoticias();
 
-    // Luego cargar guardadas
+    // Cargar estado de guardado si hay usuario
     if (this.user) {
       await this.cargarNoticiasGuardadas();
     }

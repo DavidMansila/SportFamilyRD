@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class News extends Model
 {
     use SoftDeletes;
-    
+
     protected $table = 'newsscrapping';
 
     protected $fillable = [
