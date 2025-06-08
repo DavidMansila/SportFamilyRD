@@ -132,7 +132,7 @@
           </button>
 
           <div class="popup-header">
-            <!-- Selector de categoría (solo en edición) -->
+            <!-- Selector de categoría -->
             <select v-if="noticiaSeleccionada.isEditing" v-model="noticiaSeleccionada.categoria" class="edit-select">
               <option v-for="deporte in deportes.filter(d => d.value !== 'todos')" :key="deporte.value"
                 :value="deporte.value">
@@ -210,8 +210,6 @@
 </template>
 
 
-
-
 <script>
 import axios from 'axios';
 import paginatorComponent from '@/components/paginatorComponent.vue';
@@ -247,14 +245,16 @@ export default {
   },
   computed: {
     paginatedNews() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-
       const sortedNews = [...this.noticiasFiltradas].sort((a, b) => {
-        if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
-        return b.saved - a.saved; // Noticias guardadas primero
+        // Primero: noticias guardadas
+        if (a.saved !== b.saved) return b.saved - a.saved;
+
+        // Segundo: noticias más recientes
+        return b.parsedDate - a.parsedDate;
       });
 
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
       return sortedNews.slice(start, end);
     },
     dateInput: {
@@ -287,7 +287,7 @@ export default {
           parsedDate: new Date(noticia.published_at)
         }));
 
-        // Cargar noticias guardadas si el usuario está autenticado
+        // Después de cargar las noticias
         if (this.user) {
           await this.cargarNoticiasGuardadas();
         }
@@ -303,23 +303,27 @@ export default {
       }
     },
 
-
     async cargarNoticiasGuardadas() {
-      const userData = sessionStorage.getItem('user');
-      if (!userData) return;
+      if (!this.user || !this.user.id) return;
 
       try {
-        const user = JSON.parse(userData);
-        const response = await axios.get(`/saved-news?user_id=${user.id}`);
+        const response = await axios.get('/saved-news', {
+          headers: { 'X-User-ID': this.user.id }
+        });
 
-        const savedIds = response.data.map(item => item.news_id);
+        // Asegurarse de que los IDs sean números
+        const savedIds = response.data.map(id => Number(id));
 
-        this.noticias = this.noticias.map(noticia => ({
-          ...noticia,
-          saved: savedIds.includes(noticia.id)
-        }));
+        // Actualizar estado de guardado
+        this.noticias.forEach(noticia => {
+          noticia.saved = savedIds.includes(Number(noticia.id));
+        });
+
+        // Forzar actualización de la vista
+        this.$forceUpdate();
+
       } catch (error) {
-        console.error('Error al cargar guardadas:', error);
+        console.error('Error al cargar noticias guardadas:', error);
       }
     },
 
@@ -372,93 +376,6 @@ export default {
         .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
     },
 
-
-    // parseDate(dateStr, category) {
-    //   if (!dateStr) return new Date(0); // Fecha mínima si no hay fecha
-
-    //   // Limpiar la cadena de fecha
-    //   dateStr = dateStr.trim();
-
-    //   try {
-    //     switch (category) {
-    //       case 'futbol': // "7 de enero de 2025"
-    //         const partsFutbol = dateStr.split(' de ');
-    //         if (partsFutbol.length !== 3) return new Date(0);
-    //         const dayFutbol = parseInt(partsFutbol[0]);
-    //         const monthFutbol = this.getMonthNumber(partsFutbol[1]);
-    //         const yearFutbol = parseInt(partsFutbol[2]);
-    //         if (isNaN(dayFutbol)) return new Date(0);
-    //         return new Date(yearFutbol, monthFutbol, dayFutbol);
-
-    //       case 'baloncesto': // "domingo 04 mayo, 2025"
-    //         const partsBaloncesto = dateStr.split(' ');
-    //         if (partsBaloncesto.length < 4) return new Date(0);
-    //         const dayBaloncesto = parseInt(partsBaloncesto[1]);
-    //         const monthBaloncesto = this.getMonthNumber(partsBaloncesto[2].replace(',', ''));
-    //         const yearBaloncesto = parseInt(partsBaloncesto[3]);
-    //         if (isNaN(dayBaloncesto)) return new Date(0);
-    //         return new Date(yearBaloncesto, monthBaloncesto, dayBaloncesto);
-
-    //       case 'baseball': // "06/05/2025   ·   01:31 PM"
-    //         const [datePart] = dateStr.split('·').map(s => s.trim());
-    //         const datePartsBeisbol = datePart.split('/');
-    //         if (datePartsBeisbol.length !== 3) return new Date(0);
-    //         const dayBeisbol = parseInt(datePartsBeisbol[0]);
-    //         const monthBeisbol = parseInt(datePartsBeisbol[1]) - 1;
-    //         const yearBeisbol = parseInt(datePartsBeisbol[2]);
-    //         if (isNaN(dayBeisbol) || isNaN(monthBeisbol)) return new Date(0);
-    //         return new Date(yearBeisbol, monthBeisbol, dayBeisbol);
-
-    //       case 'volleyball': // "May 5, 2025"
-    //         const partsVolleyball = dateStr.split(' ');
-    //         if (partsVolleyball.length < 3) return new Date(0);
-    //         const monthVolleyball = this.getMonthNumber(partsVolleyball[0]);
-    //         const dayVolleyball = parseInt(partsVolleyball[1].replace(',', ''));
-    //         const yearVolleyball = parseInt(partsVolleyball[2]);
-    //         if (isNaN(dayVolleyball)) return new Date(0);
-    //         return new Date(yearVolleyball, monthVolleyball, dayVolleyball);
-
-    //       case 'swimming': // "agosto 22, 2024"
-    //         const partsSwimming = dateStr.split(' ');
-    //         if (partsSwimming.length < 3) return new Date(0);
-    //         const monthSwimming = this.getMonthNumber(partsSwimming[0]);
-    //         const daySwimming = parseInt(partsSwimming[1].replace(',', ''));
-    //         const yearSwimming = parseInt(partsSwimming[2]);
-    //         if (isNaN(daySwimming)) return new Date(0);
-    //         return new Date(yearSwimming, monthSwimming, daySwimming);
-
-    //       default:
-    //         return new Date(dateStr) || new Date(0);
-    //     }
-    //   } catch (e) {
-    //     console.error(`Error parsing date (${category}): "${dateStr}"`, e);
-    //     return new Date(0);
-    //   }
-    // },
-
-    // getMonthNumber(monthName) {
-    //   if (!monthName) return 0;
-
-    //   const months = {
-    //     'enero': 0, 'january': 0, 'jan': 0,
-    //     'febrero': 1, 'february': 1, 'feb': 1,
-    //     'marzo': 2, 'march': 2, 'mar': 2,
-    //     'abril': 3, 'april': 3, 'apr': 3,
-    //     'mayo': 4, 'may': 4,
-    //     'junio': 5, 'june': 5, 'jun': 5,
-    //     'julio': 6, 'july': 6, 'jul': 6,
-    //     'agosto': 7, 'august': 7, 'aug': 7,
-    //     'septiembre': 8, 'september': 8, 'sep': 8, 'setiembre': 8,
-    //     'octubre': 9, 'october': 9, 'oct': 9,
-    //     'noviembre': 10, 'november': 10, 'nov': 10,
-    //     'diciembre': 11, 'december': 11, 'dec': 11
-    //   };
-
-    //   const normalizedMonth = monthName.toLowerCase().replace(',', '').trim();
-    //   return months[normalizedMonth] ?? 0;
-    // },
-
-
     formatDateForDisplay(dateObj) {
       if (!dateObj || !(dateObj instanceof Date)) return 'Fecha desconocida';
 
@@ -468,8 +385,6 @@ export default {
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       return dateObj.toLocaleDateString('es-ES', options);
     },
-
-
 
 
     // FUNCIONES DE GUARDADO
@@ -483,80 +398,19 @@ export default {
       try {
         const response = await axios.post(
           `/news/${noticia.id}/toggle-save`,
-          {}, // Cuerpo vacío
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest'
-            }
-          }
+          {},
+          { headers: { 'X-User-ID': this.user.id } }
         );
 
-        if (response.status === 410) {
-          alert('Esta noticia ya no está disponible');
-          await this.cargarNoticias();
-          return;
-        }
-
         noticia.saved = response.data.saved;
-        this.mostrarFeedbackGuardado(noticia);
+
+        // Actualizar lista de guardados
+        await this.cargarNoticiasGuardadas();
 
       } catch (error) {
-        if (error.response?.status === 410) {
-          alert('Esta noticia ya no está disponible');
-          await this.cargarNoticias();
-        } else {
-          console.error('Error al guardar noticia:', error);
-          alert('Error al guardar la noticia');
-        }
+        console.error('Error al guardar noticia:', error);
       }
     },
-
-
-    mostrarFeedbackGuardado(noticia) {
-      const message = noticia.saved
-        ? 'Noticia guardada en tus favoritos'
-        : 'Noticia eliminada de favoritos';
-
-      // Aquí puedes implementar un sistema de notificaciones
-      alert(message);
-    },
-
-    // guardarEnLocalStorage(noticia) {
-    //   const savedNews = JSON.parse(sessionStorage.getItem('savedNews') || '{}');
-    //   if (noticia.saved) {
-    //     savedNews[noticia.id] = true;
-    //   } else {
-    //     delete savedNews[noticia.id];
-    //   }
-    //   sessionStorage.setItem('savedNews', JSON.stringify(savedNews));
-
-    //   this.noticias = this.noticias.map(n =>
-    //     n.id === noticia.id ? { ...n, saved: noticia.saved } : n
-    //   );
-    // },
-
-    // ordenarNoticiasGuardadas() {
-    //   this.noticiasFiltradas.sort((a, b) => {
-    //     if (a.saved === b.saved) return b.parsedDate - a.parsedDate;
-    //     return b.saved - a.saved;
-    //   });
-    // },
-
-    // mostrarFeedbackGuardado(noticia) {
-    //   this.toastMessage = noticia.saved ? 'Noticia guardada' : 'Noticia eliminada de guardados';
-    //   this.mostrarToast = true;
-    //   setTimeout(() => this.mostrarToast = false, 2000);
-    // },
-
-    // cargarGuardados() {
-    //   const savedNews = JSON.parse(sessionStorage.getItem('savedNews')) || {};
-    //   this.noticias = this.noticias.map(noticia => ({
-    //     ...noticia,
-    //     saved: savedNews[noticia.id] || false
-    //   }));
-    // },
-
 
 
     // FUNCIONES PARA ADMINISTRADOR
@@ -582,6 +436,7 @@ export default {
           // Eliminar de la lista local
           this.noticias = this.noticias.filter(n => n.id !== noticia.id);
           this.filtrarNoticias();
+          await this.cargarNoticias();
 
           alert('Noticia eliminada correctamente');
         } catch (error) {
@@ -624,6 +479,8 @@ export default {
 
         this.filtrarNoticias();
         this.cerrarNoticia();
+        await this.cargarNoticias();
+
         alert('Cambios guardados exitosamente');
       } catch (error) {
         console.error('Error al guardar cambios:', error);
@@ -655,6 +512,11 @@ export default {
 
     // Cargar noticias
     await this.cargarNoticias();
+
+    // Cargar estado de guardado si hay usuario
+    if (this.user) {
+      await this.cargarNoticiasGuardadas();
+    }
 
     document.title = 'Noticias';
   }

@@ -125,7 +125,7 @@ Route::delete('/news/{id}', function ($id) {
 
 // NOTICIAS GUARDADAS
 Route::post('/news/{newsId}/toggle-save', [SavedNewsController::class, 'toggleSave']);
-Route::get('/news/{id}', [NewsController::class, 'show']);
+Route::get('/saved-news', [SavedNewsController::class, 'index']);
 
 
 // Trainer
