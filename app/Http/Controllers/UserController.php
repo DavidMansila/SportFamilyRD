@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Training;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -107,10 +108,33 @@ class UserController extends Controller
                 User::where('id', $user->id)->update(['image' => $imageName]);
                 $user['image'] = url('storage/users/' . $user->id . '/' . $imageName);
             }
+            else{
+                $user['image'] = $user->image 
+                ? url('storage/users/' . $user->id . '/' . $user->image)
+                :url('storage/users/Perfil-Icon.png');
+            }
 
             return response()->json([
                 'message' => 'Usuario actualizado con éxito',
                 'user' => $user,
+            ], 200);
+
+        }catch(\Exception $e){
+            return response()->json([
+                'message' => 'Error: '.$e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function showUserRequests(Request $request)
+    {
+        try{
+            $user = Auth::user();
+            $requests = Training::where('status', 'pending')->get();
+
+            return response()->json([
+                'message' => 'Solicitudes obtenidas con éxito',
+                'requests' => $requests,
             ], 200);
 
         }catch(\Exception $e){
