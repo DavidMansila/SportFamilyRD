@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Training;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -96,6 +97,11 @@ class UserController extends Controller
                 $imageName = Post::addImages($request['image'], $user->id, 'users');
                 $user->update(['image' => $imageName]);
             }
+            else{
+                $user['image'] = $user->image 
+                ? url('storage/users/' . $user->id . '/' . $user->image)
+                :url('storage/users/Perfil-Icon.png');
+            }
 
             // Construye la URL completa para la respuesta
             $user->image = $user->image
@@ -109,6 +115,24 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function showUserRequests(Request $request)
+    {
+        try{
+            $user = Auth::user();
+            $requests = Training::where('status', 'pending')->get();
+
+            return response()->json([
+                'message' => 'Solicitudes obtenidas con éxito',
+                'requests' => $requests,
+            ], 200);
+
+        }catch(\Exception $e){
+            return response()->json([
+                'message' => 'Error: '.$e->getMessage()
             ], 500);
         }
     }
