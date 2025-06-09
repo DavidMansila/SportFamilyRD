@@ -546,9 +546,9 @@ export default {
 
     getChatAvatar(chat) {
       if (this.user.role === 'user') {
-        return chat.trainer?.foto || '/img/default-avatar.png';
+        return chat.trainer?.image || '/img/default-avatar.png';
       }
-      return chat.user?.foto || '/img/default-avatar.png';
+      return chat.user?.image || '/img/default-avatar.png';
     },
 
     getChatName(chat) {
