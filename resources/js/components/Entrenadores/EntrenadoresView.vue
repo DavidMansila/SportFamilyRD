@@ -545,10 +545,10 @@ export default {
     },
 
     getChatAvatar(chat) {
-      if (this.user.role === 'user') {
-        return chat.trainer?.image || '/img/default-avatar.png';
+      if (this.user.user_type === 'user' || 'entrenador' || 'admin') {
+        return chat.trainer?.foto || '//storage/users/Perfil-Icon.png';
       }
-      return chat.user?.image || '/img/default-avatar.png';
+      return chat.user?.foto || '//storage/users/Perfil-Icon.png';
     },
 
     getChatName(chat) {
@@ -883,4 +883,8 @@ beforeUnmount() {
 .estado-icono {
   font-size: 0.9rem;
 }
+
+
+
+
 </style>

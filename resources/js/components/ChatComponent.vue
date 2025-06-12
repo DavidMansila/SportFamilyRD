@@ -388,7 +388,7 @@ export default {
 
 .messages {
   flex: 1;
-  padding: 15px;
+  padding: 45%;
   overflow-y: auto;
   background: #f5f5f5;
   position: relative;

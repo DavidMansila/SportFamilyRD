@@ -456,7 +456,7 @@ export default {
                     Sábado: { start: '', end: '' },
                     Domingo: { start: '', end: '' },
                 },
-            }
+            },
         }
     },
     computed: {
@@ -769,7 +769,6 @@ export default {
 
 
         // Cargar horario existente en el formulario
-        // Cargar horario existente en el formulario
         loadScheduleIntoForm() {
             this.diasSemana.forEach(dia => {
                 const diaSchedule = this.user.schedule[dia];
@@ -833,11 +832,20 @@ export default {
 
         // Al activar/desactivar el modo edición
         toggleEditMode() {
-            this.editMode = !this.editMode;
             if (this.editMode) {
+                // Si ya está en modo edición y se vuelve a presionar, descartamos los cambios y salimos del modo edición
+                this.discardChanges();
+                this.editMode = false;
+                return; // Salimos para evitar que entre de nuevo en modo edición
+            }
+
+            // Entrar en modo edición
+            this.editMode = true;
+
+            if (this.user.user_type === 'entrenador') {
                 this.loadScheduleIntoForm();
             }
-        },
+        }
 
 
 
