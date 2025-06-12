@@ -241,7 +241,7 @@
       </div>
 
       <div v-if="mostrarMensajes" class="messages-container">
-        <div class="messages-header">
+        <div class="messages-header" v-if="!activeChat">
           <h3>Chats</h3>
           <button class="close-btn" @click="toggleMensajes">×</button>
         </div>
