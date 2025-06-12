@@ -268,7 +268,8 @@
         </div>
 
         <div v-else class="active-chat-container">
-          <ChatComponent ref="chatComponent" :active-chat="activeChat" :user="user" @close-chat="cerrarChat" />
+          <ChatComponent ref="chatComponent" :active-chat="activeChat" :user="user" @close-chat="cerrarChat"
+            @messages-read="loadChats" />
         </div>
       </div>
     </div>
@@ -541,6 +542,9 @@ export default {
       this.mostrarMensajes = !this.mostrarMensajes;
       if (this.mostrarMensajes) {
         this.loadChats();
+        document.body.classList.add('chat-open');
+      } else {
+        document.body.classList.remove('chat-open');
       }
     },
 
@@ -567,145 +571,206 @@ export default {
     async openChat(chat) {
       this.activeChat = chat;
       await this.markMessagesAsRead(chat.id);
-      this.setupChatChannel(chat.id);
-      this.loadChats();
 
-      this.$nextTick(() => {
-        if (this.$refs.chatComponent) {
-          this.$refs.chatComponent.loadMessages();
-        }
-      });
+      // Solo configurar canales en producción
+      if (process.env.NODE_ENV === 'production') {
+        this.setupChatChannel(chat.id);
+      }
+
+      await this.$nextTick();
+
+      if (this.$refs.chatComponent?.loadMessages) {
+        await this.$refs.chatComponent.loadMessages();
+      }
     },
 
-  cerrarChat() {
-    this.leaveChatChannel();
-    this.activeChat = null;
-    this.loadChats();
+    cerrarChat() {
+      this.leaveChatChannel();
+      this.activeChat = null;
+      this.loadChats();
+      document.body.classList.remove('chat-open');
+    },
+
+    async loadChats() {
+      if (!this.user) return;
+      try {
+        const response = await axios.get('/chats');
+        console.log('Respuesta de /chats:', response.data);
+
+        this.chats = response.data.map(chat => {
+          return {
+            id: chat.id,
+            user_id: chat.user_id,
+            trainer_id: chat.trainer_id,
+            status: chat.status,
+            unread: chat.unread_count,
+            last_message: chat.last_message ? {
+              id: chat.last_message.id,
+              message: chat.last_message.message,
+              sender_id: chat.last_message.sender_id,
+              created_at: chat.last_message.created_at
+            } : null,
+            user: chat.user ? {
+              id: chat.user.id,
+              name: chat.user.name,
+              foto: chat.user.image
+            } : null,
+            trainer: chat.trainer ? {
+              id: chat.trainer.id,
+              name: chat.trainer.name,
+              foto: chat.trainer.image
+            } : null
+          };
+        });
+
+        this.nuevosMensajes = this.chats.reduce((total, chat) => total + chat.unread, 0);
+      } catch (error) {
+        console.error('Error cargando chats', error);
+      }
+    },
+
+    calculateUnreadMessages() {
+      this.nuevosMensajes = this.chatsAprobados.reduce((total, chat) => {
+        return total + (parseInt(chat.unread) || 0);
+      }, 0);
+    },
+
+    async markMessagesAsRead(chatId) {
+      try {
+        await axios.post(`/chats/${chatId}/read`);
+        // Actualizar solo el chat actual en lugar de recargar todos
+        this.chats = this.chats.map(chat => {
+          if (chat.id === chatId) {
+            return { ...chat, unread: 0 };
+          }
+          return chat;
+        });
+      } catch (error) {
+        console.error('Error marcando mensajes como leídos', error);
+      }
+    },
+
+    setupChatChannel(chatId) {
+      // Limpiar cualquier listener previo
+      if (typeof window.Echo === 'undefined') {
+        console.log("Broadcasting deshabilitado");
+        return;
+      }
+
+      this.leaveChatChannel();
+
+      // Suscribirse al canal del chat
+      this.echoListener = window.Echo.private(`chat.${chatId}`)
+        .listen('NewChat', (data) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.handleNewMessage(data.message);
+          }
+          this.loadChats();
+        })
+        .listen('MessageRead', (data) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.updateReadStatus(data);
+          }
+        });
+
+      // Canal de presencia para estado en línea
+      this.presenceListener = window.Echo.join(`presence-chat.${chatId}`)
+        .here((users) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.updateOnlineStatus(users);
+          }
+        })
+        .joining((user) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.userJoined(user);
+          }
+        })
+        .leaving((user) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.userLeft(user);
+          }
+        });
+    },
+
+    leaveChatChannel() {
+      if (this.echoListener) {
+        window.Echo.leave(`chat.${this.activeChat?.id}`);
+        this.echoListener = null;
+      }
+      if (this.presenceListener) {
+        window.Echo.leave(`presence-chat.${this.activeChat?.id}`);
+        this.presenceListener = null;
+      }
+    },
+
+    setupGlobalListeners() {
+      // Solo configurar listeners si Echo está disponible
+      if (typeof window.Echo === 'undefined') {
+        return;
+      }
+
+      if (this.user && this.user.token) {
+        window.Echo.private(`user.${this.user.id}`)
+          .listen('NewChat', (data) => {
+            this.loadChats();
+          })
+          .error((error) => {
+            console.error('Error en conexión Echo:', error);
+          });
+      }
+    },
+
+
+    async loadEchoLibrary() {
+      // No cargar Echo en absoluto para desarrollo
+      if (process.env.NODE_ENV !== 'production') return;
+
+      try {
+        const EchoModule = await import('laravel-echo');
+        const PusherModule = await import('pusher-js');
+
+        window.Echo = new EchoModule.default({
+          broadcaster: 'pusher',
+          key: import.meta.env.VITE_PUSHER_APP_KEY,
+          cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+          forceTLS: true,
+          authEndpoint: '/broadcasting/auth',
+          auth: {
+            headers: {
+              'Authorization': `Bearer ${this.user.token}`,
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            }
+          }
+        });
+
+        this.setupGlobalListeners();
+      } catch (error) {
+        console.error('Error cargando Echo en producción:', error);
+      }
+    },
+
   },
+  mounted() {
+    this.user = JSON.parse(sessionStorage.getItem('user'));
+    if (this.user) {
+      this.cargarEntrenadores();
+      this.loadChats();
 
-  async loadChats() {
-    if (!this.user) return;
-    try {
-      const response = await axios.get('/chats', {
-        params: {
-          with: ['user', 'trainer', 'lastMessage']
-        }
-      });
-
-      // Corrección: Usar la estructura correcta de datos
-      this.chats = response.data.map(chat => ({
-        ...chat,
-        unread: chat.unread_count || 0,
-        last_message: chat.last_message || null,
-        user: chat.user || {},
-        trainer: chat.trainer || {}
-      }));
-
-      // Calcular mensajes nuevos
-      this.nuevosMensajes = this.chats.reduce((total, chat) => total + chat.unread, 0);
-    } catch (error) {
-      console.error('Error cargando chats', error);
-      if (error.response?.status === 401) {
-        // Manejar no autorizado
+      // Verificar si Echo está disponible
+      if (typeof window.Echo !== 'undefined') {
+        this.setupGlobalListeners();
+      } else {
+        this.loadEchoLibrary();
       }
     }
   },
-
-  calculateUnreadMessages() {
-    this.nuevosMensajes = this.chatsAprobados.reduce((total, chat) => {
-      return total + (parseInt(chat.unread) || 0);
-    }, 0);
-  },
-
-  async markMessagesAsRead(chatId) {
-    try {
-      await axios.put(`/chats/${chatId}/read`);
-      this.loadChats();
-    } catch (error) {
-      console.error('Error marcando mensajes como leídos', error);
-    }
-  },
-
-  setupChatChannel(chatId) {
-    // Limpiar cualquier listener previo
+  beforeUnmount() {
     this.leaveChatChannel();
 
-    // Suscribirse al canal del chat
-    this.echoListener = window.Echo.private(`chat.${chatId}`)
-      .listen('NewChat', (data) => {
-        if (this.activeChat && this.activeChat.id === chatId) {
-          this.$refs.chatComponent?.handleNewMessage(data.message);
-        }
-        this.loadChats();
-      })
-      .listen('MessageRead', (data) => {
-        if (this.activeChat && this.activeChat.id === chatId) {
-          this.$refs.chatComponent?.updateReadStatus(data);
-        }
-      });
-
-    // Canal de presencia para estado en línea
-    this.presenceListener = window.Echo.join(`presence-chat.${chatId}`)
-      .here((users) => {
-        if (this.activeChat && this.activeChat.id === chatId) {
-          this.$refs.chatComponent?.updateOnlineStatus(users);
-        }
-      })
-      .joining((user) => {
-        if (this.activeChat && this.activeChat.id === chatId) {
-          this.$refs.chatComponent?.userJoined(user);
-        }
-      })
-      .leaving((user) => {
-        if (this.activeChat && this.activeChat.id === chatId) {
-          this.$refs.chatComponent?.userLeft(user);
-        }
-      });
-  },
-
-  leaveChatChannel() {
-    if (this.echoListener) {
-      window.Echo.leave(`chat.${this.activeChat?.id}`);
-      this.echoListener = null;
-    }
-    if (this.presenceListener) {
-      window.Echo.leave(`presence-chat.${this.activeChat?.id}`);
-      this.presenceListener = null;
-    }
-  },
-
-  setupGlobalListeners() {
-    if (typeof window.Echo === 'undefined') return;
-
-    if (this.user) {
-      window.Echo.private(`user.${this.user.id}`)
-        .listen('NewChat', (data) => {
-          this.loadChats();
-        });
-    }
-  },
-},
-mounted() {
-  this.user = JSON.parse(sessionStorage.getItem('user'));
-  if (this.user) {
-    this.cargarEntrenadores();
-    this.loadChats();
-
-    // Esperar a que Echo esté disponible
-    if (window.Echo) {
-      this.setupGlobalListeners();
-    } else {
-      console.warn('Echo no está disponible');
+    if (window.Echo && this.user) {
+      window.Echo.leave(`user.${this.user.id}`);
     }
   }
-},
-beforeUnmount() {
-  this.leaveChatChannel();
-
-  if (window.Echo && this.user) {
-    window.Echo.leave(`user.${this.user.id}`);
-  }
-}
 };
 </script>
 
@@ -883,8 +948,4 @@ beforeUnmount() {
 .estado-icono {
   font-size: 0.9rem;
 }
-
-
-
-
 </style>

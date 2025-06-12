@@ -95,4 +95,33 @@ class User extends Authenticatable
     {
         return $this->hasMany(SavedNews::class);
     }
+
+
+
+
+
+    public function chatsAsUser()
+    {
+        return $this->hasMany(Chat::class, 'user_id');
+    }
+
+    public function chatsAsTrainer()
+    {
+        return $this->hasMany(Chat::class, 'trainer_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function trainerChats()
+    {
+        return $this->hasMany(Chat::class, 'trainer_id');
+    }
+
+    public function userChats()
+    {
+        return $this->hasMany(Chat::class, 'user_id');
+    }
 }

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Events\NewChat;
+use App\Events\MessageRead;
 use App\Models\Chat;
 use App\Models\Message;
-use App\Events\NewChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,12 +15,16 @@ class ChatController extends Controller
     {
         $userId = Auth::id();
 
-        $chats = Chat::with(['user', 'trainer', 'lastMessage'])
+        $chats = Chat::with([
+            'user:id,name,image',
+            'trainer:id,name,image',
+            'lastMessage'
+        ])
             ->forUser($userId)
             ->accepted()
             ->get()
             ->map(function ($chat) use ($userId) {
-                $chat->unread = $chat->messages()
+                $chat->unread_count = $chat->messages()
                     ->where('sender_id', '!=', $userId)
                     ->where('read', false)
                     ->count();
@@ -87,10 +91,10 @@ class ChatController extends Controller
             'message' => $request->message
         ]);
 
-        $chat = Chat::findOrFail($chatId);
-        $recipientId = Auth::id() == $chat->user_id ? $chat->trainer_id : $chat->user_id;
+        // Cargar relaciones necesarias
+        $message->load('sender');
 
-        broadcast(new NewChat($message, $recipientId))->toOthers();
+        broadcast(new NewChat($message));
 
         return response()->json($message);
     }
@@ -101,5 +105,21 @@ class ChatController extends Controller
         $chat->update(['status' => 'accepted']);
 
         return response()->json($chat);
+    }
+
+
+    public function markAsRead($chatId)
+    {
+        $userId = Auth::id();
+
+        Message::where('chat_id', $chatId)
+            ->where('sender_id', '!=', $userId)
+            ->where('read', false)
+            ->update(['read' => true]);
+
+        // Enviar evento de actualización
+        broadcast(new MessageRead($chatId));
+
+        return response()->json(['success' => true]);
     }
 }

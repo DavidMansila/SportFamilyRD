@@ -105,13 +105,16 @@ export default {
       try {
         const response = await axios.get(`/chats/${this.chatId}`);
         this.messages = response.data.messages;
+
+        // Identificar el otro usuario
+        this.identifyOtherUser();
+
         this.$nextTick(() => {
           this.scrollToBottom();
           this.markMessagesAsRead();
         });
       } catch (error) {
         console.error('Error fetching messages:', error);
-        this.$toast.error('Error al cargar mensajes');
       } finally {
         this.loadingMessages = false;
       }
@@ -175,73 +178,48 @@ export default {
     },
 
     identifyOtherUser() {
+      if (!this.activeChat) return;
+
       this.otherUser = this.user.id === this.activeChat.user_id
         ? this.activeChat.trainer
         : this.activeChat.user;
     },
 
     setupChannels() {
-      // Limpiar canales anteriores
-      if (this.echoChannel) {
-        window.Echo.leave(`chat.${this.chatId}`);
-      }
-      if (this.presenceChannel) {
-        window.Echo.leave(`presence-chat.${this.chatId}`);
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("Broadcasting deshabilitado en desarrollo");
+        return;
       }
 
       // Canal para mensajes
       this.echoChannel = window.Echo.private(`chat.${this.chatId}`)
         .listen('NewMessage', (data) => {
-          const newMessage = data.message;
-
-          // Solo agregar si no es nuestro propio mensaje (ya está en optimistic UI)
-          if (newMessage.sender_id !== this.user.id) {
-            this.messages.push(newMessage);
-            this.$nextTick(this.scrollToBottom);
-            this.markMessagesAsRead();
-          }
+          this.handleNewMessage(data.message);
         })
         .listen('MessageRead', (data) => {
-          // Actualizar estado de mensajes leídos
-          this.messages.forEach(msg => {
-            if (msg.sender_id === this.user.id && !msg.read) {
-              msg.read = true;
-            }
-          });
+          this.updateReadStatus(data);
         });
 
       // Presence Channel para estado en línea
       this.presenceChannel = window.Echo.join(`presence-chat.${this.chatId}`)
         .here((users) => {
-          this.isOnline = users.some(user => user.id === this.otherUser.id);
+          this.updateOnlineStatus(users);
         })
         .joining((user) => {
-          if (user.id === this.otherUser.id) {
-            this.isOnline = true;
-          }
+          this.userJoined(user);
         })
         .leaving((user) => {
-          if (user.id === this.otherUser.id) {
-            this.isOnline = false;
-          }
+          this.userLeft(user);
         });
     },
 
-    markMessagesAsRead() {
-      const unreadMessages = this.messages.filter(
-        msg => msg.sender_id !== this.user.id && !msg.read
-      );
-
-      if (unreadMessages.length > 0) {
-        // Enviar evento al servidor para marcar como leídos
-        axios.post(`/chats/${this.chatId}/read`)
-          .then(() => {
-            // Actualizar estado local
-            unreadMessages.forEach(msg => msg.read = true);
-          })
-          .catch(error => {
-            console.error('Error marking messages as read:', error);
-          });
+    async markMessagesAsRead() {
+      try {
+        await axios.post(`/chats/${this.chatId}/read`);
+        this.$emit('messages-read');
+      } catch (error) {
+        console.error('Error marcando mensajes como leídos', error);
       }
     },
 
@@ -257,11 +235,17 @@ export default {
       this.$emit('close-chat');
     },
 
-    handleNewMessage(data) {
-      const newMessage = data.message;
-      if (newMessage.sender_id !== this.user.id) {
+    handleNewMessage(newMessage) {
+      // Solo agregar si no existe
+      const exists = this.messages.some(m => m.id === newMessage.id);
+      if (!exists) {
         this.messages.push(newMessage);
-        this.$nextTick(this.scrollToBottom);
+        this.$nextTick(() => {
+          this.scrollToBottom();
+          if (newMessage.sender_id !== this.user.id) {
+            this.markMessagesAsRead();
+          }
+        });
       }
     },
 
