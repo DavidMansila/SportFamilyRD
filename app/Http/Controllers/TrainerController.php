@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class TrainerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+ 
     public function index(Request $request)
     {
         $status = $request->query('status', 'all');
@@ -49,17 +47,11 @@ class TrainerController extends Controller
         ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $data = $request->all();
@@ -110,14 +102,6 @@ class TrainerController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage (con manejo de achievements relacional).
-     */
-
-
-    /**
-     * Update the status of the specified trainer.
-     */
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -146,9 +130,7 @@ class TrainerController extends Controller
         ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
         //
@@ -243,9 +225,7 @@ class TrainerController extends Controller
         // return response()->json(['trainer' => $trainer]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
         //

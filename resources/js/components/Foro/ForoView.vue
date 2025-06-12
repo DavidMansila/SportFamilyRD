@@ -1048,7 +1048,6 @@ export default {
 
       const endpoint = `/post/update-comment/${comentario.id}`;
 
-
       axios.put(endpoint, { texto: this.comentarioEditado })
         .then(response => {
           this.getPost()

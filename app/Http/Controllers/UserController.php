@@ -8,7 +8,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Event;
 
 class UserController extends Controller
 {
@@ -56,6 +58,10 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
                 'user_type' => 'user',
             ]);
+
+            //iniciar sesion automaticamente al crear un usuario y mandar correo
+            event(new Registered($user));
+            Auth::login($user);
 
             return response()->json([
                 'message' => 'Usuario creado con éxito',

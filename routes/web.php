@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\UserController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\UserStatsController;
 use Illuminate\Support\Facades\Route;
 use App\Models\News;
+
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
@@ -158,3 +161,23 @@ Broadcast::routes(['middleware' => ['auth:sanctum']]);
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '.*');
+
+// Muestra la vista de "Verifica tu email"
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Maneja el clic en el enlace de verificación
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Reenvía el email de verificación
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+// middleware para rutas que requieren autenticación y verificación de email
+// ->middleware(['auth', 'verified']);
