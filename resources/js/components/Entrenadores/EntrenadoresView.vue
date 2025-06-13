@@ -382,7 +382,8 @@ export default {
 
     contactarEntrenador(entrenador) {
       this.contactoEntrenador = {
-        id: entrenador.id,
+        trainer_id: entrenador.trainer_id,  // Usar trainer_id del entrenador
+        user_id: entrenador.user_id,        // Usar user_id del entrenador
         nombre: entrenador.nombre
       };
       this.mostrarFormularioContacto = true;
@@ -427,12 +428,13 @@ export default {
 
       // Preparar los datos para enviar
       const formData = {
-        user_id: this.user.id, // ID 
-        trainer_id: this.contactoEntrenador.id, // ID del entrenador
+        user_id: this.user.id,
+        trainer_id: this.contactoEntrenador.trainer_id,  // ID de la tabla trainers
+        trainer_user_id: this.contactoEntrenador.user_id, // ID de usuario del entrenador
         age: this.formularioContacto.edad,
         sport_level: this.formularioContacto.nivel,
         description: this.formularioContacto.objetivos,
-        status: 'pending' // Estado
+        status: 'pending'
       };
 
       axios.post('/training', formData)
@@ -461,7 +463,8 @@ export default {
       axios.get('/trainer/approved')
         .then(response => {
           this.entrenadores = response.data.trainers.map(trainer => ({
-            id: trainer.id,
+            trainer_id: trainer.id,        // ID real de trainers
+            user_id: trainer.user_id,      // ID de usuario asociado
             nombre: trainer.name,
             deporte: trainer.sport_category,
             experiencia: trainer.experience,

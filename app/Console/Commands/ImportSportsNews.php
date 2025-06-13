@@ -57,7 +57,6 @@ class ImportSportsNews extends Command
     private function importArticles($articles, $category)
     {
         $imported = 0;
-        $today = now()->toDateString();
 
         foreach ($articles as $article) {
             try {
@@ -65,10 +64,15 @@ class ImportSportsNews extends Command
                     continue;
                 }
 
-                // Parseo de fecha con fallback
-                $publishedAt = $this->parseDate($article['date'] ?? '', $category) ?? now();
+                // Parseo de fecha con fallback seguro
+                $publishedAt = $this->parseDate($article['date'] ?? '', $category);
 
-                // Verificación flexible de duplicados
+                // Verificación de fecha mínima válida para MySQL (1000-01-01)
+                if ($publishedAt->year < 1000) {
+                    $publishedAt = now();
+                }
+
+                // Verificación de duplicados
                 $duplicate = News::where('title', 'like', '%' . mb_substr($article['title'], 0, 30) . '%')
                     ->where('category', $category)
                     ->whereDate('published_at', $publishedAt->toDateString())
@@ -86,86 +90,90 @@ class ImportSportsNews extends Command
                     'url' => $article['link'] ?? null,
                     'image' => $article['image'] ?? null,
                     'category' => $category,
-                    'published_at' => $publishedAt
+                    'published_at' => $publishedAt,
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
 
                 $imported++;
                 $this->info("Nuevo: {$article['title']}");
             } catch (\Exception $e) {
                 $this->error("Error en {$article['title']}: " . $e->getMessage());
+                Log::error("Error importing article", [
+                    'title' => $article['title'] ?? 'No title',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
         }
 
         return $imported;
     }
 
+    
+
     private function parseDate($dateString, $category)
     {
         if (empty($dateString)) {
-            return Carbon::create(0);
+            return now(); // Devuelve la fecha actual como fallback
         }
 
         $dateString = trim($dateString);
 
         try {
             switch ($category) {
-                case 'futbol': // "7 de enero de 2025"
+                case 'futbol':
                     $partsFutbol = explode(' de ', $dateString);
-                    if (count($partsFutbol) !== 3) return Carbon::create(0);
+                    if (count($partsFutbol) !== 3) return now();
                     $dayFutbol = intval($partsFutbol[0]);
                     $monthFutbol = $this->getMonthNumber($partsFutbol[1]);
                     $yearFutbol = intval($partsFutbol[2]);
-                    if ($dayFutbol === 0) return Carbon::create(0);
                     return Carbon::create($yearFutbol, $monthFutbol + 1, $dayFutbol, 0, 0, 0);
 
-                case 'baloncesto': // "domingo 04 mayo, 2025"
+                case 'baloncesto':
                     $partsBaloncesto = explode(' ', $dateString);
-                    if (count($partsBaloncesto) < 4) return Carbon::create(0);
+                    if (count($partsBaloncesto) < 4) return now();
                     $dayBaloncesto = intval($partsBaloncesto[1]);
                     $monthBaloncesto = $this->getMonthNumber(str_replace(',', '', $partsBaloncesto[2]));
                     $yearBaloncesto = intval($partsBaloncesto[3]);
-                    if ($dayBaloncesto === 0) return Carbon::create(0);
                     return Carbon::create($yearBaloncesto, $monthBaloncesto + 1, $dayBaloncesto, 0, 0, 0);
 
-                case 'baseball': // "06/05/2025   ·   01:31 PM"
+                case 'baseball':
                     $dateParts = explode('·', $dateString);
                     $datePart = trim($dateParts[0]);
                     $datePartsBeisbol = explode('/', $datePart);
-                    if (count($datePartsBeisbol) !== 3) return Carbon::create(0);
+                    if (count($datePartsBeisbol) !== 3) return now();
                     $dayBeisbol = intval($datePartsBeisbol[0]);
                     $monthBeisbol = intval($datePartsBeisbol[1]);
                     $yearBeisbol = intval($datePartsBeisbol[2]);
-                    if ($dayBeisbol === 0 || $monthBeisbol === 0) return Carbon::create(0);
                     return Carbon::create($yearBeisbol, $monthBeisbol, $dayBeisbol, 0, 0, 0);
 
-                case 'volleyball': // "May 5, 2025"
+                case 'volleyball':
                     $partsVolleyball = explode(' ', $dateString);
-                    if (count($partsVolleyball) < 3) return Carbon::create(0);
+                    if (count($partsVolleyball) < 3) return now();
                     $monthVolleyball = $this->getMonthNumber($partsVolleyball[0]);
                     $dayVolleyball = intval(str_replace(',', '', $partsVolleyball[1]));
                     $yearVolleyball = intval($partsVolleyball[2]);
-                    if ($dayVolleyball === 0) return Carbon::create(0);
                     return Carbon::create($yearVolleyball, $monthVolleyball + 1, $dayVolleyball, 0, 0, 0);
 
-                case 'swimming': // "agosto 22, 2024"
+                case 'swimming':
                     $partsSwimming = explode(' ', $dateString);
-                    if (count($partsSwimming) < 3) return Carbon::create(0);
+                    if (count($partsSwimming) < 3) return now();
                     $monthSwimming = $this->getMonthNumber($partsSwimming[0]);
                     $daySwimming = intval(str_replace(',', '', $partsSwimming[1]));
                     $yearSwimming = intval($partsSwimming[2]);
-                    if ($daySwimming === 0) return Carbon::create(0);
                     return Carbon::create($yearSwimming, $monthSwimming + 1, $daySwimming, 0, 0, 0);
 
                 default:
                     try {
-                        return Carbon::parse($dateString) ?: Carbon::create(0);
+                        return Carbon::parse($dateString) ?: now();
                     } catch (\Exception $e) {
-                        return Carbon::create(0);
+                        return now();
                     }
             }
         } catch (\Exception $e) {
             Log::error("Error parsing date ($category): \"$dateString\"", ['error' => $e->getMessage()]);
-            return Carbon::create(0);
+            return now(); // Devuelve la fecha actual cuando hay error
         }
     }
 

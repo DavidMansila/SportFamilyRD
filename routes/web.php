@@ -134,6 +134,7 @@ Route::get('/saved-news', [SavedNewsController::class, 'index']);
 Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
 Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus']);
 Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
+Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
 Route::resource('/trainer', TrainerController::class);
 
 //training
