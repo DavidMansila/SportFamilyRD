@@ -642,18 +642,26 @@ export default {
             formData.append('_method', 'PUT');
             formData.append('image', file)
 
-            axios.post(`/user/${this.user.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
-                .then(response => {
-                    this.user = response.data.user;
-                    sessionStorage.setItem('user', JSON.stringify(response.data.user));
-                    alert('imagen actualizada correctamente!');
-
-                })
-                .catch(error => {
-                    this.handleError(error, 'Error al guardar perfil');
+            try {
+                const response = await axios.post(`/user/${this.user.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
                 });
+
+                // Actualiza el objeto user con la respuesta del servidor
+                this.user = response.data.user;
+                sessionStorage.setItem('user', JSON.stringify(response.data.user));
+
+                // Muestra la imagen actualizada inmediatamente
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.user.image = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+            } catch (error) {
+                console.error('Error al actualizar la imagen:', error);
+                alert('Error al actualizar la imagen. Por favor intenta nuevamente.');
+            }
         },
 
         discardChanges() {

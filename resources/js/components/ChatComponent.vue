@@ -1,16 +1,16 @@
 <template>
   <div class="chat-container">
     <div class="chat-header">
-      <button @click="closeChat" class="back-btn">
+      <button class="back-btn" @click="$emit('close-chat')">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
             stroke-linejoin="round" />
         </svg>
       </button>
       <div class="user-info">
-        <img :src="otherUser.foto" :alt="otherUser.name" class="avatar">
-        <div>
-          <h4>{{ otherUser.name }}</h4>
+        <img :src="otherUserAvatar" class="avatar">
+        <div class="user-details">
+          <h4>{{ otherUserName }}</h4>
           <div class="status-indicator">
             <span :class="['status-dot', isOnline ? 'online' : 'offline']"></span>
             <span class="status-text">{{ isOnline ? 'En línea' : 'Desconectado' }}</span>
@@ -59,10 +59,7 @@
 
 <script>
 export default {
-  props: {
-    activeChat: Object,
-    user: Object
-  },
+  props: ['activeChat', 'user'],
   data() {
     return {
       messages: [],
@@ -85,6 +82,22 @@ export default {
       return this.user.id === this.activeChat.user_id
         ? this.activeChat.trainer_id
         : this.activeChat.user_id;
+    },
+    otherUser() {
+      if (!this.activeChat) return null;
+
+      // Determinar quién es el otro usuario en el chat
+      if (this.user.id === this.activeChat.user_id) {
+        return this.activeChat.trainer;
+      } else {
+        return this.activeChat.user;
+      }
+    },
+    otherUserAvatar() {
+      return this.otherUser?.image || '/storage/users/Perfil-Icon.png';
+    },
+    otherUserName() {
+      return this.otherUser?.name || (this.user.id === this.activeChat.user_id ? 'Entrenador' : 'Usuario');
     }
   },
   watch: {
@@ -96,6 +109,13 @@ export default {
           this.fetchMessages();
           this.setupChannels();
         }
+      }
+
+    },
+    messages: {
+      deep: true,
+      handler() {
+        this.$nextTick(this.scrollToBottom);
       }
     }
   },
@@ -110,7 +130,9 @@ export default {
         this.identifyOtherUser();
 
         this.$nextTick(() => {
-          this.scrollToBottom();
+          setTimeout(() => {
+            this.scrollToBottom(true);
+          }, 100);
           this.markMessagesAsRead();
         });
       } catch (error) {
@@ -166,11 +188,16 @@ export default {
       }
     },
 
-    scrollToBottom() {
-      const container = this.$refs.messagesContainer;
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+    scrollToBottom(instant = false) {
+      this.$nextTick(() => {
+        const container = this.$refs.messagesContainer;
+        if (container) {
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: instant ? 'auto' : 'smooth'
+          });
+        }
+      });
     },
 
     formatTime(time) {

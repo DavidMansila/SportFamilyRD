@@ -277,10 +277,6 @@
 
 
 
-
-
-
-
   </div>
 </template>
 
@@ -549,17 +545,23 @@ export default {
     },
 
     getChatAvatar(chat) {
-      if (this.user.user_type === 'user' || 'entrenador' || 'admin') {
-        return chat.trainer?.foto || '//storage/users/Perfil-Icon.png';
+      // Determinar qué imagen usar
+      if (this.user.id === chat.user_id) {
+        return chat.trainer.image; // Usar URL completa del backend
+      } else {
+        return chat.user.image; // Usar URL completa del backend
       }
-      return chat.user?.foto || '//storage/users/Perfil-Icon.png';
     },
 
     getChatName(chat) {
-      if (this.user.role === 'user') {
+      // Determinar quién es el otro usuario en el chat
+      if (this.user.id === chat.user_id) {
+        // Si el usuario actual es el usuario normal, mostrar el nombre del entrenador
         return chat.trainer?.name || 'Entrenador';
+      } else {
+        // Si el usuario actual es el entrenador, mostrar el nombre del usuario normal
+        return chat.user?.name || 'Usuario';
       }
-      return chat.user?.name || 'Usuario';
     },
 
     truncateText(text, maxLength) {
@@ -613,12 +615,12 @@ export default {
             user: chat.user ? {
               id: chat.user.id,
               name: chat.user.name,
-              foto: chat.user.image
+              image: chat.user.image
             } : null,
             trainer: chat.trainer ? {
               id: chat.trainer.id,
               name: chat.trainer.name,
-              foto: chat.trainer.image
+              image: chat.trainer.image
             } : null
           };
         });

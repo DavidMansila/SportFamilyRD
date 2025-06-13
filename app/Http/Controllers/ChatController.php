@@ -24,6 +24,14 @@ class ChatController extends Controller
             ->accepted()
             ->get()
             ->map(function ($chat) use ($userId) {
+                $chat->trainer->image = $chat->trainer->image
+                    ? url('storage/users/' . $chat->trainer->id . '/' . $chat->trainer->image)
+                    : url('storage/users/Perfil-Icon.png');
+
+                $chat->user->image = $chat->user->image
+                    ? url('storage/users/' . $chat->user->id . '/' . $chat->user->image)
+                    : url('storage/users/Perfil-Icon.png');
+
                 $chat->unread_count = $chat->messages()
                     ->where('sender_id', '!=', $userId)
                     ->where('read', false)
