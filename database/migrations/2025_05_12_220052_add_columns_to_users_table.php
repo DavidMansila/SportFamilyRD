@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->date('birthdate')->nullable();
             $table->text('bio')->nullable();
-            $table->json('social_links')->nullable();
-            $table->text('achievements')->nullable();
+            // $table->enum('Category', ['Fútbol','Baloncesto','Tenis','Natación','Ciclismo','Atletismo','Artes Marciales'])->nullable();
         });
     }
 

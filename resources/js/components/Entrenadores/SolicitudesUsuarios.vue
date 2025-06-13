@@ -171,9 +171,12 @@ export default {
             try {
                 if (!this.user) throw new Error("Usuario no autenticado");
 
+                const trainerResponse = await axios.get(`/trainer/by-user/${this.user.id}`);
+                const trainerId = trainerResponse.data.id;
+
                 const response = await axios.get('/training', {
                     params: {
-                        trainer_id: this.user.id,
+                        trainer_id: trainerId,
                         page: this.currentPage,
                         per_page: this.itemsPerPage,
                         status: this.filtroEstado === 'todos' ? null : this.filtroEstado
@@ -219,6 +222,7 @@ export default {
 
             return {
                 id: item.id ?? 0,
+                trainer_id: item.trainer_id,
                 userId: item.user_id ?? user.id ?? 0,
                 userName: item.user?.name || user.full_name || item.user_name || item.name || 'Usuario desconocido',
                 edad: item.age ?? 0,
@@ -278,7 +282,7 @@ export default {
 
                 const response = await axios.post('/chats', {
                     user_id: solicitud.userId,
-                    trainer_id: this.user.id
+                    trainer_id: solicitud.trainer_id
                 });
 
                 console.log('Chat creado:', response.data);

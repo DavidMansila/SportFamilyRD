@@ -216,4 +216,19 @@ class TrainerController extends Controller
     /**
      * Get approved trainers with their achievements and specialties.
      */
+
+
+    public function getTrainerByUserId($userId)
+    {
+        $trainer = Trainer::where('user_id', $userId)->first();
+
+        if (!$trainer) {
+            return response()->json(['message' => 'Trainer not found'], 404);
+        }
+
+        return response()->json([
+            'id' => $trainer->id,
+            'name' => $trainer->user->name,
+        ]);
+    }
 }
