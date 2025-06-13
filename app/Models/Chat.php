@@ -25,7 +25,7 @@ class Chat extends Model
 
     public function lastMessage()
     {
-        return $this->hasOne(Message::class)->latest();
+        return $this->hasOne(Message::class)->latestOfMany();
     }
 
     public function scopeForUser($query, $userId)

@@ -50,11 +50,7 @@ class ImportSportsNews extends Command
             }
         }
 
-        // Limpiar noticias antiguas (>1 mes)
-        // $deleted = $this->cleanOldNews();
-
         $this->info("Total imported: {$totalImported} articles");
-        // $this->info("Deleted old news: {$deleted} articles");
         $this->info('News import completed successfully!');
     }
 
@@ -102,16 +98,6 @@ class ImportSportsNews extends Command
 
         return $imported;
     }
-
-
-    // private function cleanOldNews()
-    // {
-    //     $MonthsAgo = Carbon::now()->subMonths(9);
-
-    //     return News::where('published_at', '<', $MonthsAgo)
-    //         ->delete();
-    // }
-
 
     private function parseDate($dateString, $category)
     {

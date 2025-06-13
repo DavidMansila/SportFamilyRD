@@ -4,7 +4,7 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -13,17 +13,35 @@ class NewChat implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $chat;
-    public $userId;
+    public $message;
+    public $chat_id;
+    public $sender_id;
 
-    public function __construct($chat, $userId)
+    public function __construct($message)
     {
-        $this->chat = $chat;
-        $this->userId = $userId;
+        $this->message = $message;
+        $this->chat_id = $message->chat_id;
+        $this->sender_id = $message->sender_id;
     }
 
     public function broadcastOn()
     {
-        return new PrivateChannel('user.' . $this->userId);
+        return [
+            new PrivateChannel('chat.' . $this->chat_id),
+            new PrivateChannel('user.' . $this->recipientId())
+        ];
+    }
+
+    public function broadcastAs()
+    {
+        return 'NewMessage';
+    }
+
+    public function recipientId()
+    {
+        $chat = Chat::find($this->chat_id);
+        return $this->sender_id == $chat->user_id
+            ? $chat->trainer_id
+            : $chat->user_id;
     }
 }

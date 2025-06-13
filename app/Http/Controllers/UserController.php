@@ -18,12 +18,11 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all()->map(function ($user) {
-            $user->image = $user->image 
-            ? url('storage/users/' . $user->id . '/' . $user->image) 
-            : url('storage/users/Perfil-Icon.png');
+            $user->image = $user->image
+                ? url('storage/users/' . $user->id . '/' . $user->image)
+                : url('storage/users/Perfil-Icon.png');
             return $user;
         });
-
 
         return response()->json([
             'message' => 'Usuarios obtenidos con éxito',
@@ -43,7 +42,7 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {   
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -51,12 +50,12 @@ class UserController extends Controller
             //todo ponerle confirmed cuando david mande el front
         ]);
 
-        try{
-           $user = User::create([
+        try {
+            $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'user_type'=> 'user',
+                'user_type' => 'user',
                 'image' => url('storage/users/Perfil-Icon.png'),
             ]);
 
@@ -65,12 +64,11 @@ class UserController extends Controller
 
             return response()->json([
                 'message' => 'Usuario creado con éxito',
-                 'user' => $user,
+                'user' => $user,
             ], 200);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error: '.$e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -96,26 +94,27 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        try{
-            // dd($request->all());
+        try {
             $user = User::findOrFail($id);
             $user->update($request->all());
 
-            if(isset($request['image']) && $request['image']){
-                // dd($request['image']);
-                $imageName = Post::addImages($request['image'], $user->id,'users');
-                User::where('id', $user->id)->update(['image' => $imageName]);
-                $user['image'] = url('storage/users/' . $user->id . '/' . $imageName);
+            if (isset($request['image']) && $request['image']) {
+                $imageName = Post::addImages($request['image'], $user->id, 'users');
+                $user->update(['image' => $imageName]);
             }
+
+            // Construye la URL completa para la respuesta
+            $user->image = $user->image
+                ? url('storage/users/' . $user->id . '/' . $user->image)
+                : url('storage/users/Perfil-Icon.png');
 
             return response()->json([
                 'message' => 'Usuario actualizado con éxito',
                 'user' => $user,
             ], 200);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error: '.$e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -125,20 +124,17 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        try{
+        try {
             $user = User::findOrFail($id);
             $user->delete();
-          
+
             return response()->json([
                 'message' => 'Usuario eliminado con éxito',
             ], 200);
-            
-            
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error: '.$e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }
-
 }

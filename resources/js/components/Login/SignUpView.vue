@@ -109,7 +109,6 @@ export default {
     },
 
     async submitForm() {
-      // this.isSubmitting = true;
       try {
         console.log('Registering:', this.registerForm);
 
@@ -125,7 +124,6 @@ export default {
       } catch (error) {
         console.error(error);
       }
-      // this.isSubmitting = false;
     },
 
     async submitLoginForm() {

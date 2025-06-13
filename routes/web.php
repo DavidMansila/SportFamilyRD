@@ -16,8 +16,10 @@ use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
 
 use App\Models\News;
+use App\Models\Chat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Broadcast;
 
 
 //Rutas para funciones en el back
@@ -63,11 +65,11 @@ Route::post('/logout', [AuthController::class, 'logout']);
 
 
 // SCRAPPER
-Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
-Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
-Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
-Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
-Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
+// Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
+// Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
+// Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
+// Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
+// Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
 
 
 // NOTICIAS
@@ -141,16 +143,17 @@ Route::get('/training/{id}', [TrainingController::class, 'show']);
 
 //Chats
 
-Route::post('/chats', [ChatController::class, 'store']);
 Route::get('/chats', [ChatController::class, 'index']);
+Route::post('/chats', [ChatController::class, 'store']);
 Route::get('/chats/{id}', [ChatController::class, 'show']);
 Route::post('/chats/{chatId}/messages', [ChatController::class, 'storeMessage']);
 Route::put('/chats/{id}/accept', [ChatController::class, 'acceptChat']);
-
+Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
 
 Route::post('/messages/send', [ChatController::class, 'sendMessage']);
 
 
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 
 

@@ -456,7 +456,7 @@ export default {
                     Sábado: { start: '', end: '' },
                     Domingo: { start: '', end: '' },
                 },
-            }
+            },
         }
     },
     computed: {
@@ -642,18 +642,26 @@ export default {
             formData.append('_method', 'PUT');
             formData.append('image', file)
 
-            axios.post(`/user/${this.user.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
-                .then(response => {
-                    this.user = response.data.user;
-                    sessionStorage.setItem('user', JSON.stringify(response.data.user));
-                    alert('imagen actualizada correctamente!');
-
-                })
-                .catch(error => {
-                    this.handleError(error, 'Error al guardar perfil');
+            try {
+                const response = await axios.post(`/user/${this.user.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
                 });
+
+                // Actualiza el objeto user con la respuesta del servidor
+                this.user = response.data.user;
+                sessionStorage.setItem('user', JSON.stringify(response.data.user));
+
+                // Muestra la imagen actualizada inmediatamente
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.user.image = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+            } catch (error) {
+                console.error('Error al actualizar la imagen:', error);
+                alert('Error al actualizar la imagen. Por favor intenta nuevamente.');
+            }
         },
 
         discardChanges() {
@@ -769,7 +777,6 @@ export default {
 
 
         // Cargar horario existente en el formulario
-        // Cargar horario existente en el formulario
         loadScheduleIntoForm() {
             this.diasSemana.forEach(dia => {
                 const diaSchedule = this.user.schedule[dia];
@@ -833,11 +840,20 @@ export default {
 
         // Al activar/desactivar el modo edición
         toggleEditMode() {
-            this.editMode = !this.editMode;
             if (this.editMode) {
+                // Si ya está en modo edición y se vuelve a presionar, descartamos los cambios y salimos del modo edición
+                this.discardChanges();
+                this.editMode = false;
+                return; // Salimos para evitar que entre de nuevo en modo edición
+            }
+
+            // Entrar en modo edición
+            this.editMode = true;
+
+            if (this.user.user_type === 'entrenador') {
                 this.loadScheduleIntoForm();
             }
-        },
+        }
 
 
 
