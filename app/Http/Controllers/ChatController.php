@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\NewChat;
+use App\Events\NewMessage;
 use App\Events\MessageRead;
 use App\Models\Chat;
 use App\Models\Message;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
+
     public function index(Request $request)
     {
         $userId = Auth::id();
@@ -20,27 +22,59 @@ class ChatController extends Controller
             'trainer:id,name,image',
             'lastMessage'
         ])
-            ->forUser($userId)
+            ->where(function ($query) use ($userId) {
+                $query->where('user_id', $userId)
+                    ->orWhere('trainer_id', $userId);
+            })
             ->accepted()
             ->get()
             ->map(function ($chat) use ($userId) {
-                $chat->trainer->image = $chat->trainer->image
-                    ? url('storage/users/' . $chat->trainer->id . '/' . $chat->trainer->image)
-                    : url('storage/users/Perfil-Icon.png');
-
-                $chat->user->image = $chat->user->image
-                    ? url('storage/users/' . $chat->user->id . '/' . $chat->user->image)
-                    : url('storage/users/Perfil-Icon.png');
-
-                $chat->unread_count = $chat->messages()
-                    ->where('sender_id', '!=', $userId)
-                    ->where('read', false)
-                    ->count();
-                return $chat;
+                return [
+                    'id' => $chat->id,
+                    'user_id' => $chat->user_id,
+                    'trainer_id' => $chat->trainer_id,
+                    'status' => $chat->status,
+                    'unread_count' => $chat->messages()
+                        ->where('sender_id', '!=', $userId)
+                        ->where('read', false)
+                        ->count(),
+                    'last_message' => $chat->last_message,
+                    'user' => $chat->user,
+                    'trainer' => $chat->trainer
+                ];
             });
 
         return response()->json($chats);
     }
+
+
+
+    public function storeMessage(Request $request, $chatId)
+    {
+        $request->validate([
+            'message' => 'required|string'
+        ]);
+
+        $message = Message::create([
+            'chat_id' => $chatId,
+            'sender_id' => Auth::id(),
+            'message' => $request->message
+        ]);
+
+        $message->load('sender');
+
+        $chat = Chat::findOrFail($chatId);
+
+        // Determinar el receptor correctamente
+        $receiverId = (Auth::id() == $chat->user_id)
+            ? $chat->trainer_id
+            : $chat->user_id;
+
+        broadcast(new NewMessage($message, $receiverId));
+
+        return response()->json($message);
+    }
+
 
 
     public function store(Request $request)
@@ -74,6 +108,8 @@ class ChatController extends Controller
         ], 201);
     }
 
+
+
     public function show($id)
     {
         $chat = Chat::with(['messages.sender', 'user', 'trainer'])
@@ -87,25 +123,7 @@ class ChatController extends Controller
         return response()->json($chat);
     }
 
-    public function storeMessage(Request $request, $chatId)
-    {
-        $request->validate([
-            'message' => 'required|string'
-        ]);
 
-        $message = Message::create([
-            'chat_id' => $chatId,
-            'sender_id' => Auth::id(),
-            'message' => $request->message
-        ]);
-
-        // Cargar relaciones necesarias
-        $message->load('sender');
-
-        broadcast(new NewChat($message));
-
-        return response()->json($message);
-    }
 
     public function acceptChat(Request $request, $id)
     {
@@ -114,6 +132,7 @@ class ChatController extends Controller
 
         return response()->json($chat);
     }
+
 
 
     public function markAsRead($chatId)
