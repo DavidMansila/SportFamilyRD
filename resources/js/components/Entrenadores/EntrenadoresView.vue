@@ -547,26 +547,6 @@ export default {
       }
     },
 
-    getChatAvatar(chat) {
-      // Determinar qué imagen usar
-      if (this.user.id === chat.user_id) {
-        return chat.trainer.image; // Usar URL completa del backend
-      } else {
-        return chat.user.image; // Usar URL completa del backend
-      }
-    },
-
-    getChatName(chat) {
-      // Determinar quién es el otro usuario en el chat
-      if (this.user.id === chat.user_id) {
-        // Si el usuario actual es el usuario normal, mostrar el nombre del entrenador
-        return chat.trainer?.name || 'Entrenador';
-      } else {
-        // Si el usuario actual es el entrenador, mostrar el nombre del usuario normal
-        return chat.user?.name || 'Usuario';
-      }
-    },
-
     truncateText(text, maxLength) {
       if (!text) return '';
       if (text.length <= maxLength) return text;
@@ -603,28 +583,36 @@ export default {
         console.log('Respuesta de /chats:', response.data);
 
         this.chats = response.data.map(chat => {
+          // Determinar quién es el otro participante correctamente
+          let otherParticipant = null;
+
+          // Si el usuario actual es el atleta, el otro participante es el entrenador
+          if (this.user.user_type === 'atleta') {
+            otherParticipant = {
+              id: chat.trainer.id,
+              name: chat.trainer.name,
+              image: chat.trainer.image || 'public/storage/users/Perfil-Icon.png',
+              type: 'trainer'
+            };
+          }
+          // Si el usuario actual es el entrenador, el otro participante es el atleta
+          else if (this.user.user_type === 'entrenador') {
+            otherParticipant = {
+              id: chat.user.id,
+              name: chat.user.name,
+              image: chat.user.image || 'public/storage/users/Perfil-Icon.png',
+              type: 'user'
+            };
+          }
+
           return {
             id: chat.id,
             user_id: chat.user_id,
             trainer_id: chat.trainer_id,
             status: chat.status,
             unread: chat.unread_count,
-            last_message: chat.last_message ? {
-              id: chat.last_message.id,
-              message: chat.last_message.message,
-              sender_id: chat.last_message.sender_id,
-              created_at: chat.last_message.created_at
-            } : null,
-            user: chat.user ? {
-              id: chat.user.id,
-              name: chat.user.name,
-              image: chat.user.image
-            } : null,
-            trainer: chat.trainer ? {
-              id: chat.trainer.id,
-              name: chat.trainer.name,
-              image: chat.trainer.image
-            } : null
+            last_message: chat.last_message,
+            other_participant: otherParticipant
           };
         });
 
@@ -632,6 +620,14 @@ export default {
       } catch (error) {
         console.error('Error cargando chats', error);
       }
+    },
+
+    getChatAvatar(chat) {
+      return chat.other_participant?.image || 'public/storage/users/Perfil-Icon.png';
+    },
+
+    getChatName(chat) {
+      return chat.other_participant?.name || 'Usuario desconocido';
     },
 
     calculateUnreadMessages() {
@@ -667,6 +663,12 @@ export default {
       // Suscribirse al canal del chat
       this.echoListener = window.Echo.private(`chat.${chatId}`)
         .listen('NewChat', (data) => {
+          if (this.activeChat && this.activeChat.id === chatId) {
+            this.$refs.chatComponent?.handleNewMessage(data.message);
+          }
+          this.loadChats();
+        })
+        .listen('NewMessage', (data) => {
           if (this.activeChat && this.activeChat.id === chatId) {
             this.$refs.chatComponent?.handleNewMessage(data.message);
           }
@@ -709,14 +711,15 @@ export default {
     },
 
     setupGlobalListeners() {
-      // Solo configurar listeners si Echo está disponible
-      if (typeof window.Echo === 'undefined') {
-        return;
-      }
+      if (typeof window.Echo === 'undefined') return;
 
       if (this.user && this.user.token) {
         window.Echo.private(`user.${this.user.id}`)
-          .listen('NewChat', (data) => {
+          .listen('NewMessage', (data) => {
+            // Actualizar solo si el chat está abierto
+            if (this.activeChat && this.activeChat.id === data.chat_id) {
+              this.$refs.chatComponent?.handleNewMessage(data.message);
+            }
             this.loadChats();
           })
           .error((error) => {

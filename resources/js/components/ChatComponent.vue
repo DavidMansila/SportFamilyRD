@@ -122,6 +122,7 @@ export default {
   methods: {
     async fetchMessages() {
       this.loadingMessages = true;
+      this.identifyOtherUser();
       try {
         const response = await axios.get(`/chats/${this.chatId}`);
         this.messages = response.data.messages;
@@ -207,9 +208,18 @@ export default {
     identifyOtherUser() {
       if (!this.activeChat) return;
 
-      this.otherUser = this.user.id === this.activeChat.user_id
-        ? this.activeChat.trainer
-        : this.activeChat.user;
+      // El usuario autenticado puede ser el atleta (user_id) o el entrenador (trainer_id)
+      if (this.user.id === this.activeChat.user_id) {
+        this.otherUser = this.activeChat.trainer;
+      } else if (this.user.id === this.activeChat.trainer_id) {
+        this.otherUser = this.activeChat.user;
+      } else {
+        // En caso de error
+        this.otherUser = {
+          name: 'Usuario desconocido',
+          image: '/storage/users/Perfil-Icon.png'
+        };
+      }
     },
 
     setupChannels() {
@@ -269,6 +279,8 @@ export default {
         this.messages.push(newMessage);
         this.$nextTick(() => {
           this.scrollToBottom();
+
+          // Si el mensaje es para mí y no soy el remitente
           if (newMessage.sender_id !== this.user.id) {
             this.markMessagesAsRead();
           }
