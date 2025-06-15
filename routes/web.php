@@ -2,8 +2,6 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConfigurationController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PostController;
@@ -11,12 +9,10 @@ use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SavedNewsController;
-use App\Models\Configuration;
-use Illuminate\Routing\Controllers\Middleware;
+use App\Http\Controllers\LikeController;
 use Illuminate\Support\Facades\Route;
 
 use App\Models\News;
-use App\Models\Chat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
@@ -39,6 +35,8 @@ Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
 
 // Posts
 Route::resource('/post', PostController::class);
+
+Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
 
 //configuracion
 Route::post('/config-update-value', [ConfigurationController::class, 'updateValue']);

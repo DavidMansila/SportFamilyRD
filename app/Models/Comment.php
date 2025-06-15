@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Post;
+use App\Models\Reply;
 
 class Comment extends Model
 {
-    //
+
+    protected $withCount = ['likes'];
+
     protected $fillable = [
         'id',
         'post_id',
@@ -20,6 +23,16 @@ class Comment extends Model
     public function post()
     {
         return $this->belongsTo(Post::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
     }
 
     public function replies()

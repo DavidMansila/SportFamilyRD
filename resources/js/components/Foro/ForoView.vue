@@ -100,15 +100,12 @@
 
         <div class="post-footer">
           <div class="post-stats">
-            <span class="post-likes">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                :stroke="post.isLiked ? 'currentColor' : 'currentColor'" :fill="post.isLiked ? 'currentColor' : 'none'"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <span class="post-likes" @click.stop="toggleLike('post', post.id)" :class="{ liked: post.isLiked }">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                 <path
-                  d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                </path>
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
-              {{ post.likes_quantity }}
+              {{ post.likes_count || 0 }}
             </span>
             <span class="post-comments" @click.stop="abrirPopoutYFocalizarComentario(post)">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -158,12 +155,12 @@
 
 
               <div class="post-interactions">
-                <button @click="likePost" class="interaction-btn like-btn" :class="{ liked: postSeleccionado.isLiked }">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <button @click="toggleLike('post', postSeleccionado.id)" :class="{ liked: postSeleccionado.isLiked }">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                     <path
                       d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
-                  <span>{{ postSeleccionado.likes_quantity }}</span>
+                  <span>{{ postSeleccionado.likes_count }}</span>
                 </button>
                 <button @click="focusComentario" class="interaction-btn comment-btn">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -247,10 +244,10 @@
 
                         <span class="comment-author"> {{ `Usuario${comentario.user_id}` }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
-                        <button v-if="comentario.respuestas && comentario.respuestas.length > 0"
+                        <button v-if="comentario.replies && comentario.replies.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
                           {{ comentariosExpandidos.includes(comentario.id) ? 'Ocultar respuestas' : `Ver
-                          ${comentario.respuestas.length} respuesta(s)` }}
+                          ${comentario.replies.length} respuesta(s)` }}
                         </button>
                       </div>
 
@@ -286,13 +283,13 @@
 
                       <p class="comment-text">{{ comentario.texto }}</p>
                       <div class="comment-actions">
-                        <button @click="likeComentario(comentario.id)" class="comment-action like-comment"
+                        <button @click="toggleLike('comment', comentario.id)" class="comment-action like-comment"
                           :class="{ liked: comentario.isLiked }">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                             <path
                               d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                           </svg>
-                          <span>{{ comentario.likes }}</span>
+                          <span>{{ comentario.likes || 0 }}</span>
                         </button>
 
                         <!-- EDITAR Y ELIMINAR COMENTARIOS BOTONES -->
@@ -325,7 +322,7 @@
                           </div>
                           <div class="comment-content">
                             <div class="comment-header">
-                              <span class="comment-author">{{ `Usuario${comentario.user_id}` }}</span>
+                              <span class="comment-author">{{ `Usuario${reply.user_id}` }}</span>
                               <span class="comment-time">{{ formatRelativeTime(reply.created_at) }}</span>
                             </div>
 
@@ -359,13 +356,13 @@
 
                             <p class="comment-text">{{ reply.texto }}</p>
                             <div class="comment-actions">
-                              <button @click="likeComentario(reply.id)" class="comment-action like-comment"
+                              <button @click="toggleLike('reply', reply.id)" class="comment-action like-comment"
                                 :class="{ liked: reply.isLiked }">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                   <path
                                     d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                                 </svg>
-                                <span>{{ reply.likes }}</span>
+                                <span>{{ reply.likes || 0 }}</span>
                               </button>
 
                               <!-- EDITAR Y ELIMINAR REPLY BOTONES -->
@@ -642,20 +639,22 @@ export default {
 
     // Métodos para el Popup
     abrirPopout(post) {
-      // Guardar posición antes de cualquier cambio de estilo
       this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-
-      // Aplicar estilos sin position: fixed
       document.body.style.overflow = 'hidden';
-      document.documentElement.style.scrollBehavior = 'auto'; // Prevenir scroll suave
+      document.documentElement.style.scrollBehavior = 'auto';
 
       this.postSeleccionado = {
         ...post,
-        isLiked: false,
+        isLiked: post.isLiked || false,
         comments: post.comments.map(comment => ({
           ...comment,
-          isLiked: false,
-          respuestas: comment.respuestas || []
+          isLiked: comment.isLiked || false,
+          likes: comment.likes || 0,
+          replies: (comment.replies || []).map(reply => ({
+            ...reply,
+            isLiked: reply.isLiked || false,
+            likes: reply.likes || 0
+          }))
         }))
       };
     },
@@ -744,35 +743,34 @@ export default {
       }
     },
 
+
+
     async getPost() {
       try {
         const response = await axios.get('/post');
-        // Ordenar posts por fecha descendente
-        if (!this.posts || !Array.isArray(this.posts)) return [];
-
         this.posts = response.data.posts.sort((a, b) => {
           return new Date(b.created_at) - new Date(a.created_at);
         }).map(post => ({
           ...post,
-          comments: post.comments
-            // Orden descendente para comentarios principales
-            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-            .map(comment => ({
-              ...comment,
-              // CORRECCIÓN: Ordenar respuestas por fecha descendente
-              respuestas: (comment.replies || []).sort((a, b) =>
-                new Date(b.created_at) - new Date(a.created_at)), // Cambiado a b - a
-              user: { id: comment.user_id }
+          isLiked: post.is_liked || false,
+          likes_count: post.likes_count || 0,
+          comments: (post.comments || []).map(comment => ({
+            ...comment,
+            isLiked: comment.is_liked || false,
+            likes: comment.likes_count || 0, // Asegurar que viene del backend
+            replies: (comment.replies || []).map(reply => ({
+              ...reply,
+              isLiked: reply.is_liked || false,
+              likes: reply.likes_count || 0 // Asegurar que viene del backend
             }))
+          }))
         }));
         this.postsFiltrados = [...this.posts];
-
-        // sessionStorage.setItem('posts', JSON.stringify(this.posts));
-
       } catch (error) {
         console.error('Error obteniendo posts:', error);
       }
     },
+
 
     handleFileSelect(event) {
       const file = event.target.files[0];
@@ -793,7 +791,6 @@ export default {
       if (!this.nuevoComentario.trim()) return;
 
       try {
-
         if (!this.user) {
           alert('Debes iniciar sesión para comentar');
           return;
@@ -818,46 +815,46 @@ export default {
         // 1. Primero actualizamos el post en el array principal
         const postIndex = this.posts.findIndex(p => p.id === this.postSeleccionado.id);
         if (postIndex !== -1) {
-          const newComment = {
-            ...response.data.comment,
-            created_at: new Date().toISOString(),
-            likes: 0,
-            isLiked: false,
-            user: { id: response.data.comment.user_id },
-            respuestas: []
-          };
-
           if (this.comentarioRespondiendo) {
+            // Es una respuesta (reply)
+            const newReply = {
+              ...response.data.reply,  // Usar response.data.reply para replies
+              id: response.data.reply.id,
+              created_at: new Date().toISOString(),
+              likes_count: 0,
+              isLiked: false,
+              user_id: this.user.id  // Asegurar user_id
+            };
+
             const parentCommentIndex = this.posts[postIndex].comments.findIndex(
               c => c.id === this.comentarioRespondiendo
             );
+
             if (parentCommentIndex !== -1) {
-              this.posts[postIndex].comments[parentCommentIndex].respuestas =
-                this.posts[postIndex].comments[parentCommentIndex].respuestas || [];
-              this.posts[postIndex].comments[parentCommentIndex].respuestas.unshift(newComment);
+              // Inicializar array si no existe
+              if (!this.posts[postIndex].comments[parentCommentIndex].replies) {
+                this.$set(this.posts[postIndex].comments[parentCommentIndex], 'replies', []);
+              }
+
+              this.posts[postIndex].comments[parentCommentIndex].replies.unshift(newReply);
             }
           } else {
+            // Es un comentario principal
+            const newComment = {
+              ...response.data.comment,  // Usar response.data.comment para comentarios
+              id: response.data.comment.id,
+              created_at: new Date().toISOString(),
+              likes_count: 0,
+              isLiked: false,
+              user_id: this.user.id,  // Asegurar user_id
+              replies: []
+            };
             this.posts[postIndex].comments.unshift(newComment);
           }
 
-          // 2. Luego actualizamos el post seleccionado con los datos del array principal
-          // Esto evita la duplicación ya que usamos la misma fuente de datos
-          this.postSeleccionado = {
-            ...this.posts[postIndex],
-            isLiked: this.postSeleccionado.isLiked // Mantenemos el estado del like
-          };
+          // 2. Actualizar el post seleccionado
+          this.postSeleccionado = { ...this.posts[postIndex] };
         }
-
-        this.getPost()
-          .then(() => {
-            const postEncontrado = this.posts.find(post => Number(post.id) === Number(this.postSeleccionado.id));
-            if (postEncontrado) {
-              this.postSeleccionado = { ...postEncontrado };
-            }
-          })
-          .catch(error => {
-            console.error('Error al editar comentario:', error);
-          });
 
         this.nuevoComentario = '';
         this.comentarioRespondiendo = null;
@@ -871,40 +868,70 @@ export default {
 
     // METODOS PARA LIKES
 
-    async likePost() {
-
+    async toggleLike(type, id) {
       if (!this.user) {
         alert('Debes iniciar sesión para dar like');
         return;
       }
 
       try {
-        const response = await axios.post(`/post/${this.postSeleccionado.id}/likes_quantity`); // Usar /post/ID/likes_quantity
-        this.postSeleccionado.likes_quantity = response.data.likes_quantity;
-        this.postSeleccionado.isLiked = response.data.is_liked;
+        const response = await axios.post('/toggle-like', {
+          likeable_type: type,
+          likeable_id: id
+        });
+
+        // Actualizar estado local inmediatamente
+        const updateLikeInArray = (array) => {
+          for (const item of array) {
+            // Actualizar post principal
+            if (type === 'post' && item.id === id) {
+              item.likes_count = response.data.likes_count;
+              item.isLiked = response.data.is_liked;
+              return true;
+            }
+
+            // Buscar en comentarios
+            if (item.comments) {
+              for (const comment of item.comments) {
+                // Actualizar comentario
+                if (type === 'comment' && comment.id === id) {
+                  comment.likes = response.data.likes_count;
+                  comment.isLiked = response.data.is_liked;
+                  return true;
+                }
+
+                // Buscar en respuestas
+                if (comment.replies) {
+                  for (const reply of comment.replies) {
+                    // Actualizar respuesta
+                    if (type === 'reply' && reply.id === id) {
+                      reply.likes = response.data.likes_count;
+                      reply.isLiked = response.data.is_liked;
+                      return true;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          return false;
+        };
+
+        // Actualizar en posts principales
+        updateLikeInArray(this.posts);
+
+        // Actualizar en post seleccionado si está abierto
+        if (this.postSeleccionado) {
+          updateLikeInArray([this.postSeleccionado]);
+        }
+
+        this.$forceUpdate();
+
       } catch (error) {
-        console.error('Error actualizando like:', error);
+        console.error('Error al dar like:', error);
       }
     },
 
-    async likeComentario(commentId) {
-
-      if (!this.user) {
-        alert('Debes iniciar sesión para dar like');
-        return;
-      }
-
-      try {
-        const comment = this.findCommentById(commentId);
-        // Usar la ruta correcta para comentarios
-        const response = await axios.post(`/comment/${commentId}/likes_quantity`);
-        // Actualizar desde la respuesta
-        comment.likes = response.data.likes_quantity;
-        comment.isLiked = response.data.is_liked;
-      } catch (error) {
-        console.error('Error actualizando like de comentario:', error);
-      }
-    },
 
 
     // METODOS PARA EDITAR Y ELIMINAR EN POST
@@ -1278,5 +1305,111 @@ export default {
 
 .login-prompt a:hover {
   text-decoration: underline;
+}
+
+
+/* Estilos para likes */
+.post-likes,
+.comment-action.like-comment {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.post-likes:hover,
+.comment-action.like-comment:hover {
+  opacity: 0.8;
+}
+
+.post-likes.liked,
+.comment-action.like-comment.liked {
+  color: #e0245e;
+}
+
+.post-likes.liked svg,
+.comment-action.like-comment.liked svg {
+  stroke: #e0245e;
+  fill: #e0245e;
+}
+
+/* Corazón sólido cuando está activo */
+.post-likes.liked svg path,
+.comment-action.like-comment.liked svg path {
+  fill: #e0245e;
+}
+
+/* Corazón vacío cuando no está activo */
+.post-likes:not(.liked) svg path,
+.comment-action.like-comment:not(.liked) svg path {
+  fill: none;
+}
+
+.post-likes svg,
+.comment-action.like-comment svg {
+  stroke-width: 2;
+}
+
+/* Mostrar borde siempre */
+.post-likes svg path,
+.comment-action.like-comment svg path {
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Rellenar cuando está activo */
+.post-likes.liked svg path,
+.comment-action.like-comment.liked svg path {
+  fill: #e0245e;
+  stroke: #e0245e;
+}
+
+/* Animación al dar like */
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(1.2);
+  }
+
+  50% {
+    transform: scale(0.95);
+  }
+
+  75% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.liked {
+  animation: heartBeat 0.5s ease;
+}
+
+
+/* Asegurar que los corazones sean visibles siempre */
+.post-likes svg path,
+.comment-action.like-comment svg path {
+  stroke: currentColor;
+  /* Contorno visible */
+  stroke-width: 1.5;
+  /* Grosor del contorno */
+  fill: none;
+  /* Sin relleno por defecto */
+}
+
+/* Rellenar cuando está activo */
+.post-likes.liked svg path,
+.comment-action.like-comment.liked svg path {
+  fill: #e0245e;
+  /* Relleno rojo cuando está activo */
+  stroke: #e0245e;
+  /* Contorno rojo cuando está activo */
 }
 </style>
