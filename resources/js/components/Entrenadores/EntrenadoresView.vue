@@ -898,33 +898,6 @@ export default {
   background-color: #2980b9;
 }
 
-.close-modal {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.3s;
-}
-
-.close-modal:hover {
-  background-color: #f0f0f0;
-}
-
-.close-modal svg {
-  width: 20px;
-  height: 20px;
-}
-
-
-
 
 .horario-titulo {
   font-size: 1.25rem;

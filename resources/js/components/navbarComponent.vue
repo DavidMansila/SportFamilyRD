@@ -27,8 +27,6 @@
       </router-link>
     </div>
 
-    <!-- HACER CARRITO FUNCIONAL, PUEDE SER CREAR UN COMPONENT Y LLAMAR AL COMPONENTE AQUI O CREAR EL CARRITO AQUI MISMO, LO
-    MEJOR FUERA HACER UN COMPONENTE DE CARRITO -->
     <div class="Imagenes">
 
       <div class="carrito-container">
@@ -74,7 +72,7 @@
       </template>
 
       <template v-else>
-        <router-link to="/signup" class="Signup">
+        <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="Signup">
           <img src="/imagenes/Signup-Icon.png" alt="Registrarse" class="signup-icon" />
         </router-link>
       </template>
@@ -220,7 +218,7 @@ export default {
 
       this.toggleCart();
     }
-    
+
   }
 }
 </script>

@@ -40,23 +40,22 @@
         </button>
         <button @click="cambiarCategoria('Deporte')" :class="{ active: categoriaSeleccionada === 'Deporte' }"
           class="filtro-btn">
-          Deporte
+         🏅 Deporte
         </button>
         <button @click="cambiarCategoria('Gym')" :class="{ active: categoriaSeleccionada === 'Gym' }"
           class="filtro-btn">
-          Gym
-        </button>
-        <button @click="cambiarCategoria('Experiencia')" :class="{ active: categoriaSeleccionada === 'Experiencia' }"
-          class="filtro-btn">
-          Experiencia
+          🏋️ Gimnasio y Fitness
         </button>
         <button @click="cambiarCategoria('Lugares')" :class="{ active: categoriaSeleccionada === 'Lugares' }"
           class="filtro-btn">
-          Lugares
+          📍 Lugares y Centros
+        </button>
+                <button @click="cambiarCategoria('Consejos')" :class="{ active: categoriaSeleccionada === 'Consejos' }"
+          class="filtro-btn">
+          🧠 Consejos y Bienestar
         </button>
       </div>
     </div>
-
 
 
 
@@ -474,10 +473,10 @@
                 <label for="categoria">Categoría</label>
                 <select v-model="nuevoPost.categoria" id="categoria" required>
                   <option value="">Selecciona una categoría</option>
-                  <option value="Deporte">Deporte</option>
-                  <option value="Gym">Gym</option>
-                  <option value="Experiencia">Experiencia</option>
-                  <option value="Lugares">Lugares</option>
+                  <option value="Deporte">🏅 Deporte</option>
+                  <option value="Gym">🏋️ Gimnasio y Fitness</option>
+                  <option value="Experiencia">📍 Lugares y Centros</option>
+                  <option value="Lugares">📆 Eventos y Actividades</option>
                 </select>
               </div>
             </div>
