@@ -197,10 +197,24 @@
 
           <h2 class="modal-title">Contactar a {{ contactoEntrenador.nombre.split(' ')[0] }}</h2>
 
+          <div class="profile-info">
+            <div class="user-details">
+              <span class="user-avatar">
+                <img :src="user.image || 'public/storage/users/Perfil-Icon.png'" alt="Tu foto de perfil">
+              </span>
+              <div>
+                <p><strong>Nombre:</strong> {{ user.name }}</p>
+                <p v-if="user.email"><strong>Email:</strong> {{ user.email }}</p>
+              </div>
+            </div>
+          </div>
+
           <form @submit.prevent="enviarFormularioContacto" class="contact-form">
             <div class="form-group">
-              <label for="edad">Edad</label>
-              <input type="number" id="edad" v-model="formularioContacto.edad" min="10" max="100" required>
+              <label for="objetivos">¿Qué buscas aprender o lograr?</label>
+              <textarea id="objetivos" v-model="formularioContacto.objetivos" rows="4"
+                placeholder="Ej: Mejorar mi técnica de tiro, prepararme para una competencia, perder peso..."
+                required></textarea>
             </div>
 
             <div class="form-group">
@@ -214,12 +228,14 @@
               </select>
             </div>
 
-            <div class="form-group">
-              <label for="objetivos">¿Qué buscas aprender o lograr?</label>
-              <textarea id="objetivos" v-model="formularioContacto.objetivos" rows="4"
-                placeholder="Ej: Mejorar mi técnica de tiro, prepararme para una competencia, perder peso..."
-                required></textarea>
-            </div>
+            <p class="data-notice">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Tus datos de perfil serán enviados al entrenador para que pueda conocerte mejor
+            </p>
 
             <button type="submit" class="submit-btn">Enviar Solicitud</button>
           </form>
@@ -304,9 +320,8 @@ export default {
       mostrarFormularioContacto: false,
       contactoEntrenador: null,
       formularioContacto: {
-        edad: '',
         nivel: '',
-        objetivos: '',
+        objetivos: ''
       },
       entrenadores: [],
 
@@ -431,7 +446,6 @@ export default {
         user_id: this.user.id,
         trainer_id: this.contactoEntrenador.trainer_id,  // ID de la tabla trainers
         trainer_user_id: this.contactoEntrenador.user_id, // ID de usuario del entrenador
-        age: this.formularioContacto.edad,
         sport_level: this.formularioContacto.nivel,
         description: this.formularioContacto.objetivos,
         status: 'pending'
@@ -884,33 +898,6 @@ export default {
   background-color: #2980b9;
 }
 
-.close-modal {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.3s;
-}
-
-.close-modal:hover {
-  background-color: #f0f0f0;
-}
-
-.close-modal svg {
-  width: 20px;
-  height: 20px;
-}
-
-
-
 
 .horario-titulo {
   font-size: 1.25rem;
@@ -955,5 +942,62 @@ export default {
 
 .estado-icono {
   font-size: 0.9rem;
+}
+
+
+.profile-info {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+
+  p {
+    margin-bottom: 10px;
+    color: #495057;
+  }
+}
+
+.user-details {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+
+  p {
+    margin: 5px 0;
+    font-size: 0.95rem;
+  }
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.data-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #e8f4fd;
+  border-radius: 8px;
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 </style>

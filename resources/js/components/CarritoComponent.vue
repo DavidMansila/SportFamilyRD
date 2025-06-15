@@ -7,7 +7,7 @@
         <!-- Encabezado con efecto vidrio -->
         <div class="cart-header glassmorphism">
           <div class="header-content">
-            
+
             <h2>🛒 Tu Carrito <span class="items-count">{{ cartItems.length }} items</span></h2>
             <button @click="$emit('close')" class="close-btn">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -46,7 +46,7 @@
                 <div class="event-date">🗓️ {{ formatDate(item.eventDate) }}</div>
                 <div class="ticket-type">🎫 {{ item.ticketType }}</div>
               </div>
-              <div class="price">💲{{ item.price.toFixed(2) }}</div>
+              <div class="price">💲{{ (item.price || 0).toFixed(2) }}</div>
             </div>
 
             <div class="item-controls">
@@ -71,17 +71,9 @@
         <!-- Total y acciones con efecto flotante -->
         <div class="cart-footer glassmorphism">
           <div class="total-section">
-            <div class="total-line">
-              <span>Subtotal:</span>
-              <span>${{ cartTotal.toFixed(2) }}</span>
-            </div>
-            <div class="total-line">
-              <span>Envío:</span>
-              <span>{{ shippingCost }}</span>
-            </div>
             <div class="total-line grand-total">
               <span>Total:</span>
-              <span class="total-price">${{ (cartTotal + shippingCostValue).toFixed(2) }}</span>
+              <span class="total-price">${{ cartTotal }}</span>
             </div>
           </div>
 
@@ -100,34 +92,96 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue'; // Añadir watch
+import axios from 'axios';
 
 const props = defineProps({
-  isVisible: Boolean,
-  cartItems: Array
+  isVisible: Boolean
 });
 
-const emit = defineEmits(['close', 'update-quantity', 'remove-item', 'checkout']);
+const emit = defineEmits(['close']);
 
-const cartTotal = computed(() => {
-  return props.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-});
+const cartItems = ref([]);
+const isLoading = ref(true);
 
-const shippingCostValue = computed(() => cartTotal.value > 50 ? 0 : 5.99);
-const shippingCost = computed(() => cartTotal.value > 50 ? '¡Gratis! 🎉' : `$${shippingCostValue.value.toFixed(2)}`);
-const shippingProgress = computed(() => Math.min((cartTotal.value / 50) * 100, 100));
-const shippingMessage = computed(() =>
-  cartTotal.value > 50
-    ? '¡Felicidades! Envío gratis aplicado'
-    : `$${(50 - cartTotal.value).toFixed(2)} más para envío gratis`
-);
+// Obtener carrito
+const fetchCart = async () => {
+  try {
+    const response = await axios.get('/cart');
+    console.log("Respuesta del carrito:", response.data);
 
-const formatDate = (dateString) => {
-  // Implementar formato de fecha
-  return new Date(dateString).toLocaleDateString();
+    cartItems.value = response.data.items.map(item => {
+      const product = item.product || {};
+      return {
+        id: product.id || 0,
+        name: product.name || 'Producto sin nombre',
+        price: parseFloat(product.price) || 0,
+        image: product.image || '',
+        quantity: item.quantity,
+        cart_item_id: item.id,
+        type: 'product'
+      };
+    });
+
+    console.log("Items procesados:", cartItems.value);
+    window.addEventListener('cart-updated', fetchCart);
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-// Resto de métodos igual
+// watcher para actualizar cuando se abre el carrito
+watch(() => props.isVisible, (newVal) => {
+  if (newVal) {
+    fetchCart();
+  }
+});
+
+// Actualizar cantidad
+const updateQuantity = async (index, newQuantity) => {
+  if (newQuantity < 1) return;
+
+  const item = cartItems.value[index];
+  try {
+    await axios.put(`/cart/items/${item.cart_item_id}`, {
+      quantity: newQuantity
+    });
+    cartItems.value[index].quantity = newQuantity;
+  } catch (error) {
+    console.error('Error updating quantity:', error);
+  }
+};
+
+// Eliminar item
+const removeItem = async (index) => {
+  const item = cartItems.value[index];
+  try {
+    await axios.delete(`/cart/items/${item.cart_item_id}`);
+    cartItems.value.splice(index, 1);
+  } catch (error) {
+    console.error('Error removing item:', error);
+  }
+};
+
+// Finalizar compra
+const handleCheckout = () => {
+  emit('checkout', cartItems.value);
+};
+
+onMounted(fetchCart);
+
+// Computed: Totales
+const cartTotal = computed(() => {
+  return cartItems.value.reduce((total, item) => {
+    return total + (item.price * item.quantity);
+  }, 0);
+});
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString();
+};
 </script>
 
 <style scoped>

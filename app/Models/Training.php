@@ -16,7 +16,6 @@ class Training extends Model
     protected $fillable = [
         'user_id',
         'trainer_id',
-        'age',
         'sport_level',
         'description',
         'status',

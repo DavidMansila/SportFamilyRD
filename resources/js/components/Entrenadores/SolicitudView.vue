@@ -47,8 +47,9 @@
             </div>
 
             <div class="form-group floating-label">
-              <input type="tel" id="telefono" v-model="formulario.telefono" placeholder=" " @input="validarTelefono" />
-              <label for="telefono">Teléfono (opcional)</label>
+              <input type="tel" id="telefono" v-model="formulario.telefono" placeholder=" " @input="formatPhoneInput"
+                maxlength="14" />
+              <label for="telefono">Teléfono</label>
               <span class="error-message" v-if="errores.telefono">{{ errores.telefono }}</span>
             </div>
 
@@ -427,9 +428,12 @@ export default {
           this.errores.email = 'Email requerido';
           valido = false;
         }
-        if (this.formulario.telefono && !/^[+]?[\d\s-]{5,20}$/.test(this.formulario.telefono)) {
-          this.errores.telefono = 'Teléfono inválido';
-          valido = false;
+        if (this.formulario.telefono) {
+          const soloDigitos = this.formulario.telefono.replace(/\D/g, '');
+          if (soloDigitos.length !== 10) {
+            this.errores.telefono = 'Teléfono debe tener 10 dígitos';
+            valido = false;
+          }
         }
       }
 
@@ -634,11 +638,101 @@ export default {
     },
 
 
+
+    validarTelefono() {
+      // Eliminar caracteres no numéricos para validar
+      const soloDigitos = this.formulario.telefono.replace(/\D/g, '');
+
+      if (soloDigitos && soloDigitos.length < 10) {
+        this.errores.telefono = 'Teléfono debe tener 10 dígitos';
+      } else {
+        this.errores.telefono = '';
+      }
+    },
+
+
+    formatPhone(number) {
+      if (!number) return '';
+      // Eliminar todos los caracteres que no sean dígitos
+      const cleaned = number.replace(/\D/g, '');
+      // Aplicar formato xxx-xxx-xxxx
+      const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+      if (match) {
+        return `${match[1]}-${match[2]}-${match[3]}`;
+      }
+      return number; // Retornar el valor original si no coincide
+    },
+
+    // Función para formatear el teléfono mientras se escribe
+    formatPhoneInput(event) {
+      const input = event.target.value;
+      // Eliminar todos los caracteres que no sean dígitos
+      let cleaned = input.replace(/\D/g, '');
+
+      // Limitar a 10 dígitos
+      if (cleaned.length > 10) cleaned = cleaned.substring(0, 10);
+
+      // Aplicar formato mientras se escribe
+      let formatted = '';
+      if (cleaned.length > 0) {
+        formatted = '(' + cleaned.substring(0, 3);
+        if (cleaned.length > 3) {
+          formatted += ') ' + cleaned.substring(3, 6);
+          if (cleaned.length > 6) {
+            formatted += '-' + cleaned.substring(6, 10);
+          }
+        }
+      }
+
+      // Actualizar el valor en el modelo
+      this.formulario.telefono = formatted;
+    },
+
+    // Función para formatear el teléfono para mostrar
+    formatPhoneForDisplay(phone) {
+      if (!phone) return '';
+      // Eliminar todo excepto dígitos
+      const cleaned = phone.replace(/\D/g, '');
+
+      // Aplicar formato (xxx) xxx-xxxx
+      const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+      if (match) {
+        return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+      }
+      return phone;
+    },
+
+    // Cargar datos del usuario
+    cargarDatosUsuario() {
+      if (this.user) {
+        if (!this.formulario.nombre && this.user.name) {
+          this.formulario.nombre = this.user.name;
+        }
+
+        if (!this.formulario.email && this.user.email) {
+          this.formulario.email = this.user.email;
+        }
+
+        if (!this.formulario.telefono && this.user.phone) {
+          this.formulario.telefono = this.formatPhoneForDisplay(this.user.phone);
+        }
+
+        if (!this.formulario.ubicacion && this.user.location) {
+          this.formulario.ubicacion = this.user.location;
+        }
+      }
+    },
+
+
   },
   mounted() {
     this.user = JSON.parse(sessionStorage.getItem('user') || null),
-
       this.formulario.user_id = this.user.id;
+
+    if (this.user) {
+      this.formulario.user_id = this.user.id;
+      this.cargarDatosUsuario();
+    }
   }
 }
 </script>

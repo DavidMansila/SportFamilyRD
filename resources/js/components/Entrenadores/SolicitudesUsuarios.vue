@@ -25,24 +25,25 @@
                     <transition-group name="list" tag="div" class="solicitudes-list">
                         <article v-for="solicitud in solicitudesPaginadas" :key="solicitud.id" class="solicitud-card"
                             :class="solicitud.estado">
-                            <div class="card-header">
-                                <div class="avatar-container">
-                                    <img :src="solicitud.userImage || '/storage/users/Perfil-Icon.png'" alt="Imagen"
-                                        class="user-avatar">
-                                    <!-- <div v-else class="avatar"
-                                        :style="{ backgroundColor: getAvatarColor(solicitud.userName) }">
-                                        {{ getInitials(solicitud.userName) }}
-                                    </div> -->
-                                    <div class="user-info">
-                                        <p class="user-name">{{ solicitud.userName }}</p>
-                                    </div>
-                                    <p class="user-age">Edad: {{ solicitud.edad }}</p>
-                                </div>
 
-                                <time class="request-date">
-                                    {{ formatFecha(solicitud.fechaSolicitud) }}
-                                </time>
+                            <time class="request-date">
+                                {{ formatFecha(solicitud.fechaSolicitud) }}
+                            </time>
+
+                            <div class="card-header">
+                                <div class="profile-info">
+                                    <div class="user-details">
+                                        <span class="user-avatar">
+                                            <img :src="getUserImage(solicitud)" alt="Foto de perfil"
+                                                class="user-avatar">
+                                        </span>
+                                        <div>
+                                            <p><strong>Nombre:</strong> {{ solicitud.userName }}</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
 
                             <div class="card-body">
                                 <div class="sport-info">
@@ -225,14 +226,13 @@ export default {
                 trainer_id: item.trainer_id,
                 userId: item.user_id ?? user.id ?? 0,
                 userName: item.user?.name || user.full_name || item.user_name || item.name || 'Usuario desconocido',
-                edad: item.age ?? 0,
                 email: user.email || 'Desconocido',
                 telefono: user.phone || 'Desconocido',
                 My_level: item.sport_level || 'N/A',
                 mensaje: item.description || 'Sin mensaje',
                 estado: this.mapStatus(item.status || 'pending'),
                 fechaSolicitud: this.validarFecha(item.created_at) || new Date().toISOString(),
-                userImage: user.image || 'public/storage/users/Perfil-Icon.png'
+                userImage: user.image || ''
             };
         },
 
@@ -333,23 +333,22 @@ export default {
             return estados[estado];
         },
 
-        // actualizarFiltros() {
-        //     this.solicitudesFiltradas = this.solicitudes.filter(solicitud => {
-        //         const coincideEstado = this.filtroEstado === '' || solicitud.estado === this.filtroEstado;
-        //         const coincideNombre = this.filtroNombre === '' || solicitud.nombre.toLowerCase().includes(this.filtroNombre.toLowerCase());
-
-        //         return coincideEstado && coincideNombre;
-        //     });
-        // },
-
-
         validarFecha(fecha) {
             return fecha && !isNaN(new Date(fecha).getTime()) ? fecha : null;
         },
 
-        // onImageError(event) {
-        //     event.target.src = 'public/storage/users/Perfil-Icon.png';
-        // }
+        getUserImage(solicitud) {
+            if (solicitud.userImage && solicitud.userImage.startsWith('http')) {
+                return solicitud.userImage;
+            }
+
+            if (solicitud.userImage) {
+                return `/storage/users/${solicitud.userId}/${solicitud.userImage}`;
+            }
+
+            // Imagen por defecto
+            return '/storage/users/Perfil-Icon.png';
+        },
     },
     async mounted() {
         const userData = sessionStorage.getItem('user');
@@ -485,5 +484,64 @@ export default {
 .user-age {
     padding-bottom: 10px;
 
+}
+
+
+
+
+.profile-info {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+
+    p {
+        margin-bottom: 10px;
+        color: #495057;
+    }
+}
+
+.user-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+
+    p {
+        margin: 5px 0;
+        font-size: 0.95rem;
+    }
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.data-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e8f4fd;
+    border-radius: 8px;
+
+    svg {
+        flex-shrink: 0;
+    }
 }
 </style>

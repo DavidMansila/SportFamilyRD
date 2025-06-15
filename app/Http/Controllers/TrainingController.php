@@ -42,7 +42,6 @@ class TrainingController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'trainer_id' => 'required|exists:users,id',
-            'age' => 'required|integer|min:10|max:100',
             'sport_level' => 'required|in:Principiante,Intermedio,Avanzado,Profesional',
             'description' => 'required|string|max:500',
             'status' => 'required|in:pending,accepted,rejected'
@@ -82,7 +81,6 @@ class TrainingController extends Controller
         $training = Training::findOrFail($id);
         $validated = $request->validate([
             'user_id' => 'sometimes|exists:users,id',
-            'age' => 'sometimes|integer',
             'sport_level' => 'sometimes',
             'description' => 'nullable|string',
             'status' => 'sometimes',
@@ -128,7 +126,6 @@ class TrainingController extends Controller
             return [
                 'id' => $training->id,
                 'user_id' => $training->user_id,
-                'age' => $training->age,
                 'sport_level' => $training->sport_level,
                 'description' => $training->description,
                 'status' => $training->status,

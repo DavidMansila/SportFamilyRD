@@ -10,6 +10,7 @@ use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SavedNewsController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 use App\Models\News;
@@ -25,13 +26,17 @@ Route::resource('/user', UserController::class);
 Route::get('/user-stats/{user}', [UserController::class, 'stats']);
 Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
 
-// //Noticias
-// Route::resource('/news', NewsController::class);
-
 //productos
 Route::resource('/products', ProductController::class);
 Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
 Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
+
+// Carrito
+Route::get('/cart', [CartController::class, 'getCart']);
+Route::post('/cart/items', [CartController::class, 'addItem']);
+Route::put('/cart/items/{item}', [CartController::class, 'updateItem']);
+Route::delete('/cart/items/{item}', [CartController::class, 'removeItem']);
+
 
 // Posts
 Route::resource('/post', PostController::class);
