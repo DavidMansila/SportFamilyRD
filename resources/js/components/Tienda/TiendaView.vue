@@ -502,6 +502,37 @@ export default {
           texto: `${c.nombre} - ${o.texto}`
         }))
       )
+    },
+
+
+    async agregarAlCarrito(producto) {
+      try {
+        if (!this.user) {
+          alert('Debes iniciar sesión para agregar productos al carrito');
+          return;
+        }
+
+        const response = await axios.post('/cart/items', {
+          item_type: 'product',
+          item_id: producto.id,
+          quantity: 1
+        });
+
+        alert(`${producto.name} ha sido añadido al carrito`);
+
+        window.dispatchEvent(new CustomEvent('cart-updated'));
+
+      } catch (error) {
+        console.error('Error al agregar al carrito:', error);
+        alert('No se pudo agregar el producto al carrito');
+      }
+    },
+
+    addToCartFromModal() {
+      if (this.productoSeleccionado) {
+        this.agregarAlCarrito(this.productoSeleccionado);
+        this.cerrarPopup();
+      }
     }
 
   },
@@ -545,7 +576,8 @@ export default {
 }
 
 .empty-image {
-  max-width: 150px; /* Ajusta el tamaño según necesites */
+  max-width: 150px;
+  /* Ajusta el tamaño según necesites */
   height: auto;
   opacity: 0.7;
 }
@@ -562,7 +594,4 @@ export default {
   max-width: 400px;
   margin: 0 auto;
 }
-
-
-
 </style>

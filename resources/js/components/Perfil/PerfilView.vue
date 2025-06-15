@@ -121,6 +121,7 @@
                             <span v-if="!editMode" class="info-value">{{ user.birthdate || 'No especificada' }}</span>
                             <input v-else type="date" v-model="user.birthdate">
                         </div>
+
                         <div class="info-item" v-if="user.user_type === 'entrenador'">
                             <span class="info-label">Deporte:</span>
 
