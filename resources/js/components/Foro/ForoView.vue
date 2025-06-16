@@ -38,20 +38,20 @@
         <button @click="cambiarCategoria('')" :class="{ active: categoriaSeleccionada === '' }" class="filtro-btn">
           Todos
         </button>
-        <button @click="cambiarCategoria('Deporte')" :class="{ active: categoriaSeleccionada === 'Deporte' }"
+        <button @click="cambiarCategoria('🏅 Deporte')" :class="{ active: categoriaSeleccionada === '🏅 Deporte' }"
           class="filtro-btn">
-         🏅 Deporte
+          🏅 Deporte
         </button>
-        <button @click="cambiarCategoria('Gym')" :class="{ active: categoriaSeleccionada === 'Gym' }"
-          class="filtro-btn">
+        <button @click="cambiarCategoria('🏋️ Gimnasio y Fitness')"
+          :class="{ active: categoriaSeleccionada === '🏋️ Gimnasio y Fitness' }" class="filtro-btn">
           🏋️ Gimnasio y Fitness
         </button>
-        <button @click="cambiarCategoria('Lugares')" :class="{ active: categoriaSeleccionada === 'Lugares' }"
-          class="filtro-btn">
+        <button @click="cambiarCategoria('📍 Lugares y Centros')"
+          :class="{ active: categoriaSeleccionada === '📍 Lugares y Centros' }" class="filtro-btn">
           📍 Lugares y Centros
         </button>
-                <button @click="cambiarCategoria('Consejos')" :class="{ active: categoriaSeleccionada === 'Consejos' }"
-          class="filtro-btn">
+        <button @click="cambiarCategoria('🧠 Consejos y Bienestar')"
+          :class="{ active: categoriaSeleccionada === '🧠 Consejos y Bienestar' }" class="filtro-btn">
           🧠 Consejos y Bienestar
         </button>
       </div>
@@ -60,7 +60,7 @@
 
 
 
-    <!-- Sección de Posts con diseño de tarjetas -->
+    <!-- Sección de Posts -->
     <div class="posts-grid">
 
       <div class="no-posts-container" v-if="postsFiltrados.length === 0">
@@ -76,17 +76,18 @@
 
       <div v-else v-for="(post, index) in postsPaginados" :key="index" class="post-card"
         :style="`--hue: ${index * 60 % 360}`">
-        <div class="post-categoria" :style="{ backgroundColor: categoryColor(post.categoria) }">
-          {{ post.categoria || 'General' }}
-        </div>
-        <div class="post-header">
-          <h3 class="post-titulo">{{ post.titulo }}</h3>
-
-          <div class="post-meta">
-            <span class="post-author">
-              {{ `${post.user_id}` }}
-            </span>
-            <span class="post-date">{{ formatDate(post.created_at) }}</span>
+        <div class="post-header-container">
+          <div class="post-categoria" :style="{ backgroundColor: categoryColor(post.categoria) }">
+            {{ post.categoria || 'General' }}
+          </div>
+          <div class="post-header">
+            <div>
+              <h3 class="post-titulo">{{ post.titulo }}</h3>
+              <div class="post-meta">
+                <span class="post-author">{{ post.user?.name || `Usuario${post.user_id}` }}</span>
+                <span class="post-date">{{ formatDate(post.created_at) }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -177,16 +178,15 @@
               <!-- Cabecera -->
               <div class="post-popout-header">
                 <div class="post-author-info">
-                  <div class="author-avatar-wrapper">
-                    <span class="author-online-dot"></span>
-                  </div>
+                  <img :src="getUserImage(postSeleccionado.user)" class="author-avatar" alt="Avatar del autor">
                   <div>
-                    <h3 class="author-name">Usuario{{ postSeleccionado.id }}</h3>
-                    <span class="post-category-badge"
-                      :style="{ backgroundColor: categoryColor(postSeleccionado.categoria) }">
-                      {{ postSeleccionado.categoria || 'General' }}
-                    </span>
+                    <h3 class="author-name">{{ postSeleccionado.user?.name || `Usuario${postSeleccionado.user_id}` }}
+                    </h3>
                   </div>
+                  <span class="post-category-badge"
+                    :style="{ backgroundColor: categoryColor(postSeleccionado.categoria) }">
+                    {{ postSeleccionado.categoria || 'General' }}
+                  </span>
                 </div>
 
                 <!-- EDITAR Y ELIMINAR POST | HAY QUE PONER QUE SI EL ID DEL USUARIO COINCIDE CON EL ID DEL USUARIO DEL POST PUES PUEDE EDITAR Y ELIMINAR DICHO POST-->
@@ -234,14 +234,13 @@
 
                   <div v-for="(comentario) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
-                      <div class="comment-avatar-placeholder">
-                        <span>{{ comentario.user_id }}</span>
-                      </div>
+                      <img :src="getUserImage(comentario.user)" class="comment-avatar" alt="Avatar del usuario">
                     </div>
                     <div class="comment-content">
                       <div class="comment-header">
 
-                        <span class="comment-author"> {{ `Usuario${comentario.user_id}` }}</span>
+                        <span class="comment-author">{{ comentario.user?.name || `Usuario${comentario.user_id}`
+                        }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.replies && comentario.replies.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -315,13 +314,11 @@
                         class="comment-replies">
                         <div v-for="reply in comentario.replies" :key="reply.id" class="comment-item reply-item">
                           <div class="comment-avatar-wrapper">
-                            <div class="comment-avatar-placeholder">
-                              <span>{{ reply.user?.id || reply.user_id || '' }}</span>
-                            </div>
+                            <img :src="getUserImage(reply.user)" class="comment-avatar" alt="Avatar del usuario">
                           </div>
                           <div class="comment-content">
                             <div class="comment-header">
-                              <span class="comment-author">{{ `Usuario${reply.user_id}` }}</span>
+                              <span class="comment-author">{{ reply.user?.name || `Usuario${reply.user_id}` }}</span>
                               <span class="comment-time">{{ formatRelativeTime(reply.created_at) }}</span>
                             </div>
 
@@ -414,7 +411,8 @@
                 </div>
 
                 <div v-else class="login-prompt">
-                  <p>Debes <router-link to="/login">iniciar sesión</router-link> para participar en la conversación</p>
+                  <p>Debes <router-link to="/login">iniciar sesión</router-link> para participar en la conversación
+                  </p>
                 </div>
 
               </div>
@@ -473,10 +471,10 @@
                 <label for="categoria">Categoría</label>
                 <select v-model="nuevoPost.categoria" id="categoria" required>
                   <option value="">Selecciona una categoría</option>
-                  <option value="Deporte">🏅 Deporte</option>
-                  <option value="Gym">🏋️ Gimnasio y Fitness</option>
-                  <option value="Experiencia">📍 Lugares y Centros</option>
-                  <option value="Lugares">📆 Eventos y Actividades</option>
+                  <option value="🏅 Deporte">🏅 Deporte</option>
+                  <option value="🏋️ Gimnasio y Fitness">🏋️ Gimnasio y Fitness</option>
+                  <option value="📍 Lugares y Centros">📍 Lugares y Centros</option>
+                  <option value="🧠 Consejos y Bienestar">🧠 Consejos y Bienestar</option>
                 </select>
               </div>
             </div>
@@ -531,7 +529,6 @@
 </template>
 
 
-
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
@@ -545,12 +542,9 @@ export default {
   },
   data() {
     return {
-
       user: [],
       currentPage: 1,
       itemsPerPage: 9,
-
-
       posts: [],
       postsFiltrados: [],
       categoriaSeleccionada: '',
@@ -569,17 +563,12 @@ export default {
       nuevoComentario: '',
       comentariosExpandidos: [],
       comentarioRespondiendo: null,
-
-
       modoEdicion: false,
       editandoComentario: null,
-
       comentarioEditado: '',
       comentarioEditando: null,
-
       replyEditando: '',
       replyEditado: null
-
     };
   },
 
@@ -751,16 +740,19 @@ export default {
           return new Date(b.created_at) - new Date(a.created_at);
         }).map(post => ({
           ...post,
+          user: post.user || {},
           isLiked: post.is_liked || false,
           likes_count: post.likes_count || 0,
           comments: (post.comments || []).map(comment => ({
             ...comment,
+            user: comment.user || {},
             isLiked: comment.is_liked || false,
-            likes: comment.likes_count || 0, // Asegurar que viene del backend
+            likes: comment.likes_count || 0,
             replies: (comment.replies || []).map(reply => ({
               ...reply,
+              user: reply.user || {},
               isLiked: reply.is_liked || false,
-              likes: reply.likes_count || 0 // Asegurar que viene del backend
+              likes: reply.likes_count || 0
             }))
           }))
         }));
@@ -815,14 +807,18 @@ export default {
         const postIndex = this.posts.findIndex(p => p.id === this.postSeleccionado.id);
         if (postIndex !== -1) {
           if (this.comentarioRespondiendo) {
-            // Es una respuesta (reply)
             const newReply = {
-              ...response.data.reply,  // Usar response.data.reply para replies
+              ...response.data.reply,
               id: response.data.reply.id,
               created_at: new Date().toISOString(),
               likes_count: 0,
               isLiked: false,
-              user_id: this.user.id  // Asegurar user_id
+              user_id: this.user.id,
+              user: {
+                id: this.user.id,
+                name: this.user.name,
+                image: this.user.image
+              }
             };
 
             const parentCommentIndex = this.posts[postIndex].comments.findIndex(
@@ -830,28 +826,29 @@ export default {
             );
 
             if (parentCommentIndex !== -1) {
-              // Inicializar array si no existe
               if (!this.posts[postIndex].comments[parentCommentIndex].replies) {
                 this.$set(this.posts[postIndex].comments[parentCommentIndex], 'replies', []);
               }
-
               this.posts[postIndex].comments[parentCommentIndex].replies.unshift(newReply);
             }
           } else {
-            // Es un comentario principal
             const newComment = {
-              ...response.data.comment,  // Usar response.data.comment para comentarios
+              ...response.data.comment,
               id: response.data.comment.id,
               created_at: new Date().toISOString(),
               likes_count: 0,
               isLiked: false,
-              user_id: this.user.id,  // Asegurar user_id
+              user_id: this.user.id,
+              user: {
+                id: this.user.id,
+                name: this.user.name,
+                image: this.user.image
+              },
               replies: []
             };
             this.posts[postIndex].comments.unshift(newComment);
           }
 
-          // 2. Actualizar el post seleccionado
           this.postSeleccionado = { ...this.posts[postIndex] };
         }
 
@@ -1201,12 +1198,12 @@ export default {
 
     categoryColor(categoria) {
       const colors = {
-        'Deporte': '#17a2b8',
-        'Gym': '#28a745',
-        'Experiencia': '#ffc107',
-        'Lugares': '#dc3545'
+        '🏅 Deporte': '#007bff',
+        '🏋️ Gimnasio y Fitness': '#6f42c1',
+        '📍 Lugares y Centros': '#fd7e14',
+        '🧠 Consejos y Bienestar': '#20c997'
       };
-      return colors[categoria] || '#6c757d';
+      return colors[categoria] || '#adb5bd';
     },
 
     formatDate(dateString) {
@@ -1258,7 +1255,24 @@ export default {
     cancelarRespuesta() {
       this.comentarioRespondiendo = null;
       this.nuevoComentario = '';
-    }
+    },
+
+
+    getUserImage(user) {
+      if (!user) {
+        return '/storage/users/Perfil-Icon.png';
+      }
+
+      if (user.image && user.image.startsWith('http')) {
+        return user.image;
+      }
+
+      if (user.image) {
+        return `/storage/users/${user.id}/${user.image}`;
+      }
+
+      return '/storage/users/Perfil-Icon.png';
+    },
 
 
   },
@@ -1410,5 +1424,60 @@ export default {
   /* Relleno rojo cuando está activo */
   stroke: #e0245e;
   /* Contorno rojo cuando está activo */
+}
+
+
+
+
+
+/* Estilos para avatares */
+.post-author-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.post-author-avatar,
+.author-avatar,
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comment-avatar-wrapper {
+  display: flex;
+  align-items: flex-start;
+}
+
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+}
+
+/* Ajustes para el popup */
+.author-avatar {
+  width: 50px;
+  height: 50px;
+}
+
+/* En modo responsive */
+@media (max-width: 768px) {
+
+  .post-author-avatar,
+  .author-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .comment-avatar {
+    width: 28px;
+    height: 28px;
+  }
 }
 </style>

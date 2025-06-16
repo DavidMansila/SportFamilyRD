@@ -64,13 +64,7 @@
                     {{ editMode ? 'Cancelar' : 'Editar Perfil' }}
                 </button>
 
-
-
             </div>
-
-            <!-- <button v-if="user.user_type === 'entrenador'" class="upload-info-btn" @click="redirectToTrainersPage">
-                Subir Info. Entrenadores
-            </button> -->
 
             <!-- Contenido del Perfil -->
             <div class="profile-content">
@@ -126,7 +120,7 @@
                             <span class="info-label">Deporte:</span>
 
                             <span v-if="!editMode" class="info-value">
-                                {{ user.categoria || 'No especificada' }} <!-- Cambiado a mostrar string simple -->
+                                {{ user.categoria || 'No especificada' }}
                             </span>
 
                             <multiselect v-else v-model="user.categoria" :options="deportes" :multiple="false"
@@ -338,33 +332,6 @@
                     </div>
                 </div>
 
-                <!-- Sección de Redes Sociales -->
-                <!-- <div class="profile-section">
-                    <h2>Redes Sociales</h2>
-                    <div class="social-links">
-                        <div v-for="(social, index) in user.social_links" :key="index" class="social-item">
-                            <select v-model="social.platform" v-if="editMode">
-                                <option value="facebook">Facebook</option>
-                                <option value="twitter">Twitter</option>
-                                <option value="instagram">Instagram</option>
-                                <option value="linkedin">LinkedIn</option>
-                                <option value="youtube">YouTube</option>
-                            </select>
-                            <span v-else class="social-icon">
-                                <img :src="getSocialIcon(social.platform)" :alt="social.platform">
-                            </span>
-                            <input type="text" v-model="social.url" :placeholder="'Enlace de ' + social.platform"
-                                :readonly="!editMode">
-                            <button v-if="editMode" @click="removeSocialLink(index)" class="remove-social">
-                                ×
-                            </button>
-                        </div>
-                        <button v-if="editMode" @click="" class="add-social">
-                            + Añadir Red Social
-                        </button>
-                    </div>
-                </div> -->
-
             </div>
 
             <!-- Botones de acción en modo edición -->
@@ -460,6 +427,8 @@ export default {
                 .then(response => {
                     this.entrenadores = response.data.trainers;
                     this.filtroEntrenadores();
+
+                    this.originalTrainerData = JSON.parse(JSON.stringify(this.trainer));
                 })
                 .catch(error => {
                     console.error('Error al cargar entrenadores:', error);
@@ -474,7 +443,7 @@ export default {
                 this.trainer = { ...entrenador };
                 this.originalTrainerData = JSON.parse(JSON.stringify(entrenador));
 
-                // Asignar propiedades específicas de entrenador
+                // Asignar propiedades de entrenador
                 this.user.categoria = this.trainer.sport_category;
 
                 // Manejar especialidades
@@ -487,7 +456,7 @@ export default {
                     ? [...this.trainer.achievements]
                     : [];
 
-                // Manejar horario - ¡CORRECCIÓN CLAVE AQUÍ!
+                // Manejar horario
                 this.user.schedule = this.parseSchedule(this.trainer.schedule);
             }
         },
@@ -579,6 +548,11 @@ export default {
                     this.user.schedule = this.parseSchedule(trainerResponse.data.trainer.schedule);
                 }
 
+                this.originalUserData = JSON.parse(JSON.stringify(this.user));
+                if (this.user.user_type === 'entrenador' && this.trainer) {
+                    this.originalTrainerData = JSON.parse(JSON.stringify(this.trainer));
+                }
+
                 this.editMode = false;
                 alert('¡Perfil actualizado correctamente!');
 
@@ -654,8 +628,22 @@ export default {
 
         discardChanges() {
             this.user = JSON.parse(JSON.stringify(this.originalUserData));
+
+            // Si es entrenador, restaurar también los datos específicos
+            if (this.user.user_type === 'entrenador' && this.originalTrainerData) {
+                this.user.categoria = this.originalTrainerData.sport_category;
+                this.user.especialidades = this.originalTrainerData.specialties
+                    ? this.originalTrainerData.specialties.map(s => s.description)
+                    : [];
+                this.user.achievements = this.originalTrainerData.achievements
+                    ? [...this.originalTrainerData.achievements]
+                    : [];
+                this.user.schedule = this.parseSchedule(this.originalTrainerData.schedule);
+            }
+
             this.editMode = false;
         },
+
 
         getChangedFields() {
             const changes = {};
@@ -666,6 +654,7 @@ export default {
             });
             return changes;
         },
+
 
         formatPhone(number) {
             if (!number) return '';
@@ -678,6 +667,7 @@ export default {
             }
             return number; // Retornar el valor original si no coincide
         },
+
 
         formatPhoneInput(event) {
             const input = event.target.value;

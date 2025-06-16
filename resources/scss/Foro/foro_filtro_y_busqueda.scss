@@ -271,18 +271,13 @@
 .post-categoria,
 .post-category-badge {
     display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    padding: 10px;
+    border-radius:30px;
     color: white;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: bold;
     text-transform: uppercase;
-    margin-bottom: 0.5rem;
-}
-
-.post-category-badge {
-    font-size: 0.65rem;
-    padding: 0.2rem 0.4rem;
+    margin-left: 10px;
 }
 
 .post-categoria:hover,
