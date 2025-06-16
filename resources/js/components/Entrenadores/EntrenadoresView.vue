@@ -207,6 +207,8 @@
                 <p v-if="user.email"><strong>Email:</strong> {{ user.email }}</p>
               </div>
             </div>
+            <p class="mensaje"> <strong> Tus datos de perfil serán enviados al entrenador para que pueda conocerte mejor
+              </strong> </p>
           </div>
 
           <form @submit.prevent="enviarFormularioContacto" class="contact-form">
@@ -234,7 +236,9 @@
                   d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              Tus datos de perfil serán enviados al entrenador para que pueda conocerte mejor
+              Solo podras mandar una solicitud por semana a cada entrenador. Si ya has enviado una solicitud reciente,
+              no
+              podrás enviar otra hasta que se procese la anterior.
             </p>
 
             <button type="submit" class="submit-btn">Enviar Solicitud</button>
@@ -434,42 +438,57 @@ export default {
     },
 
 
-    enviarFormularioContacto() {
-      // Verificar que el usuario está autenticado
+    async enviarFormularioContacto() {
+
       if (!this.user || !this.user.id) {
         alert('Debes iniciar sesión para contactar a un entrenador');
         return;
       }
-
-      // Preparar los datos para enviar
-      const formData = {
-        user_id: this.user.id,
-        trainer_id: this.contactoEntrenador.trainer_id,  // ID de la tabla trainers
-        trainer_user_id: this.contactoEntrenador.user_id, // ID de usuario del entrenador
-        sport_level: this.formularioContacto.nivel,
-        description: this.formularioContacto.objetivos,
-        status: 'pending'
-      };
-
-      axios.post('/training', formData)
-        .then(response => {
-          if (response.status === 201) {
-            alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
-            this.cerrarFormularioContacto();
-            this.cerrarPerfil();
-          }
-        })
-        .catch(error => {
-          if (error.response?.status === 422) {
-            const errors = error.response.data.errors;
-            let errorMsg = Object.values(errors).flat().join('\n');
-            alert(`Error de validación:\n${errorMsg}`);
-          } else {
-            // Otros errores
-            console.error('Error completo:', error);
-            alert('Error al enviar la solicitud');
+      try {
+        // Verificar si ya existe una solicitud reciente para este entrenador
+        const checkResponse = await axios.get('/training/check-existing', {
+          params: {
+            user_id: this.user.id,
+            trainer_id: this.contactoEntrenador.trainer_id
           }
         });
+
+        if (checkResponse.data.exists) {
+          alert(`Ya has enviado una solicitud a ${this.contactoEntrenador.nombre} recientemente. Solo puedes enviar una solicitud por semana a cada entrenador.`);
+          return;
+        }
+
+        const formData = {
+          user_id: this.user.id,
+          trainer_id: this.contactoEntrenador.trainer_id,
+          trainer_user_id: this.contactoEntrenador.user_id,
+          sport_level: this.formularioContacto.nivel,
+          description: this.formularioContacto.objetivos,
+          status: 'pending'
+        };
+
+        axios.post('/training', formData)
+          .then(response => {
+            if (response.status === 201) {
+              alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
+              this.cerrarFormularioContacto();
+              this.cerrarPerfil();
+            }
+          })
+          .catch(error => {
+            if (error.response?.status === 422) {
+              const errors = error.response.data.errors;
+              let errorMsg = Object.values(errors).flat().join('\n');
+              alert(`Error de validación:\n${errorMsg}`);
+            } else {
+              console.error('Error completo:', error);
+              alert('Error al enviar la solicitud');
+            }
+          });
+      } catch (error) {
+        console.error('Error verificando solicitudes existentes:', error);
+        alert('Solo puedes enviar una solicitud por semana a cada entrenador.');
+      }
     },
 
 
@@ -477,8 +496,8 @@ export default {
       axios.get('/trainer/approved')
         .then(response => {
           this.entrenadores = response.data.trainers.map(trainer => ({
-            trainer_id: trainer.id,        // ID real de trainers
-            user_id: trainer.user_id,      // ID de usuario asociado
+            trainer_id: trainer.id,
+            user_id: trainer.user_id,
             nombre: trainer.name,
             deporte: trainer.sport_category,
             experiencia: trainer.experience,
@@ -999,5 +1018,11 @@ export default {
   svg {
     flex-shrink: 0;
   }
+}
+
+.mensaje {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 10px;
 }
 </style>

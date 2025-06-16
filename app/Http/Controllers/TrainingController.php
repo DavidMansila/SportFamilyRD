@@ -139,4 +139,21 @@ class TrainingController extends Controller
             ];
         });
     }
+
+
+
+    public function checkExisting(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer',
+            'trainer_id' => 'required|integer',
+        ]);
+
+        $exists = Training::where('user_id', $request->user_id)
+            ->where('trainer_id', $request->trainer_id)
+            ->where('created_at', '>=', now()->subWeek())
+            ->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
 }

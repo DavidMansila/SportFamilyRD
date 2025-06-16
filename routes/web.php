@@ -143,7 +143,7 @@ Route::resource('/trainer', TrainerController::class);
 //training
 Route::resource('/training', TrainingController::class);
 Route::get('/training/{id}', [TrainingController::class, 'show']);
-
+Route::get('/training/check-existing', [TrainingController::class, 'checkExisting']);
 
 //Chats
 
