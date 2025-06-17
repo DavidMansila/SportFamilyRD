@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <VerificaCorreo v-if="user && !user.email_verified_at && !isLoginOrHome" :user="user" />
-    <router-view v-else />
+    <router-view v-else-if="user || publicRoutes.includes($route.path)" />
   </div>
 </template>
 
@@ -20,6 +20,7 @@ export default {
     return {
       user: null,
       isLoginOrHome: false,
+      publicRoutes: ['/', '/signup', '/login'],
     };
   },
   watch: {
@@ -32,7 +33,14 @@ export default {
           this.user = JSON.parse(storedUser);
         } catch (e) {
           sessionStorage.removeItem('user');
+          this.user = null;
         }
+      } else {
+        this.user = null;
+      }
+      // Redirigir a / si intenta acceder a ruta protegida sin user
+      if (!this.user && !this.publicRoutes.includes(to.path)) {
+        this.$router.replace('/');
       }
     }
   },
@@ -40,52 +48,16 @@ export default {
     this.checkRoute(this.$route);
     // Inicializar user desde sessionStorage inmediatamente
     const storedUser = sessionStorage.getItem('user');
-    this.user = JSON.parse(storedUser);
-    console.log('User from sessionStorage:', this.user);
     if (storedUser) {
       try {
         this.user = JSON.parse(storedUser);
       } catch (e) {
         sessionStorage.removeItem('user');
+        this.user = null;
       }
-    }
-    this.loadUser();
-    // Si hay una URL de verificación guardada y el usuario ya está autenticado, redirigir automáticamente
-    const verifyUrl = sessionStorage.getItem('verifyUrl');
-    if (verifyUrl && this.user && !this.user.email_verified_at) {
-      sessionStorage.removeItem('verifyUrl');
-      this.$router.replace(verifyUrl);
     }
   },
   methods: {
-    async loadUser() {
-      const storedUser = sessionStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const parsedUser = JSON.parse(storedUser);
-          if (parsedUser && parsedUser.id && parsedUser.email) {
-            this.user = parsedUser;
-          } else {
-            sessionStorage.removeItem('user');
-            this.user = null;
-          }
-        } catch (e) {
-          sessionStorage.removeItem('user');
-          this.user = null;
-        }
-      } else {
-        this.user = null;
-      }
-    },
-
-    handleAuthError(error) {
-      if (error.response?.status === 401) {
-        this.user = null;
-        sessionStorage.removeItem('user');
-        this.$router.push('/login');
-      }
-    },
-
     checkRoute(route) {
       const loginPaths = ['/', '/signUp', '/signup'];
       this.isLoginOrHome = loginPaths.includes(route.path);

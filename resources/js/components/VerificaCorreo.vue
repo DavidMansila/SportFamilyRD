@@ -3,7 +3,7 @@
     <h2>Verifica tu correo electrónico</h2>
     <p>Hemos enviado un enlace de verificación a <b>{{ user.email }}</b>. Por favor, revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.</p>
     <p>Puedes chequear el spam si el correo no llega de 2-5 segundos.</p>
-    <p>Para tu seguridad, solo puedes verificar tu cuenta usando el enlace enviado a tu correo electrónico.</p>
+    <!-- <p>Para tu seguridad, solo puedes verificar tu cuenta usando el enlace enviado a tu correo electrónico.</p> -->
     <p v-if="reenviado" style="color: green;">¡Correo de verificación reenviado!</p>
     <button @click="reenviarCorreo" :disabled="reenviando" style="margin-top: 1rem;">
       <span v-if="reenviando">Enviando...</span>
