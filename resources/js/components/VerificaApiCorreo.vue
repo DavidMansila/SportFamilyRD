@@ -37,7 +37,7 @@ onMounted(async () => {
     const res = await axios.get(`/api/email/verify/${id}/${hash}`);
     mensaje.value = res.data.message;
     verificado.value = true;
-    // Redirigir automáticamente después de 2 segundos
+    
     setTimeout(() => {
       router.replace(redirectTo.value);
     }, 2000);
