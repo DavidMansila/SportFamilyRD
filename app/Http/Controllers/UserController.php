@@ -60,8 +60,8 @@ class UserController extends Controller
             ]);
 
             //iniciar sesion automaticamente al crear un usuario y mandar correo
-            event(new Registered($user));
             Auth::login($user);
+            event(new Registered($user));
 
             return response()->json([
                 'message' => 'Usuario creado con éxito',

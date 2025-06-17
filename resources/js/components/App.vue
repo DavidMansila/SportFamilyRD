@@ -1,57 +1,95 @@
 <template>
   <div class="app-container">
-    <router-view />
+    <VerificaCorreo v-if="user && !user.email_verified_at && !isLoginOrHome" :user="user" />
+    <router-view v-else />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import ProductModal from '../components/CarritoComponent.vue';
+import VerificaCorreo from './VerificaCorreo.vue';
 
 export default {
   components: {
     ProductModal
   },
   name: 'App',
+  components: { VerificaCorreo },
   data() {
     return {
       user: null,
+      isLoginOrHome: false,
     };
   },
-  async created() {
-    // await this.loadUser();
+  watch: {
+    '$route'(to) {
+      this.checkRoute(to);
+      // Recargar el usuario desde sessionStorage en cada cambio de ruta
+      const storedUser = sessionStorage.getItem('user');
+      if (storedUser) {
+        try {
+          this.user = JSON.parse(storedUser);
+        } catch (e) {
+          sessionStorage.removeItem('user');
+        }
+      }
+    }
+  },
+  created() {
+    this.checkRoute(this.$route);
+    // Inicializar user desde sessionStorage inmediatamente
+    const storedUser = sessionStorage.getItem('user');
+    this.user = JSON.parse(storedUser);
+    console.log('User from sessionStorage:', this.user);
+    if (storedUser) {
+      try {
+        this.user = JSON.parse(storedUser);
+      } catch (e) {
+        sessionStorage.removeItem('user');
+      }
+    }
+    this.loadUser();
+    // Si hay una URL de verificación guardada y el usuario ya está autenticado, redirigir automáticamente
+    const verifyUrl = sessionStorage.getItem('verifyUrl');
+    if (verifyUrl && this.user && !this.user.email_verified_at) {
+      sessionStorage.removeItem('verifyUrl');
+      this.$router.replace(verifyUrl);
+    }
   },
   methods: {
-    // async loadUser() {
-    //   try {
-    //     const storedUser = localStorage.getItem('user');
-    //     if (storedUser) {
-    //       try {
-    //         this.user = JSON.parse(storedUser);
-    //       } catch (e) {
-    //         console.error('Failed to parse stored user:', e);
-    //         localStorage.removeItem('user');
-    //       }
-    //     }
+    async loadUser() {
+      const storedUser = sessionStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser && parsedUser.id && parsedUser.email) {
+            this.user = parsedUser;
+          } else {
+            sessionStorage.removeItem('user');
+            this.user = null;
+          }
+        } catch (e) {
+          sessionStorage.removeItem('user');
+          this.user = null;
+        }
+      } else {
+        this.user = null;
+      }
+    },
 
-    //     const response = await axios.get('/current-user');
-    //     if (response.data) {
-    //       this.user = response.data;
-    //       localStorage.setItem('user', JSON.stringify(response.data));
-    //     }
-    //   } catch (error) {
-    //     console.error('Error loading user:', error);
-    //     this.handleAuthError(error);
-    //   }
-    // },
+    handleAuthError(error) {
+      if (error.response?.status === 401) {
+        this.user = null;
+        sessionStorage.removeItem('user');
+        this.$router.push('/login');
+      }
+    },
 
-    // handleAuthError(error) {
-    //   if (error.response?.status === 401) {
-    //     this.user = null;
-    //     localStorage.removeItem('user');
-    //     this.$router.push('/login');
-    //   }
-    // },
+    checkRoute(route) {
+      const loginPaths = ['/', '/signUp', '/signup'];
+      this.isLoginOrHome = loginPaths.includes(route.path);
+    }
   },
 };
 </script>
