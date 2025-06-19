@@ -5,27 +5,21 @@ import Echo from "laravel-echo";
 // Configura Axios
 window.axios = axios;
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+axios.defaults.withCredentials = true;
 
-// Configura Echo/Pusher SOLO después de que el DOM esté listo
 document.addEventListener("DOMContentLoaded", () => {
-    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-
-    if (!csrfMeta) {
-        console.error("ERROR: Meta tag CSRF no encontrado. Revisa tu HTML.");
-        return;
-    }
+    const pusherConfig = {
+        broadcaster: "pusher",
+        key: "337abba0601b16bbbce2", // Key directa
+        cluster: "mt1", // Cluster directo
+        forceTLS: true,
+        encrypted: true,
+        disableStats: true,
+        // authEndpoint: "/broadcasting/auth", // COMENTA ESTA LÍNEA
+    };
 
     window.Pusher = Pusher;
-    window.Echo = new Echo({
-        broadcaster: "pusher",
-        key: import.meta.env.VITE_PUSHER_APP_KEY,
-        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-        forceTLS: true,
-        authEndpoint: "/broadcasting/auth",
-        auth: {
-            headers: {
-                "X-CSRF-TOKEN": csrfMeta.content,
-            },
-        },
-    });
+    window.Echo = new Echo(pusherConfig);
+
+    console.log("Pusher inicializado sin autenticación CSRF");
 });

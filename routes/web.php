@@ -11,6 +11,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SavedNewsController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 use App\Models\News;
@@ -143,7 +144,8 @@ Route::resource('/trainer', TrainerController::class);
 //training
 Route::resource('/training', TrainingController::class);
 Route::get('/training/{id}', [TrainingController::class, 'show']);
-Route::get('/training/check-existing', [TrainingController::class, 'checkExisting']);
+Route::post('/training/check-existing', [TrainingController::class, 'checkExisting']);
+Route::post('/training', [TrainingController::class, 'store']);
 
 //Chats
 
@@ -156,8 +158,10 @@ Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
 
 Route::post('/messages/send', [ChatController::class, 'sendMessage']);
 
+Route::post('/chats/{chat}/messages', [MessageController::class, 'store']);
 
-Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
+// Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 
 

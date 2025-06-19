@@ -2,7 +2,6 @@
 
 return [
 
-
     'connections' => [
         'pusher' => [
             'driver' => 'pusher',
@@ -11,11 +10,15 @@ return [
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
                 'encrypted' => true,
                 'host' => '127.0.0.1',
-                'port' => 5173,
+                'port' => 8000,
                 'scheme' => 'http',
-                'useTLS' => false,
+                'curl_options' => [
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_SSL_VERIFYPEER => 0,
+                ]
             ],
         ],
     ],

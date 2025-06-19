@@ -10,17 +10,17 @@ class Chat extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
     public function trainer()
     {
-        return $this->belongsTo(User::class, 'trainer_id');
+        return $this->belongsTo(Trainer::class);
     }
 
     public function messages()
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Message::class)->orderBy('created_at', 'asc');
     }
 
     public function lastMessage()

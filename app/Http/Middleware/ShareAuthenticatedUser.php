@@ -24,7 +24,6 @@ class ShareAuthenticatedUser
             View::share('authUser', null);
         }
 
-        // Opcional: Compartir para APIs (si usas Inertia.js o similar)
         if ($request->wantsJson()) {
             $request->attributes->set('authUser', Auth::user());
         }
