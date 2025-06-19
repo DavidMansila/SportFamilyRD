@@ -21,6 +21,9 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Hash;
+
 
 Route::get('/sanctum/csrf-cookie', function (Request $request) {
     return response()->noContent()->withHeaders([
@@ -31,8 +34,6 @@ Route::get('/sanctum/csrf-cookie', function (Request $request) {
 
 Route::post('login', [AuthController::class, 'login'])->middleware('cors');
 Route::post('logout', [AuthController::class, 'logout']);
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Hash;
 
 
 // Rutas públicas
@@ -71,6 +72,12 @@ Route::delete('/cart/items/{item}', [CartController::class, 'removeItem']);
 // Posts
 Route::resource('/post', PostController::class);
 Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
+//Rutas para funciones en el back
+// Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);
+
+// Rutas de autenticación
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 
 // Agrupar rutas protegidas por auth
 
@@ -260,7 +267,40 @@ Route::middleware('auth')->group(function () {
     })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 
-    // --- MANSI, LA RUTA CATCH-ALL SPA AL FINAL SIEMPRE ---
-    Route::get('/{any}', function () {
-        return view('app');
-    })->where('any', '.*');
+// --- RUTAS DE VERIFICACIÓN DE EMAIL (deben ir antes del catch-all) ---
+
+// API para verificar email sin sesión activa
+Route::get('/api/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
+    $user = \App\Models\User::findOrFail($id);
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        return response()->json(['message' => 'Enlace de verificación inválido.'], 403);
+    }
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'El correo ya está verificado.'], 200);
+    }
+    $user->markEmailAsVerified();
+    return response()->json(['message' => 'Correo verificado con éxito.'], 200);
+});
+
+
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// aqui laravel Maneja el clic en el enlace de verificación (el del correo)
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// aqui para reenvíar el email de verificación
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+
+// --- MANSI, LA RUTA CATCH-ALL DEL SPA AL FINAL SIEMPRE ---
+Route::get('/{any}', function () {
+    return view('app');
+})->where('any', '.*');

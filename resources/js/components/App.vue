@@ -38,7 +38,7 @@ export default {
       } else {
         this.user = null;
       }
-      // Redirigir a / si intenta acceder a ruta protegida sin user
+      // Redirigir a / si intenta acceder a ruta protegida sin estar logeado
       if (!this.user && !this.publicRoutes.includes(to.path)) {
         this.$router.replace('/');
       }

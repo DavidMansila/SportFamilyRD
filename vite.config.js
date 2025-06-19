@@ -37,10 +37,10 @@ export default defineConfig({
     //      strictPort: true,
     //      allowedHosts: 'all',
     //  },
-
+    
     // server: {
-    //     host: '10.0.0.7',
-    //     port: 5173,
+    //     host: '10.0.0.7',           
+    //     port: 5173,               
     //     strictPort: true,
     //     allowedHosts: 'all',
     // },
