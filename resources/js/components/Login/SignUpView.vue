@@ -167,24 +167,21 @@ export default {
 
     async submitForm() {
       try {
-        const response = await axios.post('/user', this.registerForm);
+        console.log('Registering:', this.registerForm);
 
-        const loginResponse = await axios.post('/login', {
-          email: this.registerForm.email,
-          password: this.registerForm.password,
-        });
-
-        localStorage.setItem('auth_token', loginResponse.data.token);
-        sessionStorage.setItem('user', JSON.stringify(loginResponse.data.user));
-        axios.defaults.headers.common['Authorization'] = `Bearer ${loginResponse.data.token}`;
-
-        this.$router.push('/');
+        axios.post('/user', this.registerForm)
+          .then(response => {
+            sessionStorage.setItem('user', JSON.stringify(response.data.user));
+            this.$router.push('/');
+          })
+          .catch((error) => {
+            console.log(error);
+            alert('Algo salió mal, por favor intenta de nuevo');
+          });
       } catch (error) {
-        console.error('Registration error:', error);
-        alert('Error en el registro: ' + error.response.data.message);
+        console.error(error);
       }
     },
-
 
     async submitLoginForm() {
       this.isSubmitting = true;
@@ -194,24 +191,29 @@ export default {
           password: this.loginForm.password,
         });
 
-        // Guardar token en localStorage
-        localStorage.setItem('auth_token', response.data.token);
+        const { user, token } = response.data;
 
-        // Guardar usuario en sessionStorage
-        sessionStorage.setItem('user', JSON.stringify(response.data.user));
+        // Guardar token en sessionStorage
+        sessionStorage.setItem('auth_token', token);
+        sessionStorage.setItem('user', JSON.stringify(user));
 
-        // Configurar Axios para futuras solicitudes
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        // Configurar Axios para usar el token
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+        alert('Bienvenido de nuevo!');
         this.$router.push('/');
       } catch (error) {
-        console.error('Login error:', error);
-        alert('Credenciales incorrectas');
+        if (error.response?.status === 401) {
+          alert('Credenciales incorrectas');
+        } else {
+          alert('Error en el servidor');
+          console.error(error);
+        }
       }
       this.isSubmitting = false;
     },
 
-    
+
     checkLogoutMessage() {
       if (this.$route.query.logoutSuccess || sessionStorage.getItem('logoutMessage')) {
         this.showLogoutMessage = true;

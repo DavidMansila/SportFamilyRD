@@ -29,16 +29,16 @@ export default defineConfig({
     server: {
         allowedHosts: true,
     },
-    define: {
-        "process.env": {
-            VITE_PUSHER_APP_KEY: JSON.stringify(
-                process.env.VITE_PUSHER_APP_KEY
-            ),
-            VITE_PUSHER_APP_CLUSTER: JSON.stringify(
-                process.env.VITE_PUSHER_APP_CLUSTER
-            ),
-        },
-    },
+    // define: {
+    //     "process.env": {
+    //         VITE_PUSHER_APP_KEY: JSON.stringify(
+    //             process.env.VITE_PUSHER_APP_KEY
+    //         ),
+    //         VITE_PUSHER_APP_CLUSTER: JSON.stringify(
+    //             process.env.VITE_PUSHER_APP_CLUSTER
+    //         ),
+    //     },
+    // },
     //  server: {
     //      host: '10.0.0.6',           // <--mansi aqui pon tu ip
     //      port: 5173,

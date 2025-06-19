@@ -23,17 +23,16 @@ class BroadcastServiceProvider extends ServiceProvider
     public function boot()
     {
         // Deshabilitar completamente broadcasting en desarrollo
-        // if (app()->environment('local')) {
-        //     return;
-        // }
+        if (app()->environment('local')) {
+            return;
+        }
 
-        // Broadcast::routes(['middleware' => ['web', 'auth']]);
-
+        // Broadcast::routes(['middleware' => ['auth:sanctum']]);
         require base_path('routes/channels.php');
     }
 
-    // public function authenticate(Request $request)
-    // {
-    //     return Broadcast::auth($request);
-    // }
+    public function authenticate(Request $request)
+    {
+        return Broadcast::auth($request);
+    }
 }

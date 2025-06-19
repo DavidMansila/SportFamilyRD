@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -123,5 +124,26 @@ class User extends Authenticatable
     public function userChats()
     {
         return $this->hasMany(Chat::class, 'user_id');
+    }
+
+
+
+    /**
+     * Generate a new API token for the user
+     */
+    public function generateAuthToken()
+    {
+        $this->api_token = Str::random(60);
+        $this->save();
+        return $this->api_token;
+    }
+
+    /**
+     * Clear the user's API token
+     */
+    public function clearAuthToken()
+    {
+        $this->api_token = null;
+        $this->save();
     }
 }

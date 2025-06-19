@@ -2,45 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
+use App\Models\User;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $credentials = $request->only('email', 'password');
 
-        $user = User::where('email', $request->email)->first();
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $token = $user->generateAuthToken();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
-            ]);
+            $user->image = $user->image
+                ? url('storage/users/' . $user->id . '/' . $user->image)
+                : url('storage/users/Perfil-Icon.png');
+
+            return response()->json([
+                'message' => 'Login successful',
+                'user' => $user,
+                'token' => $token
+            ], 200);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        $user->image = $user->image
-            ? url('storage/users/' . $user->id . '/' . $user->image)
-            : url('storage/users/Perfil-Icon.png');
-
         return response()->json([
-            'message' => 'Login successful',
-            'user' => $user,
-            'token' => $token,
-        ], 200);
+            'message' => 'Invalid credentials',
+        ], 401);
     }
 
     public function logout(Request $request)
     {
-        // Revocar todos los tokens del usuario
-        $request->user()->tokens()->delete();
+        $user = $request->user();
+        $user->clearAuthToken();
 
         return response()->json(['message' => 'Logout successful'], 200);
     }
@@ -48,6 +44,11 @@ class AuthController extends Controller
     public function currentUser(Request $request)
     {
         $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
         $user->image = $user->image
             ? url('storage/users/' . $user->id . '/' . $user->image)
             : url('storage/users/Perfil-Icon.png');

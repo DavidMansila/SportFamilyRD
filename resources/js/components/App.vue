@@ -6,8 +6,12 @@
 
 <script>
 import axios from 'axios';
+import ProductModal from '../components/CarritoComponent.vue';
 
 export default {
+  components: {
+    ProductModal
+  },
   name: 'App',
   data() {
     return {
@@ -85,9 +89,17 @@ body {
   }
 
   /* Typography */
-  h1 { font-size: 1.6rem; }
-  h2 { font-size: 1.4rem; }
-  h3 { font-size: 1.2rem; }
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
 
   /* Form Elements */
   input,
@@ -101,7 +113,7 @@ body {
   }
 
   /* Layout Utilities */
-  .container, 
+  .container,
   .content-wrapper {
     padding: 0 12px;
   }

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+
     protected $commands = [
         \App\Console\Commands\ImportSportsNews::class,
     ];
@@ -23,20 +24,23 @@ class Kernel extends ConsoleKernel
         require base_path('routes/web.php');
     }
 
-    protected $middlewareGroups = [
-        'web' => [
-            //            \App\Http\Middleware\EncryptCookies::class, // Removed because class not found
-            // \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            // \Illuminate\Session\Middleware\StartSession::class,
-            // \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            // // \App\Http\Middleware\VerifyCsrfToken::class, // COMENTA O ELIMINA ESTA LÍNEA
-            // \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ],
+    // protected $middlewareGroups = [
+    //     'web' => [
+    //         // \App\Http\Middleware\EncryptCookies::class,
+    //         \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    //         \Illuminate\Session\Middleware\StartSession::class,
+    //         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    //         // \App\Http\Middleware\VerifyCsrfToken::class, // Asegúrate que está presente
+    //         \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    //     ],
+    // ];
 
-        'api' => [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            'throttle:api',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ],
+    protected $routeMiddleware = [
+        'api.token' => \App\Http\Middleware\ApiTokenAuth::class,
     ];
+
+    protected $middleware = [
+    // ...
+    \Illuminate\Http\Middleware\HandleCors::class,
+];
 }
