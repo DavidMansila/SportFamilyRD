@@ -167,52 +167,51 @@ export default {
 
     async submitForm() {
       try {
-        console.log('Registering:', this.registerForm);
+        const response = await axios.post('/user', this.registerForm);
 
-        axios.post('/user', this.registerForm)
-          .then(response => {
-            sessionStorage.setItem('user', JSON.stringify(response.data.user));
-            this.$router.push('/');
-          })
-          .catch((error) => {
-            console.log(error);
-            alert('Algo salió mal, por favor intenta de nuevo');
-          });
+        const loginResponse = await axios.post('/login', {
+          email: this.registerForm.email,
+          password: this.registerForm.password,
+        });
+
+        localStorage.setItem('auth_token', loginResponse.data.token);
+        sessionStorage.setItem('user', JSON.stringify(loginResponse.data.user));
+        axios.defaults.headers.common['Authorization'] = `Bearer ${loginResponse.data.token}`;
+
+        this.$router.push('/');
       } catch (error) {
-        console.error(error);
+        console.error('Registration error:', error);
+        alert('Error en el registro: ' + error.response.data.message);
       }
     },
+
 
     async submitLoginForm() {
       this.isSubmitting = true;
       try {
-        console.log('Logging in:', this.loginForm);
-
-        axios.post('/login', {
+        const response = await axios.post('/login', {
           email: this.loginForm.email,
           password: this.loginForm.password,
-        })
-          .then((response) => {
-            console.log(response);
-            // Manejar inicio de sesión exitoso
-            alert('Bienvenido de nuevo!');
-            sessionStorage.setItem('user', JSON.stringify(response.data.user));
-            this.$router.push('/');
-          })
-          .catch((error) => {
-            console.log(error);
-            // Mostrar mensaje de error
-            alert('Credenciales incorrectas');
-          });
+        });
 
+        // Guardar token en localStorage
+        localStorage.setItem('auth_token', response.data.token);
+
+        // Guardar usuario en sessionStorage
+        sessionStorage.setItem('user', JSON.stringify(response.data.user));
+
+        // Configurar Axios para futuras solicitudes
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+
+        this.$router.push('/');
       } catch (error) {
-        console.error(error);
+        console.error('Login error:', error);
+        alert('Credenciales incorrectas');
       }
       this.isSubmitting = false;
     },
 
-
-
+    
     checkLogoutMessage() {
       if (this.$route.query.logoutSuccess || sessionStorage.getItem('logoutMessage')) {
         this.showLogoutMessage = true;

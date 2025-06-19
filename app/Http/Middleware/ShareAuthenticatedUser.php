@@ -17,15 +17,24 @@ class ShareAuthenticatedUser
      */
     public function handle($request, Closure $next)
     {
+        // Verificar token Sanctum
+        if ($request->bearerToken()) {
+            $user = \Laravel\Sanctum\PersonalAccessToken::findToken($request->bearerToken())?->tokenable;
+            if ($user) {
+                Auth::setUser($user);
+                View::share('authUser', $user);
+                $request->attributes->set('authUser', $user);
+                return $next($request);
+            }
+        }
+
         // Compartir usuario autenticado con todas las vistas
         if (Auth::check()) {
             View::share('authUser', Auth::user());
+            $request->attributes->set('authUser', Auth::user());
         } else {
             View::share('authUser', null);
-        }
-
-        if ($request->wantsJson()) {
-            $request->attributes->set('authUser', Auth::user());
+            $request->attributes->set('authUser', null);
         }
 
         return $next($request);

@@ -2,52 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        $user = User::where('email', $request->email)->first();
 
-            // Obtener el usuario autenticado
-            $user = Auth::user();
-           
-            $user->image = $user->image 
-            ? url('storage/users/' . $user->id . '/' . $user->image) 
-            : url('storage/users/Perfil-Icon.png');
-
-
-            // Devolver el rol del usuario junto con el mensaje de éxito
-            return response()->json([
-                'message' => 'Login successful',
-                'user' => $user,
-            ], 200);
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Las credenciales proporcionadas son incorrectas.'],
+            ]);
         }
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $user->image = $user->image
+            ? url('storage/users/' . $user->id . '/' . $user->image)
+            : url('storage/users/Perfil-Icon.png');
+
         return response()->json([
-            'message' => 'Invalid credentials',
-            'credenciales' => $credentials,
-        ], 401);
+            'message' => 'Login successful',
+            'user' => $user,
+            'token' => $token,
+        ], 200);
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Revocar todos los tokens del usuario
+        $request->user()->tokens()->delete();
 
         return response()->json(['message' => 'Logout successful'], 200);
     }
 
     public function currentUser(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        $user->image = $user->image
+            ? url('storage/users/' . $user->id . '/' . $user->image)
+            : url('storage/users/Perfil-Icon.png');
+
+        return response()->json($user);
     }
-
-
 }

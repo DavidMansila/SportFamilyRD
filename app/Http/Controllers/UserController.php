@@ -45,8 +45,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            //todo ponerle confirmed cuando david mande el front
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         try {
@@ -55,16 +54,12 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'user_type' => 'user',
-                'image' => url('storage/users/Perfil-Icon.png'),
             ]);
-
-            //iniciar sesion automaticamente al crear un usuario
-            Auth::login($user);
 
             return response()->json([
                 'message' => 'Usuario creado con éxito',
                 'user' => $user,
-            ], 200);
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error: ' . $e->getMessage()

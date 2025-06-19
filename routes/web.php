@@ -27,6 +27,11 @@ Route::resource('/user', UserController::class);
 Route::get('/user-stats/{user}', [UserController::class, 'stats']);
 Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
 
+// Rutas de autenticación
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::get('/user', [AuthController::class, 'currentUser'])->middleware('auth:sanctum');
+
 //productos
 Route::resource('/products', ProductController::class);
 Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
@@ -60,13 +65,6 @@ Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
 Route::post('/post/create-reply/{commentId}', [PostController::class, 'createReply']);
 Route::put('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
 Route::delete('/post/destroy-reply/{replyId}', [PostController::class, 'destroyReply']);
-
-// Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);
-
-// Rutas de autenticación
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
-
 
 // SCRAPPER
 // Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);

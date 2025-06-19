@@ -145,8 +145,9 @@ export default {
       try {
         await axios.post('/logout');
         this.clearAuthData();
+        localStorage.removeItem('auth_token');
         sessionStorage.removeItem('user');
-        sessionStorage.removeItem('savedNews');
+        delete axios.defaults.headers.common['Authorization'];
 
         // Disparar evento para notificar a otros componentes
         window.dispatchEvent(new Event('user-logged-out'));
