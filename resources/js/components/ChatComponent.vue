@@ -114,7 +114,6 @@ export default {
         return '/storage/users/Perfil-Icon.png';
       }
 
-      // Verificar si ya tiene la ruta completa
       if (this.otherUser.image.startsWith('http') || this.otherUser.image.startsWith('/')) {
         return this.otherUser.image;
       }
@@ -158,13 +157,10 @@ export default {
       this.loadingMessages = true;
       try {
         const response = await axios.get(`/chats/${this.chatId}`);
-        // Acceder a response.data.messages en lugar de response.data
         this.messages = response.data.messages;
 
         this.$nextTick(() => {
-          setTimeout(() => {
-            this.scrollToBottom(true);
-          }, 100);
+          this.scrollToBottom(true);
           this.markMessagesAsRead();
         });
       } catch (error) {
@@ -173,6 +169,19 @@ export default {
         this.loadingMessages = false;
       }
     },
+
+
+    scrollToBottom(force = false) {
+      const container = this.$refs.messagesContainer;
+      if (!container) return;
+
+      if (force || container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
+        this.$nextTick(() => {
+          container.scrollTop = container.scrollHeight;
+        });
+      }
+    },
+
 
     async sendMessage() {
       if (!this.newMessage.trim() || this.sendingMessage) return;
@@ -207,9 +216,9 @@ export default {
         } else {
           this.messages.push(response.data);
         }
+
       } catch (error) {
         console.error('Error sending message:', error);
-        this.$toast.error('Error al enviar mensaje');
         const index = this.messages.findIndex(m => m.id === tempMessage.id);
         if (index !== -1) {
           this.messages.splice(index, 1);
@@ -219,17 +228,6 @@ export default {
       }
     },
 
-    scrollToBottom(instant = false) {
-      this.$nextTick(() => {
-        const container = this.$refs.messagesContainer;
-        if (container) {
-          container.scrollTo({
-            top: container.scrollHeight,
-            behavior: instant ? 'auto' : 'smooth'
-          });
-        }
-      });
-    },
 
     formatTime(time) {
       if (!time) return '';
@@ -277,40 +275,26 @@ export default {
 
       this.leaveChannels();
 
+      // Canal privado para mensajes
       this.echoChannel = window.Echo.private(`private-chat.${this.chatId}`)
-        .listen('.message.sent', (data) => {
-          this.handleIncomingMessage(data);
-        });
+        .listen('.message.sent', this.handleIncomingMessage);
+
+      // Canal de presencia para estado
+      this.presenceChannel = window.Echo.join(`presence-chat.${this.chatId}`)
+        .here(this.updateOnlineStatus)
+        .joining(this.userJoined)
+        .leaving(this.userLeft);
     },
 
 
     handleIncomingMessage(data) {
-      // Verificar si el mensaje ya existe para evitar duplicados
-      const messageExists = this.messages.some(msg => msg.id === data.id);
+      if (this.messages.some(msg => msg.id === data.id)) return;
 
-      if (!messageExists) {
-        // Agregar el nuevo mensaje
-        this.messages.push(data);
+      this.messages.push(data);
+      this.scrollToBottom();
 
-        // Desplazarse al final si es un mensaje nuevo
-        this.$nextTick(() => {
-          if (this.$refs.messagesContainer) {
-            const container = this.$refs.messagesContainer;
-            const isScrolledUp = container.scrollTop < container.scrollHeight - container.clientHeight - 100;
-
-            if (!isScrolledUp) {
-              this.scrollToBottom();
-            } else {
-              this.newMessagesIndicator = true;
-              this.unreadMessages++;
-            }
-          }
-        });
-
-        // Marcar como leído si el mensaje es para el usuario actual
-        if (!this.isMessageFromMe(data)) {
-          this.markMessagesAsRead();
-        }
+      if (!this.isMessageFromMe(data)) {
+        this.markMessagesAsRead();
       }
     },
 
@@ -347,7 +331,6 @@ export default {
     },
 
     closeChat() {
-      // Limpiar canales antes de cerrar
       if (this.echoChannel) {
         window.Echo.leave(`chat.${this.chatId}`);
       }
@@ -383,26 +366,18 @@ export default {
     }
   },
   mounted() {
-    // Inicializar Pusher solo si no está ya inicializado
     if (!window.Pusher) {
       window.Pusher = require('pusher-js');
     }
 
-    // Configurar Echo si no está inicializado
     if (!window.Echo) {
       window.Echo = new Echo({
-        broadcaster: 'pusher',
-        key: import.meta.env.VITE_PUSHER_APP_KEY,
-        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        broadcaster: "pusher",
+        key: "337abba0601b16bbbce2",
+        cluster: "mt1",
         forceTLS: true,
-        encrypted: true,
+        encryption: true,
         authEndpoint: "/broadcasting/auth",
-        auth: {
-          headers: {
-            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || "",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        },
       });
     }
 

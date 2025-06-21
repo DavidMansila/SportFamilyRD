@@ -585,10 +585,7 @@ export default {
       this.activeChat = chat;
       await this.markMessagesAsRead(chat.id);
 
-      // Solo configurar canales en producción
-      if (process.env.NODE_ENV === 'production') {
-        this.setupChatChannel(chat.id);
-      }
+      this.setupChatChannel(chat.id);
 
       await this.$nextTick();
 
@@ -690,33 +687,28 @@ export default {
 
       if (typeof window.Echo === 'undefined') return;
 
-      // Suscribirse al canal privado usando el prefijo correcto
+      // Canal privado
       this.echoListener = window.Echo.private(`private-chat.${chatId}`)
         .listen('.message.sent', (data) => {
           if (this.activeChat && this.activeChat.id === chatId) {
             this.$refs.chatComponent?.handleNewMessage(data);
           }
           this.loadChats();
-        })
-        .listen('.message.read', (data) => {
-          if (this.activeChat && this.activeChat.id === chatId) {
-            this.$refs.chatComponent?.updateReadStatus(data);
-          }
         });
 
-      // Canal de presencia para estado en línea
+      // Canal de presencia
       this.presenceListener = window.Echo.join(`presence-chat.${chatId}`)
-        .here((users) => {
+        .here(users => {
           if (this.activeChat && this.activeChat.id === chatId) {
             this.$refs.chatComponent?.updateOnlineStatus(users);
           }
         })
-        .joining((user) => {
+        .joining(user => {
           if (this.activeChat && this.activeChat.id === chatId) {
             this.$refs.chatComponent?.userJoined(user);
           }
         })
-        .leaving((user) => {
+        .leaving(user => {
           if (this.activeChat && this.activeChat.id === chatId) {
             this.$refs.chatComponent?.userLeft(user);
           }
@@ -737,26 +729,15 @@ export default {
     setupGlobalListeners() {
       if (typeof window.Echo === 'undefined') return;
 
-      if (this.user && this.user.token) {
-        window.Echo.private(`user.${this.user.id}`)
-          .listen('.message.sent', (data) => {
-            console.log('Nuevo mensaje recibido globalmente:', data);
+      window.Echo.private(`user.${this.user.id}`)
+        .listen('.message.sent', (data) => {
+          console.log('Nuevo mensaje recibido globalmente:', data);
+          this.loadChats();
 
-            if (this.activeChat && this.activeChat.id === data.chat_id) {
-              if (this.$refs.chatComponent?.handleNewMessage) {
-                this.$refs.chatComponent.handleNewMessage(data);
-              }
-            }
-            this.loadChats();
-          })
-          .listen('.message.read', (data) => {
-            if (this.activeChat && this.activeChat.id === data.chat_id) {
-              if (this.$refs.chatComponent?.updateReadStatus) {
-                this.$refs.chatComponent.updateReadStatus(data);
-              }
-            }
-          });
-      }
+          if (this.activeChat && this.activeChat.id === data.chat_id) {
+            this.$refs.chatComponent?.handleNewMessage(data);
+          }
+        });
     },
 
 
