@@ -4,8 +4,6 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -29,8 +27,8 @@ class NewChat implements ShouldBroadcast
     public function broadcastOn()
     {
         return [
-            new PrivateChannel('chat.' . $this->chat_id),
-            new PrivateChannel('user.' . $this->recipientId())
+            new Channel('chat.' . $this->chat_id),
+            new Channel('user.' . $this->recipientId())
         ];
     }
 

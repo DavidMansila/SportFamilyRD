@@ -1,3 +1,4 @@
+// En tu archivo principal de JavaScript (app.js o similar)
 import axios from "axios";
 
 // Configuración esencial

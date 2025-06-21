@@ -11,6 +11,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SavedNewsController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 use App\Models\News;
 use Illuminate\Http\Request;
@@ -125,7 +126,8 @@ Route::resource('/trainer', TrainerController::class);
 // Entrenamientos
 Route::resource('/training', TrainingController::class);
 Route::get('/training/{id}', [TrainingController::class, 'show']);
-Route::get('/training/check-existing', [TrainingController::class, 'checkExisting']);
+Route::post('/training/check-existing', [TrainingController::class, 'checkExisting']);
+Route::post('/training', [TrainingController::class, 'store']);
 
 // Chats
 Route::get('/chats', [ChatController::class, 'index']);
@@ -135,6 +137,8 @@ Route::post('/chats/{chatId}/messages', [ChatController::class, 'storeMessage'])
 Route::put('/chats/{id}/accept', [ChatController::class, 'acceptChat']);
 Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
 Route::post('/messages/send', [ChatController::class, 'sendMessage']);
+
+Route::post('/chats/{chat}/messages', [MessageController::class, 'store']);
 
 
 // Broadcasting
