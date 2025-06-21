@@ -234,7 +234,9 @@ export default {
     formatTime(time) {
       if (!time) return '';
 
-      const dateObj = time instanceof Date ? time : new Date(time);
+      const dateObj = typeof time === 'string' || typeof time === 'number'
+        ? new Date(time)
+        : time;
 
       return dateObj.toLocaleTimeString([], {
         hour: '2-digit',
@@ -271,20 +273,45 @@ export default {
 
 
     setupChannels() {
-      // Solo suscribirse si el usuario está autenticado y existe el chat
-      if (!this.currentUser || !this.chat?.id) return;
+      if (!this.chatId || !window.Echo) return;
 
-      this.pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
-        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-        authEndpoint: "/broadcasting/auth",
-      });
+      this.leaveChannels();
 
-      // Suscripción directa al canal privado
-      this.channel = this.pusher.subscribe(`private-chat.${this.chat.id}`);
+      this.echoChannel = window.Echo.private(`private-chat.${this.chatId}`)
+        .listen('.message.sent', (data) => {
+          this.handleIncomingMessage(data);
+        });
+    },
 
-      this.channel.bind("message.sent", (data) => {
-        this.handleIncomingMessage(data);
-      });
+
+    handleIncomingMessage(data) {
+      // Verificar si el mensaje ya existe para evitar duplicados
+      const messageExists = this.messages.some(msg => msg.id === data.id);
+
+      if (!messageExists) {
+        // Agregar el nuevo mensaje
+        this.messages.push(data);
+
+        // Desplazarse al final si es un mensaje nuevo
+        this.$nextTick(() => {
+          if (this.$refs.messagesContainer) {
+            const container = this.$refs.messagesContainer;
+            const isScrolledUp = container.scrollTop < container.scrollHeight - container.clientHeight - 100;
+
+            if (!isScrolledUp) {
+              this.scrollToBottom();
+            } else {
+              this.newMessagesIndicator = true;
+              this.unreadMessages++;
+            }
+          }
+        });
+
+        // Marcar como leído si el mensaje es para el usuario actual
+        if (!this.isMessageFromMe(data)) {
+          this.markMessagesAsRead();
+        }
+      }
     },
 
 
@@ -292,10 +319,6 @@ export default {
       if (this.echoChannel) {
         window.Echo.leave(`chat.${this.chatId}`);
         this.echoChannel = null;
-      }
-      if (this.presenceChannel) {
-        window.Echo.leave(`presence-chat.${this.chatId}`);
-        this.presenceChannel = null;
       }
     },
 
@@ -335,9 +358,9 @@ export default {
       this.$emit('close-chat');
     },
 
-    updateReadStatus(data) {
+    updateReadStatus() {
       this.messages.forEach(msg => {
-        if (this.isMessageFromMe(msg) && !msg.read) {
+        if (this.isMessageFromMe(msg)) {
           msg.read = true;
         }
       });
@@ -360,6 +383,29 @@ export default {
     }
   },
   mounted() {
+    // Inicializar Pusher solo si no está ya inicializado
+    if (!window.Pusher) {
+      window.Pusher = require('pusher-js');
+    }
+
+    // Configurar Echo si no está inicializado
+    if (!window.Echo) {
+      window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        forceTLS: true,
+        encrypted: true,
+        authEndpoint: "/broadcasting/auth",
+        auth: {
+          headers: {
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || "",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      });
+    }
+
     this.setupChannels();
   },
 

@@ -686,29 +686,19 @@ export default {
     },
 
     setupChatChannel(chatId) {
-      // Limpiar cualquier listener previo
-      if (typeof window.Echo === 'undefined') {
-        console.log("Broadcasting deshabilitado");
-        return;
-      }
-
       this.leaveChatChannel();
 
-      // Suscribirse al canal del chat
-      this.echoListener = window.Echo.private(`chat.${chatId}`)
-        .listen('NewChat', (data) => {
+      if (typeof window.Echo === 'undefined') return;
+
+      // Suscribirse al canal privado usando el prefijo correcto
+      this.echoListener = window.Echo.private(`private-chat.${chatId}`)
+        .listen('.message.sent', (data) => {
           if (this.activeChat && this.activeChat.id === chatId) {
-            this.$refs.chatComponent?.handleNewMessage(data.message);
+            this.$refs.chatComponent?.handleNewMessage(data);
           }
           this.loadChats();
         })
-        .listen('NewMessage', (data) => {
-          if (this.activeChat && this.activeChat.id === chatId) {
-            this.$refs.chatComponent?.handleNewMessage(data.message);
-          }
-          this.loadChats();
-        })
-        .listen('MessageRead', (data) => {
+        .listen('.message.read', (data) => {
           if (this.activeChat && this.activeChat.id === chatId) {
             this.$refs.chatComponent?.updateReadStatus(data);
           }
@@ -749,45 +739,57 @@ export default {
 
       if (this.user && this.user.token) {
         window.Echo.private(`user.${this.user.id}`)
-          .listen('NewMessage', (data) => {
-            // Actualizar solo si el chat está abierto
+          .listen('.message.sent', (data) => {
+            console.log('Nuevo mensaje recibido globalmente:', data);
+
             if (this.activeChat && this.activeChat.id === data.chat_id) {
-              this.$refs.chatComponent?.handleNewMessage(data.message);
+              if (this.$refs.chatComponent?.handleNewMessage) {
+                this.$refs.chatComponent.handleNewMessage(data);
+              }
             }
             this.loadChats();
           })
-          .error((error) => {
-            console.error('Error en conexión Echo:', error);
+          .listen('.message.read', (data) => {
+            if (this.activeChat && this.activeChat.id === data.chat_id) {
+              if (this.$refs.chatComponent?.updateReadStatus) {
+                this.$refs.chatComponent.updateReadStatus(data);
+              }
+            }
           });
       }
     },
 
 
     async loadEchoLibrary() {
-      // No cargar Echo en absoluto para desarrollo
-      if (process.env.NODE_ENV !== 'production') return;
-
       try {
         const EchoModule = await import('laravel-echo');
         const PusherModule = await import('pusher-js');
 
+        window.Pusher = PusherModule.default;
+
+        // Configuración completa para todos los entornos
         window.Echo = new EchoModule.default({
           broadcaster: 'pusher',
           key: import.meta.env.VITE_PUSHER_APP_KEY,
           cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+          wsHost: `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
+          wssHost: `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
           forceTLS: true,
-          // authEndpoint: '/broadcasting/auth',
-          // auth: {
-          //   headers: {
-          //     'Authorization': `Bearer ${this.user.token}`,
-          //     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-          //   }
-          // }
+          encrypted: true,
+          disableStats: true,
+          enabledTransports: ['ws', 'wss'],
+          authEndpoint: "/broadcasting/auth",
+          auth: {
+            headers: {
+              Authorization: `Bearer ${this.user.token}`,
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            }
+          }
         });
 
         this.setupGlobalListeners();
       } catch (error) {
-        console.error('Error cargando Echo en producción:', error);
+        console.error('Error cargando Echo:', error);
       }
     },
 
@@ -797,13 +799,7 @@ export default {
     if (this.user) {
       this.cargarEntrenadores();
       this.loadChats();
-
-      // Verificar si Echo está disponible
-      if (typeof window.Echo !== 'undefined') {
-        this.setupGlobalListeners();
-      } else {
-        this.loadEchoLibrary();
-      }
+      this.loadEchoLibrary();
     }
   },
   beforeUnmount() {

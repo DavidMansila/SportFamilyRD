@@ -26,6 +26,6 @@ class MessageRead implements ShouldBroadcast
 
     public function broadcastAs()
     {
-        return 'MessageRead';
+        return 'message.read';
     }
 }

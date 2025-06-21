@@ -5,7 +5,8 @@ use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
 
 Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
-    $chat = Chat::find($chatId);
+    $chat = \App\Models\Chat::find($chatId);
+
     if (!$chat) return false;
 
     return (int) $user->id === (int) $chat->user_id ||
@@ -25,6 +26,15 @@ Broadcast::channel('presence-chat.{chatId}', function ($user, $chatId) {
 });
 
 
+// Cambia todos los canales a private-chat.{chatId}
 Broadcast::channel('private-chat.{chatId}', function ($user, $chatId) {
-  return $user->chats()->where('chats.id', $chatId)->exists();
+    $chat = \App\Models\Chat::find($chatId);
+    if (!$chat) return false;
+
+    return (int) $user->id === (int) $chat->user_id ||
+        (int) $user->id === (int) $chat->trainer->user_id;
+});
+
+Broadcast::channel('user.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
 });

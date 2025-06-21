@@ -2,7 +2,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    <meta name="csrf-token" content="{{ csrf_token() }}"> 
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'SportFamily') }}</title>
