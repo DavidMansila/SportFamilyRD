@@ -27,8 +27,8 @@ return new class extends Migration {
         Schema::create('training_requests', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-           
-            $table->integer('age');
+            $table->foreignId('trainer_id')->constrained('users')->onDelete('cascade');
+            
             $table->enum('sport_level', ['Principiante', 'Intermedio', 'Avanzado', 'Profesional']);
             $table->text('description')->nullable();
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');

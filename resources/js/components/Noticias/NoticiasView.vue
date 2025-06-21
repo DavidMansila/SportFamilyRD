@@ -396,19 +396,30 @@ export default {
       }
 
       try {
+        const csrfToken = window.getCsrfToken();
+
+        const config = {
+          withCredentials: true,
+          headers: {
+            'X-CSRF-TOKEN': csrfToken
+          }
+        };
+
         const response = await axios.post(
           `/news/${noticia.id}/toggle-save`,
           {},
-          { headers: { 'X-User-ID': this.user.id } }
+          config
         );
 
         noticia.saved = response.data.saved;
-
-        // Actualizar lista de guardados
         await this.cargarNoticiasGuardadas();
-
       } catch (error) {
         console.error('Error al guardar noticia:', error);
+
+        if (error.response?.status === 401) {
+          alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+          this.$router.push('/login');
+        }
       }
     },
 

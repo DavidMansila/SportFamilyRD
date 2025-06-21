@@ -1,8 +1,7 @@
 <?php
 
 return [
-
-
+    
     'connections' => [
         'pusher' => [
             'driver' => 'pusher',

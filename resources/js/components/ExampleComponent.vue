@@ -15,39 +15,39 @@ export default {
     };
   },
   async created() {
-    await this.loadUser();
+    // await this.loadUser();
   },
   methods: {
-    async loadUser() {
-      try {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          try {
-            this.user = JSON.parse(storedUser);
-          } catch (e) {
-            console.error('Failed to parse stored user:', e);
-            localStorage.removeItem('user');
-          }
-        }
+    // async loadUser() {
+    //   try {
+    //     const storedUser = localStorage.getItem('user');
+    //     if (storedUser) {
+    //       try {
+    //         this.user = JSON.parse(storedUser);
+    //       } catch (e) {
+    //         console.error('Failed to parse stored user:', e);
+    //         localStorage.removeItem('user');
+    //       }
+    //     }
 
-        const response = await axios.get('/current-user');
-        if (response.data) {
-          this.user = response.data;
-          localStorage.setItem('user', JSON.stringify(response.data));
-        }
-      } catch (error) {
-        console.error('Error loading user:', error);
-        this.handleAuthError(error);
-      }
-    },
+    //     const response = await axios.get('/current-user');
+    //     if (response.data) {
+    //       this.user = response.data;
+    //       localStorage.setItem('user', JSON.stringify(response.data));
+    //     }
+    //   } catch (error) {
+    //     console.error('Error loading user:', error);
+    //     this.handleAuthError(error);
+    //   }
+    // },
 
-    handleAuthError(error) {
-      if (error.response?.status === 401) {
-        this.user = null;
-        localStorage.removeItem('user');
-        this.$router.push('/login');
-      }
-    },
+    // handleAuthError(error) {
+    //   if (error.response?.status === 401) {
+    //     this.user = null;
+    //     localStorage.removeItem('user');
+    //     this.$router.push('/login');
+    //   }
+    // },
   },
 };
 </script>

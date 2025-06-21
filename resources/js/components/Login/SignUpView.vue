@@ -186,30 +186,57 @@ export default {
     async submitLoginForm() {
       this.isSubmitting = true;
       try {
-        console.log('Logging in:', this.loginForm);
+        await axios.get('/sanctum/csrf-cookie');
 
-        axios.post('/login', {
+        const response = await axios.post('/login', {
           email: this.loginForm.email,
-          password: this.loginForm.password,
-        })
-          .then((response) => {
-            console.log(response);
-            // Manejar inicio de sesión exitoso
-            alert('Bienvenido de nuevo!');
-            sessionStorage.setItem('user', JSON.stringify(response.data.user));
-            this.$router.push('/');
-          })
-          .catch((error) => {
-            console.log(error);
-            // Mostrar mensaje de error
-            alert('Credenciales incorrectas');
-          });
+          password: this.loginForm.password
+        });
 
+        // Manejo de usuario
+        const user = response.data.user;
+        user.image = user.image
+          ? `${axios.defaults.baseURL}/storage/users/${user.id}/${user.image}`
+          : `${axios.defaults.baseURL}/storage/users/Perfil-Icon.png`;
+
+        sessionStorage.setItem('user', JSON.stringify(user));
+        this.$router.push('/');
       } catch (error) {
-        console.error(error);
+        console.error('Error en login:', error);
+
+        // Manejo específico de error 419
+        if (error.response?.status === 419) {
+          try {
+            // Reintento con nuevo token
+            await axios.get('/sanctum/csrf-cookie');
+            const retryResponse = await axios.post('/login', {
+              email: this.loginForm.email,
+              password: this.loginForm.password
+            }, {
+              headers: {
+                'X-XSRF-TOKEN': this.getCsrfFromCookies(),
+                'Accept': 'application/json'
+              }
+            });
+
+            const user = retryResponse.data.user;
+            user.image = user.image
+              ? `${axios.defaults.baseURL}/storage/users/${user.id}/${user.image}`
+              : `${axios.defaults.baseURL}/storage/users/Perfil-Icon.png`;
+
+            sessionStorage.setItem('user', JSON.stringify(user));
+            this.$router.push('/');
+          } catch (retryError) {
+            console.error('Error en reintento:', retryError);
+            alert('Error persistente. Por favor recarga la página.');
+          }
+        } else {
+          alert('Error de conexión: ' + error.message);
+        }
       }
       this.isSubmitting = false;
     },
+
 
 
 

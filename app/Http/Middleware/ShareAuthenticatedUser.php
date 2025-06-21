@@ -17,18 +17,14 @@ class ShareAuthenticatedUser
      */
     public function handle($request, Closure $next)
     {
-        // Compartir usuario autenticado con todas las vistas
         if (Auth::check()) {
-            View::share('authUser', Auth::user());
-        } else {
-            View::share('authUser', null);
-        }
+            $user = Auth::user();
+            $user->image = $user->image
+                ? asset('storage/users/' . $user->id . '/' . $user->image)
+                : asset('storage/users/Perfil-Icon.png');
 
-        // Opcional: Compartir para APIs (si usas Inertia.js o similar)
-        if ($request->wantsJson()) {
-            $request->attributes->set('authUser', Auth::user());
+            View::share('authUser', $user);
         }
-
         return $next($request);
     }
 }

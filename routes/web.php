@@ -12,21 +12,43 @@ use App\Http\Controllers\SavedNewsController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
-
 use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
 
+Route::get('/sanctum/csrf-cookie', function (Request $request) {
+    return response()->noContent()->withHeaders([
+        'Access-Control-Allow-Origin' => 'http://localhost:5173',
+        'Access-Control-Allow-Credentials' => 'true'
+    ]);
+});
 
-//Rutas para funciones en el back
+Route::post('login', [AuthController::class, 'login'])->middleware('cors');
+Route::get('logout', [AuthController::class, 'logout'])->middleware('cors');
 
-// usuarios
+// Rutas públicas
+Route::get('/news', function () {
+    $news = News::orderBy('published_at', 'desc')->get()->map(function ($item) {
+        return [
+            'id' => $item->id,
+            'title' => $item->title,
+            'description' => $item->description,
+            'image' => $item->image,
+            'author' => $item->author,
+            'published_at' => $item->published_at->toIso8601String(),
+            'category' => $item->category,
+        ];
+    });
+    return response()->json($news);
+});
+
+// Usuarios
 Route::resource('/user', UserController::class);
 Route::get('/user-stats/{user}', [UserController::class, 'stats']);
 Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
 
-//productos
+// Productos
 Route::resource('/products', ProductController::class);
 Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
 Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
@@ -37,17 +59,9 @@ Route::post('/cart/items', [CartController::class, 'addItem']);
 Route::put('/cart/items/{item}', [CartController::class, 'updateItem']);
 Route::delete('/cart/items/{item}', [CartController::class, 'removeItem']);
 
-
 // Posts
 Route::resource('/post', PostController::class);
-
 Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
-
-//configuracion
-Route::post('/config-update-value', [ConfigurationController::class, 'updateValue']);
-
-Route::post('/change-password', [ConfigurationController::class, 'changePassword']);
-Route::resource('config', ConfigurationController::class);
 
 // Comentarios
 Route::post('/post/create-comment', [PostController::class, 'createComment']);
@@ -60,40 +74,16 @@ Route::post('/post/create-reply/{commentId}', [PostController::class, 'createRep
 Route::put('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
 Route::delete('/post/destroy-reply/{replyId}', [PostController::class, 'destroyReply']);
 
-// Route::post('/post/{post}/likes_quantity', [PostController::class, 'updateLikes']);
+// Configuración
+Route::post('/config-update-value', [ConfigurationController::class, 'updateValue']);
+Route::post('/change-password', [ConfigurationController::class, 'changePassword']);
+Route::resource('config', ConfigurationController::class);
 
-// Rutas de autenticación
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
+// Noticias guardadas
+Route::post('/news/{newsId}/toggle-save', [SavedNewsController::class, 'toggleSave']);
+Route::get('/saved-news', [SavedNewsController::class, 'index']);
 
-
-// SCRAPPER
-// Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
-// Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
-// Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
-// Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
-// Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
-
-
-// NOTICIAS
-Route::get('/news', function () {
-    $news = News::orderBy('published_at', 'desc')
-        ->get()
-        ->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'title' => $item->title,
-                'description' => $item->description,
-                'image' => $item->image,
-                'author' => $item->author,
-                'published_at' => $item->published_at->toIso8601String(),
-                'category' => $item->category,
-            ];
-        });
-
-    return response()->json($news);
-});
-
+// Operaciones CRUD en noticias (solo admin)
 Route::put('/news/{id}', function (Request $request, $id) {
     $validator = Validator::make($request->all(), [
         'title' => 'required|string|max:255',
@@ -108,7 +98,6 @@ Route::put('/news/{id}', function (Request $request, $id) {
     }
 
     $noticia = News::findOrFail($id);
-
     $noticia->update([
         'title' => $request->title,
         'description' => $request->description,
@@ -118,50 +107,40 @@ Route::put('/news/{id}', function (Request $request, $id) {
     ]);
 
     return response()->json($noticia);
-});
+})->middleware('can:update,news');
 
 Route::delete('/news/{id}', function ($id) {
     $noticia = News::findOrFail($id);
     $noticia->delete();
-
     return response()->json(['message' => 'Noticia eliminada']);
-});
+})->middleware('can:delete,news');
 
-
-// NOTICIAS GUARDADAS
-Route::post('/news/{newsId}/toggle-save', [SavedNewsController::class, 'toggleSave']);
-Route::get('/saved-news', [SavedNewsController::class, 'index']);
-
-
-// Trainer
+// Entrenadores
 Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
 Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus']);
 Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
 Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
 Route::resource('/trainer', TrainerController::class);
 
-//training
+// Entrenamientos
 Route::resource('/training', TrainingController::class);
 Route::get('/training/{id}', [TrainingController::class, 'show']);
 Route::get('/training/check-existing', [TrainingController::class, 'checkExisting']);
 
-//Chats
-
+// Chats
 Route::get('/chats', [ChatController::class, 'index']);
 Route::post('/chats', [ChatController::class, 'store']);
 Route::get('/chats/{id}', [ChatController::class, 'show']);
 Route::post('/chats/{chatId}/messages', [ChatController::class, 'storeMessage']);
 Route::put('/chats/{id}/accept', [ChatController::class, 'acceptChat']);
 Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
-
 Route::post('/messages/send', [ChatController::class, 'sendMessage']);
 
 
+// Broadcasting
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
-
-
-// Ruta catch-all para SPA
+// Ruta SPA
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '.*');
