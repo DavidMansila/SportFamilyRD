@@ -9,6 +9,10 @@ class VerifyCsrfToken extends Middleware
 {
     protected $except = [
         '*',
+        'broadcasting/auth',
+        'api/*',
+        'sanctum/csrf-cookie',
+        'chats*'
     ];
 
     public function handle($request, Closure $next)

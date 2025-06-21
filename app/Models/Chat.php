@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Chat extends Model
 {
@@ -45,5 +46,13 @@ class Chat extends Model
             ->where('read', false)
             ->where('sender_id', '!=', \Illuminate\Support\Facades\Auth::user()->id)
             ->count();
+    }
+
+    public function getOtherUserAttribute()
+    {
+        if (Auth::check() && Auth::user()->id == $this->user_id) {
+            return $this->trainer;
+        }
+        return $this->user;
     }
 }

@@ -200,6 +200,8 @@ export default {
           : `${axios.defaults.baseURL}/storage/users/Perfil-Icon.png`;
 
         sessionStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('token', response.data.token);
+        
         this.$router.push('/');
       } catch (error) {
         console.error('Error en login:', error);

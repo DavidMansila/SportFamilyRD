@@ -271,44 +271,33 @@ export default {
 
 
     setupChannels() {
-      // Verificar que Echo esté disponible
-      if (!window.Echo) {
-        console.error("Echo no está disponible. ¿Están configuradas las variables de Pusher?");
+      // Solo suscribirse si el usuario está autenticado y existe el chat
+      if (!this.currentUser || !this.chat?.id) return;
 
-        // Intenta inicializar con valores por defecto
-        window.Echo = new Echo({
-          broadcaster: "pusher",
-          key: '337abba0601b16bbbce2',
-          cluster: 'mt1',
-          forceTLS: true,
-          encrypted: true
-        });
-      }
+      this.pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        authEndpoint: "/broadcasting/auth",
+      });
 
-      // Canal para mensajes
-    this.echoChannel = window.Echo.channel(`chat.${this.chatId}`)
-        .listen('NewMessage', (data) => {
-            this.handleNewMessage(data);
-        });
+      // Suscripción directa al canal privado
+      this.channel = this.pusher.subscribe(`private-chat.${this.chat.id}`);
 
-      console.log(`Suscrito al canal chat.${this.chatId}`);
-
-      // Presence Channel para estado en línea
-      // this.presenceChannel = window.Echo.join(`presence-chat.${this.chatId}`)
-      //   .here((users) => {
-      //     this.updateOnlineStatus(users);
-      //   })
-      //   .joining((user) => {
-      //     this.userJoined(user);
-      //   })
-      //   .leaving((user) => {
-      //     this.userLeft(user);
-      //   });
-
-      // console.log(`Suscrito al canal presence-chat.${this.chatId}`);
+      this.channel.bind("message.sent", (data) => {
+        this.handleIncomingMessage(data);
+      });
     },
 
 
+    leaveChannels() {
+      if (this.echoChannel) {
+        window.Echo.leave(`chat.${this.chatId}`);
+        this.echoChannel = null;
+      }
+      if (this.presenceChannel) {
+        window.Echo.leave(`presence-chat.${this.chatId}`);
+        this.presenceChannel = null;
+      }
+    },
 
     async markMessagesAsRead() {
       try {
@@ -320,22 +309,17 @@ export default {
     },
 
     handleNewMessage(newMessage) {
-      console.log('Nuevo mensaje recibido via Pusher:', newMessage);
+      // Evitar duplicados
+      const messageExists = this.messages.some(msg => msg.id === newMessage.id);
 
-      const exists = this.messages.some(m => m.id === newMessage.id);
-      if (!exists) {
-        console.log('Agregando nuevo mensaje a la lista');
+      if (!messageExists) {
         this.messages.push(newMessage);
+        this.$nextTick(this.scrollToBottom);
 
-        this.$nextTick(() => {
-          this.scrollToBottom();
-
-          if (!this.isMessageFromMe(newMessage)) {
-            this.markMessagesAsRead();
-          }
-        });
-      } else {
-        console.log('El mensaje ya existe en la lista');
+        // Marcar como leído si es mensaje entrante
+        if (!this.isMessageFromMe(newMessage)) {
+          this.markMessagesAsRead();
+        }
       }
     },
 
@@ -375,13 +359,12 @@ export default {
       }
     }
   },
+  mounted() {
+    this.setupChannels();
+  },
+
   beforeUnmount() {
-    if (this.echoChannel) {
-      window.Echo.leave(`chat.${this.chatId}`);
-    }
-    if (this.presenceChannel) {
-      window.Echo.leave(`presence-chat.${this.chatId}`);
-    }
+    this.leaveChannels();
   }
 }
 </script>

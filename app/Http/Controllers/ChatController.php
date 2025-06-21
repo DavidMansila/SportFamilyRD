@@ -55,32 +55,22 @@ class ChatController extends Controller
 
     public function storeMessage(Request $request, $chatId)
     {
-        $request->validate([
-            'message' => 'required|string',
-        ]);
+        $request->validate(['message' => 'required|string']);
 
         $user = Auth::user();
         $senderType = $user->user_type === 'user' ? 'user' : 'trainer';
 
         $message = Message::create([
             'chat_id' => $chatId,
-            'sender_id' => Auth::id(),
+            'sender_id' => $user->id,
             'sender_type' => $senderType,
             'message' => $request->message
         ]);
 
-        $chat = Chat::findOrFail($chatId);
-
-        // Determinar el receptor correctamente
-        $receiverId = (Auth::id() == $chat->user_id)
-            ? $chat->trainer_id
-            : $chat->user_id;
-
-        broadcast(new NewMessage($message, $receiverId));
+        event(new NewMessage($message));
 
         return response()->json($message);
     }
-
 
 
     public function store(Request $request)

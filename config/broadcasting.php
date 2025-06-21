@@ -1,7 +1,8 @@
 <?php
 
 return [
-    
+    'default' => env('BROADCAST_DRIVER', 'pusher'),
+
     'connections' => [
         'pusher' => [
             'driver' => 'pusher',
@@ -12,15 +13,10 @@ return [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
                 'useTLS' => true,
                 'encrypted' => true,
-                'host' => '127.0.0.1',
-                'port' => 8000,
-                'scheme' => 'http',
-                'curl_options' => [
-                    CURLOPT_SSL_VERIFYHOST => 0,
-                    CURLOPT_SSL_VERIFYPEER => 0,
-                ]
+                'host' => 'api-' . env('PUSHER_APP_CLUSTER', 'mt1') . '.pusher.com',
+                'port' => 443,
+                'scheme' => 'https',
             ],
         ],
     ],
-
 ];

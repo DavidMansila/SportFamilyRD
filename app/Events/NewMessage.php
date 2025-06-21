@@ -14,17 +14,20 @@ class NewMessage implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
-    public $chatId;
 
     public function __construct(Message $message)
     {
         $this->message = $message;
-        $this->chatId = $message->chat_id;
     }
 
     public function broadcastOn()
     {
-        return new Channel('chat.' . $this->chatId);
+        return new Channel('chat.' . $this->message->chat_id);
+    }
+
+    public function broadcastAs()
+    {
+        return 'new-message';
     }
 
     public function broadcastWith()
