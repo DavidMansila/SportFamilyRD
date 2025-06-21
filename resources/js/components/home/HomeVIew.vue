@@ -800,9 +800,15 @@ export default {
       event.target.classList.add('active');
     },
 
-
-
-
+    getCalendarScrap(){
+      axios.get('/scrap-calendar')
+        .then(response => {
+          console.log("Calendar data fetched successfully:", response.data.events);
+        })
+        .catch(error => {
+          console.error("Error fetching calendar data:", error);
+        });
+    }
 
 
 
@@ -810,6 +816,7 @@ export default {
   mounted() {
     document.title = 'SportFamilyRD - Comunidad Deportiva Dominicana';
     this.animateStats();
+    this.getCalendarScrap();
 
     // Animación de scroll para elementos
     const observer = new IntersectionObserver((entries) => {

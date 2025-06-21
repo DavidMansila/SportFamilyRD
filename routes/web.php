@@ -144,12 +144,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/messages/send', [ChatController::class, 'sendMessage']);
 });
 
-    // SCRAPPER
-    Route::get('/baseball_news', [ScrapperController::class, 'baseballNews']);
-    Route::get('/futbol_news', [ScrapperController::class, 'futbolNews']);
-    Route::get('/basketball_news', [ScrapperController::class, 'basketballNews']);
-    Route::get('/volleyball_news', [ScrapperController::class, 'volleyballNews']);
-    Route::get('/swimming_news', [ScrapperController::class, 'swimmingNews']);
+//scrapper calendar
+Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
 
     // NOTICIAS
     Route::get('/news', function () {

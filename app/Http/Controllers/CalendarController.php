@@ -76,4 +76,6 @@ class CalendarController extends Controller
         $calendar->delete();
         return response()->json(null, 204);
     }
+
+   
 }
