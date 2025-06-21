@@ -268,10 +268,10 @@
 
         <div v-if="!activeChat" class="contact-list">
           <div v-for="chat in chatsAprobados" :key="chat.id" class="contact-item" @click="openChat(chat)">
-            <img :src="getChatAvatar(chat)" class="message-avatar" />
+            <img :src="chat.other_participant.image" class="message-avatar" />
             <div class="message-content">
               <div class="message-header">
-                <span class="sender-name">{{ getChatName(chat) }}</span>
+                <span class="sender-name">{{ chat.other_participant.name }}</span>
                 <span v-if="chat.unread" class="unread-badge">{{ chat.unread }}</span>
               </div>
               <p v-if="chat.last_message" class="message-preview">
@@ -303,6 +303,7 @@
 
 
 <script>
+import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatComponent from '../ChatComponent.vue';
 
@@ -439,55 +440,49 @@ export default {
 
 
     async enviarFormularioContacto() {
-
-      if (!this.user || !this.user.id) {
+      if (!this.user?.id) {
         alert('Debes iniciar sesión para contactar a un entrenador');
         return;
       }
+
       try {
-        // Verificar si ya existe una solicitud reciente para este entrenador
-        const checkResponse = await axios.get('/training/check-existing', {
-          params: {
-            user_id: this.user.id,
-            trainer_id: this.contactoEntrenador.trainer_id
-          }
+        // 1. Verificar si ya existe solicitud
+        const checkResponse = await axios.post('/training/check-existing', {
+          user_id: this.user.id,
+          trainer_id: this.contactoEntrenador.trainer_id
         });
 
         if (checkResponse.data.exists) {
-          alert(`Ya has enviado una solicitud a ${this.contactoEntrenador.nombre} recientemente. Solo puedes enviar una solicitud por semana a cada entrenador.`);
+          alert(`Ya has enviado una solicitud a ${this.contactoEntrenador.nombre} recientemente.`);
           return;
         }
 
+        // 2. Enviar la solicitud principal
         const formData = {
           user_id: this.user.id,
           trainer_id: this.contactoEntrenador.trainer_id,
-          trainer_user_id: this.contactoEntrenador.user_id,
           sport_level: this.formularioContacto.nivel,
           description: this.formularioContacto.objetivos,
           status: 'pending'
         };
 
-        axios.post('/training', formData)
-          .then(response => {
-            if (response.status === 201) {
-              alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
-              this.cerrarFormularioContacto();
-              this.cerrarPerfil();
-            }
-          })
-          .catch(error => {
-            if (error.response?.status === 422) {
-              const errors = error.response.data.errors;
-              let errorMsg = Object.values(errors).flat().join('\n');
-              alert(`Error de validación:\n${errorMsg}`);
-            } else {
-              console.error('Error completo:', error);
-              alert('Error al enviar la solicitud');
-            }
-          });
+        const response = await axios.post('/training', formData);
+
+        if (response.status === 201) {
+          alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
+          this.cerrarFormularioContacto();
+          this.cerrarPerfil();
+        }
       } catch (error) {
-        console.error('Error verificando solicitudes existentes:', error);
-        alert('Solo puedes enviar una solicitud por semana a cada entrenador.');
+        // Manejo de errores unificado
+        if (error.response?.status === 422) {
+          const errors = error.response.data.errors;
+          let errorMsg = Object.values(errors).flat().join('\n');
+          alert(`Error de validación:\n${errorMsg}`);
+        } else {
+          console.error('Error completo:', error);
+          alert('Error al procesar la solicitud: ' + error.message);
+        }
       }
     },
 
@@ -609,6 +604,8 @@ export default {
       document.body.classList.remove('chat-open');
     },
 
+
+
     async loadChats() {
       if (!this.user) return;
       try {
@@ -616,24 +613,26 @@ export default {
         console.log('Respuesta de /chats:', response.data);
 
         this.chats = response.data.map(chat => {
-          // Determinar quién es el otro participante correctamente
           let otherParticipant = null;
 
-          // Si el usuario actual es el atleta, el otro participante es el entrenador
-          if (this.user.user_type === 'atleta') {
+          if (this.user.user_type === 'user') {
+            // Acceder al usuario asociado al entrenador
             otherParticipant = {
               id: chat.trainer.id,
-              name: chat.trainer.name,
-              image: chat.trainer.image || 'public/storage/users/Perfil-Icon.png',
+              name: chat.trainer.user.name,
+              image: chat.trainer.user.image
+                ? `/storage/users/${chat.trainer.user.id}/${chat.trainer.user.image}`
+                : 'public/storage/users/Perfil-Icon.png',
               type: 'trainer'
             };
           }
-          // Si el usuario actual es el entrenador, el otro participante es el atleta
           else if (this.user.user_type === 'entrenador') {
             otherParticipant = {
               id: chat.user.id,
               name: chat.user.name,
-              image: chat.user.image || 'public/storage/users/Perfil-Icon.png',
+              image: chat.user.image
+                ? `/storage/users/${chat.user.id}/${chat.user.image}`
+                : 'public/storage/users/Perfil-Icon.png',
               type: 'user'
             };
           }
@@ -654,6 +653,8 @@ export default {
         console.error('Error cargando chats', error);
       }
     },
+
+
 
     getChatAvatar(chat) {
       return chat.other_participant?.image || 'public/storage/users/Perfil-Icon.png';
@@ -775,13 +776,13 @@ export default {
           key: import.meta.env.VITE_PUSHER_APP_KEY,
           cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
           forceTLS: true,
-          authEndpoint: '/broadcasting/auth',
-          auth: {
-            headers: {
-              'Authorization': `Bearer ${this.user.token}`,
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            }
-          }
+          // authEndpoint: '/broadcasting/auth',
+          // auth: {
+          //   headers: {
+          //     'Authorization': `Bearer ${this.user.token}`,
+          //     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+          //   }
+          // }
         });
 
         this.setupGlobalListeners();

@@ -87,6 +87,7 @@
 
 
 <script>
+import axios from 'axios';
 import CarritoComponent from './CarritoComponent.vue';
 
 export default {
@@ -144,31 +145,21 @@ export default {
     async logout() {
       try {
         await axios.post('/logout');
-        this.clearAuthData();
+
         sessionStorage.removeItem('user');
-        sessionStorage.removeItem('savedNews');
+        this.user = null;
+        this.user_type = '';
+        this.showLogoutConfirm = false;
 
-        // Disparar evento para notificar a otros componentes
-        window.dispatchEvent(new Event('user-logged-out'));
+        window.dispatchEvent(new CustomEvent('user-logged-out'));
 
-        this.$router.push({
-          path: '/signup',
-          query: { logoutSuccess: 'true' }
-        });
-
-        // Mostrar notificación
-        this.$toast.success('Has cerrado sesión correctamente', {
-          position: 'top-right',
-          duration: 3000
-        });
-
-        this.showLogoutConfirm = false; // Cerrar diálogo después de confirmar
+        this.$router.push('/');
       } catch (error) {
         console.error('Error al cerrar sesión:', error);
-        this.$toast.error('Ocurrió un error al cerrar sesión', {
-          position: 'top-right',
-          duration: 3000
-        });
+        if (error.response?.status === 419) {
+          await axios.get('/sanctum/csrf-cookie');
+          return this.logout();
+        }
       }
     },
 
@@ -178,25 +169,6 @@ export default {
 
     closeCart() {
       this.isCartVisible = false;
-    },
-
-    updateQuantity({ index, quantity }) {
-      // Tu lógica para actualizar cantidad
-      this.cartItems[index].quantity = quantity;
-    },
-
-    removeItem(index) {
-      // Tu lógica para eliminar item
-      this.cartItems.splice(index, 1);
-    },
-
-    handleCheckout() {
-      // Tu lógica de checkout
-      console.log('Procesar compra');
-    },
-
-    handleUpdateQuantity({ index, quantity }) {
-      this.$store.dispatch('updateQuantity', { index, quantity });
     },
 
     handleRemoveItem(index) {

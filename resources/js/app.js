@@ -3,7 +3,7 @@ import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 // Importa todos tus componentes
-import ExampleComponent from "./components/ExampleComponent.vue";
+import App from "./components/App.vue";
 import SignUpView from "./components/Login/SignUpView.vue";
 import HomeView from "./components/Home/HomeView.vue";
 import DirectorioView from "./components/Directorio/DirectorioView.vue";
@@ -17,8 +17,6 @@ import SolicitudesEntrenadores from "./components/Admin/SolicitudesEntrenadores.
 import ForoView from "./components/Foro/ForoView.vue";
 import AjustesView from "./components/Ajustes/AjustesView.vue";
 import PerfilView from "./components/Perfil/PerfilView.vue";
-import App from "./components/ExampleComponent.vue"; // Componente raíz nuevo
-
 import store from "./cartStore";
 
 // Paginate
@@ -45,7 +43,6 @@ const router = createRouter({
         { path: "/foro", component: ForoView },
         { path: "/ajustes", component: AjustesView },
         { path: "/perfil", component: PerfilView },
-        // Agrega más rutas según necesites
     ],
 });
 
@@ -57,7 +54,6 @@ app.use(router);
 app.use(VueAwesomePaginate);
 app.use(store);
 
-// Registra componentes globales solo si son necesarios en múltiples lugares
-app.component("example-component", ExampleComponent);
+app.component("app-component", App);
 
 app.mount("#app");

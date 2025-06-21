@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Training;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TrainingController extends Controller
 {
@@ -46,6 +47,19 @@ class TrainingController extends Controller
             'description' => 'required|string|max:500',
             'status' => 'required|in:pending,accepted,rejected'
         ]);
+
+        $lastWeek = now()->subWeek();
+        $existing = Training::where('user_id', $request->user_id)
+            ->where('trainer_id', $request->trainer_id)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->where('created_at', '>=', $lastWeek)
+            ->exists();
+
+        if ($existing) {
+            return response()->json([
+                'message' => 'Ya tienes una solicitud activa con este entrenador'
+            ], 422);
+        }
 
         $training = Training::create($validated);
         return response()->json($training, 201);
@@ -102,7 +116,7 @@ class TrainingController extends Controller
     /**
      * Get all training requests made by a user.
      */
-    // En TrainingController.php
+
     public function getReceivedTrainings(Request $request)
     {
         $request->validate([
@@ -118,10 +132,9 @@ class TrainingController extends Controller
             ->get();
 
         return $trainings->map(function ($training) {
-            // Construir la URL completa de la imagen
             $imageUrl = $training->user && $training->user->image
                 ? asset('storage/users/' . $training->user->id . '/' . $training->user->image)
-                : asset('storage/users/Perfil-Icon.png'); // Imagen por defecto
+                : asset('storage/users/Perfil-Icon.png');
 
             return [
                 'id' => $training->id,
@@ -140,8 +153,6 @@ class TrainingController extends Controller
         });
     }
 
-
-
     public function checkExisting(Request $request)
     {
         $request->validate([
@@ -149,11 +160,25 @@ class TrainingController extends Controller
             'trainer_id' => 'required|integer',
         ]);
 
-        $exists = Training::where('user_id', $request->user_id)
-            ->where('trainer_id', $request->trainer_id)
-            ->where('created_at', '>=', now()->subWeek())
-            ->exists();
+        $lastWeek = now()->subWeek();
 
-        return response()->json(['exists' => $exists]);
+        $existingRequests = Training::where('user_id', $request->user_id)
+            ->where('trainer_id', $request->trainer_id)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->where('created_at', '>=', $lastWeek)
+            ->get();
+
+        return response()->json([
+            'exists' => $existingRequests->isNotEmpty(),
+            'count' => $existingRequests->count(),
+            'last_week' => $lastWeek->toDateTimeString(),
+            'requests' => $existingRequests->map(function ($req) {
+                return [
+                    'id' => $req->id,
+                    'created_at' => $req->created_at->toDateTimeString(),
+                    'status' => $req->status
+                ];
+            })
+        ]);
     }
 }

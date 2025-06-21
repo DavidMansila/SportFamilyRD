@@ -6,8 +6,12 @@
 
 <script>
 import axios from 'axios';
+import ProductModal from '../components/CarritoComponent.vue';
 
 export default {
+  components: {
+    ProductModal
+  },
   name: 'App',
   data() {
     return {
@@ -15,39 +19,39 @@ export default {
     };
   },
   async created() {
-    await this.loadUser();
+    // await this.loadUser();
   },
   methods: {
-    async loadUser() {
-      try {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          try {
-            this.user = JSON.parse(storedUser);
-          } catch (e) {
-            console.error('Failed to parse stored user:', e);
-            localStorage.removeItem('user');
-          }
-        }
+    // async loadUser() {
+    //   try {
+    //     const storedUser = localStorage.getItem('user');
+    //     if (storedUser) {
+    //       try {
+    //         this.user = JSON.parse(storedUser);
+    //       } catch (e) {
+    //         console.error('Failed to parse stored user:', e);
+    //         localStorage.removeItem('user');
+    //       }
+    //     }
 
-        const response = await axios.get('/current-user');
-        if (response.data) {
-          this.user = response.data;
-          localStorage.setItem('user', JSON.stringify(response.data));
-        }
-      } catch (error) {
-        console.error('Error loading user:', error);
-        this.handleAuthError(error);
-      }
-    },
+    //     const response = await axios.get('/current-user');
+    //     if (response.data) {
+    //       this.user = response.data;
+    //       localStorage.setItem('user', JSON.stringify(response.data));
+    //     }
+    //   } catch (error) {
+    //     console.error('Error loading user:', error);
+    //     this.handleAuthError(error);
+    //   }
+    // },
 
-    handleAuthError(error) {
-      if (error.response?.status === 401) {
-        this.user = null;
-        localStorage.removeItem('user');
-        this.$router.push('/login');
-      }
-    },
+    // handleAuthError(error) {
+    //   if (error.response?.status === 401) {
+    //     this.user = null;
+    //     localStorage.removeItem('user');
+    //     this.$router.push('/login');
+    //   }
+    // },
   },
 };
 </script>
@@ -85,9 +89,17 @@ body {
   }
 
   /* Typography */
-  h1 { font-size: 1.6rem; }
-  h2 { font-size: 1.4rem; }
-  h3 { font-size: 1.2rem; }
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
 
   /* Form Elements */
   input,
@@ -101,7 +113,7 @@ body {
   }
 
   /* Layout Utilities */
-  .container, 
+  .container,
   .content-wrapper {
     padding: 0 12px;
   }

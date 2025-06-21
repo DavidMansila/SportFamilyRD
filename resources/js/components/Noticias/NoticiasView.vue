@@ -275,6 +275,7 @@ export default {
       try {
         // Cargar noticias
         const newsResponse = await axios.get('/news');
+
         this.noticias = newsResponse.data.map(noticia => ({
           id: noticia.id,
           title: noticia.title,
@@ -291,6 +292,8 @@ export default {
         if (this.user) {
           await this.cargarNoticiasGuardadas();
         }
+        // const validNewsIds = newsResponse.data.map(n => n.id);
+        // this.savedNews = this.savedNews.filter(id => validNewsIds.includes(id));
 
         this.noticias.sort((a, b) => b.parsedDate - a.parsedDate);
         this.filtrarNoticias();
@@ -307,26 +310,30 @@ export default {
       if (!this.user || !this.user.id) return;
 
       try {
-        const response = await axios.get('/saved-news', {
-          headers: { 'X-User-ID': this.user.id }
-        });
+        const response = await axios.get('/saved-news');
 
-        // Asegurarse de que los IDs sean números
-        const savedIds = response.data.map(id => Number(id));
-
-        // Actualizar estado de guardado
-        this.noticias.forEach(noticia => {
-          noticia.saved = savedIds.includes(Number(noticia.id));
-        });
-
-        // Forzar actualización de la vista
-        this.$forceUpdate();
-
+        if (Array.isArray(response.data)) {
+          const savedIds = response.data.map(id => Number(id));
+          this.noticias.forEach(noticia => {
+            noticia.saved = savedIds.includes(Number(noticia.id));
+          });
+        } else if (response.data && Array.isArray(response.data.news_ids)) {
+          const savedIds = response.data.news_ids.map(id => Number(id));
+          this.noticias.forEach(noticia => {
+            noticia.saved = savedIds.includes(Number(noticia.id));
+          });
+        } else {
+          console.error('Formato inesperado en noticias guardadas:', response.data);
+        }
       } catch (error) {
         console.error('Error al cargar noticias guardadas:', error);
+
+        if (error.response?.status === 419) {
+          await axios.get('/sanctum/csrf-cookie');
+          return this.cargarNoticiasGuardadas();
+        }
       }
     },
-
 
     filtrarNoticias() {
       this.noticiasFiltradas = this.deporteSeleccionado === 'todos'
@@ -396,19 +403,30 @@ export default {
       }
 
       try {
-        const response = await axios.post(
-          `/news/${noticia.id}/toggle-save`,
-          {},
-          { headers: { 'X-User-ID': this.user.id } }
-        );
+        const response = await axios.post(`/news/${noticia.id}/toggle-save`);
 
+        // Actualizar el estado de guardado directamente
         noticia.saved = response.data.saved;
 
-        // Actualizar lista de guardados
+        // Actualizar la lista de guardados
         await this.cargarNoticiasGuardadas();
 
       } catch (error) {
         console.error('Error al guardar noticia:', error);
+
+        if (error.response?.status === 404 || error.response?.status === 410) {
+          // Noticia no existe (404) o ya no disponible (410)
+          await this.cargarNoticias();
+          alert('Esta noticia ya no está disponible');
+        }
+        else if (error.response?.status === 419) {
+          // Token CSRF expirado, renovar y reintentar
+          await axios.get('/sanctum/csrf-cookie');
+          return this.toggleSave(noticia);
+        }
+        else {
+          alert('Error al guardar la noticia. Por favor intente nuevamente.');
+        }
       }
     },
 
@@ -504,21 +522,26 @@ export default {
   },
 
   async mounted() {
-    // Cargar usuario
+    // Configurar credenciales antes de cualquier solicitud
+    axios.defaults.withCredentials = true;
+
+    // Obtener token CSRF inicial
+    try {
+      await axios.get('/sanctum/csrf-cookie');
+    } catch (error) {
+      console.error('Error obteniendo CSRF token:', error);
+    }
+
+    // Resto del código...
     const userData = sessionStorage.getItem('user');
     if (userData) {
       this.user = JSON.parse(userData);
     }
 
-    // Cargar noticias
     await this.cargarNoticias();
-
-    // Cargar estado de guardado si hay usuario
     if (this.user) {
       await this.cargarNoticiasGuardadas();
     }
-
-    document.title = 'Noticias';
   }
 };
 

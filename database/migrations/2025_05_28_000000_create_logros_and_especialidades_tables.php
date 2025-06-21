@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -26,27 +27,27 @@ return new class extends Migration {
 
         Schema::create('training_requests', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-           
-            $table->integer('age');
-            $table->enum('sport_level', ['Principiante', 'Intermedio', 'Avanzado', 'Profesional']);
+
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('trainer_id')->constrained('trainer')->onDelete('cascade');
+
+            $table->string('sport_level');
             $table->text('description')->nullable();
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->string('status')->default('pendiente');
 
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         // Remove 'achievements' column 
         Schema::table('users', function (Blueprint $table) {
-            
+
             $table->enum('category', ['Fútbol', 'Baloncesto', 'Tenis', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'])->nullable()->default(null);
             if (Schema::hasColumn('users', 'achievements')) {
                 $table->dropColumn('achievements');
             }
         });
 
-        
+
         Schema::table('trainer', function (Blueprint $table) {
             if (Schema::hasColumn('trainer', 'achievements')) {
                 $table->dropColumn('achievements');

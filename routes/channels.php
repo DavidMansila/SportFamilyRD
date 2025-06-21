@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use App\Models\Chat;
 
 // Canal de chat
-Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
+Broadcast::channel('chat.{chatId}', function () {
     return true;
 });
 

@@ -175,6 +175,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 
 export default {

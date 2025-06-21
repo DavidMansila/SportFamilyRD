@@ -8,10 +8,10 @@ class SavedNews extends Model
 {
     protected $table = 'saved_news';
     protected $fillable = ['user_id', 'news_id'];
+    public $timestamps = false;
 
-    // Especificar la tabla correcta para la relación
     public function news()
     {
-        return $this->belongsTo(News::class, 'news_id', 'id');
+        return $this->belongsTo(News::class, 'news_id');
     }
 }

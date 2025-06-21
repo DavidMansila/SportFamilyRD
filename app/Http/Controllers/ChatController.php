@@ -19,12 +19,14 @@ class ChatController extends Controller
 
         $chats = Chat::with([
             'user:id,name,image',
-            'trainer:id,name,image',
+            'trainer.user:id,name,image',
             'lastMessage'
         ])
             ->where(function ($query) use ($userId) {
                 $query->where('user_id', $userId)
-                    ->orWhere('trainer_id', $userId);
+                    ->orWhereHas('trainer', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    });
             })
             ->accepted()
             ->get()
@@ -40,7 +42,10 @@ class ChatController extends Controller
                         ->count(),
                     'last_message' => $chat->last_message,
                     'user' => $chat->user,
-                    'trainer' => $chat->trainer
+                    'trainer' => [
+                        'id' => $chat->trainer->id,
+                        'user' => $chat->trainer->user
+                    ]
                 ];
             });
 
@@ -48,20 +53,21 @@ class ChatController extends Controller
     }
 
 
-
     public function storeMessage(Request $request, $chatId)
     {
         $request->validate([
-            'message' => 'required|string'
+            'message' => 'required|string',
         ]);
+
+        $user = Auth::user();
+        $senderType = $user->user_type === 'user' ? 'user' : 'trainer';
 
         $message = Message::create([
             'chat_id' => $chatId,
             'sender_id' => Auth::id(),
+            'sender_type' => $senderType,
             'message' => $request->message
         ]);
-
-        $message->load('sender');
 
         $chat = Chat::findOrFail($chatId);
 
@@ -81,7 +87,7 @@ class ChatController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'trainer_id' => 'required|exists:users,id',
+            'trainer_id' => 'required|exists:trainer,id',
         ]);
 
         // Verificar si ya existe un chat
@@ -112,15 +118,19 @@ class ChatController extends Controller
 
     public function show($id)
     {
-        $chat = Chat::with(['messages.sender', 'user', 'trainer'])
+        $chat = Chat::with(['messages' => function ($query) {
+            $query->orderBy('created_at', 'asc');
+        }, 'user', 'trainer'])
             ->findOrFail($id);
 
-        // Marcar mensajes como leídos
         Message::where('chat_id', $id)
             ->where('sender_id', '!=', Auth::id())
             ->update(['read' => true]);
 
-        return response()->json($chat);
+        return response()->json([
+            'messages' => $chat->messages,
+            'chat' => $chat
+        ]);
     }
 
 

@@ -4,29 +4,22 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 
 class ShareAuthenticatedUser
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        // Compartir usuario autenticado con todas las vistas
         if (Auth::check()) {
-            View::share('authUser', Auth::user());
-        } else {
-            View::share('authUser', null);
-        }
+            $user = Auth::user();
 
-        // Opcional: Compartir para APIs (si usas Inertia.js o similar)
-        if ($request->wantsJson()) {
-            $request->attributes->set('authUser', Auth::user());
+            // Agregar propiedades necesarias
+            $user->image = $user->image
+                ? asset('storage/users/' . $user->id . '/' . $user->image)
+                : asset('storage/users/Perfil-Icon.png');
+
+            View::share('authUser', $user);
         }
 
         return $next($request);

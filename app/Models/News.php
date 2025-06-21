@@ -11,6 +11,7 @@ class News extends Model
 {
     use SoftDeletes;
 
+    // Especifica el nombre correcto de la tabla
     protected $table = 'newsscrapping';
 
     protected $fillable = [

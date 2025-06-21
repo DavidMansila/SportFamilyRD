@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -13,26 +15,15 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-            // Obtener el usuario autenticado
             $user = Auth::user();
-           
-            $user->image = $user->image 
-            ? url('storage/users/' . $user->id . '/' . $user->image) 
-            : url('storage/users/Perfil-Icon.png');
 
-
-            // Devolver el rol del usuario junto con el mensaje de éxito
             return response()->json([
                 'message' => 'Login successful',
-                'user' => $user,
-            ], 200);
+                'user' => $user
+            ]);
         }
 
-        return response()->json([
-            'message' => 'Invalid credentials',
-            'credenciales' => $credentials,
-        ], 401);
+        return response()->json(['message' => 'Invalid credentials'], 401);
     }
 
     public function logout(Request $request)
@@ -41,14 +32,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Logout successful'], 200);
+        return response()->json(['message' => 'Logout successful']);
     }
-
-    // En AuthController.php
-    public function currentUser(Request $request)
-    {
-        return response()->json($request->user());
-    }
-
-
 }
