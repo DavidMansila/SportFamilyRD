@@ -51,7 +51,7 @@
     <!-- Lista de Entrenadores -->
     <div class="entrenadores-container">
       <transition-group name="cards" tag="div" class="entrenadores-grid">
-        <div v-for="entrenador in entrenadoresFiltrados" :key="entrenador.id" class="entrenador-card"
+        <div v-for="entrenador in entrenadoresFiltrados" :key="entrenador.trainer_id" class="entrenador-card"
           @click="verPerfil(entrenador)">
           <div class="card-image-container">
             <img :src="entrenador.foto" :alt="`${entrenador.nombre} - ${entrenador.deporte}`">

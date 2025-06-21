@@ -189,7 +189,16 @@ export default {
       }
 
       this.toggleCart();
-    }
+    },
+
+    handleUpdateQuantity({ index, quantity }) {
+      this.$store.dispatch('updateQuantity', { index, quantity });
+    },
+    
+    handleCheckout() {
+      this.closeCart();
+      // this.$router.push('/checkout');
+    },
 
   }
 }

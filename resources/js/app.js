@@ -46,6 +46,10 @@ const router = createRouter({
     ],
 });
 
+// app.js
+import gsap from 'gsap';
+
+
 // Crea la aplicación Vue
 const app = createApp(App);
 
@@ -55,5 +59,11 @@ app.use(VueAwesomePaginate);
 app.use(store);
 
 app.component("app-component", App);
+
+app.use({
+  install(app) {
+    app.config.globalProperties.$gsap = gsap;
+  }
+});
 
 app.mount("#app");

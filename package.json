@@ -20,6 +20,7 @@
         "vue": "^3.5.13"
     },
     "dependencies": {
+        "gsap": "^3.13.0",
         "laravel-echo": "^2.1.5",
         "pusher-js": "^8.4.0",
         "vue-awesome-paginate": "^1.2.0",
