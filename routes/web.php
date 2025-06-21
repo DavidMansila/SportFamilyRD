@@ -26,11 +26,12 @@ Route::get('/sanctum/csrf-cookie', function (Request $request) {
 });
 
 Route::post('login', [AuthController::class, 'login'])->middleware('cors');
-Route::get('logout', [AuthController::class, 'logout'])->middleware('cors');
+Route::post('logout', [AuthController::class, 'logout']);
+
 
 // Rutas públicas
 Route::get('/news', function () {
-    $news = News::orderBy('published_at', 'desc')->get()->map(function ($item) {
+    $news = \App\Models\News::orderBy('published_at', 'desc')->get()->map(function ($item) {
         return [
             'id' => $item->id,
             'title' => $item->title,
@@ -81,40 +82,47 @@ Route::post('/change-password', [ConfigurationController::class, 'changePassword
 Route::resource('config', ConfigurationController::class);
 
 // Noticias guardadas
-Route::post('/news/{newsId}/toggle-save', [SavedNewsController::class, 'toggleSave']);
-Route::get('/saved-news', [SavedNewsController::class, 'index']);
+Route::middleware('auth')->group(function () {
+    Route::post('/news/{newsId}/toggle-save', [SavedNewsController::class, 'toggleSave']);
+    Route::get('/saved-news', [SavedNewsController::class, 'index']);
+});
 
 // Operaciones CRUD en noticias (solo admin)
-Route::put('/news/{id}', function (Request $request, $id) {
-    $validator = Validator::make($request->all(), [
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'author' => 'required|string|max:100',
-        'published_at' => 'required|date',
-        'categoria' => 'required|string|max:50'
-    ]);
 
-    if ($validator->fails()) {
-        return response()->json($validator->errors(), 422);
-    }
+Route::middleware('auth', 'can:admin')->group(function () {
 
-    $noticia = News::findOrFail($id);
-    $noticia->update([
-        'title' => $request->title,
-        'description' => $request->description,
-        'author' => $request->author,
-        'published_at' => $request->published_at,
-        'category' => $request->categoria
-    ]);
+    Route::put('/news/{id}', function (Request $request, $id) {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'author' => 'required|string|max:100',
+            'published_at' => 'required|date',
+            'categoria' => 'required|string|max:50'
+        ]);
 
-    return response()->json($noticia);
-})->middleware('can:update,news');
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
-Route::delete('/news/{id}', function ($id) {
-    $noticia = News::findOrFail($id);
-    $noticia->delete();
-    return response()->json(['message' => 'Noticia eliminada']);
-})->middleware('can:delete,news');
+        $noticia = News::findOrFail($id);
+        $noticia->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'author' => $request->author,
+            'published_at' => $request->published_at,
+            'category' => $request->categoria
+        ]);
+
+        return response()->json($noticia);
+    })->middleware('can:update,news');
+
+    Route::delete('/news/{id}', function ($id) {
+        $noticia = \App\Models\News::findOrFail($id);
+        $noticia->delete();
+        return response()->json(['message' => 'Noticia eliminada']);
+    })->middleware('can:delete,news');
+});
+
 
 // Entrenadores
 Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);

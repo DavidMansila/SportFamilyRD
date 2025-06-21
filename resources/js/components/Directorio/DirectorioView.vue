@@ -107,6 +107,7 @@
 
 
 <script setup>
+import axios from 'axios';
 import { ref, computed } from 'vue';
 import Navbar from '../navbarComponent.vue';
   

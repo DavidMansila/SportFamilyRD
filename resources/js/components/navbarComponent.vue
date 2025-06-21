@@ -87,6 +87,7 @@
 
 
 <script>
+import axios from 'axios';
 import CarritoComponent from './CarritoComponent.vue';
 
 export default {
@@ -144,12 +145,21 @@ export default {
     async logout() {
       try {
         await axios.post('/logout');
-        sessionStorage.removeItem('auth_token');
+
         sessionStorage.removeItem('user');
-        delete axios.defaults.headers.common['Authorization'];
-        this.$router.push('/login');
+        this.user = null;
+        this.user_type = '';
+        this.showLogoutConfirm = false;
+
+        window.dispatchEvent(new CustomEvent('user-logged-out'));
+
+        this.$router.push('/');
       } catch (error) {
         console.error('Error al cerrar sesión:', error);
+        if (error.response?.status === 419) {
+          await axios.get('/sanctum/csrf-cookie');
+          return this.logout();
+        }
       }
     },
 

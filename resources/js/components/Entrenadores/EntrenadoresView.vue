@@ -303,6 +303,7 @@
 
 
 <script>
+import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatComponent from '../ChatComponent.vue';
 
