@@ -51,10 +51,10 @@
                             <span class="stat-label">Solicitudes Entrenadores</span>
                         </div>
 
-                        <div class="stat-item" v-if="user.user_type === 'entrenador'">
+                        <!-- <div class="stat-item" v-if="user.user_type === 'entrenador'">
                             <span class="stat-number">{{ stats.rating }}</span>
                             <span class="stat-label">Valoración</span>
-                        </div>
+                        </div> -->
 
                     </div>
 
@@ -831,15 +831,32 @@ export default {
             if (this.user.user_type === 'entrenador') {
                 this.loadScheduleIntoForm();
             }
-        }
+        },
 
 
+        async fetchUserStats() {
+            try {
+                const response = await axios.get(`/user-stats/${this.user.id}`);
 
+                if (response.data.success) {
+                    this.stats = {
+                        posts: response.data.stats.posts,
+                        likes: response.data.stats.likes,
+                        SolicitudesUsuarios: response.data.stats.training_requests
+                    };
+                }
+            } catch (error) {
+                console.error('Error obteniendo estadísticas:', error);
+            }
+        },
 
     },
     mounted() {
         this.user = JSON.parse(sessionStorage.getItem('user'));
         document.title = 'Perfil de ' + this.user.name;
+
+        // Obtener estadísticas
+        this.fetchUserStats();
 
         if (this.user.user_type === 'entrenador') {
             this.cargarEntrenadores();
