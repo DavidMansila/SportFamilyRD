@@ -92,8 +92,8 @@
         </div>
 
         <div class="post-imagen">
-          <img :src="post.imagen" alt="Imagen del post" class="post-image" @load="onImageLoad"
-            :class="{ loaded: imageLoaded }" />
+          <img :src="post.imagen" alt="Imagen del post" class="post-image" @load="onImageLoad(post.id)"
+            :class="{ loaded: imageLoaded[post.id] }" />
         </div>
 
         <p class="post-contenido">{{ post.contenido.substring(0, 150) }}...</p>
@@ -125,7 +125,7 @@
 
 
     <!-- Popout para ver publicación completa -->
-    <transition name="fade">
+    <transition name="fade" @before-enter="beforeEnter" @enter="enter" @leave="leave" :css="false">
       <div v-if="postSeleccionado" class="post-popout-overlay" @click.self="cerrarPopout">
         <div class="post-popout-container">
           <!-- Contenedor principal -->
@@ -141,7 +141,8 @@
               </div>
 
               <div class="image-container">
-                <img :src="postSeleccionado.imagen" :alt="postSeleccionado.titulo" class="post-popout-image">
+                <img :src="postSeleccionado.imagen" @load="onImageLoad('selected')"
+                  :class="{ loaded: imageLoaded['selected'] }" />
               </div>
 
 
@@ -240,7 +241,7 @@
                       <div class="comment-header">
 
                         <span class="comment-author">{{ comentario.user?.name || `Usuario${comentario.user_id}`
-                        }}</span>
+                          }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.replies && comentario.replies.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -568,7 +569,8 @@ export default {
       comentarioEditado: '',
       comentarioEditando: null,
       replyEditando: '',
-      replyEditado: null
+      replyEditado: null,
+      imageLoaded: {}
     };
   },
 
@@ -627,45 +629,41 @@ export default {
 
     // Métodos para el Popup
     abrirPopout(post) {
-      this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.scrollBehavior = 'auto';
+      try {
+        this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        document.body.style.overflow = 'hidden';
 
-      this.postSeleccionado = {
-        ...post,
-        isLiked: post.isLiked || false,
-        comments: post.comments.map(comment => ({
-          ...comment,
-          isLiked: comment.isLiked || false,
-          likes: comment.likes || 0,
-          replies: (comment.replies || []).map(reply => ({
-            ...reply,
-            isLiked: reply.isLiked || false,
-            likes: reply.likes || 0
+        this.postSeleccionado = {
+          ...post,
+          isLiked: post.isLiked || false,
+          likes_count: post.likes_count || 0,
+          comments: (post.comments || []).map(comment => ({
+            ...comment,
+            isLiked: comment.isLiked || false,
+            likes: comment.likes || 0,
+            replies: (comment.replies || []).map(reply => ({
+              ...reply,
+              isLiked: reply.isLiked || false,
+              likes: reply.likes || 0
+            }))
           }))
-        }))
-      };
+        };
+      } catch (error) {
+        console.error('Popup open error:', error);
+      }
     },
 
     cerrarPopout() {
-      // Restaurar estilos correctamente
-      document.body.style.overflow = 'auto';
-      document.body.style.position = 'relative'; // Cambiar de static a relative
-      document.body.style.top = 'auto';
-
-      // Restaurar scroll después de actualizar el DOM
-      this.$nextTick(() => {
-        window.scrollTo({
-          top: this.scrollPosition,
-          behavior: 'auto'
-        });
-      });
-
-      // Restablecer estados
-      this.postSeleccionado = null;
-      this.comentarioRespondiendo = null;
-      this.nuevoComentario = '';
+      try {
+        document.body.style.overflow = 'auto';
+        this.postSeleccionado = null;
+        this.comentarioRespondiendo = null;
+        this.nuevoComentario = '';
+      } catch (error) {
+        console.error('Popup close error:', error);
+      }
     },
+
 
     toggleCommentExpansion(commentId) {
       const index = this.comentariosExpandidos.indexOf(commentId);
@@ -676,10 +674,18 @@ export default {
       }
     },
 
+
     focusComentario() {
-      this.$nextTick(() => {
-        this.$refs.comentarioInput?.focus();
-      });
+      try {
+        this.$nextTick(() => {
+          const input = this.$refs.comentarioInput;
+          if (input && input.focus) {
+            input.focus();
+          }
+        });
+      } catch (error) {
+        this.handleError(error, 'focusing comment input');
+      }
     },
 
     abrirPopoutYFocalizarComentario(post) {
@@ -758,7 +764,7 @@ export default {
         }));
         this.postsFiltrados = [...this.posts];
       } catch (error) {
-        console.error('Error obteniendo posts:', error);
+        console.error('Post fetch error:', error);
       }
     },
 
@@ -1275,11 +1281,48 @@ export default {
     },
 
 
+    onImageLoad(postId) {
+      this.imageLoaded = {
+        ...this.imageLoaded,
+        [postId]: true
+      };
+    },
+
+    handleError(error, context = '') {
+      console.error(`Error in ${context}:`, error);
+    },
+
+
+
+    beforeEnter(el) {
+      if (!el) return;
+      el.style.opacity = 0;
+    },
+    enter(el, done) {
+      if (!el) return done();
+      this.$gsap.to(el, {
+        opacity: 1,
+        duration: 0.3,
+        onComplete: done
+      });
+    },
+    leave(el, done) {
+      if (!el) return done();
+      this.$gsap.to(el, {
+        opacity: 0,
+        duration: 0.2,
+        onComplete: done
+      });
+    },
+
   },
   mounted() {
+    this.user = JSON.parse(sessionStorage.getItem('user')) || null;
     this.getPost();
-    document.title = 'Foro';
-    this.user = JSON.parse(sessionStorage.getItem('user'));
+  },
+  beforeUnmount() {
+    document.body.style.overflow = 'auto';
+    this.postSeleccionado = null;
   }
 }
 </script>
