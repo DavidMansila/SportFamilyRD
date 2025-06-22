@@ -14,10 +14,18 @@ class Authenticate
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle($request, Closure $next, ...$guards)
     {
-        if (!Auth::check()) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        if ($request->bearerToken()) {
+            // Token-based authentication
+            if (!Auth::guard('sanctum')->check()) {
+                return response()->json(['message' => 'Unauthenticated'], 401);
+            }
+        } else {
+            // Session-based authentication
+            if (!Auth::guard('web')->check()) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
         }
 
         return $next($request);

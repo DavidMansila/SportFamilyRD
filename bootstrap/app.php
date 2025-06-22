@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 // Remover encabezados inseguros
 if (!headers_sent() && function_exists('header_remove')) {
@@ -27,13 +28,26 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ShareAuthenticatedUser::class,
         ]);
 
+        // Add Sanctum middleware for API stateful requests
         $middleware->api(prepend: [
+            EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
 
+        // Register custom middleware
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
             'cors' => \App\Http\Middleware\EnsureCors::class,
+            'fix.cookies' => \App\Http\Middleware\FixCookieHeaders::class,
+            'force.cookies' => \App\Http\Middleware\ForceCookieMiddleware::class,
+            'security.headers' => \App\Http\Middleware\SecurityHeadersMiddleware::class,
+        ]);
+
+        // Apply critical middleware globally
+        $middleware->append([
+            \App\Http\Middleware\ForceCookieMiddleware::class,
+            \App\Http\Middleware\FixCookieHeaders::class,
+            \App\Http\Middleware\SecurityHeadersMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
