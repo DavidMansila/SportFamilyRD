@@ -20,22 +20,9 @@ use App\Models\News;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Hash;
 
-// CSRF
-Route::get('/sanctum/csrf-cookie', function (Request $request) {
-    return response()->noContent()->withHeaders([
-        'Access-Control-Allow-Origin' => 'http://localhost:5173',
-        'Access-Control-Allow-Origin' => 'http://localhost:8000',
-        'Access-Control-Allow-Credentials' => 'true'
-    ]);
-});
-
-// Autenticación
-Route::post('login', [AuthController::class, 'login'])->middleware('cors');
-Route::post('logout', [AuthController::class, 'logout']);
+// RUTAS PÚBLICAS
+Route::post('/login', [AuthController::class, 'login']);
 
 // Noticias públicas
 Route::get('/news', function () {
@@ -53,40 +40,34 @@ Route::get('/news', function () {
     return response()->json($news);
 });
 
-// Usuarios
-Route::resource('/user', UserController::class);
-Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
-Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
+// Scrapper calendar
+Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
 
-// Productos
-Route::resource('/products', ProductController::class);
-Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
-Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
+// RUTAS PROTEGIDAS POR TOKEN
+Route::middleware('token.auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-// Carrito
-Route::get('/cart', [CartController::class, 'getCart']);
-Route::post('/cart/items', [CartController::class, 'addItem']);
-Route::put('/cart/items/{item}', [CartController::class, 'updateItem']);
-Route::delete('/cart/items/{item}', [CartController::class, 'removeItem']);
-
-// Posts
-Route::resource('/post', PostController::class);
-Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
-
-// Rutas protegidas por auth
-Route::middleware(['auth'])->group(function () {
     // Usuarios
     Route::resource('/user', UserController::class);
-    Route::get('/user-stats/{user}', [UserController::class, 'stats']);
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
+    Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
 
     // Productos
     Route::resource('/products', ProductController::class);
     Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
     Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
 
+    // Carrito
+    Route::get('/cart', [CartController::class, 'getCart']);
+    Route::post('/cart/items', [CartController::class, 'addItem']);
+    Route::put('/cart/items/{item}', [CartController::class, 'updateItem']);
+    Route::delete('/cart/items/{item}', [CartController::class, 'removeItem']);
+
     // Posts
     Route::resource('/post', PostController::class);
+    Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
+
+    // Funcionalidades completas de posts
     Route::post('/post/create-comment', [PostController::class, 'createComment']);
     Route::put('/post/update-comment/{commentId}', [PostController::class, 'updateComment']);
     Route::delete('/post/delete-comment/{commentId}', [PostController::class, 'destroyComment']);
@@ -126,60 +107,45 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
     Route::post('/messages/send', [ChatController::class, 'sendMessage']);
     Route::post('/chats/{chat}/messages', [MessageController::class, 'store']);
+
+    // CRUD de noticias (solo admin)
+    Route::middleware('can:admin')->group(function () {
+        Route::put('/news/{id}', function (Request $request, $id) {
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'author' => 'required|string|max:100',
+                'published_at' => 'required|date',
+                'categoria' => 'required|string|max:50'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
+            $noticia = News::findOrFail($id);
+            $noticia->update([
+                'title' => $request->title,
+                'description' => $request->description,
+                'author' => $request->author,
+                'published_at' => $request->published_at,
+                'category' => $request->categoria
+            ]);
+
+            return response()->json($noticia);
+        });
+
+        Route::delete('/news/{id}', function ($id) {
+            $noticia = \App\Models\News::findOrFail($id);
+            $noticia->delete();
+            return response()->json(['message' => 'Noticia eliminada']);
+        });
+    });
 });
 
-// Noticias guardadas y entrenamientos fuera del grupo anterior (si es necesario)
-Route::middleware('auth')->group(function () {
-    Route::post('/news/{newsId}/toggle-save', [SavedNewsController::class, 'toggleSave']);
-    Route::get('/saved-news', [SavedNewsController::class, 'index']);
-    Route::resource('/training', TrainingController::class);
-    Route::get('/training/{id}', [TrainingController::class, 'show']);
-    Route::post('/training/check-existing', [TrainingController::class, 'checkExisting']);
-    Route::post('/training', [TrainingController::class, 'store']);
-    // Chats
-    Route::post('/chats', [ChatController::class, 'store']);
-    Route::get('/chats', [ChatController::class, 'index']);
-    Route::get('/chats/{id}', [ChatController::class, 'show']);
-    Route::post('/chats/{chatId}/messages', [ChatController::class, 'storeMessage']);
-    Route::put('/chats/{id}/accept', [ChatController::class, 'acceptChat']);
-    Route::post('/messages/send', [ChatController::class, 'sendMessage']);
-});
 
-// Scrapper calendar
-Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
-
-// CRUD de noticias (solo admin)
-Route::middleware(['auth', 'can:admin'])->group(function () {
-    Route::put('/news/{id}', function (Request $request, $id) {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'author' => 'required|string|max:100',
-            'published_at' => 'required|date',
-            'categoria' => 'required|string|max:50'
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-        $noticia = News::findOrFail($id);
-        $noticia->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'author' => $request->author,
-            'published_at' => $request->published_at,
-            'category' => $request->categoria
-        ]);
-        return response()->json($noticia);
-    })->middleware('can:update,news');
-    Route::delete('/news/{id}', function ($id) {
-        $noticia = \App\Models\News::findOrFail($id);
-        $noticia->delete();
-        return response()->json(['message' => 'Noticia eliminada']);
-    })->middleware('can:delete,news');
-});
 
 // --- RUTAS DE VERIFICACIÓN DE EMAIL (deben ir antes del catch-all) ---
-Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::get('/api/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
     $user = \App\Models\User::findOrFail($id);
@@ -206,6 +172,7 @@ Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
 
 // --- MANSI, LA RUTA CATCH-ALL DEL SPA AL FINAL SIEMPRE ---
 Route::get('/{any}', function () {
