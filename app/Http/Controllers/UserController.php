@@ -125,6 +125,24 @@ class UserController extends Controller
         }
     }
 
+    // public function showUserRequests(Request $request)
+    // {
+    //     try{
+    //         $user = Auth::user();
+    //         $requests = Training::where('status', 'pending')->get();
+
+    //         return response()->json([
+    //             'message' => 'Solicitudes obtenidas con éxito',
+    //             'requests' => $requests,
+    //         ], 200);
+
+    //     }catch(\Exception $e){
+    //         return response()->json([
+    //             'message' => 'Error: '.$e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function showUserRequests(Request $request)
     {
         try{
