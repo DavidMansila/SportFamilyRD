@@ -12,6 +12,7 @@ use App\Http\Controllers\SavedNewsController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\UserStatsController;
 use Illuminate\Support\Facades\Route;
 use App\Models\News;
 use Illuminate\Http\Request;
@@ -47,8 +48,9 @@ Route::get('/news', function () {
 
 // Usuarios
 Route::resource('/user', UserController::class);
-Route::get('/user-stats/{user}', [UserController::class, 'stats']);
 Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
+
+Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
 
 // Productos
 Route::resource('/products', ProductController::class);

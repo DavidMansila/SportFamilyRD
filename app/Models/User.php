@@ -99,6 +99,14 @@ class User extends Authenticatable
 
 
 
+    public function chats()
+    {
+        return $this->hasMany(Chat::class, 'user_id')
+            ->orWhereHas('trainer', function ($query) {
+                $query->where('user_id', $this->id);
+            });
+    }
+
 
 
     public function chatsAsUser()

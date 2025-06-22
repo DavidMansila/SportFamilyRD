@@ -114,7 +114,6 @@ export default {
         return '/storage/users/Perfil-Icon.png';
       }
 
-      // Verificar si ya tiene la ruta completa
       if (this.otherUser.image.startsWith('http') || this.otherUser.image.startsWith('/')) {
         return this.otherUser.image;
       }
@@ -158,13 +157,10 @@ export default {
       this.loadingMessages = true;
       try {
         const response = await axios.get(`/chats/${this.chatId}`);
-        // Acceder a response.data.messages en lugar de response.data
         this.messages = response.data.messages;
 
         this.$nextTick(() => {
-          setTimeout(() => {
-            this.scrollToBottom(true);
-          }, 100);
+          this.scrollToBottom(true);
           this.markMessagesAsRead();
         });
       } catch (error) {
@@ -173,6 +169,19 @@ export default {
         this.loadingMessages = false;
       }
     },
+
+
+    scrollToBottom(force = false) {
+      const container = this.$refs.messagesContainer;
+      if (!container) return;
+
+      if (force || container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
+        this.$nextTick(() => {
+          container.scrollTop = container.scrollHeight;
+        });
+      }
+    },
+
 
     async sendMessage() {
       if (!this.newMessage.trim() || this.sendingMessage) return;
@@ -207,9 +216,9 @@ export default {
         } else {
           this.messages.push(response.data);
         }
+
       } catch (error) {
         console.error('Error sending message:', error);
-        this.$toast.error('Error al enviar mensaje');
         const index = this.messages.findIndex(m => m.id === tempMessage.id);
         if (index !== -1) {
           this.messages.splice(index, 1);
@@ -219,22 +228,13 @@ export default {
       }
     },
 
-    scrollToBottom(instant = false) {
-      this.$nextTick(() => {
-        const container = this.$refs.messagesContainer;
-        if (container) {
-          container.scrollTo({
-            top: container.scrollHeight,
-            behavior: instant ? 'auto' : 'smooth'
-          });
-        }
-      });
-    },
 
     formatTime(time) {
       if (!time) return '';
 
-      const dateObj = time instanceof Date ? time : new Date(time);
+      const dateObj = typeof time === 'string' || typeof time === 'number'
+        ? new Date(time)
+        : time;
 
       return dateObj.toLocaleTimeString([], {
         hour: '2-digit',
@@ -271,20 +271,31 @@ export default {
 
 
     setupChannels() {
-      // Solo suscribirse si el usuario está autenticado y existe el chat
-      if (!this.currentUser || !this.chat?.id) return;
+      if (!this.chatId || !window.Echo) return;
 
-      this.pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
-        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-        authEndpoint: "/broadcasting/auth",
-      });
+      this.leaveChannels();
 
-      // Suscripción directa al canal privado
-      this.channel = this.pusher.subscribe(`private-chat.${this.chat.id}`);
+      // Canal privado para mensajes
+      this.echoChannel = window.Echo.private(`private-chat.${this.chatId}`)
+        .listen('.message.sent', this.handleIncomingMessage);
 
-      this.channel.bind("message.sent", (data) => {
-        this.handleIncomingMessage(data);
-      });
+      // Canal de presencia para estado
+      this.presenceChannel = window.Echo.join(`presence-chat.${this.chatId}`)
+        .here(this.updateOnlineStatus)
+        .joining(this.userJoined)
+        .leaving(this.userLeft);
+    },
+
+
+    handleIncomingMessage(data) {
+      if (this.messages.some(msg => msg.id === data.id)) return;
+
+      this.messages.push(data);
+      this.scrollToBottom();
+
+      if (!this.isMessageFromMe(data)) {
+        this.markMessagesAsRead();
+      }
     },
 
 
@@ -292,10 +303,6 @@ export default {
       if (this.echoChannel) {
         window.Echo.leave(`chat.${this.chatId}`);
         this.echoChannel = null;
-      }
-      if (this.presenceChannel) {
-        window.Echo.leave(`presence-chat.${this.chatId}`);
-        this.presenceChannel = null;
       }
     },
 
@@ -324,7 +331,6 @@ export default {
     },
 
     closeChat() {
-      // Limpiar canales antes de cerrar
       if (this.echoChannel) {
         window.Echo.leave(`chat.${this.chatId}`);
       }
@@ -335,9 +341,9 @@ export default {
       this.$emit('close-chat');
     },
 
-    updateReadStatus(data) {
+    updateReadStatus() {
       this.messages.forEach(msg => {
-        if (this.isMessageFromMe(msg) && !msg.read) {
+        if (this.isMessageFromMe(msg)) {
           msg.read = true;
         }
       });
@@ -360,6 +366,21 @@ export default {
     }
   },
   mounted() {
+    if (!window.Pusher) {
+      window.Pusher = require('pusher-js');
+    }
+
+    if (!window.Echo) {
+      window.Echo = new Echo({
+        broadcaster: "pusher",
+        key: "337abba0601b16bbbce2",
+        cluster: "mt1",
+        forceTLS: true,
+        encryption: true,
+        authEndpoint: "/broadcasting/auth",
+      });
+    }
+
     this.setupChannels();
   },
 

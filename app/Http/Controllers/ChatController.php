@@ -67,11 +67,26 @@ class ChatController extends Controller
             'message' => $request->message
         ]);
 
-        event(new NewMessage($message));
+        // Disparar evento de mensaje enviado
+        broadcast(new NewMessage($message))->toOthers();
 
         return response()->json($message);
     }
 
+    public function markAsRead($chatId)
+    {
+        $userId = Auth::id();
+
+        Message::where('chat_id', $chatId)
+            ->where('sender_id', '!=', $userId)
+            ->where('read', false)
+            ->update(['read' => true]);
+
+        // Disparar evento de mensaje leído
+        broadcast(new MessageRead($chatId))->toOthers();
+
+        return response()->json(['success' => true]);
+    }
 
     public function store(Request $request)
     {
@@ -131,22 +146,5 @@ class ChatController extends Controller
         $chat->update(['status' => 'accepted']);
 
         return response()->json($chat);
-    }
-
-
-
-    public function markAsRead($chatId)
-    {
-        $userId = Auth::id();
-
-        Message::where('chat_id', $chatId)
-            ->where('sender_id', '!=', $userId)
-            ->where('read', false)
-            ->update(['read' => true]);
-
-        // Enviar evento de actualización
-        broadcast(new MessageRead($chatId));
-
-        return response()->json(['success' => true]);
     }
 }

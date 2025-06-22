@@ -20,24 +20,27 @@ axios.interceptors.request.use(async (config) => {
     return config;
 });
 
-// Configuración de Echo
+// Configuración de Echo y Pusher
 window.Pusher = Pusher;
 
 window.Echo = new Echo({
     broadcaster: "pusher",
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+    key: "337abba0601b16bbbce2",
+    cluster: "mt1",
     forceTLS: true,
     encrypted: true,
     authEndpoint: "/broadcasting/auth",
     auth: {
         headers: {
-            "X-CSRF-Token":
-                document.querySelector('meta[name="csrf-token"]')?.content ||
-                "",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "X-CSRF-Token": getCookie("XSRF-TOKEN"),
+            Accept: "application/json",
         },
     },
-    disableStats: true,
-    enabledTransports: ["ws", "wss"],
 });
+
+// Función para obtener cookies
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
