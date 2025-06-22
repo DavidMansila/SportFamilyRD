@@ -165,12 +165,14 @@ export default {
       }
     },
 
+
     async submitForm() {
       try {
         console.log('Registering:', this.registerForm);
 
         axios.post('/user', this.registerForm)
           .then(response => {
+            sessionStorage.setItem('token', response.data.token);
             sessionStorage.setItem('user', JSON.stringify(response.data.user));
             this.$router.push('/');
           })
@@ -183,76 +185,21 @@ export default {
       }
     },
 
+
     async submitLoginForm() {
-      this.isSubmitting = true;
-
       try {
-
-        await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
-
         const response = await axios.post('/login', {
           email: this.loginForm.email,
           password: this.loginForm.password
-        }, {
-          withCredentials: true,
-          headers: {
-            'X-XSRF-TOKEN': this.getCsrfFromCookies(),
-            'Accept': 'application/json'
-          }
         });
 
-        const user = response.data.user;
-        user.image = user.image
-          ? `${axios.defaults.baseURL}/storage/users/${user.id}/${user.image}`
-          : `${axios.defaults.baseURL}/storage/users/Perfil-Icon.png`;
-
-        // Store in both sessionStorage and localStorage
-        sessionStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('loggedIn', 'true');
-
+        sessionStorage.setItem('user', JSON.stringify(response.data.user));
+        sessionStorage.setItem('token', response.data.token);
         this.$router.push('/');
-
       } catch (error) {
-        console.error('Error en login:', error);
-
-        // Manejo específico de error 419
-        if (error.response?.status === 419) {
-          try {
-            // Reintento con nuevo token
-            await axios.get('/sanctum/csrf-cookie');
-            const retryResponse = await axios.post('/login', {
-              email: this.loginForm.email,
-              password: this.loginForm.password
-            }, {
-              headers: {
-                'X-XSRF-TOKEN': this.getCsrfFromCookies(),
-                'Accept': 'application/json'
-              }
-            });
-
-
-            const user = retryResponse.data.user;
-            user.image = user.image
-              ? `${axios.defaults.baseURL}/storage/users/${user.id}/${user.image}`
-              : `${axios.defaults.baseURL}/storage/users/Perfil-Icon.png`;
-
-            sessionStorage.setItem('user', JSON.stringify(user));
-            this.$router.push('/');
-          } catch (retryError) {
-            console.error('Error en reintento:', retryError);
-            alert('Error persistente. Por favor recarga la página.');
-          }
-        } else {
-          alert('Error de conexión: ' + error.message);
-        }
+        console.error('Login error:', error);
+        alert('Credenciales inválidas');
       }
-      this.isSubmitting = false;
-    },
-
-
-    getCsrfFromCookies() {
-      const matches = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-      return matches ? decodeURIComponent(matches[1]) : null;
     },
 
 

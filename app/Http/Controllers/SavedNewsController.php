@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\SavedNews;
 use App\Models\News;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class SavedNewsController extends Controller
 {
-    public function toggleSave($newsId)
+    public function toggleSave($newsId, Request $request)
     {
-        $user = Auth::user();
+        // Obtener usuario del request (adjuntado por el middleware)
+        $user = $request->user;
 
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
@@ -44,9 +44,10 @@ class SavedNewsController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
+        // Obtener usuario del request
+        $user = $request->user;
 
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
