@@ -244,6 +244,7 @@ export default {
       return matches ? decodeURIComponent(matches[1]) : null;
     },
 
+
     checkLogoutMessage() {
       if (this.$route.query.logoutSuccess || sessionStorage.getItem('logoutMessage')) {
         this.showLogoutMessage = true;
