@@ -719,7 +719,7 @@ export default {
       formData.append('titulo', this.nuevoPost.titulo);
       formData.append('contenido', this.nuevoPost.contenido);
       formData.append('categoria', this.nuevoPost.categoria);
-      formData.append('user_id', this.user.id); // Asegurar user_id en el formData
+      formData.append('user_id', this.user.id);
 
       if (this.nuevoPost.imagenFile) {
         formData.append('imagen', this.nuevoPost.imagenFile);
@@ -727,7 +727,7 @@ export default {
 
       try {
         await axios.post('/post', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
         await this.getPost();
         this.cerrarModal();

@@ -32,10 +32,9 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
 
-            // Agrega esto para Sanctum
-            Route::prefix('sanctum')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/sanctum.php'));
+            // Route::prefix('sanctum')
+            //     ->namespace($this->namespace)
+            //     ->group(base_path('routes/sanctum.php'));
         });
     }
 

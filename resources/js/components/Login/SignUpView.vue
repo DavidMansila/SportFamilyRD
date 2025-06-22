@@ -165,12 +165,14 @@ export default {
       }
     },
 
+
     async submitForm() {
       try {
         console.log('Registering:', this.registerForm);
 
         axios.post('/user', this.registerForm)
           .then(response => {
+            sessionStorage.setItem('token', response.data.token);
             sessionStorage.setItem('user', JSON.stringify(response.data.user));
             this.$router.push('/');
           })
@@ -182,7 +184,6 @@ export default {
         console.error(error);
       }
     },
-
 
 
     async submitLoginForm() {

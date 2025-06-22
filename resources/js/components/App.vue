@@ -63,6 +63,9 @@ export default {
       this.isLoginOrHome = loginPaths.includes(route.path);
     }
   },
+  mounted() {
+    axios.defaults.withCredentials = true;
+  }
 };
 </script>
 

@@ -1,19 +1,19 @@
-import axios from "axios";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 
 // Configuración de Axios
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:8000";
+import axios from 'axios';
 
-axios.interceptors.request.use((config) => {
-    const token = sessionStorage.getItem("token");
+axios.defaults.baseURL = 'http://localhost:8000/api';
+axios.interceptors.request.use(config => {
+    const token = sessionStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 });
 
+export default axios;
 // // Configuración de Echo y Pusher
 // window.Pusher = Pusher;
 

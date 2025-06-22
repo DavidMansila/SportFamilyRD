@@ -147,6 +147,7 @@ export default {
         await axios.post('/logout');
 
         sessionStorage.removeItem('user');
+        sessionStorage.removeItem('token');
         this.user = null;
         this.user_type = '';
         this.showLogoutConfirm = false;
@@ -194,7 +195,7 @@ export default {
     handleUpdateQuantity({ index, quantity }) {
       this.$store.dispatch('updateQuantity', { index, quantity });
     },
-    
+
     handleCheckout() {
       this.closeCart();
       // this.$router.push('/checkout');
