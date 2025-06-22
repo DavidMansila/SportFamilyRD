@@ -187,28 +187,31 @@ export default {
       this.isSubmitting = true;
 
       try {
-      await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
-     
-      await axios.post('/login', { 
-        email: this.loginForm.email, 
-        password: this.loginForm.password 
-      }, {
-        withCredentials: true,
-        headers: {
-          'X-XSRF-TOKEN': this.getCsrfFromCookies(),
-          'Accept': 'application/json'
-        }
-      });
 
-        // Manejo de usuario
+        await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+
+        const response = await axios.post('/login', {
+          email: this.loginForm.email,
+          password: this.loginForm.password
+        }, {
+          withCredentials: true,
+          headers: {
+            'X-XSRF-TOKEN': this.getCsrfFromCookies(),
+            'Accept': 'application/json'
+          }
+        });
+
         const user = response.data.user;
         user.image = user.image
           ? `${axios.defaults.baseURL}/storage/users/${user.id}/${user.image}`
           : `${axios.defaults.baseURL}/storage/users/Perfil-Icon.png`;
 
+        // Store in both sessionStorage and localStorage
         sessionStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('loggedIn', 'true');
 
         this.$router.push('/');
+
       } catch (error) {
         console.error('Error en login:', error);
 
@@ -227,7 +230,7 @@ export default {
               }
             });
 
-          
+
             const user = retryResponse.data.user;
             user.image = user.image
               ? `${axios.defaults.baseURL}/storage/users/${user.id}/${user.image}`

@@ -20,7 +20,15 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Login successful',
                 'user' => $user
-            ]);
+            ])->withCookie(cookie(
+                'laravel_session',
+                $request->session()->getId(),
+                60 * 24 * 7, // 1 week
+                null,
+                '.localhost', // Note the leading dot
+                false,
+                true
+            ));
         }
 
         return response()->json(['message' => 'Invalid credentials'], 401);
