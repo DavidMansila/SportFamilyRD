@@ -1,57 +1,67 @@
 <template>
   <div class="app-container">
-    <router-view />
+    <VerificaCorreo v-if="user && !user.email_verified_at && !isLoginOrHome" :user="user" />
+    <router-view v-else-if="user || publicRoutes.includes($route.path)" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import ProductModal from '../components/CarritoComponent.vue';
+import VerificaCorreo from './VerificaCorreo.vue';
 
 export default {
   components: {
     ProductModal
   },
   name: 'App',
+  components: { VerificaCorreo },
   data() {
     return {
       user: null,
+      isLoginOrHome: false,
+      publicRoutes: ['/', '/signup', '/login'],
     };
   },
-  async created() {
-    // await this.loadUser();
+  watch: {
+    '$route'(to) {
+      this.checkRoute(to);
+      // Recargar el usuario desde sessionStorage en cada cambio de ruta
+      const storedUser = sessionStorage.getItem('user');
+      if (storedUser) {
+        try {
+          this.user = JSON.parse(storedUser);
+        } catch (e) {
+          sessionStorage.removeItem('user');
+          this.user = null;
+        }
+      } else {
+        this.user = null;
+      }
+      // Redirigir a / si intenta acceder a ruta protegida sin estar logeado
+      if (!this.user && !this.publicRoutes.includes(to.path)) {
+        this.$router.replace('/');
+      }
+    }
+  },
+  created() {
+    this.checkRoute(this.$route);
+    // Inicializar user desde sessionStorage inmediatamente
+    const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+      try {
+        this.user = JSON.parse(storedUser);
+      } catch (e) {
+        sessionStorage.removeItem('user');
+        this.user = null;
+      }
+    }
   },
   methods: {
-    // async loadUser() {
-    //   try {
-    //     const storedUser = localStorage.getItem('user');
-    //     if (storedUser) {
-    //       try {
-    //         this.user = JSON.parse(storedUser);
-    //       } catch (e) {
-    //         console.error('Failed to parse stored user:', e);
-    //         localStorage.removeItem('user');
-    //       }
-    //     }
-
-    //     const response = await axios.get('/current-user');
-    //     if (response.data) {
-    //       this.user = response.data;
-    //       localStorage.setItem('user', JSON.stringify(response.data));
-    //     }
-    //   } catch (error) {
-    //     console.error('Error loading user:', error);
-    //     this.handleAuthError(error);
-    //   }
-    // },
-
-    // handleAuthError(error) {
-    //   if (error.response?.status === 401) {
-    //     this.user = null;
-    //     localStorage.removeItem('user');
-    //     this.$router.push('/login');
-    //   }
-    // },
+    checkRoute(route) {
+      const loginPaths = ['/', '/signUp', '/signup'];
+      this.isLoginOrHome = loginPaths.includes(route.path);
+    }
   },
 };
 </script>

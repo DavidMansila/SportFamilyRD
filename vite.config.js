@@ -29,26 +29,18 @@ export default defineConfig({
         },
     },
     server: {
-        host: "localhost",
-        port: 5173,
-        strictPort: true,
-        proxy: {
-            "/sanctum": "http://localhost:8000",
-            "/login": "http://localhost:8000",
-            "/logout": "http://localhost:8000",
-        },
+        allowedHosts: true,
     },
-
     //  server: {
     //      host: '10.0.0.6',           // <--mansi aqui pon tu ip
     //      port: 5173,
     //      strictPort: true,
     //      allowedHosts: 'all',
     //  },
-
+    
     // server: {
-    //     host: '10.0.0.7',
-    //     port: 5173,
+    //     host: '10.0.0.7',           
+    //     port: 5173,               
     //     strictPort: true,
     //     allowedHosts: 'all',
     // },

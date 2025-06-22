@@ -185,13 +185,20 @@ export default {
 
     async submitLoginForm() {
       this.isSubmitting = true;
-      try {
-        await axios.get('/sanctum/csrf-cookie');
 
-        const response = await axios.post('/login', {
-          email: this.loginForm.email,
-          password: this.loginForm.password
-        });
+      try {
+      await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+     
+      await axios.post('/login', { 
+        email: this.loginForm.email, 
+        password: this.loginForm.password 
+      }, {
+        withCredentials: true,
+        headers: {
+          'X-XSRF-TOKEN': this.getCsrfFromCookies(),
+          'Accept': 'application/json'
+        }
+      });
 
         // Manejo de usuario
         const user = response.data.user;
@@ -220,6 +227,7 @@ export default {
               }
             });
 
+          
             const user = retryResponse.data.user;
             user.image = user.image
               ? `${axios.defaults.baseURL}/storage/users/${user.id}/${user.image}`
@@ -243,6 +251,7 @@ export default {
       const matches = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
       return matches ? decodeURIComponent(matches[1]) : null;
     },
+
 
     checkLogoutMessage() {
       if (this.$route.query.logoutSuccess || sessionStorage.getItem('logoutMessage')) {

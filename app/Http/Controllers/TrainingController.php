@@ -27,17 +27,12 @@ class TrainingController extends Controller
         return $query->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         // For API, this can be left empty or return a view if needed
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -65,9 +60,6 @@ class TrainingController extends Controller
         return response()->json($training, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $training = Training::find($id);

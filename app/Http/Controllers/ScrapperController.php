@@ -467,5 +467,43 @@ class ScrapperController extends Controller
             'swimming_news' => $articles,
         ]);
     }
+
+    public function sdcTicketsScrap()
+    {
+        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $response = $client->request('GET', 'https://www.sdctickets.do/');
+        $html = (string) $response->getBody();
+        $crawler = new \Symfony\Component\DomCrawler\Crawler($html);
+
+        $events = $crawler->filter('.event-list .inners')->each(function ($node) {
+            $title = $node->filter('h4 span')->count() ? trim($node->filter('h4 span')->text()) : null;
+            $date = $node->filter('h4 em')->count() ? trim($node->filter('h4 em')->text()) : null;
+            $place = $node->filter('.event_place')->count() ? trim(str_replace(['Lugar:', '\n', '\r'], '', $node->filter('.event_place')->text())) : null;
+            $hour = null;
+            $price = null;
+            $image = $node->filter('img')->count() ? $node->filter('img')->attr('loader-src') : null;
+            $links = $node->filter('.inner-url a')->each(function($a) { return $a->attr('href'); });
+
+            // Buscar hora y precio
+            $node->filter('p')->each(function($p) use (&$hour, &$price) {
+                $label = $p->filter('label')->count() ? trim($p->filter('label')->text()) : '';
+                $text = trim(str_replace($label, '', $p->text()));
+                if (stripos($label, 'Hora') !== false) $hour = $text;
+                if (stripos($label, 'Desde') !== false) $price = $text;
+            });
+
+            return [
+                'title' => $title,
+                'date' => $date,
+                'place' => $place,
+                'hour' => $hour,
+                'price' => $price,
+                'image' => $image,
+                'links' => $links,
+            ];
+        });
+
+        return response()->json(['events' => $events]);
+    }
     
 }

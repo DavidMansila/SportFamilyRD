@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class TrainerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+ 
     public function index(Request $request)
     {
         $status = $request->query('status', 'all');
@@ -49,17 +47,11 @@ class TrainerController extends Controller
         ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $data = $request->all();
@@ -110,14 +102,6 @@ class TrainerController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage (con manejo de achievements relacional).
-     */
-
-
-    /**
-     * Update the status of the specified trainer.
-     */
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -146,9 +130,7 @@ class TrainerController extends Controller
         ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
         //
@@ -167,47 +149,83 @@ class TrainerController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $data = $request->all();
+        $achievements = $data['achievements'] ?? [];
+        unset($data['achievements']);
+        $specialties = $data['specialties'] ?? [];
+        unset($data['specialties']);
+
+        if (isset($data['cost']) && ($data['cost'] === 'null' || $data['cost'] === '')) {
+            $data['cost'] = null;
+        }
+
         $trainer = Trainer::findOrFail($id);
+        $trainer->update($data);
 
-        $trainer->sport_category = $request->input('sport_category');
-        $trainer->schedule = $request->input('schedule');
-
-        // Sincronizar especialidades
-        $trainer->specialties()->delete();
-        $specialties = $request->input('specialties', []);
-        foreach ($specialties as $specialty) {
-            $trainer->specialties()->create([
-                'description' => $specialty['description']
-            ]);
-        }
-
-        // Sincronizar logros
+        // Actualizar logros (achievements)
         $trainer->achievements()->delete();
-        $achievements = $request->input('achievements', []);
-
-        foreach ($achievements as $achievement) {
-            $date = isset($achievement['achievement_date'])
-                ? $achievement['achievement_date']
-                : null;
-
-            $trainer->achievements()->create([
-                'title' => $achievement['title'],
-                'description' => $achievement['description'],
-                'achievement_date' => $date
-            ]);
+        if (is_string($achievements)) {
+            $achievements = json_decode($achievements, true) ?? [];
+        }
+        $achievements = array_map(function ($item) {
+            if (is_string($item)) {
+                $decoded = json_decode($item, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return $item;
+        }, $achievements);
+        if (!empty($achievements)) {
+            $trainer->achievements()->createMany($achievements);
         }
 
-        $trainer->save();
+        // Actualizar especialidades (specialties)
+        $trainer->specialties()->delete();
+        if (is_string($specialties)) {
+            $specialties = json_decode($specialties, true) ?? [];
+        }
+        $specialties = array_map(function ($item) {
+            if (is_string($item)) {
+                $decoded = json_decode($item, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return $item;
+        }, $specialties);
+        if (!empty($specialties)) {
+            $trainer->specialties()->createMany($specialties);
+        }
 
         return response()->json([
-            'message' => 'Entrenador actualizado correctamente',
-            'trainer' => $trainer->load(['achievements', 'specialties'])
-        ]);
+            'message' => 'solicitud de entrenador actualizada exitosamente (con achievements y specialties)',
+            'product' => $trainer->load(['achievements', 'specialties'])
+        ], 200);
+
+
+        //  $trainer = Trainer::findOrFail($id);
+
+        // $trainer->sport_category = $request->input('sport_category');
+
+        // // Sincronizar especialidades
+        // $trainer->specialties()->delete();
+        // foreach ($request->input('specialties') as $specialty) {
+        //     $trainer->specialties()->create(['description' => $specialty['description']]);
+        // }
+
+        // // Sincronizar logros
+        // $trainer->achievements()->delete();
+        // foreach ($request->input('achievements') as $achievement) {
+        //     $trainer->achievements()->create([
+        //         'title' => $achievement['title'],
+        //         'description' => $achievement['description'],
+        //         'date' => $achievement['date'] ?? null
+        //     ]);
+        // }
+
+        // $trainer->save();
+
+        // return response()->json(['trainer' => $trainer]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
         //
