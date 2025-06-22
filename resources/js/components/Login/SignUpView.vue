@@ -200,7 +200,7 @@ export default {
           : `${axios.defaults.baseURL}/storage/users/Perfil-Icon.png`;
 
         sessionStorage.setItem('user', JSON.stringify(user));
-        
+
         this.$router.push('/');
       } catch (error) {
         console.error('Error en login:', error);
@@ -239,7 +239,10 @@ export default {
     },
 
 
-
+    getCsrfFromCookies() {
+      const matches = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+      return matches ? decodeURIComponent(matches[1]) : null;
+    },
 
     checkLogoutMessage() {
       if (this.$route.query.logoutSuccess || sessionStorage.getItem('logoutMessage')) {
