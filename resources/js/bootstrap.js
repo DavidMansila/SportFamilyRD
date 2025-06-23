@@ -1,34 +1,25 @@
-import Echo from "laravel-echo";
-import Pusher from "pusher-js";
-
-// Configuración de Axios
-import axios from 'axios';
+import axios from "axios";
 
 axios.defaults.baseURL = 'http://localhost:8000/api';
-axios.interceptors.request.use(config => {
-    const token = sessionStorage.getItem('token');
+
+// Interceptor para agregar token
+axios.interceptors.request.use((config) => {
+    const token = sessionStorage.getItem("token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 });
 
-export default axios;
-// // Configuración de Echo y Pusher
-// window.Pusher = Pusher;
-
-// window.Echo = new Echo({
-//     broadcaster: "pusher",
-//     key: "337abba0601b16bbbce2",
-//     cluster: "mt1",
-//     forceTLS: true,
-//     encrypted: true,
-//     authEndpoint: "/broadcasting/auth",
-//     auth: {
-//         headers: {
-//             "X-CSRF-Token": getCookie("XSRF-TOKEN"),
-//             Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-//             Accept: "application/json",
-//         },
-//     },
-// });
+// Manejar errores 401 (No autorizado)
+// axios.interceptors.response.use(
+//     (response) => response,
+//     (error) => {
+//         if (error.response && error.response.status === 401) {
+//             sessionStorage.removeItem("token");
+//             sessionStorage.removeItem("user");
+//             window.location.href = "";
+//         }
+//         return Promise.reject(error);
+//     }
+// );

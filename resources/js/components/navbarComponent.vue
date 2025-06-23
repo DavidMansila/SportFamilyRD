@@ -144,25 +144,40 @@ export default {
 
     async logout() {
       try {
-        await axios.post('/logout');
-
+        // Limpiar datos de sesión primero
         sessionStorage.removeItem('user');
         sessionStorage.removeItem('token');
         this.user = null;
         this.user_type = '';
         this.showLogoutConfirm = false;
 
+        // Disparar evento global
         window.dispatchEvent(new CustomEvent('user-logged-out'));
 
+        // Intentar cerrar sesión en el backend (no bloqueante)
+        const token = sessionStorage.getItem('token');
+        if (token) {
+          axios.post('/logout', {}, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(e => console.warn('Error en logout backend:', e.message));
+        }
+
+        // Redirigir
         this.$router.push('/');
       } catch (error) {
-        console.error('Error al cerrar sesión:', error);
-        if (error.response?.status === 419) {
-          await axios.get('/sanctum/csrf-cookie');
-          return this.logout();
-        }
+        console.warn('Error en logout frontend:', error.message);
+        this.$router.push('/');
       }
     },
+
+    clearAuthData() {
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      this.user = null;
+      this.user_type = '';
+    },
+
+
 
     toggleCart() {
       this.isCartVisible = !this.isCartVisible;

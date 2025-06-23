@@ -18,9 +18,14 @@ use Illuminate\Support\Facades\Route;
 use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Broadcast;
+
+
+Route::get('/sanctum/csrf-cookie', [AuthController::class, 'csrfCookie']);
 
 // RUTAS PÚBLICAS
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 
 // Noticias públicas
 Route::get('/news', function () {
@@ -42,8 +47,7 @@ Route::get('/news', function () {
 Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
 
 // RUTAS PROTEGIDAS POR TOKEN
-Route::middleware('token.auth')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+Route::middleware('auth:sanctum')->group(function () {
 
     // Usuarios
     Route::resource('/user', UserController::class);
@@ -98,10 +102,8 @@ Route::middleware('token.auth')->group(function () {
 
     // Chats
     Route::get('/chats', [ChatController::class, 'index']);
-    Route::post('/chats', [ChatController::class, 'store']);
     Route::get('/chats/{id}', [ChatController::class, 'show']);
-    Route::post('/chats/{chatId}/messages', [ChatController::class, 'storeMessage']);
-    Route::put('/chats/{id}/accept', [ChatController::class, 'acceptChat']);
+    Route::post('/chats/{id}/messages', [ChatController::class, 'storeMessage']);
     Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
     Route::post('/messages/send', [ChatController::class, 'sendMessage']);
     Route::post('/chats/{chat}/messages', [MessageController::class, 'store']);
