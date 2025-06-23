@@ -14,4 +14,5 @@ class SavedNews extends Model
     {
         return $this->belongsTo(News::class, 'news_id');
     }
+    
 }

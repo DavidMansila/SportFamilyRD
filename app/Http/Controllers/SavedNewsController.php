@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SavedNews;
 use App\Models\News;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -46,8 +47,8 @@ class SavedNewsController extends Controller
 
     public function index(Request $request)
     {
-        // Obtener usuario del request
-        $user = $request->user;
+
+        $user = User::findOrFail($request['user_id']);
 
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);

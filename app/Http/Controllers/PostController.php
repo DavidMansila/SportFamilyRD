@@ -101,8 +101,8 @@ class PostController extends Controller
                 ], 422);
             }
 
-            $postData = $request->only(['titulo', 'contenido', 'categoria']);
-            $postData['user_id'] = Auth::id();
+            $postData = $request->only(['titulo', 'contenido', 'categoria','user_id']);
+            // $postData['user_id'] = Auth::id();
 
             $post = Post::create($postData);
 

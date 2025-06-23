@@ -310,8 +310,13 @@ export default {
         const token = sessionStorage.getItem('token');
 
         const response = await axios.get('/saved-news', {
+
           headers: {
+            // user_id: this.user.id,
             Authorization: `Bearer ${token}`
+          },
+          params: {
+            user_id: this.user.id
           }
         });
 
