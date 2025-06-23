@@ -102,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Chats
     Route::get('/chats', [ChatController::class, 'index']);
+    Route::post('/chats', [ChatController::class, 'store']);
     Route::get('/chats/{id}', [ChatController::class, 'show']);
     Route::post('/chats/{id}/messages', [ChatController::class, 'storeMessage']);
     Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);

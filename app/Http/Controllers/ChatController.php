@@ -16,8 +16,11 @@ class ChatController extends Controller
 
     public function index(Request $request)
     {
-        $userId = Auth::id();
+        $userId = $request->user_id;
 
+        // Log::info($request->all());
+        // return response()->json(['debug' => $request->all()]);
+        
         $chats = Chat::with([
             'user:id,name,image',
             'trainer.user:id,name,image',

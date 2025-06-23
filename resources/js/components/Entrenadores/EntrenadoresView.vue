@@ -605,7 +605,9 @@ export default {
     async loadChats() {
       if (!this.user) return;
       try {
-        const response = await axios.get('/chats');
+        const response = await axios.get('/chats',
+         { params: { user_id: this.user.id } }
+        );
         console.log('Respuesta de /chats:', response.data);
 
         this.chats = response.data.map(chat => {

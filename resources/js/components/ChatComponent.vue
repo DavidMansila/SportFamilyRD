@@ -158,7 +158,11 @@ export default {
       try {
         console.log('Fetching messages for chat ID:', this.chatId);
 
-        const response = await axios.get(`/chats/${this.chatId}`);
+        const response = await axios.get(`/chats/${this.chatId}`, {
+          // params: {
+          //   user_id: this.user.id,
+          // }
+        });
         console.log('Messages response:', response.data);
 
         this.messages = response.data.messages;
