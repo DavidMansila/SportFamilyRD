@@ -12,6 +12,7 @@ class SavedNewsController extends Controller
     public function toggleSave($newsId, Request $request)
     {
         // Obtener usuario del request (adjuntado por el middleware)
+        // dd($request->user);
         $user = $request->user;
 
         if (!$user) {
@@ -48,7 +49,8 @@ class SavedNewsController extends Controller
     {
         // Obtener usuario del request
         $user = $request->user;
-
+        dd($user);
+        
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
