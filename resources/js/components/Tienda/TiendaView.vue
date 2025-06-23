@@ -316,7 +316,7 @@ export default {
         .then(response => {
           this.productos = response.data.products.map(product => ({
             ...product,
-            categoria: product.category.toLowerCase(), // Normalizar categorías
+            categoria: product.category.toLowerCase(),
             name: product.name.toLowerCase(),
             description: product.description?.toLowerCase() || '',
             images: product.images || [product.image],
@@ -542,8 +542,6 @@ export default {
     this.user = JSON.parse(sessionStorage.getItem('user'));
     this.generarCategoriasFlat()
     document.title = 'Tienda';
-    // document.body.style.backgroundColor = '#e9ecef';
-    // document.body.style.paddingBottom = '10px';
   },
   beforeDestroy() {
     window.removeEventListener('keyup', this.handleKeyup);

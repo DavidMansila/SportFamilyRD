@@ -410,6 +410,9 @@ export default {
           {
             headers: {
               Authorization: `Bearer ${token}`
+            },
+            params: {
+              user_id: this.user.id
             }
           }
         );
