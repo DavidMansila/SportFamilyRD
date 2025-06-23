@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -27,8 +27,8 @@ class NewChat implements ShouldBroadcast
     public function broadcastOn()
     {
         return [
-            new Channel('chat.' . $this->chat_id),
-            new Channel('user.' . $this->recipientId())
+            new PrivateChannel('chat.' . $this->chat_id),
+            new PrivateChannel('user.' . $this->recipientId())
         ];
     }
 

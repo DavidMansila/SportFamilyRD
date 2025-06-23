@@ -751,11 +751,11 @@ export default {
     setupGlobalListeners() {
       if (typeof window.Echo === 'undefined') return;
 
-      window.Echo.private(`user.${this.user.id}`)
+      // Canal privado para usuario autenticado
+      window.Echo.private(`private-user.${this.user.id}`)
         .listen('.message.sent', (data) => {
           console.log('Nuevo mensaje recibido globalmente:', data);
           this.loadChats();
-
           if (this.activeChat && this.activeChat.id === data.chat_id) {
             this.$refs.chatComponent?.handleNewMessage(data);
           }
@@ -793,14 +793,18 @@ export default {
   },
   mounted() {
     this.user = JSON.parse(sessionStorage.getItem('user'));
-    if (this.user) {
-      this.cargarEntrenadores();
-      this.loadChats();
-
+    // Solo inicializar Echo si el usuario existe y el token está presente
+    const token = sessionStorage.getItem('token');
+    if (this.user && token) {
+      // Opcional: puedes validar el token con un endpoint antes de inicializar Echo
       if (!window.Echo) {
         this.loadEchoLibrary();
       }
-
+      this.cargarEntrenadores();
+      this.loadChats();
+    } else {
+      // Esperar a que el usuario inicie sesión antes de inicializar Echo
+      console.warn('Usuario no autenticado, Echo no se inicializa');
     }
   },
   beforeUnmount() {
