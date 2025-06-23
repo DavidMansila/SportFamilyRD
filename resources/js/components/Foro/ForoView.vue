@@ -879,7 +879,8 @@ export default {
       try {
         const response = await axios.post('/toggle-like', {
           likeable_type: type,
-          likeable_id: id
+          likeable_id: id,
+          user_id: this.user.id
         });
 
         // Actualizar estado local inmediatamente
