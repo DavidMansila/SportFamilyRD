@@ -109,15 +109,11 @@ class UserController extends Controller
                 :url('storage/users/Perfil-Icon.png');
             }
 
-            // Construye la URL completa para la respuesta
-            $user->image = $user->image
-                ? url('storage/users/' . $user->id . '/' . $user->image)
-                : url('storage/users/Perfil-Icon.png');
-
             return response()->json([
                 'message' => 'Usuario actualizado con éxito',
                 'user' => $user,
             ], 200);
+            
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error: ' . $e->getMessage()
