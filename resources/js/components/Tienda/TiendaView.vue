@@ -504,7 +504,6 @@ export default {
       )
     },
 
-
     async agregarAlCarrito(producto) {
       try {
         if (!this.user) {
@@ -515,7 +514,8 @@ export default {
         const response = await axios.post('/cart/items', {
           item_type: 'product',
           item_id: producto.id,
-          quantity: 1
+          quantity: 1,
+          user_id: this.user.id
         });
 
         alert(`${producto.name} ha sido añadido al carrito`);
