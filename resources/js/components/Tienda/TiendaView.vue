@@ -316,7 +316,7 @@ export default {
         .then(response => {
           this.productos = response.data.products.map(product => ({
             ...product,
-            categoria: product.category.toLowerCase(), // Normalizar categorías
+            categoria: product.category.toLowerCase(),
             name: product.name.toLowerCase(),
             description: product.description?.toLowerCase() || '',
             images: product.images || [product.image],
@@ -515,7 +515,8 @@ export default {
         const response = await axios.post('/cart/items', {
           item_type: 'product',
           item_id: producto.id,
-          quantity: 1
+          quantity: 1,
+          user_id: this.user.id
         });
 
         alert(`${producto.name} ha sido añadido al carrito`);
@@ -542,8 +543,6 @@ export default {
     this.user = JSON.parse(sessionStorage.getItem('user'));
     this.generarCategoriasFlat()
     document.title = 'Tienda';
-    // document.body.style.backgroundColor = '#e9ecef';
-    // document.body.style.paddingBottom = '10px';
   },
   beforeDestroy() {
     window.removeEventListener('keyup', this.handleKeyup);

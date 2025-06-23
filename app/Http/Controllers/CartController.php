@@ -5,13 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\CartItem;
 use App\Models\Cart;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    public function getCart()
+    public function getCart(Request $request)
     {
-        if (!Auth::check()) {
+
+        $user = User::findOrFail($request['user_id']);
+
+        if (!$user) {
             return response()->json(['items' => []]);
         }
 
@@ -62,11 +66,13 @@ class CartController extends Controller
             'quantity' => 'nullable|integer|min:1'
         ]);
 
-        if (!Auth::check()) {
+        
+        $user = User::findOrFail($request['user_id']);
+
+        if (!$user) {
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
-        $user = Auth::user();
         $cart = Cart::firstOrCreate([
             'user_id' => $user->id,
             'status' => 'active'
