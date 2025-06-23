@@ -142,6 +142,7 @@ export default {
       }
     }
   },
+
   methods: {
 
     isMessageFromMe(message) {
@@ -158,7 +159,11 @@ export default {
       try {
         console.log('Fetching messages for chat ID:', this.chatId);
 
-        const response = await axios.get(`/chats/${this.chatId}`);
+        const response = await axios.get(`/chats/${this.chatId}`, {
+          // params: {
+          //   user_id: this.user.id,
+          // }
+        });
         console.log('Messages response:', response.data);
 
         this.messages = response.data.messages;
@@ -212,6 +217,7 @@ export default {
 
         const response = await axios.post(`/chats/${this.chatId}/messages`, {
           message: messageContent,
+          user_id: this.user.id,
         });
 
         const index = this.messages.findIndex(m => m.id === tempMessage.id);
