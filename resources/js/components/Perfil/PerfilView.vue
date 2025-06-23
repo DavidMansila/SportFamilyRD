@@ -9,7 +9,7 @@
             <!-- Header del Perfil -->
             <div class="profile-header">
                 <div class="avatar-container">
-                    <img :src="user.image ? `${user.image}` : '/storage/users/Perfil-Icon.png'" alt=""
+                    <img :src="user.image ? user.image : '/storage/users/Perfil-Icon.png'" alt=""
                         class="profile-avatar" />
                     <button class="edit-avatar" @click="handleAvatarChange">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
