@@ -7,6 +7,7 @@ use App\Models\Like;
 use App\Models\Post;
 use App\Models\Comment;
 use App\Models\Reply;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
@@ -18,7 +19,7 @@ class LikeController extends Controller
             'likeable_id' => 'required|integer',
         ]);
 
-        $user = Auth::user();
+        $user = User::findOrFail($request['user_id']);
         if (!$user) {
             return response()->json(['message' => 'Debes iniciar sesión para dar like'], 401);
         }
