@@ -25,6 +25,10 @@ class AuthController extends Controller
             ]);
         }
 
+        $user->image = $user->image
+            ? url('storage/users/' . $user->id . '/' . $user->image)
+            : url('storage/users/Perfil-Icon.png');
+
         return response()->json([
             'user' => $user,
             'token' => $user->createToken('auth_token')->plainTextToken
