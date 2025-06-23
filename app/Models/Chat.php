@@ -11,13 +11,15 @@ class Chat extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function trainer()
     {
-        return $this->belongsTo(Trainer::class);
+        return $this->belongsTo(Trainer::class, 'trainer_id');
     }
+
+
 
     public function messages()
     {
@@ -26,8 +28,11 @@ class Chat extends Model
 
     public function lastMessage()
     {
-        return $this->hasOne(Message::class)->latestOfMany();
+        return $this->hasOne(Message::class)->latest('created_at');
     }
+
+
+
 
     public function scopeForUser($query, $userId)
     {

@@ -103,59 +103,20 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
 
-    public function chats()
-    {
-        return $this->hasMany(Chat::class, 'user_id')
-            ->orWhereHas('trainer', function ($query) {
-                $query->where('user_id', $this->id);
-            });
-    }
-
-
-
     public function chatsAsUser()
     {
         return $this->hasMany(Chat::class, 'user_id');
     }
+    
 
     public function chatsAsTrainer()
     {
         return $this->hasMany(Chat::class, 'trainer_id');
     }
 
+
     public function messages()
     {
         return $this->hasMany(Message::class, 'sender_id');
-    }
-
-    public function trainerChats()
-    {
-        return $this->hasMany(Chat::class, 'trainer_id');
-    }
-
-    public function userChats()
-    {
-        return $this->hasMany(Chat::class, 'user_id');
-    }
-
-
-
-    /**
-     * Generate a new API token for the user
-     */
-    public function generateAuthToken()
-    {
-        $this->api_token = Str::random(60);
-        $this->save();
-        return $this->api_token;
-    }
-
-    /**
-     * Clear the user's API token
-     */
-    public function clearAuthToken()
-    {
-        $this->api_token = null;
-        $this->save();
     }
 }

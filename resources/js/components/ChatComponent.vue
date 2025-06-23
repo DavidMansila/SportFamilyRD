@@ -156,7 +156,11 @@ export default {
     async fetchMessages() {
       this.loadingMessages = true;
       try {
+        console.log('Fetching messages for chat ID:', this.chatId);
+
         const response = await axios.get(`/chats/${this.chatId}`);
+        console.log('Messages response:', response.data);
+
         this.messages = response.data.messages;
 
         this.$nextTick(() => {
@@ -366,21 +370,6 @@ export default {
     }
   },
   mounted() {
-    if (!window.Pusher) {
-      window.Pusher = require('pusher-js');
-    }
-
-    if (!window.Echo) {
-      window.Echo = new Echo({
-        broadcaster: "pusher",
-        key: "337abba0601b16bbbce2",
-        cluster: "mt1",
-        forceTLS: true,
-        encryption: true,
-        authEndpoint: "/broadcasting/auth",
-      });
-    }
-
     this.setupChannels();
   },
 

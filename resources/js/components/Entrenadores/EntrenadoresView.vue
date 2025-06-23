@@ -602,7 +602,6 @@ export default {
     },
 
 
-
     async loadChats() {
       if (!this.user) return;
       try {
@@ -610,44 +609,65 @@ export default {
         console.log('Respuesta de /chats:', response.data);
 
         this.chats = response.data.map(chat => {
-          let otherParticipant = null;
+          // Verifica si el usuario actual es el usuario o el entrenador
+          const isUser = this.user.user_type === 'user';
 
-          if (this.user.user_type === 'user') {
-            // Acceder al usuario asociado al entrenador
-            otherParticipant = {
-              id: chat.trainer.id,
-              name: chat.trainer.user.name,
-              image: chat.trainer.user.image
-                ? `/storage/users/${chat.trainer.user.id}/${chat.trainer.user.image}`
-                : 'public/storage/users/Perfil-Icon.png',
-              type: 'trainer'
+          // Para usuario normal: el otro participante es el entrenador
+          if (isUser && chat.trainer && chat.trainer.user) {
+            return {
+              id: chat.id,
+              user_id: chat.user_id,
+              trainer_id: chat.trainer_id,
+              status: chat.status,
+              unread: chat.unread_count || 0,
+              last_message: chat.last_message,
+              other_participant: {
+                id: chat.trainer.user.id,
+                name: chat.trainer.user.name,
+                image: chat.trainer.user.image
+                  ? `/storage/users/${chat.trainer.user.id}/${chat.trainer.user.image}`
+                  : 'public/storage/users/Perfil-Icon.png',
+                type: 'trainer'
+              }
             };
           }
-          else if (this.user.user_type === 'entrenador') {
-            otherParticipant = {
-              id: chat.user.id,
-              name: chat.user.name,
-              image: chat.user.image
-                ? `/storage/users/${chat.user.id}/${chat.user.image}`
-                : 'public/storage/users/Perfil-Icon.png',
-              type: 'user'
+          // Para entrenador: el otro participante es el usuario
+          else if (!isUser && chat.user) {
+            return {
+              id: chat.id,
+              user_id: chat.user_id,
+              trainer_id: chat.trainer_id,
+              status: chat.status,
+              unread: chat.unread_count || 0,
+              last_message: chat.last_message,
+              other_participant: {
+                id: chat.user.id,
+                name: chat.user.name,
+                image: chat.user.image
+                  ? `/storage/users/${chat.user.id}/${chat.user.image}`
+                  : 'public/storage/users/Perfil-Icon.png',
+                type: 'user'
+              }
             };
           }
-
+          // Datos por defecto si algo falla
           return {
             id: chat.id,
             user_id: chat.user_id,
             trainer_id: chat.trainer_id,
             status: chat.status,
-            unread: chat.unread_count,
+            unread: chat.unread_count || 0,
             last_message: chat.last_message,
-            other_participant: otherParticipant
+            other_participant: {
+              name: 'Usuario desconocido',
+              image: 'public/storage/users/Perfil-Icon.png'
+            }
           };
         });
 
-        this.nuevosMensajes = this.chats.reduce((total, chat) => total + chat.unread, 0);
+        this.nuevosMensajes = this.chats.reduce((total, chat) => total + (chat.unread || 0), 0);
       } catch (error) {
-        console.error('Error cargando chats', error);
+        console.error('Error cargando chats', error.response ? error.response.data : error);
       }
     },
 
@@ -748,22 +768,16 @@ export default {
 
         window.Pusher = PusherModule.default;
 
-        // Configuración completa para todos los entornos
+        // Uso correcto del constructor
         window.Echo = new EchoModule.default({
           broadcaster: 'pusher',
           key: import.meta.env.VITE_PUSHER_APP_KEY,
           cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-          wsHost: `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
-          wssHost: `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
-          forceTLS: true,
-          encrypted: true,
-          disableStats: true,
-          enabledTransports: ['ws', 'wss'],
-          authEndpoint: "/broadcasting/auth",
+          authEndpoint: 'http://127.0.0.1:8000/api/broadcasting/auth',
           auth: {
             headers: {
-              Authorization: `Bearer ${this.user.token}`,
-              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
+              Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+              Accept: 'application/json'
             }
           }
         });
@@ -780,7 +794,11 @@ export default {
     if (this.user) {
       this.cargarEntrenadores();
       this.loadChats();
-      this.loadEchoLibrary();
+
+      if (!window.Echo) {
+        this.loadEchoLibrary();
+      }
+
     }
   },
   beforeUnmount() {

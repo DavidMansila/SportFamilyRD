@@ -9,6 +9,7 @@ use App\Models\Chat;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -28,7 +29,7 @@ class ChatController extends Controller
                         $q->where('user_id', $userId);
                     });
             })
-            ->accepted()
+            ->where('status', 'accepted') // Mover el where aquí
             ->get()
             ->map(function ($chat) use ($userId) {
                 return [
@@ -40,7 +41,12 @@ class ChatController extends Controller
                         ->where('sender_id', '!=', $userId)
                         ->where('read', false)
                         ->count(),
-                    'last_message' => $chat->last_message,
+                    'last_message' => $chat->lastMessage ? [
+                        'id' => $chat->lastMessage->id,
+                        'message' => $chat->lastMessage->message,
+                        'sender_id' => $chat->lastMessage->sender_id,
+                        'created_at' => $chat->lastMessage->created_at
+                    ] : null,
                     'user' => $chat->user,
                     'trainer' => [
                         'id' => $chat->trainer->id,
@@ -49,8 +55,13 @@ class ChatController extends Controller
                 ];
             });
 
+        // Depuración
+        Log::info('Chats encontrados: ' . count($chats));
+        Log::info('User ID: ' . $userId);
+
         return response()->json($chats);
     }
+
 
 
     public function storeMessage(Request $request, $chatId)
@@ -72,6 +83,8 @@ class ChatController extends Controller
 
         return response()->json($message);
     }
+
+
 
     public function markAsRead($chatId)
     {

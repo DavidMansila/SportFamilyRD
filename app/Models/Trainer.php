@@ -29,6 +29,11 @@ class Trainer extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
+    }
+
     public function achievements()
     {
         return $this->hasMany(Achievement::class, 'trainer_id');
