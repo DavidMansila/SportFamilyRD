@@ -107,7 +107,10 @@ const isLoading = ref(true);
 // Obtener carrito
 const fetchCart = async () => {
   try {
-    const response = await axios.get('/cart');
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    const response = await axios.get('/cart', {
+      params: { user_id: user.id }
+    });
     console.log("Respuesta del carrito:", response.data);
 
     cartItems.value = response.data.items.map(item => {

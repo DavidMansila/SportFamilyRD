@@ -20,7 +20,7 @@ class CartController extends Controller
         }
 
         $cart = Cart::with(['items.product'])
-            ->where('user_id', Auth::id())
+            ->where('user_id', $user->id)
             ->where('status', 'active')
             ->first();
 

@@ -504,7 +504,6 @@ export default {
       )
     },
 
-
     async agregarAlCarrito(producto) {
       try {
         if (!this.user) {
