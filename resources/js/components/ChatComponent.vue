@@ -142,6 +142,7 @@ export default {
       }
     }
   },
+
   methods: {
 
     isMessageFromMe(message) {
@@ -216,6 +217,7 @@ export default {
 
         const response = await axios.post(`/chats/${this.chatId}/messages`, {
           message: messageContent,
+          user_id: this.user.id,
         });
 
         const index = this.messages.findIndex(m => m.id === tempMessage.id);

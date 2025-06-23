@@ -7,6 +7,7 @@ use App\Events\NewMessage;
 use App\Events\MessageRead;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -71,7 +72,7 @@ class ChatController extends Controller
     {
         $request->validate(['message' => 'required|string']);
 
-        $user = Auth::user();
+        $user = User::findOrFail($request->user_id);
         $senderType = $user->user_type === 'user' ? 'user' : 'trainer';
 
         $message = Message::create([
