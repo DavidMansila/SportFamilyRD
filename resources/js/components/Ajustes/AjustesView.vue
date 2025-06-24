@@ -2,11 +2,8 @@
 
   <div class="settings-view">
 
-
-
     <!-- Navbar -->
     <Navbar />
-
 
     <div class="settings-container">
       <h1 class="settings-title">Configuración de Cuenta</h1>
@@ -26,15 +23,33 @@
             <h3>Seguridad</h3>
             <div class="form-group">
               <label>Contraseña Actual</label>
-              <input type="password" v-model="security.currentPassword" placeholder="••••••••">
+              <div class="password-input">
+                <input :type="showCurrentPassword ? 'text' : 'password'" v-model="security.currentPassword"
+                  placeholder="••••••••">
+                <span class="toggle-password" @click="showCurrentPassword = !showCurrentPassword">
+                  <i :class="showCurrentPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </span>
+              </div>
             </div>
             <div class="form-group">
               <label>Nueva Contraseña</label>
-              <input type="password" v-model="security.newPassword" placeholder="••••••••">
+              <div class="password-input">
+                <input :type="showNewPassword ? 'text' : 'password'" v-model="security.newPassword"
+                  placeholder="••••••••">
+                <span class="toggle-password" @click="showNewPassword = !showNewPassword">
+                  <i :class="showNewPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </span>
+              </div>
             </div>
             <div class="form-group">
               <label>Confirmar Contraseña</label>
-              <input type="password" v-model="security.confirmPassword" placeholder="••••••••">
+              <div class="password-input">
+                <input :type="showConfirmPassword ? 'text' : 'password'" v-model="security.confirmPassword"
+                  placeholder="••••••••">
+                <span class="toggle-password" @click="showConfirmPassword = !showConfirmPassword">
+                  <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -42,53 +57,9 @@
         </div>
 
 
-
-        <!-- Pestaña de Notificaciones -->
-        <!-- <div v-if="activeTab === 'notifications'" class="tab-content">
-          <h3>Preferencias de Notificación</h3>
-          <div class="toggle-group">
-
-            <div class="toggle-item">
-              <span>Notificaciones por Email</span>
-              <label class="switch">
-                <input type="checkbox" v-model="notifications.email">
-                <span class="slider"></span>
-              </label>
-            </div>
-
-             <div class="toggle-item">
-              <span>Notificaciones por Telefono</span>
-              <label class="switch">
-                <input type="checkbox" v-model="notifications.push">
-                <span class="slider"></span>
-              </label>
-            </div> 
-
-          </div>
-
-        </div> -->
-
-
-
         <div v-if="activeTab === 'privacy'" class="tab-content" role="tabpanel" aria-labelledby="privacy-tab">
           <h2 class="privacy-heading">Configuración de Privacidad</h2>
 
-          <!-- <section class="privacy-section">
-            <h3 class="section-title">Preferencias de visibilidad</h3>
-            <div class="privacy-options">
-              <div class="privacy-item" v-for="option in privacyOptions" :key="option.id">
-                <div class="option-label">
-                  <span>{{ option.label }}</span>
-                  <span class="option-description" v-if="option.description">{{ option.description }}</span>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" v-model="privacy[option.model]"
-                    :aria-label="`${option.label} - actualmente ${privacy[option.model] ? 'activado' : 'desactivado'}`">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-          </section> -->
 
           <div class="settings-container">
             <div v-for="config in userConfigs" :key="config.id" class="setting-item">
@@ -178,7 +149,7 @@ export default {
       security: {
         currentPassword: '',
         newPassword: '',
-        confirmPassword: ''
+        confirmPassword: '',
       },
 
       notifications: {
@@ -226,7 +197,12 @@ export default {
       loading: false,
       error: null,
 
-      userConfigs: []
+      userConfigs: [],
+
+      showCurrentPassword: false,
+      showNewPassword: false,
+      showConfirmPassword: false,
+      showSuccessMessage: false
 
     }
   },
@@ -271,59 +247,73 @@ export default {
       axios.get('/config', {
         params: { user_id: this.user.id }
       })
-      .then(response => {
-        this.userConfigs = response.data.config;
-      })
-      .catch(error => {
-        this.handleApiError(error, 'Error al cargar configuraciones');
-      });
+        .then(response => {
+          this.userConfigs = response.data.config;
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al cargar configuraciones');
+        });
     },
-    
-    changePassword() {
 
+    async changePassword() {
       if (this.security.newPassword !== this.security.confirmPassword) {
         this.showToast('Las nuevas contraseñas no coinciden', 'error');
         return;
       }
 
-      axios.post('/change-password', {
-        user_id: this.user.id,
-        password: this.security.newPassword
-      })
-      .then(response => {
-        this.showToast('Contraseña actualizada exitosamente', 'success');
-      })
-      .catch(error => {
-        this.handleApiError(error, 'Error al actualizar la contraseña');
-      });
+      try {
+        await axios.post('/change-password', {
+          user_id: this.user.id,
+          current_password: this.security.currentPassword,
+          new_password: this.security.newPassword
+        });
+
+        // Mostrar mensaje de éxito
+        this.showToast('¡Contraseña cambiada con éxito!', 'success');
+
+        // Vaciar campos
+        this.security = {
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        };
+
+        // Reiniciar visibilidad
+        this.showCurrentPassword = false;
+        this.showNewPassword = false;
+        this.showConfirmPassword = false;
+
+      } catch (error) {
+        this.handleApiError(error, 'Error al cambiar la contraseña');
+      }
     },
 
     deleteAccount() {
-      axios.delete(`/user/${this.user.id}`, )
-      .then(response => {
-        this.showToast('Cuenta eliminada exitosamente', 'success');
-        sessionStorage.removeItem('user');
-        this.$router.push('/signup');
-      })
-      .catch(error => {
-        this.handleApiError(error, 'Error al eliminar la cuenta');
-      });
+      axios.delete(`/user/${this.user.id}`,)
+        .then(response => {
+          this.showToast('Cuenta eliminada exitosamente', 'success');
+          sessionStorage.removeItem('user');
+          this.$router.push('/signup');
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al eliminar la cuenta');
+        });
     },
 
     toggleConfig(config) {
       config.value = config.value === 'enabled' ? 'disabled' : 'enabled';
-    
+
       axios.post('/config-update-value', {
-        user_id: this.user.id ,
+        user_id: this.user.id,
         configuration_id: config.id,
         status: config.value
       })
-      .then(response => {
-        this.showToast('Configuración actualizada correctamente', 'success');
-      })
-      .catch(error => {
-        this.handleApiError(error, 'Error al actualizar configuración');
-      });
+        .then(response => {
+          this.showToast('Configuración actualizada correctamente', 'success');
+        })
+        .catch(error => {
+          this.handleApiError(error, 'Error al actualizar configuración');
+        });
     },
 
   },
@@ -352,4 +342,36 @@ export default {
 @import '/resources/scss/Ajustes/ajustes_privacidad.scss';
 
 @import '/resources/scss/Ajustes/ajustes_responsive.scss';
+
+
+.password-input {
+  position: relative;
+  width: 100%;
+}
+
+.password-input input {
+  padding-right: 35px;
+  /* Espacio para el ícono */
+  width: 100%;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6c757d;
+  z-index: 2;
+}
+
+.toggle-password:hover {
+  color: #495057;
+}
+
+/* Asegúrate de tener espacio suficiente en los inputs */
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
 </style>

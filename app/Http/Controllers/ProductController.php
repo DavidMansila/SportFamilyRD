@@ -49,7 +49,6 @@ class ProductController extends Controller
                 'message' => 'Producto creado exitosamente',
                 'product' => $product
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al crear el producto',
@@ -62,7 +61,7 @@ class ProductController extends Controller
     {
         try {
             $product = Product::find($id);
-            
+
             if (!$product) {
                 return response()->json([
                     'message' => 'Producto no encontrado'
@@ -91,7 +90,6 @@ class ProductController extends Controller
                 'message' => 'Producto actualizado exitosamente',
                 'product' => $product
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al actualizar el producto',
@@ -104,7 +102,7 @@ class ProductController extends Controller
     {
         try {
             $product = Product::find($id);
-            
+
             if (!$product) {
                 return response()->json([
                     'message' => 'Producto no encontrado'
@@ -116,10 +114,25 @@ class ProductController extends Controller
             return response()->json([
                 'message' => 'Producto eliminado exitosamente'
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al eliminar el producto',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function recentProducts()
+    {
+        try {
+            $products = Product::orderBy('created_at', 'desc')->take(4)->get();
+            return response()->json([
+                'message' => 'Productos recientes obtenidos con éxito',
+                'products' => $products
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener productos recientes',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Training;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -35,17 +36,43 @@ class TrainingController extends Controller
 
     public function store(Request $request)
     {
+        // Verificar autenticación
+        $user = User::findOrFail($request['user_id']);
+
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
             'trainer_id' => 'required|exists:users,id',
             'sport_level' => 'required|in:Principiante,Intermedio,Avanzado,Profesional',
             'description' => 'required|string|max:500',
             'status' => 'required|in:pending,accepted,rejected'
         ]);
 
+        // 1. Validar no enviar solicitud a sí mismo
+        if ($user->id == $validated['trainer_id']) {
+            return response()->json([
+                'message' => 'No puedes enviarte una solicitud a ti mismo'
+            ], 422);
+        }
+
+        // 2. Validar que entrenador no pueda enviar solicitudes a otros entrenadores
+        $trainer = User::find($validated['trainer_id']);
+
+        if (!$trainer) {
+            return response()->json([
+                'message' => 'Entrenador no encontrado'
+            ], 404);
+        }
+
+
+        if ($user->user_type === 'entrenador' && $trainer->user_type === 'entrenador') {
+            return response()->json([
+                'message' => 'Los entrenadores no pueden enviar solicitudes a otros entrenadores'
+            ], 422);
+        }
+
+        // 3. Validar solicitud reciente
         $lastWeek = now()->subWeek();
-        $existing = Training::where('user_id', $request->user_id)
-            ->where('trainer_id', $request->trainer_id)
+        $existing = Training::where('user_id', $user->id)
+            ->where('trainer_id', $validated['trainer_id'])
             ->whereIn('status', ['pending', 'accepted'])
             ->where('created_at', '>=', $lastWeek)
             ->exists();
@@ -56,9 +83,19 @@ class TrainingController extends Controller
             ], 422);
         }
 
-        $training = Training::create($validated);
+        // Crear la solicitud
+        $training = Training::create([
+            'user_id' => $user->id,
+            'trainer_id' => $validated['trainer_id'],
+            'sport_level' => $validated['sport_level'],
+            'description' => $validated['description'],
+            'status' => $validated['status']
+        ]);
+
         return response()->json($training, 201);
     }
+
+
 
     public function show($id)
     {

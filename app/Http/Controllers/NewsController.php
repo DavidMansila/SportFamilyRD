@@ -12,20 +12,18 @@ class NewsController extends Controller
      */
     public function index()
     {
-        try{
+        try {
             $news = News::all();
             return response()->json([
                 'message' => 'Noticias obtenidas con éxito',
                 'news' => $news
             ], 200);
-       
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al obtener las noticias',
                 'error' => $e->getMessage()
             ], 500);
         }
-        
     }
 
     /**
@@ -33,7 +31,7 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+        try {
             $request->validate([
                 'title' => 'required|string|max:255',
                 'content' => 'required|string',
@@ -42,21 +40,19 @@ class NewsController extends Controller
                 'url' => 'required|url',
                 'published_at' => 'nullable|date',
             ]);
-    
+
             $news = News::create($request->all());
-           
+
             return response()->json([
                 'message' => 'Noticia creada exitosamente',
                 'News' => $news
             ], 200);
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al crear la noticia',
                 'error' => $e->getMessage()
             ], 500);
         }
-      
     }
 
     /**
@@ -81,22 +77,22 @@ class NewsController extends Controller
             'published_at' => 'nullable|date',
         ]);
 
-       
-        try{
+
+        try {
             $news->update($request->all());
-            return response()->json([
-                'message' => 'Noticia actualizada con éxito',
-                'news' => $news
-            ]
-            , 200);
-        }
-        catch(\Exception $e){
+            return response()->json(
+                [
+                    'message' => 'Noticia actualizada con éxito',
+                    'news' => $news
+                ],
+                200
+            );
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al actualizar la noticia',
                 'error' => $e->getMessage()
             ], 500);
         }
-
     }
 
     /**
@@ -104,18 +100,34 @@ class NewsController extends Controller
      */
     public function destroy(News $news)
     {
-        try{
+        try {
             $news->delete();
             return response()->json([
                 'message' => 'Noticia eliminada con éxito'
             ], 200);
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al eliminar la noticia',
                 'error' => $e->getMessage()
             ], 500);
         }
-        
+    }
+
+
+    public function recentNews()
+    {
+        try {
+            $news = News::select('id', 'title', 'content as excerpt', 'author', 'image', 'published_at as date', 'category')
+                ->orderBy('published_at', 'desc')
+                ->take(7)
+                ->get();
+
+            return response()->json($news);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener noticias recientes',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -184,8 +184,8 @@
               </button>
 
               <template v-else>
-                <button class="popup-share">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <button class="popup-share" @click.stop="compartirNoticia(noticiaSeleccionada)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37061L8.0826 9.84066C7.54305 9.32015 6.8089 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15C6.8089 15 7.54305 14.6798 8.0826 14.1593L15.0227 18.6294C15.0077 18.7508 15 18.8745 15 19C15 20.6569 16.3431 22 18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C17.1911 16 16.457 16.3202 15.9174 16.8407L8.9773 12.3706C8.99225 12.2492 9 12.1255 9 12C9 11.8745 8.99225 11.7508 8.9773 11.6294L15.9174 7.15934C16.457 7.67985 17.1911 8 18 8Z"
                       fill="currentColor" />
@@ -511,8 +511,34 @@ export default {
       const month = String(dateObj.getMonth() + 1).padStart(2, '0');
       const day = String(dateObj.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
-    }
+    },
 
+    async compartirNoticia(noticia) {
+      try {
+
+        const url = `${window.location.origin}/noticia/${noticia.id}`;
+
+        // Construir texto para compartir con todos los detalles
+        const shareText = `SportFamilyRD - ${noticia.title}\n\n${noticia.description.substring(0, 100) +
+          (noticia.description.length > 300 ? '...' : '')
+          }\n\nVen a ver mas noticias: ${url}`;
+
+        if (navigator.share) {
+          await navigator.share({
+            title: `SportFamilyRD: ${noticia.title}`,
+            text: shareText,
+          });
+        } else {
+          await navigator.clipboard.writeText(shareText);
+          alert('¡Contenido copiado! Puedes compartir esta noticia:\n\n' + shareText);
+        }
+      } catch (error) {
+        console.error('Error al compartir:', error);
+        if (error.name !== 'AbortError') {
+          alert('Error al compartir. Por favor, inténtalo de nuevo.');
+        }
+      }
+    }
 
   },
 
@@ -603,5 +629,44 @@ export default {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+
+
+
+
+
+.no-news {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.center-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.empty-image {
+  max-width: 150px;
+  /* Ajusta el tamaño según necesites */
+  height: auto;
+  opacity: 0.7;
+}
+
+.no-news h3 {
+  font-size: 1.5rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.no-news p {
+  color: #777;
+  font-size: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
 }
 </style>
