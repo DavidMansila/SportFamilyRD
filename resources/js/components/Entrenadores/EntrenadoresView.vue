@@ -236,9 +236,14 @@
                   d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              Solo podras mandar una solicitud por semana a cada entrenador. Si ya has enviado una solicitud reciente,
-              no
-              podrás enviar otra hasta que se procese la anterior.
+              <template v-if="user.user_type === 'entrenador'">
+                Los entrenadores no pueden enviar solicitudes de entrenamiento.
+              </template>
+              <template v-else>
+                Solo podras mandar una solicitud por semana a cada entrenador. Si ya has enviado una solicitud reciente,
+                no
+                podrás enviar otra hasta que se procese la anterior.
+              </template>
             </p>
 
             <button type="submit" class="submit-btn">Enviar Solicitud</button>
@@ -445,8 +450,14 @@ export default {
         return;
       }
 
+      // Verificar si el usuario es entrenador
+      if (this.user.user_type === 'entrenador') {
+        alert('Los entrenadores no pueden enviar solicitudes a otros entrenadores');
+        return;
+      }
+
       try {
-        // 1. Verificar si ya existe solicitud
+        // Verificar solicitud existente
         const checkResponse = await axios.post('/training/check-existing', {
           user_id: this.user.id,
           trainer_id: this.contactoEntrenador.trainer_id
@@ -457,7 +468,7 @@ export default {
           return;
         }
 
-        // 2. Enviar la solicitud principal
+        // Enviar solicitud
         const formData = {
           user_id: this.user.id,
           trainer_id: this.contactoEntrenador.trainer_id,
@@ -474,11 +485,15 @@ export default {
           this.cerrarPerfil();
         }
       } catch (error) {
-        // Manejo de errores unificado
+        // Manejo de errores
         if (error.response?.status === 422) {
           const errors = error.response.data.errors;
           let errorMsg = Object.values(errors).flat().join('\n');
           alert(`Error de validación:\n${errorMsg}`);
+        } else if (error.response?.status === 401) {
+          alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+        } else if (error.response?.data?.message) {
+          alert(error.response.data.message);
         } else {
           console.error('Error completo:', error);
           alert('Error al procesar la solicitud: ' + error.message);
