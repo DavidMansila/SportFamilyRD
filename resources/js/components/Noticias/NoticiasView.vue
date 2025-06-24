@@ -54,6 +54,18 @@
               <img :src="noticia.image" alt="Imagen de noticia" class="image" />
               <span class="news-category">{{ getCategoryName(noticia.categoria) }}</span>
             </div>
+
+            <button v-if="user.user_type === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M4 7H20" stroke="currentColor" stroke-width="2" />
+                <path d="M10 11V17" stroke="currentColor" />
+                <path d="M14 11V17" stroke="currentColor" />
+                <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7"
+                  stroke="currentColor" />
+                <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" />
+              </svg>
+            </button>
+
             <div class="noticia-content">
               <div class="content-wrapper">
                 <h3 class="noticia-title">{{ noticia.title }}</h3>
@@ -69,33 +81,10 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19 21L12 16L5 21V5C5 3.89543 5.89543 3 7 3H17C18.1046 3 19 3.89543 19 5V21Z" />
                 </svg>
+
+
               </div>
 
-              <div v-if="user">
-                <!-- ADMIN -->
-                <button v-if="user.user_type === 'admin'" class="btn-editar" @click.stop="editarNoticia(noticia)">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M13.945 5.23997L3.87503 15.31C3.70599 15.479 3.58707 15.6913 3.53203 15.923L2.72203 19.447C2.65321 19.735 2.74074 20.0382 2.95403 20.25C3.1489 20.444 3.41422 20.5486 3.68803 20.539L7.19503 20.458C7.42676 20.4494 7.6493 20.3744 7.83803 20.242L17.906 10.172"
-                      stroke="currentColor" />
-                    <path
-                      d="M12.945 6.23999L16.766 2.41799C17.546 1.63899 18.812 1.63899 19.592 2.41799L21.592 4.41799C22.372 5.19799 22.372 6.46399 21.592 7.24399L17.846 10.99"
-                      stroke="currentColor" />
-                  </svg>
-                </button>
-
-                <!-- ADMIN -->
-                <button v-if="user.user_type === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M4 7H20" stroke="currentColor" stroke-width="2" />
-                    <path d="M10 11V17" stroke="currentColor" />
-                    <path d="M14 11V17" stroke="currentColor" />
-                    <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7"
-                      stroke="currentColor" />
-                    <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" />
-                  </svg>
-                </button>
-              </div>
 
             </div>
           </div>
@@ -167,6 +156,24 @@
 
           <div class="popup-image-container">
             <img :src="noticiaSeleccionada.image" alt="Imagen de noticia" class="popup-image" />
+
+            <div v-if="noticiaSeleccionada.isEditing" class="image-upload">
+              <label for="image-upload" class="upload-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" />
+                  <path
+                    d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6"
+                    stroke="currentColor" stroke-width="2" />
+                  <path
+                    d="M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6"
+                    stroke="currentColor" stroke-width="2" />
+                  <path d="M10 11V17" stroke="currentColor" stroke-width="2" />
+                  <path d="M14 11V17" stroke="currentColor" stroke-width="2" />
+                </svg>
+                Cambiar imagen
+              </label>
+              <input id="image-upload" type="file" accept="image/*" @change="handleImageChange" class="hidden-upload">
+            </div>
           </div>
 
           <div class="popup-body">
@@ -442,19 +449,28 @@ export default {
     },
 
     async eliminarNoticia(noticia) {
-      if (confirm(`¿Estás seguro de eliminar "${noticia.title}"?`)) {
+      if (confirm(`¿Estás seguro de eliminar "${noticia.title}"? Esta acción no se puede deshacer.`)) {
         try {
-          await axios.delete(`/news/${noticia.id}`);
+          const token = sessionStorage.getItem('token');
+
+          await axios.delete(`/news/${noticia.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
 
           // Eliminar de la lista local
           this.noticias = this.noticias.filter(n => n.id !== noticia.id);
           this.filtrarNoticias();
-          await this.cargarNoticias();
 
-          alert('Noticia eliminada correctamente');
+          if (this.noticiaSeleccionada && this.noticiaSeleccionada.id === noticia.id) {
+            this.cerrarNoticia();
+          }
+
+          this.showToast('Noticia eliminada correctamente', 'success');
         } catch (error) {
           console.error('Error al eliminar noticia:', error);
-          alert('Error al eliminar noticia. Por favor intente nuevamente.');
+          this.showToast('Error al eliminar noticia. Por favor intente nuevamente.', 'error');
         }
       }
     },
@@ -467,41 +483,66 @@ export default {
       try {
         this.isLoading = true;
 
-        // Preparar los datos para enviar
-        const datosActualizados = {
-          title: this.noticiaSeleccionada.title,
-          description: this.noticiaSeleccionada.description,
-          author: this.noticiaSeleccionada.author,
-          categoria: this.noticiaSeleccionada.categoria,
-          // Asegúrate de formatear correctamente la fecha para el backend
-          published_at: this.formatDateForAPI(this.noticiaSeleccionada.parsedDate)
-        };
+        const formData = new FormData();
+        formData.append('title', this.noticiaSeleccionada.title);
+        formData.append('content', this.noticiaSeleccionada.description);
+        formData.append('author', this.noticiaSeleccionada.author);
+        formData.append('category', this.noticiaSeleccionada.categoria);
+        formData.append('published_at', this.formatDateForAPI(this.noticiaSeleccionada.parsedDate));
 
-        // Enviar los cambios
-        const response = await axios.put(`/news/${this.noticiaSeleccionada.id}`, datosActualizados);
+        // Agregar imagen si se seleccionó una nueva
+        if (this.newImage) {
+          formData.append('image', this.newImage);
+        }
+
+        const token = sessionStorage.getItem('token');
+
+        const response = await axios.put(
+          `/news/${this.noticiaSeleccionada.id}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
 
         // Actualizar la noticia en el frontend
-        const index = this.noticias.findIndex(n => n.id === this.noticiaSeleccionada.id);
+        const updatedNews = response.data.news;
+        const index = this.noticias.findIndex(n => n.id === updatedNews.id);
+
         if (index !== -1) {
           this.noticias[index] = {
-            ...this.noticiaSeleccionada,
-            isEditing: false,
-            parsedDate: new Date(this.noticiaSeleccionada.parsedDate)
+            ...updatedNews,
+            parsedDate: new Date(updatedNews.published_at)
           };
         }
 
         this.filtrarNoticias();
         this.cerrarNoticia();
-        await this.cargarNoticias();
+        this.newImage = null;
 
-        alert('Cambios guardados exitosamente');
+        this.showToast('Cambios guardados exitosamente', 'success');
       } catch (error) {
         console.error('Error al guardar cambios:', error);
-        alert('Error al guardar cambios. Por favor intente nuevamente.');
+        this.showToast('Error al guardar cambios. Por favor intente nuevamente.', 'error');
       } finally {
         this.isLoading = false;
       }
     },
+
+
+    handleImageChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.newImage = file;
+
+        // Crear una URL temporal para previsualización
+        this.noticiaSeleccionada.image = URL.createObjectURL(file);
+      }
+    },
+
 
     formatDateForAPI(dateObj) {
       if (!dateObj || !(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
@@ -512,6 +553,9 @@ export default {
       const day = String(dateObj.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     },
+
+
+
 
     async compartirNoticia(noticia) {
       try {
@@ -668,5 +712,69 @@ export default {
   font-size: 1rem;
   max-width: 400px;
   margin: 0 auto;
+}
+
+
+
+
+.image-upload {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  z-index: 10;
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid #ddd;
+}
+
+.upload-btn:hover {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.hidden-upload {
+  display: none;
+}
+
+.edit-select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.edit-title,
+.edit-author,
+.edit-date {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.edit-description {
+  width: 100%;
+  min-height: 300px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1.6;
+  resize: vertical;
 }
 </style>
