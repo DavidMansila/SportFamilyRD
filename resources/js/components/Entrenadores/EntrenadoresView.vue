@@ -583,19 +583,18 @@ export default {
 
     async openChat(chat) {
       this.activeChat = chat;
-      await this.markMessagesAsRead(chat.id);
-
-      this.setupChatChannel(chat.id);
-
       await this.$nextTick();
 
-      if (this.$refs.chatComponent?.loadMessages) {
-        await this.$refs.chatComponent.loadMessages();
+      if (this.$refs.chatComponent?.initializeChat) {
+        await this.$refs.chatComponent.initializeChat();
       }
     },
 
     cerrarChat() {
-      this.leaveChatChannel();
+      if (this.$refs.chatComponent && this.$refs.chatComponent.leaveChannels) {
+        this.$refs.chatComponent.leaveChannels();
+      }
+
       this.activeChat = null;
       this.loadChats();
       document.body.classList.remove('chat-open');
@@ -704,117 +703,14 @@ export default {
       }
     },
 
-    setupChatChannel(chatId) {
-      this.leaveChatChannel();
-
-      if (typeof window.Echo === 'undefined') return;
-
-      // Canal privado
-      this.echoListener = window.Echo.private(`private-chat.${chatId}`)
-        .listen('.message.sent', (data) => {
-          if (this.activeChat && this.activeChat.id === chatId) {
-            this.$refs.chatComponent?.handleNewMessage(data);
-          }
-          this.loadChats();
-        });
-
-      // Canal de presencia
-      this.presenceListener = window.Echo.join(`presence-chat.${chatId}`)
-        .here(users => {
-          if (this.activeChat && this.activeChat.id === chatId) {
-            this.$refs.chatComponent?.updateOnlineStatus(users);
-          }
-        })
-        .joining(user => {
-          if (this.activeChat && this.activeChat.id === chatId) {
-            this.$refs.chatComponent?.userJoined(user);
-          }
-        })
-        .leaving(user => {
-          if (this.activeChat && this.activeChat.id === chatId) {
-            this.$refs.chatComponent?.userLeft(user);
-          }
-        });
-    },
-
-    leaveChatChannel() {
-      if (this.echoListener) {
-        window.Echo.leave(`chat.${this.activeChat?.id}`);
-        this.echoListener = null;
-      }
-      if (this.presenceListener) {
-        window.Echo.leave(`presence-chat.${this.activeChat?.id}`);
-        this.presenceListener = null;
-      }
-    },
-
-    setupGlobalListeners() {
-      if (typeof window.Echo === 'undefined') return;
-
-      // Canal privado para usuario autenticado
-      window.Echo.private(`private-user.${this.user.id}`)
-        .listen('.message.sent', (data) => {
-          console.log('Nuevo mensaje recibido globalmente:', data);
-          this.loadChats();
-          if (this.activeChat && this.activeChat.id === data.chat_id) {
-            this.$refs.chatComponent?.handleNewMessage(data);
-          }
-        });
-    },
-
-
-    async loadEchoLibrary() {
-      try {
-        const EchoModule = await import('laravel-echo');
-        const PusherModule = await import('pusher-js');
-
-        window.Pusher = PusherModule.default;
-
-        // Uso correcto del constructor
-        window.Echo = new EchoModule.default({
-          broadcaster: 'pusher',
-          key: import.meta.env.VITE_PUSHER_APP_KEY,
-          cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-          // wsHost: window.location.hostname,
-          // wsPort: 6001,
-          forceTLS: false,
-          disableStats: true,
-          authEndpoint: '/api/broadcasting/auth',
-          auth: {
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-            }
-          }
-        });
-        this.setupGlobalListeners();
-      } catch (error) {
-        console.error('Error cargando Echo:', error);
-      }
-    },
-
   },
   mounted() {
     this.user = JSON.parse(sessionStorage.getItem('user'));
-    // Solo inicializar Echo si el usuario existe y el token está presente
-    const token = sessionStorage.getItem('token');
-    if (this.user && token) {
-      // Opcional: puedes validar el token con un endpoint antes de inicializar Echo
-      if (!window.Echo) {
-        this.loadEchoLibrary();
-      }
-      this.cargarEntrenadores();
-      this.loadChats();
-    } else {
-      // Esperar a que el usuario inicie sesión antes de inicializar Echo
-      console.warn('Usuario no autenticado, Echo no se inicializa');
-    }
+    this.cargarEntrenadores();
+    this.loadChats();
   },
   beforeUnmount() {
-    this.leaveChatChannel();
 
-    if (window.Echo && this.user) {
-      window.Echo.leave(`user.${this.user.id}`);
-    }
   }
 };
 </script>

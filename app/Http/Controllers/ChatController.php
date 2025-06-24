@@ -21,7 +21,7 @@ class ChatController extends Controller
 
         // Log::info($request->all());
         // return response()->json(['debug' => $request->all()]);
-        
+
         $chats = Chat::with([
             'user:id,name,image',
             'trainer.user:id,name,image',
@@ -82,7 +82,6 @@ class ChatController extends Controller
             'message' => $request->message
         ]);
 
-        // Disparar evento de mensaje enviado
         broadcast(new NewMessage($message))->toOthers();
 
         return response()->json($message);
