@@ -13,7 +13,14 @@ class CalendarController extends Controller
     public function index()
     {
         $calendars = Calendar::all();
-        return response()->json($calendars);
+        
+        if ($calendars->isEmpty()) {
+            return response()->json(['events' => []]);
+        }
+
+        return response()->json([
+            'events' => $calendars,
+        ]);
     }
 
     /**

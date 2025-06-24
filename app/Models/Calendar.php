@@ -13,5 +13,12 @@ class Calendar extends Model
         'time',
         'place',
         'price',
+        'image', 
+        'quantity', 
     ];
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class, 'item_id')->where('item_type', 'event');
+    }
 }
