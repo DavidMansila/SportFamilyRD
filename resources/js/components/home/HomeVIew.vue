@@ -106,9 +106,6 @@
             <h3 class="news-title">{{ recentNews[0].title }}</h3>
             <p class="news-excerpt">{{ recentNews[0].description.substring(0, 150) }}...</p>
             <div class="news-actions">
-              <router-link :to="'/noticia/' + recentNews[0].id" class="read-more">
-                Leer más <i class="fas fa-arrow-right"></i>
-              </router-link>
             </div>
           </div>
         </div>
@@ -126,9 +123,6 @@
               </div>
               <h4 class="news-title">{{ news.title }}</h4>
               <p class="news-excerpt">{{ news.description.substring(0, 100) }}...</p>
-              <router-link :to="'/noticia/' + news.id" class="read-more">
-                Leer más <i class="fas fa-arrow-right"></i>
-              </router-link>
             </div>
           </div>
         </div>
