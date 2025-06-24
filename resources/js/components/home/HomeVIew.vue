@@ -20,6 +20,13 @@
             <span class="title-line">Dominicana</span>
           </h1>
           <p class="hero-subtitle">Eventos • Entrenamiento • Tienda • Comunidad</p>
+
+          <div v-if="!user" class="hero-cta">
+            <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="cta-button">
+              Únete a la Comunidad
+            </router-link>
+          </div>
+
         </div>
 
         <div class="hero-stats">
@@ -428,6 +435,7 @@ export default {
   },
   data() {
     return {
+      user: null,
       showModal: false,
       selectedProduct: null,
       recentNews: [],
@@ -710,6 +718,9 @@ export default {
     this.fetchInitialData();
     this.animateElements();
 
+    const userData = sessionStorage.getItem('user');
+    this.user = userData ? JSON.parse(userData) : null;
+
     // Optimizar scroll
     this.throttledScroll = throttle(this.handleScroll, 100);
     window.addEventListener('scroll', this.throttledScroll);
@@ -775,6 +786,62 @@ img {
       align-items: center;
       gap: 5px;
     }
+  }
+}
+
+.hero-cta {
+  margin-top: 2rem;
+  animation: fadeInUp 0.8s ease-out 0.5s both;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #ff6b00, #ff3c00);
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(255, 107, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(255, 107, 0, 0.6);
+  background: linear-gradient(135deg, #ff7a1a, #ff4d00);
+}
+
+.cta-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4);
+}
+
+.cta-button i {
+  margin-left: 10px;
+  transition: transform 0.3s ease;
+}
+
+.cta-button:hover i {
+  transform: translateX(5px);
+}
+
+/* Animación para el botón */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>
