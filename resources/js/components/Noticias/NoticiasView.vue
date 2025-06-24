@@ -630,4 +630,43 @@ export default {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+
+
+
+
+
+.no-news {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.center-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.empty-image {
+  max-width: 150px;
+  /* Ajusta el tamaño según necesites */
+  height: auto;
+  opacity: 0.7;
+}
+
+.no-news h3 {
+  font-size: 1.5rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.no-news p {
+  color: #777;
+  font-size: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
 </style>
