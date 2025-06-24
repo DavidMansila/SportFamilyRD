@@ -16,6 +16,8 @@ use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserStatsController;
 use Illuminate\Support\Facades\Route;
 use App\Models\News;
+use App\Models\User;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
@@ -26,6 +28,33 @@ Route::get('/sanctum/csrf-cookie', [AuthController::class, 'csrfCookie']);
 // RUTAS PÚBLICAS
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
+
+Route::get('/recent-news', function () {
+    $news = \App\Models\News::orderBy('published_at', 'desc')->take(7)->get();
+    return response()->json($news);
+});
+
+Route::get('/recent-products', [ProductController::class, 'recentProducts']);
+
+Route::get('/popular-posts', [PostController::class, 'popularPosts']);
+
+
+Route::get('/home-stats', function() {
+    try {
+        return response()->json([
+            'users' => User::count(),
+            // 'events' => Event::count()
+            'posts' => Post::count(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error obteniendo estadísticas',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
+
 
 // Noticias públicas
 Route::get('/news', function () {
@@ -43,12 +72,15 @@ Route::get('/news', function () {
     return response()->json($news);
 });
 
+
 // Scrapper calendar
 Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
 
+
+
 // RUTAS PROTEGIDAS POR TOKEN
 Route::middleware('auth:sanctum')->group(function () {
-
+    
     // Usuarios
     Route::resource('/user', UserController::class);
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);

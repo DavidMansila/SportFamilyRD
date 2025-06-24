@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -471,6 +472,33 @@ class PostController extends Controller
             return response()->json([
                 'message' => 'Error al eliminar la respuesta',
                 'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function popularPosts()
+    {
+        try {
+            $posts = Post::withCount(['likes', 'comments'])
+                ->with(['user' => function ($query) {
+                    // Cargar el avatar_url directamente
+                    $query->select('id', 'name', 'image')
+                        ->addSelect(DB::raw("CONCAT('" . asset('storage/users') . "/', id, '/', image) as image_url"));
+                }])
+                ->orderByRaw('(likes_count + comments_count) DESC')
+                ->take(5)
+                ->get();
+
+            return response()->json([
+                'message' => 'Posts populares obtenidos exitosamente',
+                'posts' => $posts
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching popular posts: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error al obtener posts populares',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
