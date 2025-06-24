@@ -82,7 +82,7 @@ class ChatController extends Controller
             'message' => $request->message
         ]);
 
-        broadcast(new NewMessage($message))->toOthers();
+        event(new NewMessage($message));
 
         return response()->json($message);
     }

@@ -4,9 +4,15 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 use App\Models\Chat;
 
-// Canal privado para mensajes
+
+// Canal privado
 Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
-    $chat = Chat::findOrFail($chatId);
+    $chat = Chat::with('trainer')->find($chatId);
+
+    if (!$chat) {
+        Log::warning("Chat no encontrado: $chatId");
+        return false;
+    }
 
     $isMember = $user->id == $chat->user_id ||
         ($chat->trainer && $user->id == $chat->trainer->user_id);
@@ -14,12 +20,13 @@ Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
     return $isMember;
 });
 
-// Canal de presencia
+
+// Presencia en el canal
 Broadcast::channel('online.{chatId}', function ($user, $chatId) {
     $chat = Chat::find($chatId);
 
     if (!$chat) {
-        Log::warning("Chat no encontrado: $chatId");
+        Log::warning("Chat not found: $chatId");
         return false;
     }
 
@@ -34,6 +41,6 @@ Broadcast::channel('online.{chatId}', function ($user, $chatId) {
         'id' => $user->id,
         'name' => $user->name,
         'trainer_id' => optional($user->trainer)->id,
-        'type' => $user->user_type
+        'user_type' => $user->user_type
     ];
 });

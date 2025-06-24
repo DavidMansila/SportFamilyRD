@@ -117,13 +117,9 @@ export default {
       async handler(newVal) {
         if (newVal) {
           await this.initializeChat();
+        } else {
+          this.leaveChannels();
         }
-      }
-    },
-    messages: {
-      deep: true,
-      handler() {
-        this.$nextTick(this.scrollToBottom);
       }
     }
   },
@@ -151,19 +147,16 @@ export default {
     },
 
     async loadEchoLibrary() {
-      if (window.Echo || this.echoInitialized) return;
+      if (window.Echo) return;
 
       try {
         const token = sessionStorage.getItem('token');
-        if (!token) {
-          throw new Error('Token no encontrado en sessionStorage');
-        }
+        if (!token) throw new Error('Token not found');
 
-        // Verificar token
-        const userResponse = await axios.get('/api/user', {
+        // Verify token validity
+        await axios.get('/user', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log('Usuario autenticado:', userResponse.data);
 
         const [EchoModule, PusherModule] = await Promise.all([
           import('laravel-echo'),
@@ -176,29 +169,22 @@ export default {
           key: import.meta.env.VITE_PUSHER_APP_KEY,
           cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
           forceTLS: true,
-          encrypted: true,
-          disableStats: true,
           authEndpoint: '/api/broadcasting/auth',
           auth: {
             headers: {
               'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest'
+              'Accept': 'application/json'
             }
           }
         });
-
-        this.echoInitialized = true;
       } catch (error) {
-        console.error('Error inicializando Echo:', error);
-
-        // Intento de refrescar el token
+        console.error('Echo init error:', error);
         try {
           const refreshResponse = await axios.post('/api/auth/refresh');
           sessionStorage.setItem('token', refreshResponse.data.token);
-          this.loadEchoLibrary(); // Reintentar
+          await this.loadEchoLibrary();
         } catch (refreshError) {
-          console.error('Error refrescando token:', refreshError);
+          console.error('Token refresh failed:', refreshError);
           this.$emit('auth-error');
         }
       }
@@ -253,41 +239,17 @@ export default {
         const messageContent = this.newMessage.trim();
         this.newMessage = '';
 
-        const senderType = this.user.user_type === 'user' ? 'user' : 'trainer';
-
-        // Crear mensaje temporal
-        const tempMessage = {
-          id: Date.now(),
-          chat_id: this.chatId,
-          sender_id: this.user.id,
-          sender_type: senderType,
-          message: messageContent,
-          created_at: new Date().toISOString(),
-          read: false
-        };
-
-        this.messages.push(tempMessage);
-        this.scrollToBottom(true);
-
-        // Enviar mensaje real al servidor
+        // Enviar directamente al servidor
         const response = await axios.post(`/chats/${this.chatId}/messages`, {
           message: messageContent,
           user_id: this.user.id,
         });
 
-        // Reemplazar mensaje temporal con el real
-        const index = this.messages.findIndex(m => m.id === tempMessage.id);
-        if (index !== -1) {
-          this.messages.splice(index, 1, response.data);
-        }
+        // Añadir el mensaje a la lista cuando se recibe la respuesta
+        this.messages.push(response.data);
+        this.scrollToBottom(true);
       } catch (error) {
         console.error('Error sending message:', error);
-
-        // Eliminar mensaje temporal en caso de error
-        const index = this.messages.findIndex(m => m.id === tempMessage.id);
-        if (index !== -1) {
-          this.messages.splice(index, 1);
-        }
       } finally {
         this.sendingMessage = false;
       }
@@ -303,48 +265,34 @@ export default {
       }
     },
 
-    setupChannels() {
-      if (!this.chatId || !window.Echo) {
-        console.warn('No se pueden configurar canales sin chatId o Echo');
-        return;
-      }
+    async setupChannels() {
+      if (!this.chatId || !window.Echo) return;
 
-      this.leaveChannels();
+      this.leaveChannels(); // Clean up previous channels
 
-      // Canal para mensajes
+      // Message channel
       this.echoChannel = window.Echo.private(`chat.${this.chatId}`)
-        .listen('.message-sent', (data) => {
-          this.handleIncomingMessage(data);
-        })
-        .error((error) => {
-          console.error('Error en canal de mensajes:', error);
-        });
+        .listen('message-sent', this.handleIncomingMessage)
+        .error(console.error);
 
-      // Canal de presencia
+      // Presence channel - match backend naming
       this.presenceChannel = window.Echo.join(`online.${this.chatId}`)
-        .here((users) => {
-          this.updateOnlineStatus(users);
-        })
-        .joining((user) => {
-          this.userJoined(user);
-        })
-        .leaving((user) => {
-          this.userLeft(user);
-        })
-        .error((error) => {
-          console.error('Error en canal de presencia:', error);
-        });
+        .here(this.updateOnlineStatus)
+        .joining(this.userJoined)
+        .leaving(this.userLeft)
+        .error(console.error);
     },
 
     handleIncomingMessage(data) {
       if (!data || !data.id) return;
 
-      // Evitar duplicados
+      // Evitar duplicados usando el ID del mensaje
       const messageExists = this.messages.some(msg => msg.id === data.id);
       if (!messageExists) {
         this.messages.push(data);
         this.scrollToBottom();
 
+        // Marcar como leído si es necesario
         if (!this.isMessageFromMe(data)) {
           this.markMessagesAsRead();
         }
@@ -353,9 +301,11 @@ export default {
 
     leaveChannels() {
       if (this.echoChannel) {
+        this.echoChannel.stopListening('message-sent');
         window.Echo.leave(`chat.${this.chatId}`);
         this.echoChannel = null;
       }
+
       if (this.presenceChannel) {
         window.Echo.leave(`online.${this.chatId}`);
         this.presenceChannel = null;
@@ -367,9 +317,16 @@ export default {
 
       try {
         await axios.post(`/chats/${this.chatId}/read`);
-        this.$emit('messages-read');
+
+        this.messages.forEach(msg => {
+          if (!this.isMessageFromMe(msg)) {
+            msg.read = true;
+          }
+        });
+
+        this.$emit('messages.read');
       } catch (error) {
-        console.error('Error marcando mensajes como leídos', error);
+        console.error('Error marking as read:', error);
       }
     },
 
@@ -414,10 +371,12 @@ export default {
 
   },
   beforeUnmount() {
+    console.log('Component unmounting - leaving channels');
     this.leaveChannels();
   },
   mounted() {
     if (this.chatId) {
+      console.log('Initializing chat for ID:', this.chatId);
       this.initializeChat();
     }
   }
