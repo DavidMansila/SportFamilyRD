@@ -241,7 +241,7 @@
                       <div class="comment-header">
 
                         <span class="comment-author">{{ comentario.user?.name || `Usuario${comentario.user_id}`
-                          }}</span>
+                        }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.replies && comentario.replies.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -738,10 +738,16 @@ export default {
     },
 
 
-
     async getPost() {
       try {
-        const response = await axios.get('/post');
+        // Configurar parámetros con user_id si está disponible
+        const params = {};
+        if (this.user && this.user.id) {
+          params.user_id = this.user.id;
+        }
+
+        const response = await axios.get('/post', { params });
+
         this.posts = response.data.posts.sort((a, b) => {
           return new Date(b.created_at) - new Date(a.created_at);
         }).map(post => ({
@@ -762,6 +768,7 @@ export default {
             }))
           }))
         }));
+
         this.postsFiltrados = [...this.posts];
       } catch (error) {
         console.error('Post fetch error:', error);
@@ -883,52 +890,48 @@ export default {
           user_id: this.user.id
         });
 
-        // Actualizar estado local inmediatamente
-        const updateLikeInArray = (array) => {
-          for (const item of array) {
-            // Actualizar post principal
-            if (type === 'post' && item.id === id) {
-              item.likes_count = response.data.likes_count;
-              item.isLiked = response.data.is_liked;
-              return true;
-            }
-
-            // Buscar en comentarios
-            if (item.comments) {
-              for (const comment of item.comments) {
-                // Actualizar comentario
-                if (type === 'comment' && comment.id === id) {
-                  comment.likes = response.data.likes_count;
-                  comment.isLiked = response.data.is_liked;
-                  return true;
-                }
-
-                // Buscar en respuestas
-                if (comment.replies) {
-                  for (const reply of comment.replies) {
-                    // Actualizar respuesta
-                    if (type === 'reply' && reply.id === id) {
-                      reply.likes = response.data.likes_count;
-                      reply.isLiked = response.data.is_liked;
-                      return true;
-                    }
-                  }
-                }
-              }
-            }
+        // Función para actualizar cualquier elemento
+        const updateItem = (item) => {
+          if (item.id === id) {
+            item.isLiked = response.data.is_liked;
+            item.likes_count = response.data.likes_count;
+            return true;
           }
           return false;
         };
 
-        // Actualizar en posts principales
-        updateLikeInArray(this.posts);
+        // Buscar y actualizar en posts principales
+        this.posts.forEach(post => {
+          // Actualizar el post mismo
+          if (type === 'post' && updateItem(post)) return;
+
+          // Buscar en comentarios
+          post.comments?.forEach(comment => {
+            // Actualizar comentario
+            if (type === 'comment' && updateItem(comment)) return;
+
+            // Buscar en respuestas
+            comment.replies?.forEach(reply => {
+              // Actualizar respuesta
+              if (type === 'reply' && updateItem(reply)) return;
+            });
+          });
+        });
 
         // Actualizar en post seleccionado si está abierto
         if (this.postSeleccionado) {
-          updateLikeInArray([this.postSeleccionado]);
-        }
+          // Actualizar el post seleccionado mismo
+          if (type === 'post' && updateItem(this.postSeleccionado)) return;
 
-        this.$forceUpdate();
+          // Buscar en comentarios del post seleccionado
+          this.postSeleccionado.comments?.forEach(comment => {
+            if (type === 'comment' && updateItem(comment)) return;
+
+            comment.replies?.forEach(reply => {
+              if (type === 'reply' && updateItem(reply)) return;
+            });
+          });
+        }
 
       } catch (error) {
         console.error('Error al dar like:', error);
