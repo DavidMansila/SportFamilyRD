@@ -955,6 +955,7 @@ export default {
     async editarPost() {
       try {
         let response;
+        const userId = this.user.id;
 
         if (this.nuevoPost.imagenFile) {
           const formData = new FormData();
@@ -968,7 +969,10 @@ export default {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
         } else {
-          response = await axios.put(`/post/${this.nuevoPost.id}`, this.nuevoPost);
+          response = await axios.put(`/post/${this.nuevoPost.id}`, {
+            ...this.nuevoPost,
+            user_id: userId
+          });
         }
 
         // Actualizar lista de posts
@@ -993,7 +997,12 @@ export default {
         try {
           const postId = this.postSeleccionado.id;
 
-          const response = await axios.delete(`/post/${postId}`);
+          const response = await axios.delete(`/post/${postId}`, {
+            data: {
+              user_id: this.user.id,
+              user_type: this.user.user_type
+            }
+          });
 
           if (response.status === 200) {
             // Eliminar de los arrays principales
@@ -1049,7 +1058,7 @@ export default {
 
       const endpoint = `/post/update-comment/${comentario.id}`;
 
-      axios.put(endpoint, { texto: this.comentarioEditado })
+      axios.put(endpoint, { texto: this.comentarioEditado, user_id: this.user.id })
         .then(response => {
           this.getPost()
             .then(() => {
@@ -1086,7 +1095,7 @@ export default {
       const endpoint = `/post/update-reply/${reply.id}`
 
 
-      axios.put(endpoint, { comment_id: comentarioID, texto: this.replyEditado, })
+      axios.put(endpoint, { comment_id: comentarioID, texto: this.replyEditado, user_id: this.user.id })
         .then(response => {
           this.getPost()
             .then(() => {
@@ -1121,7 +1130,12 @@ export default {
         ? `/post/destroy-reply/${comentario.id}`
         : `/post/delete-comment/${comentario.id}`;
 
-      axios.delete(endpoint)
+      axios.delete(endpoint, {
+        data: {
+          user_id: this.user.id,
+          user_type: this.user.user_type
+        }
+      })
         .then(() => {
           this.getPost()
             .then(() => {
@@ -1156,7 +1170,12 @@ export default {
 
       const endpoint = `/post/destroy-reply/${reply.id}`
 
-      axios.delete(endpoint)
+      axios.delete(endpoint, {
+        data: {
+          user_id: this.user.id,
+          user_type: this.user.user_type
+        }
+      })
         .then(() => {
           this.getPost()
             .then(() => {
