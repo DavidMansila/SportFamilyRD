@@ -30,7 +30,7 @@ class BroadcastServiceProvider extends ServiceProvider
         Broadcast::routes([
             'prefix' => 'api',
             'as' => 'api.broadcasting.',
-            'middleware' => ['api', 'auth:sanctum'],
+            'middleware' => ['api', 'auth:sanctum','broadcast.auth'],
             'methods' => ['GET', 'POST']
         ]);
 

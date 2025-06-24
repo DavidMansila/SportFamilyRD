@@ -145,4 +145,6 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-Broadcast::routes(['middleware' => ['broadcast.auth']]); // Middleware personalizado para tokens personales en broadcasting
+Broadcast::routes([
+    'middleware' => ['api', 'auth:sanctum', 'broadcast.auth']
+]);

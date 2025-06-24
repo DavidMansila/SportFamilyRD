@@ -606,7 +606,7 @@ export default {
       if (!this.user) return;
       try {
         const response = await axios.get('/chats',
-         { params: { user_id: this.user.id } }
+          { params: { user_id: this.user.id } }
         );
         console.log('Respuesta de /chats:', response.data);
 
@@ -775,15 +775,17 @@ export default {
           broadcaster: 'pusher',
           key: import.meta.env.VITE_PUSHER_APP_KEY,
           cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-          authEndpoint: 'http://127.0.0.1:8000/api/broadcasting/auth',
+          // wsHost: window.location.hostname,
+          // wsPort: 6001,
+          forceTLS: false,
+          disableStats: true,
+          authEndpoint: '/api/broadcasting/auth',
           auth: {
             headers: {
               Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-              Accept: 'application/json'
             }
           }
         });
-
         this.setupGlobalListeners();
       } catch (error) {
         console.error('Error cargando Echo:', error);
