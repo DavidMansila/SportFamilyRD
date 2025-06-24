@@ -11,18 +11,20 @@ class MessageController extends Controller
 {
     public function store(Request $request, $chatId)
     {
-        $request->validate([
-            'message' => 'required|string|max:1000'
-        ]);
+        $request->validate(['message' => 'required|string|max:1000']);
+
+        $user = Auth::user();
+        $senderType = $user->user_type === 'user' ? 'user' : 'trainer';
 
         $message = Message::create([
             'chat_id' => $chatId,
-            'sender_type' => Auth::user()->user_type === 'user' ? 'user' : 'trainer',
+            'sender_id' => $user->id,
+            'sender_type' => $senderType,
             'message' => $request->message
         ]);
 
-        // Disparar evento
-        event(new NewMessage($message));
+        // Disparar evento correctamente
+        broadcast(new NewMessage($message))->toOthers();
 
         return response()->json($message, 201);
     }

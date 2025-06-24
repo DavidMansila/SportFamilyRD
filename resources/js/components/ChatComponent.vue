@@ -1,7 +1,7 @@
 <template>
   <div class="chat-container">
     <div class="chat-header">
-      <button class="back-btn" @click="$emit('close-chat')">
+      <button class="back-btn" @click="closeChat">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
             stroke-linejoin="round" />
@@ -67,85 +67,132 @@ export default {
     return {
       messages: [],
       newMessage: '',
-      otherUser: '',
       isOnline: false,
       loadingMessages: true,
       sendingMessage: false,
       echoChannel: null,
       presenceChannel: null,
-      newMessagesIndicator: false,
-      unreadMessages: 0
+      echoInitialized: false
     }
   },
   computed: {
     chatId() {
       return this.activeChat?.id;
     },
-    recipientId() {
-      return this.user.id === this.activeChat.user_id
-        ? this.activeChat.trainer_id
-        : this.activeChat.user_id;
-    },
 
     otherUser() {
       if (!this.activeChat) return null;
 
-      if (this.user.user_type === 'user') {
+      try {
+        const isUser = this.user.user_type === 'user';
+        const target = isUser ?
+          (this.activeChat.trainer || this.activeChat.trainer_id) :
+          (this.activeChat.user || this.activeChat.user_id);
+
+        if (!target) return null;
+
         return {
-          id: this.activeChat.trainer.id,
-          name: this.activeChat.trainer.user.name,
-          image: this.activeChat.trainer.user.image
-            ? `/storage/users/${this.activeChat.trainer.user.id}/${this.activeChat.trainer.user.image}`
-            : 'public/storage/users/Perfil-Icon.png'
+          id: target.id || target,
+          name: target.user?.name || target.name || (isUser ? 'Entrenador' : 'Usuario'),
+          trainer_id: target.trainer_id,
+          image: this.getUserImage(target)
         };
-      } else {
-        return {
-          id: this.activeChat.user.id,
-          name: this.activeChat.user.name,
-          image: this.activeChat.user.image
-            ? `/storage/users/${this.activeChat.user.id}/${this.activeChat.user.image}`
-            : 'public/storage/users/Perfil-Icon.png'
-        };
+      } catch (error) {
+        console.error('Error al obtener otherUser:', error);
+        return null;
       }
     },
 
     otherUserAvatar() {
-      if (!this.otherUser?.image) {
-        return '/storage/users/Perfil-Icon.png';
-      }
-
-      if (this.otherUser.image.startsWith('http') || this.otherUser.image.startsWith('/')) {
-        return this.otherUser.image;
-      }
-
-      return `/storage/users/${this.otherUser.id}/${this.otherUser.image}`;
+      return this.otherUser?.image || '/storage/users/Perfil-Icon.png';
     },
 
     otherUserName() {
-      return this.otherUser?.name || (this.user.id === this.activeChat.user_id ? 'Entrenador' : 'Usuario');
+      return this.otherUser?.name || (this.user.id === this.activeChat?.user_id ? 'Entrenador' : 'Usuario');
     }
   },
   watch: {
     chatId: {
       immediate: true,
-      handler(newVal) {
+      async handler(newVal) {
         if (newVal) {
-          this.fetchMessages();
-          this.setupChannels();
+          await this.initializeChat();
+        } else {
+          this.leaveChannels();
         }
-      }
-    },
-    messages: {
-      deep: true,
-      handler() {
-        this.$nextTick(this.scrollToBottom);
       }
     }
   },
 
   methods: {
+    getUserImage(user) {
+      if (!user) return '/storage/users/Perfil-Icon.png';
+
+      // Si es un objeto completo
+      if (user.user?.image) {
+        return `/storage/users/${user.user.id}/${user.user.image}`;
+      }
+      if (user.image) {
+        return `/storage/users/${user.id}/${user.image}`;
+      }
+
+      // Si es solo un ID (caso de respaldo)
+      return '/storage/users/Perfil-Icon.png';
+    },
+
+    async initializeChat() {
+      await this.fetchMessages();
+      await this.loadEchoLibrary();
+      this.setupChannels();
+    },
+
+    async loadEchoLibrary() {
+      if (window.Echo) return;
+
+      try {
+        const token = sessionStorage.getItem('token');
+        if (!token) throw new Error('Token not found');
+
+        // Verify token validity
+        await axios.get('/user', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const [EchoModule, PusherModule] = await Promise.all([
+          import('laravel-echo'),
+          import('pusher-js')
+        ]);
+
+        window.Pusher = PusherModule.default;
+        window.Echo = new EchoModule.default({
+          broadcaster: 'pusher',
+          key: import.meta.env.VITE_PUSHER_APP_KEY,
+          cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+          forceTLS: true,
+          authEndpoint: '/api/broadcasting/auth',
+          auth: {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json'
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Echo init error:', error);
+        try {
+          const refreshResponse = await axios.post('/api/auth/refresh');
+          sessionStorage.setItem('token', refreshResponse.data.token);
+          await this.loadEchoLibrary();
+        } catch (refreshError) {
+          console.error('Token refresh failed:', refreshError);
+          this.$emit('auth-error');
+        }
+      }
+    },
 
     isMessageFromMe(message) {
+      if (!message || !this.user) return false;
+
       if (this.user.user_type === 'user') {
         return message.sender_type === 'user';
       } else if (this.user.user_type === 'entrenador') {
@@ -155,18 +202,12 @@ export default {
     },
 
     async fetchMessages() {
+      if (!this.chatId) return;
+
       this.loadingMessages = true;
       try {
-        console.log('Fetching messages for chat ID:', this.chatId);
-
-        const response = await axios.get(`/chats/${this.chatId}`, {
-          // params: {
-          //   user_id: this.user.id,
-          // }
-        });
-        console.log('Messages response:', response.data);
-
-        this.messages = response.data.messages;
+        const response = await axios.get(`/chats/${this.chatId}`);
+        this.messages = response.data.messages || [];
 
         this.$nextTick(() => {
           this.scrollToBottom(true);
@@ -179,18 +220,16 @@ export default {
       }
     },
 
-
     scrollToBottom(force = false) {
       const container = this.$refs.messagesContainer;
       if (!container) return;
 
-      if (force || container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
-        this.$nextTick(() => {
+      this.$nextTick(() => {
+        if (force || container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
           container.scrollTop = container.scrollHeight;
-        });
-      }
+        }
+      });
     },
-
 
     async sendMessage() {
       if (!this.newMessage.trim() || this.sendingMessage) return;
@@ -200,190 +239,150 @@ export default {
         const messageContent = this.newMessage.trim();
         this.newMessage = '';
 
-        const senderType = this.user.user_type === 'user' ? 'user' : 'trainer';
-
-        const tempMessage = {
-          id: Date.now(),
-          chat_id: this.chatId,
-          sender_id: this.user.id,
-          sender_type: senderType,
-          message: messageContent,
-          created_at: new Date().toISOString(),
-          read: false
-        };
-
-        this.messages.push(tempMessage);
-        this.$nextTick(this.scrollToBottom);
-
+        // Enviar directamente al servidor
         const response = await axios.post(`/chats/${this.chatId}/messages`, {
           message: messageContent,
           user_id: this.user.id,
         });
 
-        const index = this.messages.findIndex(m => m.id === tempMessage.id);
-        if (index !== -1) {
-          this.messages.splice(index, 1, response.data);
-        } else {
-          this.messages.push(response.data);
-        }
-
+        // Añadir el mensaje a la lista cuando se recibe la respuesta
+        this.messages.push(response.data);
+        this.scrollToBottom(true);
       } catch (error) {
         console.error('Error sending message:', error);
-        const index = this.messages.findIndex(m => m.id === tempMessage.id);
-        if (index !== -1) {
-          this.messages.splice(index, 1);
-        }
       } finally {
         this.sendingMessage = false;
       }
     },
 
-
     formatTime(time) {
       if (!time) return '';
-
-      const dateObj = typeof time === 'string' || typeof time === 'number'
-        ? new Date(time)
-        : time;
-
-      return dateObj.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    },
-
-    identifyOtherUser() {
-      if (!this.activeChat) return;
-
-      if (this.user.id === this.activeChat.user_id) {
-        this.otherUser = {
-          id: this.activeChat.trainer.id,
-          name: this.activeChat.trainer.user.name,
-          image: this.activeChat.trainer.user.image
-            ? `/storage/users/${this.activeChat.trainer.user.id}/${this.activeChat.trainer.user.image}`
-            : '/storage/users/Perfil-Icon.png'
-        };
-      } else if (this.user.id === this.activeChat.trainer_id) {
-        this.otherUser = {
-          id: this.activeChat.user.id,
-          name: this.activeChat.user.name,
-          image: this.activeChat.user.image
-            ? `/storage/users/${this.activeChat.user.id}/${this.activeChat.user.image}`
-            : '/storage/users/Perfil-Icon.png'
-        };
-      } else {
-        this.otherUser = {
-          name: 'Usuario desconocido',
-          image: '/storage/users/Perfil-Icon.png'
-        };
+      try {
+        const dateObj = new Date(time);
+        return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      } catch {
+        return '';
       }
     },
 
-
-    setupChannels() {
+    async setupChannels() {
       if (!this.chatId || !window.Echo) return;
 
-      this.leaveChannels();
+      this.leaveChannels(); // Clean up previous channels
 
-      // Canal privado para mensajes
-      this.echoChannel = window.Echo.private(`private-chat.${this.chatId}`)
-        .listen('.message.sent', this.handleIncomingMessage);
+      // Message channel
+      this.echoChannel = window.Echo.private(`chat.${this.chatId}`)
+        .listen('message-sent', this.handleIncomingMessage)
+        .error(console.error);
 
-      // Canal de presencia para estado
-      this.presenceChannel = window.Echo.join(`presence-chat.${this.chatId}`)
+      // Presence channel - match backend naming
+      this.presenceChannel = window.Echo.join(`online.${this.chatId}`)
         .here(this.updateOnlineStatus)
         .joining(this.userJoined)
-        .leaving(this.userLeft);
+        .leaving(this.userLeft)
+        .error(console.error);
     },
-
 
     handleIncomingMessage(data) {
-      if (this.messages.some(msg => msg.id === data.id)) return;
+      if (!data || !data.id) return;
 
-      this.messages.push(data);
-      this.scrollToBottom();
-
-      if (!this.isMessageFromMe(data)) {
-        this.markMessagesAsRead();
-      }
-    },
-
-
-    leaveChannels() {
-      if (this.echoChannel) {
-        window.Echo.leave(`chat.${this.chatId}`);
-        this.echoChannel = null;
-      }
-    },
-
-    async markMessagesAsRead() {
-      try {
-        await axios.post(`/chats/${this.chatId}/read`);
-        this.$emit('messages-read');
-      } catch (error) {
-        console.error('Error marcando mensajes como leídos', error);
-      }
-    },
-
-    handleNewMessage(newMessage) {
-      // Evitar duplicados
-      const messageExists = this.messages.some(msg => msg.id === newMessage.id);
-
+      // Evitar duplicados usando el ID del mensaje
+      const messageExists = this.messages.some(msg => msg.id === data.id);
       if (!messageExists) {
-        this.messages.push(newMessage);
-        this.$nextTick(this.scrollToBottom);
+        this.messages.push(data);
+        this.scrollToBottom();
 
-        // Marcar como leído si es mensaje entrante
-        if (!this.isMessageFromMe(newMessage)) {
+        // Marcar como leído si es necesario
+        if (!this.isMessageFromMe(data)) {
           this.markMessagesAsRead();
         }
       }
     },
 
-    closeChat() {
+    leaveChannels() {
       if (this.echoChannel) {
+        this.echoChannel.stopListening('message-sent');
         window.Echo.leave(`chat.${this.chatId}`);
-      }
-      if (this.presenceChannel) {
-        window.Echo.leave(`presence-chat.${this.chatId}`);
+        this.echoChannel = null;
       }
 
-      this.$emit('close-chat');
+      if (this.presenceChannel) {
+        window.Echo.leave(`online.${this.chatId}`);
+        this.presenceChannel = null;
+      }
     },
 
-    updateReadStatus() {
-      this.messages.forEach(msg => {
-        if (this.isMessageFromMe(msg)) {
-          msg.read = true;
-        }
-      });
+    async markMessagesAsRead() {
+      if (!this.chatId) return;
+
+      try {
+        await axios.post(`/chats/${this.chatId}/read`);
+
+        this.messages.forEach(msg => {
+          if (!this.isMessageFromMe(msg)) {
+            msg.read = true;
+          }
+        });
+
+        this.$emit('messages.read');
+      } catch (error) {
+        console.error('Error marking as read:', error);
+      }
     },
 
     updateOnlineStatus(users) {
-      this.isOnline = users.some(user => user.id === this.otherUser.id);
+      if (!this.otherUser || !users) {
+        this.isOnline = false;
+        return;
+      }
+
+      this.isOnline = users.some(user =>
+        user.id === this.otherUser.id ||
+        user.trainer_id === this.otherUser.id
+      );
     },
 
     userJoined(user) {
-      if (user.id === this.otherUser.id) {
+      if (!this.otherUser || !user) return;
+
+      if ((user.id && user.id === this.otherUser.id) ||
+        (user.trainer_id && user.trainer_id === this.otherUser.id)) {
         this.isOnline = true;
       }
     },
 
     userLeft(user) {
-      if (user.id === this.otherUser.id) {
+      if (!this.otherUser || !user) return;
+
+      if ((user.id && user.id === this.otherUser.id) ||
+        (user.trainer_id && user.trainer_id === this.otherUser.id)) {
         this.isOnline = false;
       }
+    },
+
+    leaveChatChannel() {
+      this.leaveChannels();
+    },
+
+    closeChat() {
+      this.leaveChannels();
+      this.$emit('close-chat');
     }
+
+  },
+  beforeUnmount() {
+    console.log('Component unmounting - leaving channels');
+    this.leaveChannels();
   },
   mounted() {
-    this.setupChannels();
-  },
-
-  beforeUnmount() {
-    this.leaveChannels();
+    if (this.chatId) {
+      console.log('Initializing chat for ID:', this.chatId);
+      this.initializeChat();
+    }
   }
 }
 </script>
+
 
 <style scoped>
 @import '../../scss/Entrenadores/chatcomponent.scss';
