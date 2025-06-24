@@ -143,21 +143,6 @@
       </div>
 
       <div class="events-container">
-        <div class="calendar-widget">
-          <div class="calendar-header">
-            <button class="nav-button"><i class="fas fa-chevron-left"></i></button>
-            <h3 class="month-year">Julio 2025</h3>
-            <button class="nav-button"><i class="fas fa-chevron-right"></i></button>
-          </div>
-          <div class="calendar-grid">
-            <div class="day-header" v-for="day in ['L', 'M', 'M', 'J', 'V', 'S', 'D']" :key="day">{{ day }}</div>
-            <div class="day" v-for="day in 31" :key="day"
-              :class="{ 'has-event': day % 3 === 0, 'current-day': day === new Date().getDate() }">
-              {{ day }}
-              <div class="event-dot" v-if="day % 3 === 0"></div>
-            </div>
-          </div>
-        </div>
 
         <div class="featured-events">
           <div class="event-card" v-for="event in featuredEvents" :key="event.id">
