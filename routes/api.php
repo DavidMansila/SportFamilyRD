@@ -12,6 +12,7 @@ use App\Http\Controllers\SavedNewsController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserStatsController;
 use Illuminate\Support\Facades\Route;
@@ -39,7 +40,7 @@ Route::get('/recent-products', [ProductController::class, 'recentProducts']);
 Route::get('/popular-posts', [PostController::class, 'popularPosts']);
 
 
-Route::get('/home-stats', function() {
+Route::get('/home-stats', function () {
     try {
         return response()->json([
             'users' => User::count(),
@@ -80,7 +81,7 @@ Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
 
 // RUTAS PROTEGIDAS POR TOKEN
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     // Usuarios
     Route::resource('/user', UserController::class);
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
@@ -141,39 +142,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/messages/send', [ChatController::class, 'sendMessage']);
     Route::post('/chats/{chat}/messages', [MessageController::class, 'store']);
 
-    // CRUD de noticias (solo admin)
-    Route::middleware('can:admin')->group(function () {
-        Route::put('/news/{id}', function (Request $request, $id) {
-            $validator = Validator::make($request->all(), [
-                'title' => 'required|string|max:255',
-                'description' => 'required|string',
-                'author' => 'required|string|max:100',
-                'published_at' => 'required|date',
-                'categoria' => 'required|string|max:50'
-            ]);
 
-            if ($validator->fails()) {
-                return response()->json($validator->errors(), 422);
-            }
+    Route::put('/news/{id}', [NewsController::class, 'update']);
 
-            $noticia = News::findOrFail($id);
-            $noticia->update([
-                'title' => $request->title,
-                'description' => $request->description,
-                'author' => $request->author,
-                'published_at' => $request->published_at,
-                'category' => $request->categoria
-            ]);
-
-            return response()->json($noticia);
-        });
-
-        Route::delete('/news/{id}', function ($id) {
-            $noticia = \App\Models\News::findOrFail($id);
-            $noticia->delete();
-            return response()->json(['message' => 'Noticia eliminada']);
-        });
-    });
+    Route::delete('/news/{id}', [NewsController::class, 'destroy']);
+    
 });
 
 

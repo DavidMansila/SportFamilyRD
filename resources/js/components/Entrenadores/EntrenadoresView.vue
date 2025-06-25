@@ -255,7 +255,7 @@
 
 
     <!-- Burbuja de Mensajes Flotante -->
-    <div v-if="user" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
+    <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
       <div class="message-icon-container" @click="toggleMensajes">
         <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path

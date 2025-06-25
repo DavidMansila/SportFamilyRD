@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
@@ -66,42 +67,59 @@ class NewsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, News $news)
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'content' => 'sometimes|required|string',
-            'author' => 'sometimes|required|string|max:255',
-            'source' => 'sometimes|required|string|max:255',
-            'url' => 'sometimes|required|url',
-            'published_at' => 'nullable|date',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'author' => 'required|string|max:255',
+            'category' => 'required|string|max:50',
+            'published_at' => 'required|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
+        $news = News::findOrFail($id);
 
-        try {
-            $news->update($request->all());
-            return response()->json(
-                [
-                    'message' => 'Noticia actualizada con éxito',
-                    'news' => $news
-                ],
-                200
-            );
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al actualizar la noticia',
-                'error' => $e->getMessage()
-            ], 500);
+        $data = $request->only([
+            'title',
+            'content',
+            'author',
+            'category',
+            'published_at'
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($news->image && Storage::exists($news->image)) {
+                Storage::delete($news->image);
+            }
+
+            $imagePath = $request->file('image')->store('news_images', 'public');
+            $data['image'] = $imagePath;
         }
+
+        $news->update($data);
+
+        return response()->json([
+            'message' => 'Noticia actualizada con éxito',
+            'news' => $news
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(News $news)
+    public function destroy($id)
     {
         try {
+            $news = News::findOrFail($id);
+
+            // Eliminar imagen asociada
+            if ($news->image && Storage::exists($news->image)) {
+                Storage::delete($news->image);
+            }
+
             $news->delete();
+
             return response()->json([
                 'message' => 'Noticia eliminada con éxito'
             ], 200);
