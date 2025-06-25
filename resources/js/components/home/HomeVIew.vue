@@ -68,15 +68,7 @@
                 <span>{{ category.participation }}% participación</span>
               </div>
             </div>
-            <div class="card-back">
-              <h3>{{ category.name }}</h3>
-              <p class="card-description">{{ category.description }}</p>
-              <div class="card-stats">
-              </div>
-              <router-link :to="'/deporte/' + category.slug" class="card-button">
-                Explorar <i class="fas fa-arrow-right"></i>
-              </router-link>
-            </div>
+
           </div>
         </div>
       </div>
@@ -107,7 +99,7 @@
           <div class="featured-content">
             <div class="news-meta">
               <span class="date"><i class="far fa-calendar-alt"></i> {{ formatNewsDate(recentNews[0].published_at)
-                }}</span>
+              }}</span>
               <span class="author"><i class="far fa-user"></i> Por {{ recentNews[0].author }}</span>
             </div>
             <h3 class="news-title">{{ recentNews[0].title }}</h3>
@@ -164,9 +156,6 @@
                 <span class="event-time"><i class="fas fa-clock"></i> {{ event.time }}</span>
               </div>
               <p class="event-description">{{ event.description }}</p>
-              <!-- <div class="event-actions">
-                <button class="share-button"><i class="fas fa-share-alt"></i></button>
-              </div> -->
             </div>
           </div>
         </div>
@@ -371,23 +360,6 @@
     <!-- Product Modal -->
     <ProductModal v-if="showModal" :product="selectedProduct" @close="closeModal" />
 
-    <!-- Floating Action Buttons -->
-    <!-- <div class="fab-container">
-      <button class="fab main-fab">
-        <i class="fas fa-comment-dots"></i>
-      </button>
-      <div class="fab-options">
-        <button class="fab option-fab">
-          <i class="fas fa-question"></i>
-        </button>
-        <button class="fab option-fab">
-          <i class="fas fa-calendar-alt"></i>
-        </button>
-        <button class="fab option-fab">
-          <i class="fas fa-shopping-cart"></i>
-        </button>
-      </div>
-    </div> -->
 
     <!-- Back to Top Button -->
     <button class="back-to-top" @click="scrollToTop">
@@ -461,34 +433,24 @@ export default {
         {
           name: "Baseball",
           image: "/imagenes/DirectorioDeDeportes/baseball.jpg",
-          description: "La pasión de multitudes en RD",
-          participation: 80,
-          members: 1250,
-          events: 45,
           slug: "futbol",
-          popular: true
+          popular: true,
+          participation: 90,
         },
         {
           name: "Basketball",
           image: "/imagenes/DirectorioDeDeportes/Baloncesto.jpg",
-          description: "La pasión de multitudes en RD",
-          participation: 64,
-          members: 1250,
-          events: 45,
           slug: "futbol",
-          popular: true
+          popular: true,
+          participation: 50,
         },
         {
           name: "Domino",
           image: "/imagenes/DirectorioDeDeportes/Domino.jpg",
-          description: "La pasión de multitudes en RD",
-          participation: 72,
-          members: 1250,
-          events: 45,
           slug: "futbol",
-          popular: true
+          popular: true,
+          participation: 60,
         },
-        // Más categorías...
       ],
     }
   },
@@ -794,6 +756,9 @@ img {
   animation: fadeInUp 0.8s ease-out 0.5s both;
 }
 
+
+/* BOTON EN NARANJA */
+
 .cta-button {
   display: inline-flex;
   align-items: center;
@@ -844,4 +809,58 @@ img {
     transform: translateY(0);
   }
 }
+
+
+/* BOTON EN ROJO  */
+
+/* 
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #ff0000, #000000);
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(255, 0, 0, 0.6);
+  background: linear-gradient(135deg, #ff1a1a, #000000);
+}
+
+.cta-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+}
+
+.cta-button i {
+  margin-left: 10px;
+  transition: transform 0.3s ease;
+}
+
+.cta-button:hover i {
+  transform: translateX(5px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} */
 </style>

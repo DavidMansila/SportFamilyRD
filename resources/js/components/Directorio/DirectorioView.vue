@@ -6,7 +6,7 @@
     <Navbar />
 
 
-    <!-- Header con imagen representativa -->
+    <!-- Header -->
     <header class="app-header">
       <img src="imagenes/DirectorioDeDeportes/directoriofondo.jpg" alt="Deportes Dominicana" class="header-image">
       <div class="header-content">
@@ -90,9 +90,9 @@
                 <h4>{{ place.name }}</h4>
                 <p><i class="fas fa-location-dot"></i> {{ place.location }}</p>
                 <p v-if="place.cost"><i class="fas fa-money-bill-wave"></i> {{ place.cost }}</p>
-                <a v-if="place.website" :href="place.website" target="_blank">
+                <!-- <a v-if="place.website" :href="place.website" target="_blank">
                   <i class="fas fa-globe"></i> Sitio web
-                </a>
+                </a> -->
               </div>
             </div>
           </div>
@@ -107,7 +107,6 @@
 
 
 <script setup>
-import axios from 'axios';
 import { ref, computed } from 'vue';
 import Navbar from '../navbarComponent.vue';
   
@@ -117,7 +116,6 @@ import Navbar from '../navbarComponent.vue';
 //   components: {
 //     Navbar
 //   },
-
 
 const searchTerm = ref('')
 const activeRegion = ref('Todas')
@@ -544,28 +542,28 @@ const sports = ref([
       }
     ],
   },
-  {
-    id: 17,
-    name: 'Gallera',
-    region: 'Santiago, San Cristóbal, Higüey',
-    type: 'Individual',
-    popularity: 'Tradicional',
-    image: 'http://e00-elmundo.uecdn.es/assets/multimedia/imagenes/2017/02/24/14879512766963.jpg',
-    shortDescription: 'Deporte tradicional controvertido',
-    description: 'Aunque polémico, es parte de la cultura rural dominicana. Las peleas de gallos se realizan en coliseos especializados llamados "galleras".',
-    requirements: [
-      'Gallos de pelea',
-      'Espuelas especiales',
-      'Gallera autorizada'
-    ],
-    places: [
-      {
-        name: 'Coliseo Gallístico de Santiago',
-        location: 'Santiago',
-        cost: 'RD$300-1,000 entrada'
-      }
-    ],
-  },
+  // {
+  //   id: 17,
+  //   name: 'Gallera',
+  //   region: 'Santiago, San Cristóbal, Higüey',
+  //   type: 'Individual',
+  //   popularity: 'Tradicional',
+  //   image: 'http://e00-elmundo.uecdn.es/assets/multimedia/imagenes/2017/02/24/14879512766963.jpg',
+  //   shortDescription: 'Deporte tradicional controvertido',
+  //   description: 'Aunque polémico, es parte de la cultura rural dominicana. Las peleas de gallos se realizan en coliseos especializados llamados "galleras".',
+  //   requirements: [
+  //     'Gallos de pelea',
+  //     'Espuelas especiales',
+  //     'Gallera autorizada'
+  //   ],
+  //   places: [
+  //     {
+  //       name: 'Coliseo Gallístico de Santiago',
+  //       location: 'Santiago',
+  //       cost: 'RD$300-1,000 entrada'
+  //     }
+  //   ],
+  // },
   {
     id: 18,
     name: 'Buceo',

@@ -1,6 +1,5 @@
 <template>
     <div class="solicitudes-entrenadores-container">
-        <!-- Navbar -->
         <Navbar />
 
         <main class="main-content">
@@ -24,7 +23,6 @@
             </div>
 
             <div class="solicitudes-list">
-                <!-- Solicitud Card -->
                 <div v-for="solicitud in solicitudesFiltradas" :key="solicitud.id" class="solicitud-card"
                     :class="solicitud.status">
                     <div class="card-header">
@@ -64,9 +62,47 @@
                         </div>
 
                         <div class="details-section">
-                            <div class="detail-item">
-                                <h4 class="detail-title">Logros</h4>
-                                <p class="detail-content">{{ solicitud.achievements || 'No especificado' }}</p>
+
+                            <div class="detail-item full-width">
+                                <h4 class="detail-title">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                        viewBox="0 0 16 16" class="icon">
+                                        <path
+                                            d="M2.5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2h-11zm4.5 3h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1zM4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-7z" />
+                                    </svg>
+                                    Logros
+                                </h4>
+
+                                <div v-if="solicitud.achievements && solicitud.achievements.length > 0"
+                                    class="achievements-grid">
+                                    <div v-for="(logro, index) in solicitud.achievements" :key="index"
+                                        class="achievement-card">
+                                        <div class="achievement-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                fill="currentColor" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M9.673 5.933v1.938h1.033c.66 0 1.068-.316 1.068-.95 0-.64-.422-.988-1.05-.988h-1.05z" />
+                                                <path
+                                                    d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm5.937 7 1.99-5.999H6.61L5.277 9.708H5.22L3.875 5.001H2.5L4.508 11h1.429zM8.5 5.001V11h1.173V8.763h1.064L11.787 11h1.327L11.91 8.583C12.455 8.373 13 7.779 13 6.9c0-1.147-.773-1.9-2.105-1.9H8.5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="achievement-content">
+                                            <h5 class="achievement-title">{{ logro.title }}</h5>
+                                            <p class="achievement-desc">{{ logro.description }}</p>
+                                            <div v-if="logro.date" class="achievement-date">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                    fill="currentColor" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z" />
+                                                    <path
+                                                        d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4zM8 8a.5.5 0 0 1 .5.5V10H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V11H6a.5.5 0 0 1 0-1h1.5V8.5A.5.5 0 0 1 8 8z" />
+                                                </svg>
+                                                {{ formatDate(logro.date) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p v-else class="no-items">No se han registrado logros</p>
                             </div>
 
                             <div class="detail-item">
@@ -84,9 +120,27 @@
                             </div>
 
                             <div class="detail-item full-width">
-                                <h4 class="detail-title">Declaración Personal</h4>
-                                <p class="detail-content">{{ solicitud.certificates_linked || 'No proporcionada' }}</p>
+                                <h4 class="detail-title">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                        viewBox="0 0 16 16" class="icon">
+                                        <path
+                                            d="M9.5 2.672a.5.5 0 1 0 1 0V.843a.5.5 0 0 0-1 0v1.829Zm4.5.035A.5.5 0 0 0 13.293 2L12 3.293a.5.5 0 1 0 .707.707L14 2.707ZM7.293 4A.5.5 0 1 0 8 3.293L6.707 2A.5.5 0 0 0 6 2.707L7.293 4Zm-.621 2.5a.5.5 0 1 0 0-1H4.843a.5.5 0 1 0 0 1h1.829Zm8.485 0a.5.5 0 1 0 0-1h-1.829a.5.5 0 0 0 0 1h1.829ZM13.293 10A.5.5 0 1 0 14 9.293L12.707 8a.5.5 0 1 0-.707.707L13.293 10ZM9.5 11.157a.5.5 0 0 0 1 0V9.328a.5.5 0 0 0-1 0v1.829Zm-5.172-2a.5.5 0 0 0-.707 0L2 9.293a.5.5 0 1 0 .707.707L4.328 9.12a.5.5 0 0 0 0-.707ZM8 10a.5.5 0 0 0 0 1h1.829a.5.5 0 1 0 0-1H8Z" />
+                                        <path
+                                            d="M14 6.5v3a3.5 3.5 0 0 1-3.5 3.5H6A4.5 4.5 0 0 1 1.5 9h1A3.5 3.5 0 0 0 6 12.5h4.5a2.5 2.5 0 0 0 2.5-2.5V6.5a2.5 2.5 0 0 0-2.5-2.5H6A3.5 3.5 0 0 0 2.5 7h-1A4.5 4.5 0 0 1 6 2.5h4.5A3.5 3.5 0 0 1 14 6.5Zm-5.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                                    </svg>
+                                    Especialidades
+                                </h4>
+
+                                <div v-if="solicitud.specialties && solicitud.specialties.length > 0"
+                                    class="specialties-container">
+                                    <span v-for="(especialidad, index) in solicitud.specialties" :key="index"
+                                        class="specialty-badge">
+                                        {{ especialidad.description }}
+                                    </span>
+                                </div>
+                                <p v-else class="no-items">No se han registrado especialidades</p>
                             </div>
+
                         </div>
 
                         <div v-if="solicitud.documentos" class="documentos-section">
@@ -123,7 +177,6 @@
                     </div>
                 </div>
 
-                <!-- Empty State -->
                 <div v-if="solicitudesFiltradas.length === 0" class="empty-state">
                     <div class="empty-icon-wrapper">
                         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
@@ -166,25 +219,27 @@ export default {
     },
     methods: {
 
-        getTrainers() {
+        async getTrainers() {
             const status = this.filtroEstado === 'all' ? null : this.filtroEstado;
-            axios.get('/trainer', {
-                params: {
-                    status: status
-                }
-            })
-                .then(response => {
-                    this.solicitudes = response.data.trainers
-                        .map(trainer => ({
-                            ...trainer,
-                            status: trainer.status.toLowerCase()
-                        }))
-                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                })
-                .catch(error => {
-                    console.error('Error al cargar solicitudes:', error);
-                    alert('Error al cargar las solicitudes');
+            try {
+                const response = await axios.get('/trainer', {
+                    params: { status: status }
                 });
+
+                this.solicitudes = response.data.trainers.map(trainer => ({
+                    ...trainer,
+                    status: trainer.status.toLowerCase(),
+                    achievements: Array.isArray(trainer.achievements)
+                        ? trainer.achievements
+                        : [],
+                    specialties: Array.isArray(trainer.specialties)
+                        ? trainer.specialties
+                        : []
+                })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            } catch (error) {
+                console.error('Error al cargar solicitudes:', error);
+                alert('Error al cargar las solicitudes');
+            }
         },
 
         formatFecha(fecha) {
@@ -195,6 +250,12 @@ export default {
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        },
+
+        formatDate(dateString) {
+            if (!dateString) return '';
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
         },
 
         formatEstado(status) {
@@ -220,18 +281,16 @@ export default {
                 ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
                 : name.substring(0, 2).toUpperCase();
         },
-        
+
         aprobarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
             if (solicitud) {
-                axios.put(`/update-status/${solicitud.id}`, { // Cambiar a PUT y usar trainer.id
+                axios.put(`/update-status/${solicitud.id}`, {
                     status: 'approved'
                 })
                     .then(response => {
                         console.log('Solicitud aprobada:', response.data);
-                        // Actualizar estado localmente
                         solicitud.status = 'approved';
-                        // Actualizar la lista completa
                         this.getTrainers();
                     })
                     .catch(error => {
@@ -244,14 +303,12 @@ export default {
         rechazarSolicitud(id) {
             const solicitud = this.solicitudes.find(s => s.id === id);
             if (solicitud) {
-                axios.put(`/update-status/${solicitud.id}`, { // Cambiar a PUT y usar trainer.id
+                axios.put(`/update-status/${solicitud.id}`, {
                     status: 'rejected'
                 })
                     .then(response => {
                         console.log('Solicitud rechazada:', response.data);
-                        // Actualizar estado localmente
                         solicitud.status = 'rejected';
-                        // Actualizar la lista completa
                         this.getTrainers();
                     })
                     .catch(error => {
@@ -278,7 +335,6 @@ export default {
 <style scoped>
 @import '../../../scss/SolicitudUsuarios/SolicitudU_navbar.scss';
 
-/* Base Styles */
 :root {
     --primary-color: #4361ee;
     --success-color: #4cc9f0;
@@ -304,7 +360,6 @@ export default {
     padding: 0 1.5rem;
 }
 
-/* Header Section */
 .header-section {
     display: flex;
     justify-content: space-between;
@@ -333,7 +388,6 @@ export default {
     font-size: 1rem;
 }
 
-/* Filters Section */
 .filters-section {
     display: flex;
     align-items: center;
@@ -375,7 +429,6 @@ export default {
     font-size: 0.8rem;
 }
 
-/* Solicitudes List */
 .solicitudes-list {
     display: grid;
     grid-template-columns: 1fr;
@@ -383,7 +436,6 @@ export default {
     margin-bottom: 3rem;
 }
 
-/* Solicitud Card */
 .solicitud-card {
     background: white;
     border-radius: var(--border-radius);
@@ -679,5 +731,132 @@ export default {
     .card-actions {
         flex-direction: column;
     }
+}
+
+.logros-list,
+.especialidades-list {
+    padding-left: 1.5rem;
+    margin: 0;
+}
+
+.logros-list li,
+.especialidades-list li {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+
+
+
+
+
+
+.detail-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.icon {
+  margin-right: 8px;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.achievement-card {
+  display: flex;
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.achievement-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.achievement-icon {
+  margin-right: 16px;
+  color: #000000;
+  display: flex;
+  align-items: center;
+}
+
+.achievement-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.achievement-content {
+  flex: 1;
+}
+
+.achievement-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.achievement-desc {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.achievement-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #7a7a7a;
+}
+
+.achievement-date svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.specialties-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.specialty-badge {
+  background: linear-gradient(135deg, #565656, #000000);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(56, 56, 56, 0.2);
+  display: inline-flex;
+  align-items: center;
+}
+
+.no-items {
+  color: #7a7a7a;
+  font-style: italic;
+  padding: 8px 0;
+  margin: 0;
+}
+
+.detail-item {
+  margin-bottom: 24px;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
 }
 </style>
