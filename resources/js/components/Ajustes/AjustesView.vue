@@ -239,7 +239,6 @@ export default {
     },
 
     showToast(message, type = 'info') {
-      // Implementar lógica de toast con tipo (success, error, warning, info)
       alert(`${type.toUpperCase()}: ${message}`);
     },
 
@@ -268,17 +267,14 @@ export default {
           new_password: this.security.newPassword
         });
 
-        // Mostrar mensaje de éxito
         this.showToast('¡Contraseña cambiada con éxito!', 'success');
 
-        // Vaciar campos
         this.security = {
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         };
 
-        // Reiniciar visibilidad
         this.showCurrentPassword = false;
         this.showNewPassword = false;
         this.showConfirmPassword = false;

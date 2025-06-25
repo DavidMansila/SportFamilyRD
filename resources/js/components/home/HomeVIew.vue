@@ -68,15 +68,7 @@
                 <span>{{ category.participation }}% participación</span>
               </div>
             </div>
-            <div class="card-back">
-              <h3>{{ category.name }}</h3>
-              <p class="card-description">{{ category.description }}</p>
-              <div class="card-stats">
-              </div>
-              <router-link :to="'/deporte/' + category.slug" class="card-button">
-                Explorar <i class="fas fa-arrow-right"></i>
-              </router-link>
-            </div>
+
           </div>
         </div>
       </div>
@@ -107,7 +99,7 @@
           <div class="featured-content">
             <div class="news-meta">
               <span class="date"><i class="far fa-calendar-alt"></i> {{ formatNewsDate(recentNews[0].published_at)
-                }}</span>
+              }}</span>
               <span class="author"><i class="far fa-user"></i> Por {{ recentNews[0].author }}</span>
             </div>
             <h3 class="news-title">{{ recentNews[0].title }}</h3>
@@ -164,9 +156,6 @@
                 <span class="event-time"><i class="fas fa-clock"></i> {{ event.time }}</span>
               </div>
               <p class="event-description">{{ event.description }}</p>
-              <!-- <div class="event-actions">
-                <button class="share-button"><i class="fas fa-share-alt"></i></button>
-              </div> -->
             </div>
           </div>
         </div>
@@ -371,23 +360,6 @@
     <!-- Product Modal -->
     <ProductModal v-if="showModal" :product="selectedProduct" @close="closeModal" />
 
-    <!-- Floating Action Buttons -->
-    <!-- <div class="fab-container">
-      <button class="fab main-fab">
-        <i class="fas fa-comment-dots"></i>
-      </button>
-      <div class="fab-options">
-        <button class="fab option-fab">
-          <i class="fas fa-question"></i>
-        </button>
-        <button class="fab option-fab">
-          <i class="fas fa-calendar-alt"></i>
-        </button>
-        <button class="fab option-fab">
-          <i class="fas fa-shopping-cart"></i>
-        </button>
-      </div>
-    </div> -->
 
     <!-- Back to Top Button -->
     <button class="back-to-top" @click="scrollToTop">
@@ -461,34 +433,24 @@ export default {
         {
           name: "Baseball",
           image: "/imagenes/DirectorioDeDeportes/baseball.jpg",
-          description: "La pasión de multitudes en RD",
-          participation: 80,
-          members: 1250,
-          events: 45,
           slug: "futbol",
-          popular: true
+          popular: true,
+          participation: 90,
         },
         {
           name: "Basketball",
           image: "/imagenes/DirectorioDeDeportes/Baloncesto.jpg",
-          description: "La pasión de multitudes en RD",
-          participation: 64,
-          members: 1250,
-          events: 45,
           slug: "futbol",
-          popular: true
+          popular: true,
+          participation: 50,
         },
         {
           name: "Domino",
           image: "/imagenes/DirectorioDeDeportes/Domino.jpg",
-          description: "La pasión de multitudes en RD",
-          participation: 72,
-          members: 1250,
-          events: 45,
           slug: "futbol",
-          popular: true
+          popular: true,
+          participation: 60,
         },
-        // Más categorías...
       ],
     }
   },
@@ -901,7 +863,4 @@ img {
     transform: translateY(0);
   }
 } */
-
-
-
 </style>

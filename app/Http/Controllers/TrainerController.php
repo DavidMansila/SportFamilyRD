@@ -8,18 +8,44 @@ use Illuminate\Http\Request;
 
 class TrainerController extends Controller
 {
- 
+
     public function index(Request $request)
     {
         $status = $request->query('status', 'all');
 
-        $query = Trainer::query();
+        $query = Trainer::query()->with(['achievements', 'specialties']);
 
         if ($status !== 'all') {
             $query->where('status', $status);
         }
 
-        $trainers = $query->get();
+        $trainers = $query->get()->map(function ($trainer) {
+            return [
+                'id' => $trainer->id,
+                'name' => $trainer->name,
+                'email' => $trainer->email,
+                'phone' => $trainer->phone,
+                'sport_category' => $trainer->sport_category,
+                'experience' => $trainer->experience,
+                'city_country' => $trainer->city_country,
+                'cost' => $trainer->cost,
+                'certificates_linked' => $trainer->certificates_linked,
+                'status' => $trainer->status,
+                'created_at' => $trainer->created_at,
+                'achievements' => $trainer->achievements->map(function ($achievement) {
+                    return [
+                        'title' => $achievement->title,
+                        'description' => $achievement->description,
+                        'date' => $achievement->date
+                    ];
+                })->toArray(),
+                'specialties' => $trainer->specialties->map(function ($specialty) {
+                    return [
+                        'description' => $specialty->description
+                    ];
+                })->toArray()
+            ];
+        });
 
         return response()->json([
             'message' => 'Solicitudes obtenidas exitosamente',
@@ -162,7 +188,6 @@ class TrainerController extends Controller
         $trainer = Trainer::findOrFail($id);
         $trainer->update($data);
 
-        // Actualizar logros (achievements)
         $trainer->achievements()->delete();
         if (is_string($achievements)) {
             $achievements = json_decode($achievements, true) ?? [];
@@ -178,7 +203,6 @@ class TrainerController extends Controller
             $trainer->achievements()->createMany($achievements);
         }
 
-        // Actualizar especialidades (specialties)
         $trainer->specialties()->delete();
         if (is_string($specialties)) {
             $specialties = json_decode($specialties, true) ?? [];
@@ -198,31 +222,6 @@ class TrainerController extends Controller
             'message' => 'solicitud de entrenador actualizada exitosamente (con achievements y specialties)',
             'product' => $trainer->load(['achievements', 'specialties'])
         ], 200);
-
-
-        //  $trainer = Trainer::findOrFail($id);
-
-        // $trainer->sport_category = $request->input('sport_category');
-
-        // // Sincronizar especialidades
-        // $trainer->specialties()->delete();
-        // foreach ($request->input('specialties') as $specialty) {
-        //     $trainer->specialties()->create(['description' => $specialty['description']]);
-        // }
-
-        // // Sincronizar logros
-        // $trainer->achievements()->delete();
-        // foreach ($request->input('achievements') as $achievement) {
-        //     $trainer->achievements()->create([
-        //         'title' => $achievement['title'],
-        //         'description' => $achievement['description'],
-        //         'date' => $achievement['date'] ?? null
-        //     ]);
-        // }
-
-        // $trainer->save();
-
-        // return response()->json(['trainer' => $trainer]);
     }
 
 
