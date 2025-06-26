@@ -32,13 +32,16 @@
           <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-header">
             {{ day }}
           </div>
-          <div v-for="day in daysInMonth" :key="day" :class="['calendar-day', {
-            'has-events': hasEvents(day),
-            'selected-day': selectedDay === day,
-            'current-day': isCurrentDay(day)
-          }]" @click="selectDay(day)">
-            <span class="day-number">{{ day }}</span>
-            <div v-if="hasEvents(day)" class="event-dots">
+          <div v-for="day in daysInMonth" :key="day"
+            :class="['calendar-day', {
+              'has-events': day && hasEvents(day),
+              'selected-day': day && selectedDay === day,
+              'current-day': day && isCurrentDay(day)
+            }]"
+            @click="day && selectDay(day)"
+          >
+            <span class="day-number" v-if="day">{{ day }}</span>
+            <div v-if="day && hasEvents(day)" class="event-dots">
               <span v-for="(event, index) in getEventsForDay(day)" :key="index"
                 :style="{ backgroundColor: event.categoryColor || '#3498db' }"></span>
             </div>
@@ -187,7 +190,7 @@ export default {
     return {
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
-      selectedDay: new Date().getDate(),
+      selectedDay: null, // Cambiado de new Date().getDate() a null
       selectedDayEvents: [],
       selectedEvent: null,
       ticketQuantity: 1,
@@ -385,7 +388,7 @@ export default {
         }
       }
 
-      this.selectedDay = null;
+      this.selectedDay = null; // Asegura que ningún día esté seleccionado al cambiar de mes
       this.selectedDayEvents = [];
       this.updateSelectedDayEvents();
     },
@@ -552,6 +555,8 @@ export default {
       
     this.user = JSON.parse(sessionStorage.getItem('user'));
     console.log("🚀 ~ mounted ~ this.user:", this.user)
+    // No seleccionar ningún día al cargar la vista
+    this.selectedDay = null;
   },
 };
 </script>

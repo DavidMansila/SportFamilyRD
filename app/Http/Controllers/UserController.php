@@ -103,11 +103,10 @@ class UserController extends Controller
                 $imageName = Post::addImages($request['image'], $user->id, 'users');
                 $user->update(['image' => $imageName]);
             }
-            else{
-                $user['image'] = $user->image 
+
+            $user->image = $user->image
                 ? url('storage/users/' . $user->id . '/' . $user->image)
-                :url('storage/users/Perfil-Icon.png');
-            }
+                : url('storage/users/Perfil-Icon.png');
 
             return response()->json([
                 'message' => 'Usuario actualizado con éxito',
