@@ -419,16 +419,7 @@ export default {
         posts: 0,
       },
       isLoading: false,
-      featuredEvents: [
-        {
-          id: 1,
-          title: "Torneo Nacional de Baseball",
-          date: "15/Jul",
-          time: "4:00 PM",
-          location: "Estadio Quisqueya, Santo Domingo",
-          description: "La gran final del torneo nacional con los mejores equipos"
-        },
-      ],
+      featuredEvents: [], // Ahora se inicializa vacío, se llenará dinámicamente
       categories: [
         {
           name: "Baseball",
@@ -606,6 +597,28 @@ export default {
         });
     },
 
+    async fetchFeaturedEvents() {
+      try {
+        // Ajusta el endpoint según tu backend, aquí se asume /featured-events devuelve los 3 próximos eventos
+        const response = await axios.get('/featured-events');
+        // Si tu endpoint es /events?limit=3, usa ese en su lugar
+        this.featuredEvents = response.data.events || [];
+      } catch (error) {
+        // Fallback: si falla, muestra el evento hardcodeado
+        this.featuredEvents = [
+          {
+            id: 1,
+            title: "Torneo Nacional de Baseball",
+            date: "15/Jul",
+            time: "4:00 PM",
+            location: "Estadio Quisqueya, Santo Domingo",
+            description: "La gran final del torneo nacional con los mejores equipos"
+          },
+        ];
+        console.error('Error fetching featured events:', error);
+      }
+    },
+
     formatDate(dateString) {
       if (!dateString) return '';
       const date = new Date(dateString);
@@ -679,6 +692,7 @@ export default {
     document.title = 'SportFamilyRD - Comunidad Deportiva Dominicana';
     this.fetchInitialData();
     this.animateElements();
+    this.fetchFeaturedEvents(); // Llama a la función para cargar los eventos reales
 
     const userData = sessionStorage.getItem('user');
     this.user = userData ? JSON.parse(userData) : null;
