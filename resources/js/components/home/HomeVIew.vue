@@ -764,7 +764,7 @@ img {
   align-items: center;
   justify-content: center;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #ff6b00, #ff3c00);
+  background: linear-gradient(135deg, #e28b4c, #ff3c00);
   color: white;
   font-weight: bold;
   font-size: 1.2rem;
