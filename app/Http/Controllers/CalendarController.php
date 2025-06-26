@@ -84,5 +84,27 @@ class CalendarController extends Controller
         return response()->json(null, 204);
     }
 
-   
+    /**
+     * Devuelve los 3 próximos eventos para la home
+     */
+    public function featuredEvents()
+    {
+        $events = Calendar::whereDate('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->orderBy('time', 'asc')
+            ->take(3)
+            ->get()
+            ->map(function($event) {
+                return [
+                    'id' => $event->id,
+                    'title' => $event->title ?? 'Evento Deportivo',
+                    'date' => date('d/M', strtotime($event->date)),
+                    'time' => $event->time,
+                    'location' => $event->place,
+                    'description' => $event->description ?? '',
+                    'image' => $event->image ?? null,
+                ];
+            });
+        return response()->json(['events' => $events]);
+    }
 }

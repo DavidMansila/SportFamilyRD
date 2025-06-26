@@ -160,3 +160,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Broadcast::routes([
     'middleware' => ['api', 'auth:sanctum', 'broadcast.auth']
 ]);
+
+// ENDPOINT para eventos destacados en home
+Route::get('/featured-events', [CalendarController::class, 'featuredEvents']);
