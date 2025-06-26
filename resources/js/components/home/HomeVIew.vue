@@ -53,7 +53,8 @@
       <div class="section-header">
         <h2 class="section-title">Descubre tu Deporte</h2>
         <p class="section-description">Explora más de 20 disciplinas deportivas</p>
-        <router-link to="/directorio" class="view-all">Ver todos <i class="fas fa-arrow-right"></i></router-link>
+        <router-link v-if="user" to="/directorio" class="view-all">Ver todos <i
+            class="fas fa-arrow-right"></i></router-link>
       </div>
 
       <div class="category-grid">
@@ -83,7 +84,7 @@
       <div class="section-header">
         <h2 class="section-title">Últimas Noticias Deportivas</h2>
         <p class="section-description">Mantente al día con lo último del mundo deportivo</p>
-        <router-link to="/noticias" class="view-all-news">
+        <router-link v-if="user" to="/noticias" class="view-all-news">
           Ver todas las noticias <i class="fas fa-arrow-right"></i>
         </router-link>
       </div>
@@ -138,7 +139,10 @@
     <section class="events-section">
       <div class="section-header">
         <h2 class="section-title">Eventos Destacados</h2>
-        <p class="section-description">No te pierdas los próximos encuentros deportivos</p>
+        <p class="section-description">No te pierdas los próximos eventos deportivos</p>
+        <router-link v-if="user" to="/calendario" class="view-all-calendar">
+          Ver todos los eventos <i class="fas fa-arrow-right"></i>
+        </router-link>
       </div>
 
       <div class="events-container">
@@ -165,29 +169,29 @@
 
 
 
-
     <!-- Productos -->
     <section class="products-section">
       <div class="section-header">
         <h2 class="section-title">Equipamiento Premium</h2>
         <p class="section-description">Los mejores productos para tu rendimiento</p>
-        <div class="view-options">
-          <button class="view-option active">Destacados</button>
-          <button class="view-option">Nuevos</button>
-        </div>
+        <router-link v-if="user" to="/tienda" class="view-all-products">
+          Ver todos los productos <i class="fas fa-arrow-right"></i>
+        </router-link>
       </div>
 
       <div class="products-carousel">
-        <div class="product-card" v-for="product in recentProducts" :key="product.id">
+
+        <div v-if="recentProducts.length === 0" class="no-products">
+          <i class="fas fa-box-open"></i>
+          <p>No hay productos disponibles en este momento</p>
+        </div>
+
+        <div v-else class="product-card" v-for="product in recentProducts" :key="product.id">
           <div class="product-badges">
             <div class="badge featured" v-if="product.featured">Destacado</div>
-            <div class="badge discount" v-if="product.discount">-{{ product.discount }}%</div>
           </div>
           <div class="product-image-container">
             <img :src="product.image" :alt="product.name" class="product-image">
-            <button class="quick-view" @click="showProductModal(product)">
-              <i class="fas fa-expand"></i> Vista Rápida
-            </button>
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
@@ -195,18 +199,14 @@
               <div class="stars">
                 <i class="fas fa-star" v-for="n in 5" :key="n" :class="{ 'filled': n <= product.rating }"></i>
               </div>
-              <span class="review-count">({{ product.reviews }})</span>
             </div>
             <div class="product-pricing">
               <span class="current-price">${{ product.price }}</span>
               <span class="original-price" v-if="product.originalPrice">${{ product.originalPrice }}</span>
             </div>
             <div class="product-actions">
-              <button class="add-to-cart">
+              <button v-if="user" class="add-to-cart">
                 <i class="fas fa-shopping-cart"></i> Añadir
-              </button>
-              <button class="add-to-wishlist">
-                <i class="far fa-heart"></i>
               </button>
             </div>
           </div>
@@ -257,7 +257,7 @@
             </p>
           </div>
 
-          <router-link to="/foro" class="view-all-threads">
+          <router-link v-if="user" to="/foro" class="view-all-threads">
             Ver todas las discusiones <i class="fas fa-arrow-right"></i>
           </router-link>
         </div>
@@ -485,7 +485,7 @@ export default {
 
         this.stats = stats.data || {};
         this.recentNews = news.data || [];
-        this.recentProducts = products.data || [];
+        this.recentProducts = products.data.products || [];
 
         // Extraer posts de la respuesta
         this.popularPosts = this.extractPopularPosts(posts);
@@ -627,7 +627,7 @@ export default {
 
         // Verificar si la respuesta tiene posts
         if (data && data.posts && Array.isArray(data.posts)) {
-          return data.posts.slice(0, 5);
+          return data.posts.slice(0, 4);
         }
 
         // Si no hay posts, devolver un array vacío
@@ -863,4 +863,22 @@ img {
     transform: translateY(0);
   }
 } */
+
+
+.no-products {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1.2rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.no-products i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+  color: #ccc;
+  justify-content: center;
+}
 </style>
