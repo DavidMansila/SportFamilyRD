@@ -17,4 +17,9 @@ class CartItem extends Model
     {
         return $this->belongsTo(Product::class, 'item_id');
     }
+    
+    public function event()
+    {
+        return $this->belongsTo(Calendar::class, 'item_id');
+    }
 }

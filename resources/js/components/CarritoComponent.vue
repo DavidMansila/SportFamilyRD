@@ -114,16 +114,37 @@ const fetchCart = async () => {
     console.log("Respuesta del carrito:", response.data);
 
     cartItems.value = response.data.items.map(item => {
-      const product = item.product || {};
-      return {
-        id: product.id || 0,
-        name: product.name || 'Producto sin nombre',
-        price: parseFloat(product.price) || 0,
-        image: product.image || '',
-        quantity: item.quantity,
-        cart_item_id: item.id,
-        type: 'product'
-      };
+      if (item.product) {
+        return {
+          id: item.product.id,
+          name: item.product.name,
+          price: parseFloat(item.product.price) || 0,
+          image: item.product.image || '',
+          quantity: item.quantity,
+          cart_item_id: item.id,
+          type: 'product'
+        };
+      } else if (item.event) {
+        return {
+          id: item.event.id,
+          name: item.event.place || 'Evento sin nombre',
+          price: parseFloat(item.event.price) || 0,
+          image: item.event.image || '',
+          quantity: item.quantity,
+          cart_item_id: item.id,
+          type: 'event'
+        };
+      } else {
+        return {
+          id: 0,
+          name: 'Sin nombre',
+          price: 0,
+          image: '',
+          quantity: item.quantity,
+          cart_item_id: item.id,
+          type: 'unknown'
+        };
+      }
     });
 
     console.log("Items procesados:", cartItems.value);

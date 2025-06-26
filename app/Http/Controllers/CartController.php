@@ -19,7 +19,7 @@ class CartController extends Controller
             return response()->json(['items' => []]);
         }
 
-        $cart = Cart::with(['items.product'])
+        $cart = Cart::with(['items.product', 'items.event'])
             ->where('user_id', $user->id)
             ->where('status', 'active')
             ->first();
@@ -33,7 +33,8 @@ class CartController extends Controller
                 return [
                     'id' => $item->id,
                     'quantity' => $item->quantity,
-                    'product' => $item->product
+                    'product' => $item->product,
+                    'event' => $item->event
                 ];
             })
         ]);
@@ -61,8 +62,8 @@ class CartController extends Controller
     public function addItem(Request $request)
     {
         $request->validate([
-            'item_type' => 'required|in:product',
-            'item_id' => 'required|integer|exists:products,id',
+            'item_type' => 'required|in:product,event',
+            'item_id' => 'required|integer',
             'quantity' => 'nullable|integer|min:1'
         ]);
 
@@ -79,7 +80,7 @@ class CartController extends Controller
         ]);
 
         $existingItem = $cart->items()
-            ->where('item_type', 'product')
+            ->whereIn('item_type', ['product', 'event'])
             ->where('item_id', $request->item_id)
             ->first();
 
@@ -89,7 +90,7 @@ class CartController extends Controller
             ]);
         } else {
             $cart->items()->create([
-                'item_type' => 'product',
+                'item_type' => $request->item_type,
                 'item_id' => $request->item_id,
                 'quantity' => $request->quantity ?? 1
             ]);

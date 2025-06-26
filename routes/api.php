@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\ScrapCalendarController;
 use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserStatsController;
 use Illuminate\Support\Facades\Route;
@@ -76,12 +78,16 @@ Route::get('/news', function () {
 
 // Scrapper calendar
 Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
+Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
+
 
 
 
 // RUTAS PROTEGIDAS POR TOKEN
 Route::middleware('auth:sanctum')->group(function () {
-
+    //calendario
+    Route::resource('/calendar', CalendarController::class);
+    
     // Usuarios
     Route::resource('/user', UserController::class);
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);

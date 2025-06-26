@@ -32,13 +32,16 @@
           <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-header">
             {{ day }}
           </div>
-          <div v-for="day in daysInMonth" :key="day" :class="['calendar-day', {
-            'has-events': hasEvents(day),
-            'selected-day': selectedDay === day,
-            'current-day': isCurrentDay(day)
-          }]" @click="selectDay(day)">
-            <span class="day-number">{{ day }}</span>
-            <div v-if="hasEvents(day)" class="event-dots">
+          <div v-for="day in daysInMonth" :key="day"
+            :class="['calendar-day', {
+              'has-events': day && hasEvents(day),
+              'selected-day': day && selectedDay === day,
+              'current-day': day && isCurrentDay(day)
+            }]"
+            @click="day && selectDay(day)"
+          >
+            <span class="day-number" v-if="day">{{ day }}</span>
+            <div v-if="day && hasEvents(day)" class="event-dots">
               <span v-for="(event, index) in getEventsForDay(day)" :key="index"
                 :style="{ backgroundColor: event.categoryColor || '#3498db' }"></span>
             </div>
@@ -187,12 +190,14 @@ export default {
     return {
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
-      selectedDay: new Date().getDate(),
+      selectedDay: null, // Cambiado de new Date().getDate() a null
       selectedDayEvents: [],
       selectedEvent: null,
       ticketQuantity: 1,
       showCartPopup: false,
+      calendarData: [],
       cartItems: [],
+      user: null, 
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
       eventos: [
@@ -268,7 +273,8 @@ export default {
           location: 'Piscina Olímpica',
           categoryColor: '#1abc9c'
         }
-      ]
+      ],
+      scrapEvents: [] // Aquí se guardarán los eventos del scrap
     };
   },
   computed: {
@@ -291,12 +297,80 @@ export default {
     },
     cartTotal() {
       return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    },
+    // Nuevo: obtener los eventos a mostrar (scrap si hay, si no los de ejemplo)
+    eventosToShow() {
+      return this.scrapEvents.length > 0 ? this.scrapEvents : this.eventos;
     }
   },
-  mounted() {
-    this.updateSelectedDayEvents();
-  },
+
+
   methods: {
+    // getCalendarScrap(){
+    //   axios.get('/scrap-calendar')
+    //     .then(response => {
+    //       console.log("Calendar data fetched successfully:", response.data.events);
+
+    //       // Guardar los eventos scrappeados en la base de datos y actualizar scrapEvents con los IDs reales
+    //       this.saveScrapEventsToDB(response.data.events);
+    //     })
+    //     .catch(error => {
+    //       console.error("Error fetching calendar data:", error);
+    //     });
+    // },
+
+
+    // Guarda los eventos scrappeados en la base de datos y actualiza scrapEvents con los IDs reales
+    saveScrapEventsToDB(scrapRawEvents) {
+      // Mapear los eventos al formato esperado por el backend
+      const mappedEvents = scrapRawEvents.map(e => ({
+        nombre: e.title,
+        fecha: this.parseScrapDate(e.date),
+        startTime: e.hour ? this.parseScrapHour(e.hour) : '',
+        endTime: '',
+        descripcion: '',
+        boletosDisponibles: 100, // valor por defecto
+        price: this.parseScrapPrice(e.price),
+        place: e.place || '',
+        categoryColor: '#3498db',
+        links: e.links || [],
+        image: e.image || ''
+      }));
+      axios.post('/scrap-calendar', { events: mappedEvents })
+        .then(saveRes => {
+          this.scrapEvents = saveRes.data;
+          this.updateSelectedDayEvents();
+        })
+        .catch(saveErr => {
+          console.error('Error guardando eventos scrappeados:', saveErr);
+        });
+    },
+    // Parsear fecha tipo "6 jul., 2025" a formato YYYY-MM-DD
+    parseScrapDate(dateStr) {
+      const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      const match = dateStr.match(/(\d{1,2}) ([a-záéíóúñ]+)\., (\d{4})/i);
+      if (!match) return '';
+      const day = match[1].padStart(2, '0');
+      const month = months.findIndex(m => match[2].toLowerCase().startsWith(m)) + 1;
+      const year = match[3];
+      return `${year}-${month.toString().padStart(2, '0')}-${day}`;
+    },
+    // Parsear hora tipo "06:00 AM" a "06:00"
+    parseScrapHour(hourStr) {
+      if (!hourStr) return '';
+      const [time, ampm] = hourStr.split(' ');
+      let [h, m] = time.split(':');
+      h = parseInt(h);
+      if (ampm && ampm.toUpperCase() === 'PM' && h !== 12) h += 12;
+      if (ampm && ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+      return `${h.toString().padStart(2, '0')}:${m}`;
+    },
+    // Parsear precio tipo "RD$ 1,850.00" a número
+    parseScrapPrice(priceStr) {
+      if (!priceStr) return 0;
+      const num = priceStr.replace(/[^\d.,]/g, '').replace(',', '');
+      return parseFloat(num) || 0;
+    },
     changeMonth(direction) {
       if (direction === 'prev') {
         if (this.currentMonth === 0) {
@@ -314,8 +388,9 @@ export default {
         }
       }
 
-      this.selectedDay = null;
+      this.selectedDay = null; // Asegura que ningún día esté seleccionado al cambiar de mes
       this.selectedDayEvents = [];
+      this.updateSelectedDayEvents();
     },
     selectDay(day) {
       if (day) {
@@ -324,7 +399,8 @@ export default {
       }
     },
     updateSelectedDayEvents() {
-      this.selectedDayEvents = this.eventos.filter(evento => {
+      // Usar eventosToShow para filtrar los eventos del día
+      this.selectedDayEvents = this.eventosToShow.filter(evento => {
         const eventDate = new Date(evento.fecha);
         return eventDate.getDate() === this.selectedDay &&
           eventDate.getMonth() === this.currentMonth &&
@@ -332,7 +408,7 @@ export default {
       });
     },
     hasEvents(day) {
-      return this.eventos.some(evento => {
+      return this.eventosToShow.some(evento => {
         const eventDate = new Date(evento.fecha);
         return eventDate.getDate() === day &&
           eventDate.getMonth() === this.currentMonth &&
@@ -340,7 +416,7 @@ export default {
       });
     },
     getEventsForDay(day) {
-      return this.eventos.filter(evento => {
+      return this.eventosToShow.filter(evento => {
         const eventDate = new Date(evento.fecha);
         return eventDate.getDate() === day &&
           eventDate.getMonth() === this.currentMonth &&
@@ -378,28 +454,43 @@ export default {
         this.ticketQuantity--;
       }
     },
-    addToCart() {
-      const existingItem = this.cartItems.find(item => item.id === this.selectedEvent.id);
-
-      if (existingItem) {
-        existingItem.quantity += this.ticketQuantity;
-      } else {
-        this.cartItems.push({
-          id: this.selectedEvent.id,
-          name: this.selectedEvent.nombre,
-          price: this.selectedEvent.precio,
-          quantity: this.ticketQuantity
+    async addToCart() {
+      if (!this.user) {
+        alert('Debes iniciar sesión para agregar eventos al carrito');
+        return;
+      }
+      try {
+        await axios.post('/cart/items', {
+          item_type: 'event',
+          item_id: this.selectedEvent.id,
+          quantity: this.ticketQuantity,
+          user_id: this.user.id
         });
+        alert(`${this.selectedEvent.nombre} ha sido añadido al carrito`);
+        window.dispatchEvent(new CustomEvent('cart-updated'));
+        // Lógica visual local (opcional, para UX inmediata)
+        const existingItem = this.cartItems.find(item => item.id === this.selectedEvent.id);
+        if (existingItem) {
+          existingItem.quantity += this.ticketQuantity;
+        } else {
+          this.cartItems.push({
+            id: this.selectedEvent.id,
+            name: this.selectedEvent.nombre,
+            price: this.selectedEvent.precio,
+            quantity: this.ticketQuantity
+          });
+        }
+        // Actualizar disponibilidad local
+        const event = this.eventos.find(e => e.id === this.selectedEvent.id);
+        if (event) {
+          event.boletosDisponibles -= this.ticketQuantity;
+        }
+        this.closeEventDetail();
+        this.showCartPopup = true;
+      } catch (error) {
+        console.error('Error al agregar al carrito:', error);
+        alert('No se pudo agregar el evento al carrito');
       }
-
-      // Actualizar disponibilidad
-      const event = this.eventos.find(e => e.id === this.selectedEvent.id);
-      if (event) {
-        event.boletosDisponibles -= this.ticketQuantity;
-      }
-
-      this.closeEventDetail();
-      this.showCartPopup = true;
     },
     removeFromCart(index) {
       const removedItem = this.cartItems[index];
@@ -419,10 +510,34 @@ export default {
       alert(`Compra realizada por $${this.cartTotal}. ¡Gracias por tu compra!`);
       this.cartItems = [];
       this.showCartPopup = false;
+    },
+
+    // Obtiene los eventos desde la base de datos usando /calendar
+    getCalendarFromDB() {
+      axios.get('/calendar')
+        .then(response => {
+          console.log('Eventos recibidos desde /calendar:', response.data.events);
+          // Mapear los eventos al formato esperado por el frontend
+          this.scrapEvents = response.data.events.map(e => ({
+            id: e.id,
+            nombre: e.name || e.title || e.place || 'Sin nombre',
+            fecha: e.date,
+            startTime: e.time || '',
+            endTime: '',
+            descripcion: e.description || '',
+            boletosDisponibles: e.quantity || 100,
+            precio: parseFloat(e.price) || 0,
+            location: e.place || '',
+            categoryColor: '#3498db',
+            image: e.image || '',
+            links: e.links || []
+          }));
+          this.updateSelectedDayEvents();
+        })
+        .catch(error => {
+          console.error('Error obteniendo eventos desde la base de datos:', error);
+        });
     }
-
-
-
 
 
     // FUNCIONES PARA ADMINISTRADOR
@@ -435,6 +550,13 @@ export default {
   },
   mounted() {
     document.title = 'Calendario';
+    // this.getCalendarScrap(); // usar para cuando vayas a pasar el scrap a la base de datos
+    this.getCalendarFromDB(); 
+      
+    this.user = JSON.parse(sessionStorage.getItem('user'));
+    console.log("🚀 ~ mounted ~ this.user:", this.user)
+    // No seleccionar ningún día al cargar la vista
+    this.selectedDay = null;
   },
 };
 </script>
