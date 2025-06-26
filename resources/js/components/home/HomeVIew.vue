@@ -53,7 +53,8 @@
       <div class="section-header">
         <h2 class="section-title">Descubre tu Deporte</h2>
         <p class="section-description">Explora más de 20 disciplinas deportivas</p>
-        <router-link to="/directorio" class="view-all">Ver todos <i class="fas fa-arrow-right"></i></router-link>
+        <router-link v-if="user" to="/directorio" class="view-all">Ver todos <i
+            class="fas fa-arrow-right"></i></router-link>
       </div>
 
       <div class="category-grid">
@@ -83,7 +84,7 @@
       <div class="section-header">
         <h2 class="section-title">Últimas Noticias Deportivas</h2>
         <p class="section-description">Mantente al día con lo último del mundo deportivo</p>
-        <router-link to="/noticias" class="view-all-news">
+        <router-link v-if="user" to="/noticias" class="view-all-news">
           Ver todas las noticias <i class="fas fa-arrow-right"></i>
         </router-link>
       </div>
@@ -138,7 +139,10 @@
     <section class="events-section">
       <div class="section-header">
         <h2 class="section-title">Eventos Destacados</h2>
-        <p class="section-description">No te pierdas los próximos encuentros deportivos</p>
+        <p class="section-description">No te pierdas los próximos eventos deportivos</p>
+        <router-link v-if="user" to="/calendario" class="view-all-calendar">
+          Ver todos los eventos <i class="fas fa-arrow-right"></i>
+        </router-link>
       </div>
 
       <div class="events-container">
@@ -170,6 +174,9 @@
       <div class="section-header">
         <h2 class="section-title">Equipamiento Premium</h2>
         <p class="section-description">Los mejores productos para tu rendimiento</p>
+        <router-link v-if="user" to="/tienda" class="view-all-products">
+          Ver todos los productos <i class="fas fa-arrow-right"></i>
+        </router-link>
       </div>
 
       <div class="products-carousel">
@@ -250,7 +257,7 @@
             </p>
           </div>
 
-          <router-link to="/foro" class="view-all-threads">
+          <router-link v-if="user" to="/foro" class="view-all-threads">
             Ver todas las discusiones <i class="fas fa-arrow-right"></i>
           </router-link>
         </div>

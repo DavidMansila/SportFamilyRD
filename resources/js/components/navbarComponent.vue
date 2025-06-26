@@ -52,7 +52,6 @@
       </router-link>
 
 
-      <!-- SI EL USUARIO ESTA REGISTRADO PUES APARECE LOGOUT Y SINO PUES APARECE EL REGISTRARSE -->
       <template v-if="user">
         <div class="logout-container">
           <button @click="showLogoutConfirm = true" class="Logout">
@@ -73,7 +72,7 @@
 
       <template v-else>
         <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="Signup">
-          <img src="/imagenes/Signup-Icon.png" alt="Registrarse" class="signup-icon" />
+          <img src="/imagenes/Logout-Icon.png" alt="Registrarse" class="signup-icon" />
         </router-link>
       </template>
 
@@ -142,19 +141,17 @@ export default {
       this.user_type = '';
     },
 
+    
     async logout() {
       try {
-        // Limpiar datos de sesión primero
         sessionStorage.removeItem('user');
         sessionStorage.removeItem('token');
         this.user = null;
         this.user_type = '';
         this.showLogoutConfirm = false;
 
-        // Disparar evento global
         window.dispatchEvent(new CustomEvent('user-logged-out'));
 
-        // Intentar cerrar sesión en el backend (no bloqueante)
         const token = sessionStorage.getItem('token');
         if (token) {
           axios.post('/logout', {}, {
@@ -162,19 +159,16 @@ export default {
           }).catch(e => console.warn('Error en logout backend:', e.message));
         }
 
-        // Redirigir
-        this.$router.push('/');
+        this.$router.push('/').then(() => {
+          window.location.reload();
+        });
+
       } catch (error) {
         console.warn('Error en logout frontend:', error.message);
-        this.$router.push('/');
+        this.$router.push('/').then(() => {
+          window.location.reload();
+        });
       }
-    },
-
-    clearAuthData() {
-      sessionStorage.removeItem('user');
-      sessionStorage.removeItem('token');
-      this.user = null;
-      this.user_type = '';
     },
 
 
@@ -618,5 +612,27 @@ export default {
   to {
     transform: scale(1);
   }
+}
+
+
+.Imagenes a img {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Estilo específico para el ícono de Signup */
+.Signup .signup-icon {
+  transform: rotate(180deg);
+}
+
+/* Efecto hover general para todos los íconos excepto Signup */
+.Imagenes a:not(.Signup):hover img {
+  transform: rotate(10deg) scale(1.2);
+}
+
+/* Efecto hover específico para Signup */
+.Imagenes a.Signup:hover img {
+  transform: rotate(180deg) scale(1.2);
 }
 </style>
