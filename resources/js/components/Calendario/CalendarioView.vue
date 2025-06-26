@@ -32,14 +32,11 @@
           <div v-for="(day, index) in daysOfWeek" :key="index" class="calendar-day-header">
             {{ day }}
           </div>
-          <div v-for="day in daysInMonth" :key="day"
-            :class="['calendar-day', {
-              'has-events': day && hasEvents(day),
-              'selected-day': day && selectedDay === day,
-              'current-day': day && isCurrentDay(day)
-            }]"
-            @click="day && selectDay(day)"
-          >
+          <div v-for="day in daysInMonth" :key="day" :class="['calendar-day', {
+            'has-events': day && hasEvents(day),
+            'selected-day': day && selectedDay === day,
+            'current-day': day && isCurrentDay(day)
+          }]" @click="day && selectDay(day)">
             <span class="day-number" v-if="day">{{ day }}</span>
             <div v-if="day && hasEvents(day)" class="event-dots">
               <span v-for="(event, index) in getEventsForDay(day)" :key="index"
@@ -137,10 +134,10 @@
         </div>
 
         <div class="event-content">
-          <div class="event-description">
+          <!-- <div class="event-description">
             <h3>Descripción</h3>
             <p>{{ selectedEvent.descripcion }}</p>
-          </div>
+          </div> -->
 
           <div class="event-tickets">
             <h3>Boletos</h3>
@@ -182,7 +179,7 @@ import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 
 export default {
-    name: 'Calendario',
+  name: 'Calendario',
   components: {
     Navbar
   },
@@ -197,7 +194,7 @@ export default {
       showCartPopup: false,
       calendarData: [],
       cartItems: [],
-      user: null, 
+      user: null,
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
       eventos: [
@@ -306,7 +303,8 @@ export default {
 
 
   methods: {
-    // getCalendarScrap(){
+
+    // getCalendarScrap() {
     //   axios.get('/scrap-calendar')
     //     .then(response => {
     //       console.log("Calendar data fetched successfully:", response.data.events);
@@ -551,8 +549,8 @@ export default {
   mounted() {
     document.title = 'Calendario';
     // this.getCalendarScrap(); // usar para cuando vayas a pasar el scrap a la base de datos
-    this.getCalendarFromDB(); 
-      
+    this.getCalendarFromDB();
+
     this.user = JSON.parse(sessionStorage.getItem('user'));
     console.log("🚀 ~ mounted ~ this.user:", this.user)
     // No seleccionar ningún día al cargar la vista
