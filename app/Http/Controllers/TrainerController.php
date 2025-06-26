@@ -248,4 +248,14 @@ class TrainerController extends Controller
             'name' => $trainer->user->name,
         ]);
     }
+
+
+    public function getAllTrainerRequests()
+    {
+        $requests = Trainer::all();
+        return response()->json([
+            'success' => true,
+            'requests' => $requests
+        ]);
+    }
 }

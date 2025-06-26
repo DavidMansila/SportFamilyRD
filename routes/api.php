@@ -121,6 +121,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
     Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
     Route::resource('/trainer', TrainerController::class);
+    Route::get('/trainer-requests', [TrainerController::class, 'getAllTrainerRequests']);
+
 
     // Configuración
     Route::post('/config-update-value', [ConfigurationController::class, 'updateValue']);
@@ -146,7 +148,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/news/{id}', [NewsController::class, 'update']);
 
     Route::delete('/news/{id}', [NewsController::class, 'destroy']);
-    
 });
 
 

@@ -7,6 +7,8 @@ use App\Models\Like;
 use App\Models\Training;
 use App\Models\Comment;
 use App\Models\Reply;
+use App\Models\Trainer;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -18,11 +20,24 @@ class UserStatsController extends Controller
             // 1. Total de publicaciones del usuario
             $postCount = Post::where('user_id', $userId)->count();
 
-            // 2. Total de likes recibidos (forma más eficiente)
-            $likesCount = $this->getUserLikesCount($userId);
+            // 2. Total de likes DADOS por el usuario (modificado)
+            $likesCount = Like::where('user_id', $userId)->count();
 
-            // 3. Solicitudes para entrenadores
-            $trainingRequests = Training::where('trainer_id', $userId)->count();
+            // 3. Inicializar variables
+            $trainingRequests = 0;
+            $trainerRequests = 0;
+
+            $user = User::find($userId);
+
+            if ($user) {
+                if ($user->user_type === 'entrenador') {
+                    // Solicitudes de usuarios para este entrenador
+                    $trainingRequests = Training::where('trainer_id', $userId)->count();
+                } else if ($user->user_type === 'admin') {
+                    // TOTAL de solicitudes de entrenador
+                    $trainerRequests = Trainer::count();
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -30,6 +45,7 @@ class UserStatsController extends Controller
                     'posts' => $postCount,
                     'likes' => $likesCount,
                     'training_requests' => $trainingRequests,
+                    'trainer_requests' => $trainerRequests,
                 ]
             ]);
         } catch (\Exception $e) {

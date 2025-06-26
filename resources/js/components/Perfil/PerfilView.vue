@@ -42,12 +42,12 @@
                         </div>
 
                         <div class="stat-item" v-if="user.user_type === 'entrenador'">
-                            <span class="stat-number">{{ stats.SolicitudesUsuarios }}</span>
+                            <span class="stat-number">{{ stats.training_requests }}</span>
                             <span class="stat-label">Solicitudes Usuarios</span>
                         </div>
 
                         <div class="stat-item" v-if="user.user_type === 'admin'">
-                            <span class="stat-number">{{ stats.SolicitudesUsuarios }}</span>
+                            <span class="stat-number">{{ stats.trainer_requests }}</span>
                             <span class="stat-label">Solicitudes Entrenadores</span>
                         </div>
 
@@ -842,7 +842,8 @@ export default {
                     this.stats = {
                         posts: response.data.stats.posts,
                         likes: response.data.stats.likes,
-                        SolicitudesUsuarios: response.data.stats.training_requests
+                        training_requests: response.data.stats.training_requests,
+                        trainer_requests: response.data.stats.trainer_requests
                     };
                 }
             } catch (error) {
