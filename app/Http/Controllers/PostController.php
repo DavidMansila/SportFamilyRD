@@ -89,12 +89,16 @@ class PostController extends Controller
     public function store(Request $request)
     {
         try {
+
             $validator = Validator::make($request->all(), [
                 'titulo' => 'required|string|max:255',
                 'contenido' => 'required|string',
                 'categoria' => 'required|string',
-                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'user_id' => 'required|exists:users,id'
+                'user_id' => 'required|exists:users,id',
+                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,jpe,jfif'
+            ], [
+                'imagen.image' => 'El archivo debe ser una imagen válida',
+                'imagen.mimes' => 'Formatos permitidos: jpeg, png, jpg, gif, webp, jpe, jfif'
             ]);
 
             if ($validator->fails()) {

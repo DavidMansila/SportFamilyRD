@@ -78,7 +78,7 @@
 
     </div>
 
-    <CarritoComponent :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" :user="user" @close="closeCart"
+    <CarritoComponent v-if="user" :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" :user="user" @close="closeCart"
       @update-quantity="handleUpdateQuantity" @remove-item="handleRemoveItem" @checkout="handleCheckout" />
 
   </nav>
@@ -95,10 +95,10 @@ export default {
   },
   data() {
     return {
-      user: null, // Cambiado a null para mejor manejo
+      user: null,
       user_type: '',
       isCartVisible: false,
-      cartItems: [], // Debes llenar esto con tu lógica de carrito
+      cartItems: [],
 
       authMessage: '',
 
@@ -108,7 +108,6 @@ export default {
   },
   created() {
     this.checkAuthStatus();
-    // Escuchar eventos personalizados si otras partes de la app afectan la autenticación
     window.addEventListener('user-authenticated', this.checkAuthStatus);
     window.addEventListener('user-logged-out', this.checkAuthStatus);
   },

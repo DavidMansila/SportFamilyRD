@@ -482,7 +482,8 @@
 
             <div class="form-group">
               <label class="file-upload-label">
-                <input type="file" id="imagen" @change="handleFileSelect" accept="image/*" class="file-upload-input" />
+                <input type="file" id="imagen" @change="handleFileSelect" accept=".jpg,.jpeg,.png,.gif"
+                  class="file-upload-input" />
                 <span class="file-upload-btn">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -780,6 +781,19 @@ export default {
       const file = event.target.files[0];
       if (!file) return;
 
+      const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/jpg'
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        alert(`Tipo de archivo no válido: ${file.type}. Use JPEG, PNG o GIF.`);
+        event.target.value = '';
+        return;
+      }
+
       this.nuevoPost.imagenFile = file;
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -967,6 +981,7 @@ export default {
           formData.append('contenido', this.nuevoPost.contenido);
           formData.append('categoria', this.nuevoPost.categoria);
           formData.append('imagen', this.nuevoPost.imagenFile);
+          formData.append('user_id', this.user.id);
 
           response = await axios.post(`/post/${this.nuevoPost.id}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },

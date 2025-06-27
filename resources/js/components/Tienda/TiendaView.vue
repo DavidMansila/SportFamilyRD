@@ -518,7 +518,7 @@ export default {
           user_id: this.user.id
         });
 
-        // alert(`${producto.name} ha sido añadido al carrito`);
+      
 
         window.dispatchEvent(new CustomEvent('cart-updated'));
 
