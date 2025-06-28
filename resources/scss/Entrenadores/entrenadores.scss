@@ -14,8 +14,8 @@
     height: 560px;
     display: flex;
     align-items: center;
-    background: linear-gradient(45deg, #1f2937, #374151); /* Fallback */
-    background: linear-gradient(135deg, #e9aa58 0%, #a2854b 100%),
+    background: linear-gradient(45deg, #1f2937, #374151);
+    background: linear-gradient(135deg, #8a5f1f 0%, #a2864b 100%),
         linear-gradient(45deg, #1f2937, #374151);
     overflow: hidden;
     text-align: center;
@@ -129,7 +129,7 @@
 }
 
 .cta-button {
-    background: #ebab14;
+    background: #8a5f1f;
     color: white;
     padding: 1rem 2rem;
     border-radius: 8px;
@@ -142,7 +142,7 @@
 }
 
 .cta-button:hover {
-    background: #cc9108;
+    background: #6a4917;
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 4px 12px rgba(76, 81, 191, 0.2);
 }
@@ -175,7 +175,7 @@
     background: white;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
     outline: none;
-    border-color: #ebab14;
+    border-color: #8a5f1f;
 }
 
 .search-icon {
@@ -223,7 +223,7 @@
 }
 
 .filter-tabs button.active {
-    background: #ebab14;
+    background: #8a5f1f;
     color: white;
 }
 
@@ -235,7 +235,7 @@
     transform: translateX(-50%);
     width: 60%;
     height: 2px;
-    background: #ebab14;
+    background: #8a5f1f;
 }
 
 /* Tarjetas de Entrenadores */
@@ -294,7 +294,7 @@
 .trainer-specialty {
     display: inline-block;
     background: #eef2ff;
-    color: #ebab14;
+    color: #8a5f1f;
     padding: 0.25rem 0.75rem;
     border-radius: 50px;
     font-size: 0.875rem;
@@ -450,7 +450,7 @@
 }
 
 .page-item.active {
-    background: #ebab14;
+    background: #8a5f1f;
     color: white;
     border-color: #ebab14;
 }
@@ -477,7 +477,7 @@
     width: 3rem;
     height: 3rem;
     border: 3px solid #e5e7eb;
-    border-top-color: #ebab14;
+    border-top-color: #8a5f1f;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -532,7 +532,7 @@
 button:focus,
 input:focus,
 .cta-button:focus {
-    outline: 2px solid var(#ebab14);
+    outline: 2px solid var(#8a5f1f);
     outline-offset: 2px;
 }
 
