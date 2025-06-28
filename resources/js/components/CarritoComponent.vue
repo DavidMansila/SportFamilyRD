@@ -25,7 +25,7 @@
             <div class="empty-illustration">
               <div class="basket-emoji">🧺</div>
               <div class="floating-items">
-                <span>🛍️</span>
+                <span>🛍</span>
                 <span>👟</span>
                 <span>🎫</span>
               </div>
@@ -37,13 +37,13 @@
           <div v-for="(item, index) in cartItems" :key="item.id" class="cart-item neumorphism">
             <div class="item-image">
               <img :src="item.image" :alt="item.name" class="item-img">
-              <div class="item-type" :class="item.type">{{ item.type === 'product' ? '🛍️' : '🎟️' }}</div>
+              <div class="item-type" :class="item.type">{{ item.type === 'product' ? '🛍' : '🎟' }}</div>
             </div>
 
             <div class="item-details">
               <h3>{{ item.name }}</h3>
               <div v-if="item.type === 'ticket'" class="event-details">
-                <div class="event-date">🗓️ {{ formatDate(item.eventDate) }}</div>
+                <div class="event-date">🗓 {{ formatDate(item.eventDate) }}</div>
                 <div class="ticket-type">🎫 {{ item.ticketType }}</div>
               </div>
               <div class="price">💲{{ (item.price || 0).toFixed(2) }}</div>
@@ -62,7 +62,7 @@
                 </button>
               </div>
               <button @click="removeItem(index)" class="remove-btn">
-                🗑️ Eliminar
+                🗑 Eliminar
               </button>
             </div>
           </div>
@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue'; // Añadir watch
 import axios from 'axios';
 
 const props = defineProps({
