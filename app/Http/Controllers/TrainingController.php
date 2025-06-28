@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Training;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -36,7 +37,6 @@ class TrainingController extends Controller
 
     public function store(Request $request)
     {
-        // Verificar autenticación
         $user = User::findOrFail($request['user_id']);
 
         $validated = $request->validate([
@@ -46,44 +46,36 @@ class TrainingController extends Controller
             'status' => 'required|in:pending,accepted,rejected'
         ]);
 
-        // 1. Validar no enviar solicitud a sí mismo
-        if ($user->id == $validated['trainer_id']) {
-            return response()->json([
-                'message' => 'No puedes enviarte una solicitud a ti mismo'
-            ], 422);
-        }
-
-        // 2. Validar que entrenador no pueda enviar solicitudes a otros entrenadores
-        $trainer = User::find($validated['trainer_id']);
-
-        if (!$trainer) {
-            return response()->json([
-                'message' => 'Entrenador no encontrado'
-            ], 404);
-        }
-
-
-        if ($user->user_type === 'entrenador' && $trainer->user_type === 'entrenador') {
-            return response()->json([
-                'message' => 'Los entrenadores no pueden enviar solicitudes a otros entrenadores'
-            ], 422);
-        }
-
-        // 3. Validar solicitud reciente
-        $lastWeek = now()->subWeek();
-        $existing = Training::where('user_id', $user->id)
+        // Verificar si ya existe una solicitud pendiente o recientemente expirada
+        $existingRequest = Training::where('user_id', $user->id)
             ->where('trainer_id', $validated['trainer_id'])
-            ->whereIn('status', ['pending', 'accepted'])
-            ->where('created_at', '>=', $lastWeek)
-            ->exists();
+            ->whereIn('status', ['pending', 'expired'])
+            ->first();
 
-        if ($existing) {
-            return response()->json([
-                'message' => 'Ya tienes una solicitud activa con este entrenador'
-            ], 422);
+        if ($existingRequest) {
+            // Si la solicitud está expirada, permitir nueva solicitud eliminando la anterior
+            if ($existingRequest->status === 'expired') {
+                $existingRequest->delete();
+            }
+            // Si está pendiente, verificar si ha expirado
+            else {
+                $expirationDate = Carbon::parse($existingRequest->created_at)
+                    ->addWeekdays(3)
+                    ->endOfDay();
+
+                if (now()->gt($expirationDate)) {
+                    // Marcar como expirada y permitir nueva solicitud
+                    $existingRequest->update(['status' => 'expired']);
+                    $existingRequest->delete();
+                } else {
+                    return response()->json([
+                        'message' => 'Ya tienes una solicitud pendiente con este entrenador'
+                    ], 422);
+                }
+            }
         }
 
-        // Crear la solicitud
+        // Crear nueva solicitud
         $training = Training::create([
             'user_id' => $user->id,
             'trainer_id' => $validated['trainer_id'],
