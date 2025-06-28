@@ -76,22 +76,24 @@ Route::get('/news', function () {
 });
 
 
-// Scrapper calendar
-Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
-Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
 
-
+Route::resource('/user', UserController::class);
 
 
 // RUTAS PROTEGIDAS POR TOKEN
 Route::middleware('auth:sanctum')->group(function () {
+    
     //calendario
     Route::resource('/calendar', CalendarController::class);
-    
+
     // Usuarios
-    Route::resource('/user', UserController::class);
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
     Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
+
+
+    // Calendario
+    Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
+    Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
 
     // Productos
     Route::resource('/products', ProductController::class);

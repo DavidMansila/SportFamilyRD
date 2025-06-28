@@ -773,7 +773,7 @@ img {
 
 /* BOTON EN NARANJA */
 
-.cta-button {
+/* .cta-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -811,7 +811,6 @@ img {
   transform: translateX(5px);
 }
 
-/* Animación para el botón */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -822,34 +821,29 @@ img {
     opacity: 1;
     transform: translateY(0);
   }
-}
+} */
 
 
 /* BOTON EN ROJO  */
 
-/* 
 .cta-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #ff0000, #000000);
+  background: linear-gradient(to right, #000000, #a10013);
   color: white;
   font-weight: bold;
   font-size: 1.2rem;
   border-radius: 50px;
   text-decoration: none;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
 }
 
 .cta-button:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 25px rgba(255, 0, 0, 0.6);
-  background: linear-gradient(135deg, #ff1a1a, #000000);
 }
 
 .cta-button:active {
@@ -876,7 +870,7 @@ img {
     opacity: 1;
     transform: translateY(0);
   }
-} */
+} 
 
 
 .no-products {

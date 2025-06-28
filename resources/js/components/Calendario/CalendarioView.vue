@@ -197,84 +197,13 @@ export default {
       user: null,
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-      eventos: [
-        {
-          id: 1,
-          nombre: 'Torneo de Fútbol',
-          fecha: '2025-03-15',
-          startTime: '09:00',
-          endTime: '18:00',
-          descripcion: 'Un emocionante torneo de fútbol local con equipos de toda la región. Ven a apoyar a tu equipo favorito y disfruta de un día lleno de deporte y diversión.',
-          boletosDisponibles: 100,
-          precio: 50,
-          location: 'Estadio Municipal',
-          categoryColor: '#3498db'
-        },
-        {
-          id: 2,
-          nombre: 'Maratón Ciudad',
-          fecha: '2025-03-25',
-          startTime: '07:00',
-          endTime: '12:00',
-          descripcion: 'Participa en nuestra maratón anual de 10k. Rutas certificadas, medallas para todos los participantes y premios para los ganadores.',
-          boletosDisponibles: 200,
-          precio: 30,
-          location: 'Parque Central',
-          categoryColor: '#e74c3c'
-        },
-        {
-          id: 3,
-          nombre: 'Conferencia Deportiva',
-          fecha: '2025-03-15',
-          startTime: '14:00',
-          endTime: '17:00',
-          descripcion: 'Conferencia con expertos en deporte y salud. Aprende sobre las últimas tendencias en entrenamiento, nutrición y psicología deportiva.',
-          boletosDisponibles: 50,
-          precio: 20,
-          location: 'Centro de Convenciones',
-          categoryColor: '#2ecc71'
-        },
-        {
-          id: 4,
-          nombre: 'Partido de Tenis',
-          fecha: '2025-04-18',
-          startTime: '10:00',
-          endTime: '13:00',
-          descripcion: 'Partido amistoso de tenis entre los equipos regionales. Exhibición de dobles con jugadores profesionales.',
-          boletosDisponibles: 75,
-          precio: 40,
-          location: 'Club de Tenis',
-          categoryColor: '#9b59b6'
-        },
-        {
-          id: 5,
-          nombre: 'Torneo de Baloncesto',
-          fecha: '2025-04-22',
-          startTime: '08:00',
-          endTime: '20:00',
-          descripcion: 'Torneo local de baloncesto con equipos regionales. Tres categorías: infantil, juvenil y adultos.',
-          boletosDisponibles: 120,
-          precio: 25,
-          location: 'Coliseo Municipal',
-          categoryColor: '#f39c12'
-        },
-        {
-          id: 6,
-          nombre: 'Clínica de Natación',
-          fecha: '2025-05-05',
-          startTime: '15:00',
-          endTime: '18:00',
-          descripcion: 'Clínica intensiva para nadadores principiantes e intermedios. Instructores certificados y grupos reducidos.',
-          boletosDisponibles: 60,
-          precio: 35,
-          location: 'Piscina Olímpica',
-          categoryColor: '#1abc9c'
-        }
-      ],
-      scrapEvents: [] // Aquí se guardarán los eventos del scrap
+      eventos: [ ],
+      scrapEvents: []
     };
   },
+  
   computed: {
+
     daysInMonth() {
       const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
       const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
@@ -390,12 +319,14 @@ export default {
       this.selectedDayEvents = [];
       this.updateSelectedDayEvents();
     },
+
     selectDay(day) {
       if (day) {
         this.selectedDay = day;
         this.updateSelectedDayEvents();
       }
     },
+
     updateSelectedDayEvents() {
       // Usar eventosToShow para filtrar los eventos del día
       this.selectedDayEvents = this.eventosToShow.filter(evento => {
@@ -405,6 +336,7 @@ export default {
           eventDate.getFullYear() === this.currentYear;
       });
     },
+
     hasEvents(day) {
       return this.eventosToShow.some(evento => {
         const eventDate = new Date(evento.fecha);
@@ -413,6 +345,7 @@ export default {
           eventDate.getFullYear() === this.currentYear;
       });
     },
+
     getEventsForDay(day) {
       return this.eventosToShow.filter(evento => {
         const eventDate = new Date(evento.fecha);
@@ -421,12 +354,14 @@ export default {
           eventDate.getFullYear() === this.currentYear;
       });
     },
+
     isCurrentDay(day) {
       const today = new Date();
       return day === today.getDate() &&
         this.currentMonth === today.getMonth() &&
         this.currentYear === today.getFullYear();
     },
+
     formatTime(time) {
       if (!time) return '';
       const [hours, minutes] = time.split(':');
@@ -435,23 +370,28 @@ export default {
       const hour12 = hour % 12 || 12;
       return `${hour12}:${minutes} ${ampm}`;
     },
+
     openEventDetail(event) {
       this.selectedEvent = event;
       this.ticketQuantity = 1;
     },
+
     closeEventDetail() {
       this.selectedEvent = null;
     },
+
     incrementTicket() {
       if (this.ticketQuantity < this.selectedEvent.boletosDisponibles) {
         this.ticketQuantity++;
       }
     },
+
     decrementTicket() {
       if (this.ticketQuantity > 1) {
         this.ticketQuantity--;
       }
     },
+
     async addToCart() {
       if (!this.user) {
         alert('Debes iniciar sesión para agregar eventos al carrito');
@@ -490,6 +430,7 @@ export default {
         alert('No se pudo agregar el evento al carrito');
       }
     },
+
     removeFromCart(index) {
       const removedItem = this.cartItems[index];
 
@@ -537,13 +478,11 @@ export default {
         });
     }
 
-
     // FUNCIONES PARA ADMINISTRADOR
 
     // EDITAR EVENTO
     // ELIMINAR EVENTO
     // AGREGAR EVENTO
-
 
   },
   mounted() {
@@ -558,7 +497,6 @@ export default {
   },
 };
 </script>
-
 
 
 

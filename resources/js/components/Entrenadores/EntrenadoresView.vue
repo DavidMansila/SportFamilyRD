@@ -240,9 +240,7 @@
                 Los entrenadores no pueden enviar solicitudes de entrenamiento.
               </template>
               <template v-else>
-                Solo podras mandar una solicitud por semana a cada entrenador. Si ya has enviado una solicitud reciente,
-                no
-                podrás enviar otra hasta que se procese la anterior.
+                Tu solicitud será evaluada en un plazo aproximado de 3 días laborables.
               </template>
             </p>
 
@@ -457,18 +455,23 @@ export default {
       }
 
       try {
-        // Verificar solicitud existente
+        // Verificar si ya existe una solicitud
         const checkResponse = await axios.post('/training/check-existing', {
           user_id: this.user.id,
           trainer_id: this.contactoEntrenador.trainer_id
         });
 
         if (checkResponse.data.exists) {
-          alert(`Ya has enviado una solicitud a ${this.contactoEntrenador.nombre} recientemente.`);
-          return;
+          // Si está expirada, eliminar y permitir nueva
+          if (checkResponse.data.status === 'expired') {
+            await axios.delete(`/training/${checkResponse.data.id}`);
+          } else {
+            alert(`Ya tienes una solicitud pendiente con ${this.contactoEntrenador.nombre}`);
+            return;
+          }
         }
 
-        // Enviar solicitud
+        // Enviar nueva solicitud
         const formData = {
           user_id: this.user.id,
           trainer_id: this.contactoEntrenador.trainer_id,
@@ -482,7 +485,6 @@ export default {
         if (response.status === 201) {
           alert(`Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`);
           this.cerrarFormularioContacto();
-          this.cerrarPerfil();
         }
       } catch (error) {
         // Manejo de errores

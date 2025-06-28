@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'; // Añadir watch
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 
 const props = defineProps({
