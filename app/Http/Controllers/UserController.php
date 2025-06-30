@@ -63,9 +63,13 @@ class UserController extends Controller
             Auth::login($user);
             event(new Registered($user));
 
+            // Generar token para el usuario
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()->json([
                 'message' => 'Usuario creado con éxito',
                 'user' => $user,
+                'token' => $token,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -79,7 +83,16 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->image = $user->image
+            ? url('storage/users/' . $user->id . '/' . $user->image)
+            : url('storage/users/Perfil-Icon.png');
+        // Forzar que email_verified_at siempre esté presente en la respuesta
+        $arr = $user->toArray();
+        if (!array_key_exists('email_verified_at', $arr)) {
+            $arr['email_verified_at'] = $user->email_verified_at;
+        }
+        return response()->json($arr);
     }
 
     /**
