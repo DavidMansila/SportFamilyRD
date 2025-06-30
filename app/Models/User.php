@@ -6,6 +6,7 @@ use App\Models\Trainer;
 use App\Models\Achievement;
 use App\Models\Specialty;
 use App\Models\SavedNews;
+use App\Notifications\VerifyEmail;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,6 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'email_verified_at',
         'password',
         'user_type',
         'image',
@@ -115,5 +117,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function messages()
     {
         return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    /**
+     * Override the default email verification notification to include user_id in the link
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmail);
     }
 }

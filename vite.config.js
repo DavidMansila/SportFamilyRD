@@ -30,6 +30,7 @@ export default defineConfig({
     server: {
         allowedHosts: true,
     },
+
     //  server: {
     //      host: '10.0.0.6',           // <--mansi aqui pon tu ip
     //      port: 5173,

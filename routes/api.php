@@ -22,9 +22,12 @@ use Illuminate\Support\Facades\Route;
 use App\Models\News;
 use App\Models\User;
 use App\Models\Post;
+
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
 Route::get('/sanctum/csrf-cookie', [AuthController::class, 'csrfCookie']);
@@ -157,8 +160,73 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/news/{id}', [NewsController::class, 'update']);
 
     Route::delete('/news/{id}', [NewsController::class, 'destroy']);
-});
 
+    
+});    
+
+// --- RUTAS DE VERIFICACIÓN DE EMAIL (API) ---
+// Reenviar correo de verificación
+Route::post('/email/verification-notification', function (Request $request) {
+    $user = $request->user();
+    if ($request->has('user_id')) {
+        $user = User::find($request->input('user_id'));
+    }
+    if (!$user) {
+        return response()->json(['message' => 'No autenticado.'], 401);
+    }
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'El correo ya está verificado.'], 200);
+    }
+    $user->sendEmailVerificationNotification();
+    return response()->json(['message' => '¡Correo de verificación enviado!'], 200);
+})->middleware(['throttle:6,1'])->name('api.verification.send');
+
+// Verificar correo electrónico
+Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
+    $user = User::find($request->input('user_id'));
+  
+   
+    if (!$user) {
+        return response()->json(['message' => 'No autenticado.'], 401);
+    }
+    // Validar hash
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        return response()->json(['message' => 'Enlace de verificación inválido.'], 403);
+    }
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'El correo ya está verificado.'], 200);
+    }
+
+     // Forzar actualización manual del campo email_verified_at
+    $user->email_verified_at = now();
+    $user->save();
+    return response()->json(['message' => 'Correo verificado con éxito (puedes dirigirte a la app ).'], 200);
+
+  
+})->name('api.verification.verify');
+
+// Aviso de verificación
+Route::get('/email/verify', function (Request $request) {
+    $user = $request->user();
+    if ($request->has('user_id')) {
+        $user = User::find($request->input('user_id'));
+    }
+    if (!$user) {
+        return response()->json([
+            'message' => 'No autenticado.',
+            'user' => $user,
+        ], 401);
+    }
+    return response()->json([
+        'message' => 'Por favor verifica tu correo.',
+        'user' => $user,
+    ], 200);
+})->name('api.verification.notice');
+
+
+Route::middleware('auth:sanctum')->get('/test-auth', function (Request $request) {
+    return response()->json(['user' => $request->user()]);
+});
 
 Broadcast::routes([
     'middleware' => ['api', 'auth:sanctum', 'broadcast.auth']

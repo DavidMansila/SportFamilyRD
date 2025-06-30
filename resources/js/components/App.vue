@@ -1,7 +1,13 @@
 <template>
   <div class="app-container">
     <VerificaCorreo v-if="user && !user.email_verified_at && !isLoginOrHome" :user="user" />
-    <router-view v-else-if="user || publicRoutes.includes($route.path)" />
+    <div v-else-if="verificationStatus" class="verification-message" :class="verificationStatus.type">
+      <h2>{{ verificationStatus.title }}</h2>
+      <p>{{ verificationStatus.message }}</p>
+      <pre v-if="verificationStatus.raw" style="text-align:left; background:#f3f4f6; color:#334155; padding:10px; border-radius:6px; font-size:13px; overflow-x:auto;">{{ verificationStatus.raw }}</pre>
+      <router-link v-if="verificationStatus.type==='success'" to="/login">Iniciar sesión</router-link>
+    </div>
+    <router-view v-else-if="user || isPublicRoute($route)" />
   </div>
 </template>
 
@@ -21,6 +27,7 @@ export default {
       user: null,
       isLoginOrHome: false,
       publicRoutes: ['/', '/signup', '/login'],
+      verificationStatus: null
     };
   },
   watch: {
@@ -38,9 +45,15 @@ export default {
       } else {
         this.user = null;
       }
-      // Redirigir a / si intenta acceder a ruta protegida sin estar logeado
-      if (!this.user && !this.publicRoutes.includes(to.path)) {
+      // Redirigir a / si intenta acceder a ruta protegida sin estar logeado y no es pública
+      if (!this.user && !this.isPublicRoute(to)) {
         this.$router.replace('/');
+      }
+      // Limpiar mensaje de verificación si cambia de ruta
+      this.verificationStatus = null;
+      // Si es ruta de verificación, intentar verificar
+      if (this.isVerifyRoute(to)) {
+        this.handleEmailVerification(to);
       }
     }
   },
@@ -56,11 +69,51 @@ export default {
         this.user = null;
       }
     }
+    // Si entra directo a la ruta de verificación
+    if (this.isVerifyRoute(this.$route)) {
+      this.handleEmailVerification(this.$route);
+    }
   },
   methods: {
     checkRoute(route) {
       const loginPaths = ['/', '/signUp', '/signup'];
       this.isLoginOrHome = loginPaths.includes(route.path);
+    },
+    isPublicRoute(route) {
+      if (this.publicRoutes.includes(route.path)) return true;
+      const verifyRegex = /^\/email\/verify\/\d+\/[^/]+$/;
+      return verifyRegex.test(route.path);
+    },
+    isVerifyRoute(route) {
+      // Detectar /email/verify/:id/:hash
+      const verifyRegex = /^\/email\/verify\/(\d+)\/([^/]+)$/;
+      return verifyRegex.test(route.path);
+    },
+    async handleEmailVerification(route) {
+      // Extraer id y hash de la ruta
+      const match = route.path.match(/^\/email\/verify\/(\d+)\/([^/]+)$/);
+      if (!match) return;
+      const [ , id, hash ] = match;
+      try {
+        const response = await axios.get(`/api/email/verify/${id}/${hash}`);
+        this.verificationStatus = {
+          type: 'success',
+          title: '¡Correo verificado!',
+          message: response.data?.message || 'Tu correo electrónico ha sido verificado correctamente. Ahora puedes iniciar sesión.',
+          raw: JSON.stringify(response.data, null, 2)
+        };
+        // Obtener usuario actualizado tras verificar
+        const userResp = await axios.get(`/api/user/${id}`);
+        this.user = userResp.data;
+        sessionStorage.setItem('user', JSON.stringify(this.user));
+      } catch (error) {
+        this.verificationStatus = {
+          type: 'error',
+          title: 'Error de verificación',
+          message: error?.response?.data?.message || 'No se pudo verificar el correo. El enlace puede haber expirado o ya fue usado.',
+          raw: error?.response ? JSON.stringify(error.response.data, null, 2) : String(error)
+        };
+      }
     }
   },
   mounted() {
@@ -93,6 +146,30 @@ body {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
+}
+
+/* Verification Message Styles */
+.verification-message {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 2rem 1.5rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  text-align: center;
+  h2 {
+    margin-bottom: 0.5rem;
+  }
+  &.success {
+    border: 1.5px solid #22c55e;
+    color: #166534;
+    background: #f0fdf4;
+  }
+  &.error {
+    border: 1.5px solid #ef4444;
+    color: #991b1b;
+    background: #fef2f2;
+  }
 }
 
 /* Responsive Breakpoints */

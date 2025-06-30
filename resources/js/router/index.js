@@ -69,6 +69,11 @@ const routes = [
         name: "PerfilComponent",
         component: () => import("../components/Perfil/PerfilView.vue"),
     },
+    {
+        path: "/email/verify/:id/:hash",
+        name: "VerificaApiCorreo",
+        component: () => import("../components/VerificaApiCorreo.vue"),
+    },
 
 ];
 
