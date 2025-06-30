@@ -38,9 +38,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'location',
         'birthdate',
         'bio',
-        'social_links',
-        'achivements',
-
     ];
 
     public function trainer()

@@ -495,10 +495,11 @@
 }
 
 .success-icon {
-    width: 60px;
-    height: 60px;
-    color: #2ecc71;
-    margin-bottom: 20px;
+  width: 60px;
+  height: 60px;
+  color: #2ecc71;
+  display: block;
+  margin: 0 auto 20px;
 }
 
 .modal-body p {

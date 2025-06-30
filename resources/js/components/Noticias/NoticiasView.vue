@@ -319,7 +319,6 @@ export default {
         const response = await axios.get('/saved-news', {
 
           headers: {
-            // user_id: this.user.id,
             Authorization: `Bearer ${token}`
           },
           params: {
