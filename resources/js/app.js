@@ -18,6 +18,8 @@ import SolicitudesEntrenadores from "./components/Admin/SolicitudesEntrenadores.
 import ForoView from "./components/Foro/ForoView.vue";
 import AjustesView from "./components/Ajustes/AjustesView.vue";
 import PerfilView from "./components/Perfil/PerfilView.vue";
+import EmailVerifiedSuccess from "./components/EmailVerifiedSuccess.vue";
+import VerificaApiCorreo from "./components/VerificaApiCorreo.vue";
 import store from "./cartStore";
 
 // Paginate
@@ -44,6 +46,8 @@ const router = createRouter({
         { path: "/foro", component: ForoView },
         { path: "/ajustes", component: AjustesView },
         { path: "/perfil", component: PerfilView },
+        { path: "/email/verified-success", component: EmailVerifiedSuccess },
+        { path: "/email/verify/:id/:hash", component: VerificaApiCorreo },
     ],
 });
 

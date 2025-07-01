@@ -74,6 +74,11 @@ const routes = [
         name: "VerificaApiCorreo",
         component: () => import("../components/VerificaApiCorreo.vue"),
     },
+    {
+        path: "/email/verified-success",
+        name: "EmailVerifiedSuccess",
+        component: () => import("../components/EmailVerifiedSuccess.vue"),
+    },
 
 ];
 
