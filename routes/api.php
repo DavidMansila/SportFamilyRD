@@ -184,8 +184,6 @@ Route::post('/email/verification-notification', function (Request $request) {
 // Verificar correo electrónico
 Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
     $user = User::find($request->input('user_id'));
-  
-   
     if (!$user) {
         return response()->json(['message' => 'No autenticado.'], 401);
     }
@@ -194,15 +192,18 @@ Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) 
         return response()->json(['message' => 'Enlace de verificación inválido.'], 403);
     }
     if ($user->hasVerifiedEmail()) {
-        return response()->json(['message' => 'El correo ya está verificado.'], 200);
+        return response()->json(['message' => 'El correo ya está verificado.', 'id' => $user->id], 200);
     }
-
-     // Forzar actualización manual del campo email_verified_at
+    // Forzar actualización manual del campo email_verified_at
     $user->email_verified_at = now();
     $user->save();
-    return response()->json(['message' => 'Correo verificado con éxito (puedes dirigirte a la app ).'], 200);
-
-  
+    // Emitir evento de broadcast para Pusher
+    event(new \App\Events\EmailVerified($user->id));
+    $query = http_build_query(['id' => $user->id]);
+    if ($request->expectsJson() || $request->ajax()) {
+        return response()->json(['message' => 'Correo verificado con exito.', 'id' => $user->id], 200);
+    }
+    return redirect("/email/verified-success?{$query}");
 })->name('api.verification.verify');
 
 // Aviso de verificación
@@ -234,3 +235,6 @@ Broadcast::routes([
 
 // ENDPOINT para eventos destacados en home
 Route::get('/featured-events', [CalendarController::class, 'featuredEvents']);
+
+// Obtener usuario por ID (para refresco tras verificación de email)
+Route::get('/user-by-id/{id}', [UserController::class, 'getUserByID']);

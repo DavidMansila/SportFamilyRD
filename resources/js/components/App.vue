@@ -15,18 +15,20 @@
 import axios from 'axios';
 import ProductModal from '../components/CarritoComponent.vue';
 import VerificaCorreo from './VerificaCorreo.vue';
+import EmailVerifiedSuccess from './EmailVerifiedSuccess.vue';
 
 export default {
   components: {
-    ProductModal
+    ProductModal,
+    VerificaCorreo,
+    EmailVerifiedSuccess
   },
   name: 'App',
-  components: { VerificaCorreo },
   data() {
     return {
       user: null,
       isLoginOrHome: false,
-      publicRoutes: ['/', '/signup', '/login'],
+      publicRoutes: ['/', '/signup', '/login', '/email/verified-success'],
       verificationStatus: null
     };
   },
@@ -69,7 +71,7 @@ export default {
         this.user = null;
       }
     }
-    // Si entra directo a la ruta de verificación
+    // Siempre intentar verificar si la ruta es de verificación, aunque no haya usuario
     if (this.isVerifyRoute(this.$route)) {
       this.handleEmailVerification(this.$route);
     }
@@ -94,8 +96,11 @@ export default {
       const match = route.path.match(/^\/email\/verify\/(\d+)\/([^/]+)$/);
       if (!match) return;
       const [ , id, hash ] = match;
+      // Extraer query params de la ruta
+      const query = route.fullPath.split('?')[1] || '';
+      const url = `/api/email/verify/${id}/${hash}` + (query ? `?${query}` : '');
       try {
-        const response = await axios.get(`/api/email/verify/${id}/${hash}`);
+        const response = await axios.get(url);
         this.verificationStatus = {
           type: 'success',
           title: '¡Correo verificado!',
@@ -103,9 +108,14 @@ export default {
           raw: JSON.stringify(response.data, null, 2)
         };
         // Obtener usuario actualizado tras verificar
-        const userResp = await axios.get(`/api/user/${id}`);
+        const userResp = await axios.get(`/api/user-by-id/${id}`);
+        console.log('Usuario verificado:', userResp.data);
         this.user = userResp.data;
         sessionStorage.setItem('user', JSON.stringify(this.user));
+        // Notificar a otras pestañas que el usuario fue verificado
+        localStorage.setItem('email_verified', id);
+        // Redirigir a la pantalla de éxito
+        this.$router.replace({ name: 'EmailVerifiedSuccess', query: { id } });
       } catch (error) {
         this.verificationStatus = {
           type: 'error',
@@ -114,10 +124,32 @@ export default {
           raw: error?.response ? JSON.stringify(error.response.data, null, 2) : String(error)
         };
       }
+    },
+    showToast(message) {
+      // Crea un toast simple y autodestructible
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '32px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.background = '#22c55e';
+      toast.style.color = '#fff';
+      toast.style.padding = '14px 28px';
+      toast.style.borderRadius = '8px';
+      toast.style.fontSize = '16px';
+      toast.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
+      toast.style.zIndex = 9999;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
     }
   },
   mounted() {
     axios.defaults.withCredentials = true;
+    // Eliminar listeners de localStorage y Pusher/Echo
+    // Si necesitas refrescar el usuario tras verificación, hazlo solo localmente
   }
 };
 </script>

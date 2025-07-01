@@ -187,4 +187,18 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    // Obtener usuario por ID (para refresco tras verificación de email)
+    public function getUserByID($id)
+    {
+        $user = User::findOrFail($id);
+        $user->image = $user->image
+            ? url('storage/users/' . $user->id . '/' . $user->image)
+            : url('storage/users/Perfil-Icon.png');
+        $arr = $user->toArray();
+        if (!array_key_exists('email_verified_at', $arr)) {
+            $arr['email_verified_at'] = $user->email_verified_at;
+        }
+        return response()->json($arr);
+    }
 }
