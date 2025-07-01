@@ -342,6 +342,7 @@ export default {
     }
   },
   computed: {
+
     entrenadoresFiltrados() {
       let filtrados = this.entrenadores;
 
@@ -362,6 +363,7 @@ export default {
       return this.chats.filter(chat => chat.status === 'accepted');
     }
   },
+
   methods: {
 
     // async obtenerChats() {
@@ -518,8 +520,10 @@ export default {
             reseñas: trainer.reviews || 0,
             biografia: trainer.description || '',
             horario: trainer.schedule,
-            especialidades: trainer.specialties ? trainer.specialties.map(e => e.description || e.name) : [],
-            logros: trainer.achievements ? trainer.achievements.map(a => `${a.title}${a.date ? ` (${a.date})` : ''}`) : []
+            especialidades: trainer.specialties ? trainer.specialties.map
+              (e => e.description || e.name) : [],
+            logros: trainer.achievements ? trainer.achievements.map
+              (a => `${a.title}${a.date ? ` (${a.date})` : ''}`) : []
           }));
         })
         .catch(error => {

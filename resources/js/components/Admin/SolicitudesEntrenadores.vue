@@ -752,111 +752,111 @@ export default {
 
 
 .detail-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
 .icon {
-  margin-right: 8px;
+    margin-right: 8px;
 }
 
 .achievements-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
 }
 
 .achievement-card {
-  display: flex;
-  background: #ffffff;
-  border: 1px solid #eaeaea;
-  border-radius: 10px;
-  padding: 16px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    background: #ffffff;
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .achievement-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
 .achievement-icon {
-  margin-right: 16px;
-  color: #000000;
-  display: flex;
-  align-items: center;
+    margin-right: 16px;
+    color: #000000;
+    display: flex;
+    align-items: center;
 }
 
 .achievement-icon svg {
-  width: 24px;
-  height: 24px;
+    width: 24px;
+    height: 24px;
 }
 
 .achievement-content {
-  flex: 1;
+    flex: 1;
 }
 
 .achievement-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  color: #2c3e50;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #2c3e50;
 }
 
 .achievement-desc {
-  font-size: 0.9rem;
-  color: #555;
-  margin: 0 0 8px 0;
-  line-height: 1.4;
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
 }
 
 .achievement-date {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: #7a7a7a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #7a7a7a;
 }
 
 .achievement-date svg {
-  width: 14px;
-  height: 14px;
-  opacity: 0.7;
+    width: 14px;
+    height: 14px;
+    opacity: 0.7;
 }
 
 .specialties-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .specialty-badge {
-  background: linear-gradient(135deg, #565656, #000000);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(56, 56, 56, 0.2);
-  display: inline-flex;
-  align-items: center;
+    background: linear-gradient(135deg, #565656, #000000);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(56, 56, 56, 0.2);
+    display: inline-flex;
+    align-items: center;
 }
 
 .no-items {
-  color: #7a7a7a;
-  font-style: italic;
-  padding: 8px 0;
-  margin: 0;
+    color: #7a7a7a;
+    font-style: italic;
+    padding: 8px 0;
+    margin: 0;
 }
 
 .detail-item {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .detail-item:last-child {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 </style>
