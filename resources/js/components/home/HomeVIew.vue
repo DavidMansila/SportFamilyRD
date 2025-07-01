@@ -599,12 +599,9 @@ export default {
 
     async fetchFeaturedEvents() {
       try {
-        // Ajusta el endpoint según tu backend, aquí se asume /featured-events devuelve los 3 próximos eventos
         const response = await axios.get('/featured-events');
-        // Si tu endpoint es /events?limit=3, usa ese en su lugar
         this.featuredEvents = response.data.events || [];
       } catch (error) {
-        // Fallback: si falla, muestra el evento hardcodeado
         this.featuredEvents = [
           {
             id: 1,

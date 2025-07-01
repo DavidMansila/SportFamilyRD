@@ -135,7 +135,14 @@ class NewsController extends Controller
     public function recentNews()
     {
         try {
-            $news = News::select('id', 'title', 'content as excerpt', 'author', 'image', 'published_at as date', 'category')
+            $news = News::select(
+                'id', 
+                'title', 
+                'content as excerpt', 
+                'author',
+                'image', 
+                'published_at as date', 
+                'category')
                 ->orderBy('published_at', 'desc')
                 ->take(7)
                 ->get();

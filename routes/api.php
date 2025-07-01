@@ -17,6 +17,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ScrapCalendarController;
 use App\Http\Controllers\ScrapperController;
 use App\Http\Controllers\UserStatsController;
+use App\Models\Calendar;
 use Illuminate\Support\Facades\Route;
 use App\Models\News;
 use App\Models\User;
@@ -46,7 +47,7 @@ Route::get('/home-stats', function () {
     try {
         return response()->json([
             'users' => User::count(),
-            // 'events' => Event::count()
+            'events' => Calendar::count(),
             'posts' => Post::count(),
         ]);
     } catch (\Exception $e) {
