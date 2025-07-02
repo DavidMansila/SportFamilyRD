@@ -1,7 +1,13 @@
 <template>
   <div class="app-container">
     <VerificaCorreo v-if="user && !user.email_verified_at && !isLoginOrHome" :user="user" />
-    <router-view v-else-if="user || publicRoutes.includes($route.path)" />
+    <div v-else-if="verificationStatus" class="verification-message" :class="verificationStatus.type">
+      <h2>{{ verificationStatus.title }}</h2>
+      <p>{{ verificationStatus.message }}</p>
+      <pre v-if="verificationStatus.raw" style="text-align:left; background:#f3f4f6; color:#334155; padding:10px; border-radius:6px; font-size:13px; overflow-x:auto;">{{ verificationStatus.raw }}</pre>
+      <router-link v-if="verificationStatus.type==='success'" to="/login">Iniciar sesión</router-link>
+    </div>
+    <router-view v-else-if="user || isPublicRoute($route)" />
   </div>
 </template>
 
@@ -9,18 +15,21 @@
 import axios from 'axios';
 import ProductModal from '../components/CarritoComponent.vue';
 import VerificaCorreo from './VerificaCorreo.vue';
+import EmailVerifiedSuccess from './EmailVerifiedSuccess.vue';
 
 export default {
   components: {
-    ProductModal
+    ProductModal,
+    VerificaCorreo,
+    EmailVerifiedSuccess
   },
   name: 'App',
-  components: { VerificaCorreo },
   data() {
     return {
       user: null,
       isLoginOrHome: false,
-      publicRoutes: ['/', '/signup', '/login'],
+      publicRoutes: ['/', '/signup', '/login', '/email/verified-success'],
+      verificationStatus: null
     };
   },
   watch: {
@@ -38,9 +47,15 @@ export default {
       } else {
         this.user = null;
       }
-      // Redirigir a / si intenta acceder a ruta protegida sin estar logeado
-      if (!this.user && !this.publicRoutes.includes(to.path)) {
+      // Redirigir a / si intenta acceder a ruta protegida sin estar logeado y no es pública
+      if (!this.user && !this.isPublicRoute(to)) {
         this.$router.replace('/');
+      }
+      // Limpiar mensaje de verificación si cambia de ruta
+      this.verificationStatus = null;
+      // Si es ruta de verificación, intentar verificar
+      if (this.isVerifyRoute(to)) {
+        this.handleEmailVerification(to);
       }
     }
   },
@@ -56,15 +71,85 @@ export default {
         this.user = null;
       }
     }
+    // Siempre intentar verificar si la ruta es de verificación, aunque no haya usuario
+    if (this.isVerifyRoute(this.$route)) {
+      this.handleEmailVerification(this.$route);
+    }
   },
   methods: {
     checkRoute(route) {
       const loginPaths = ['/', '/signUp', '/signup'];
       this.isLoginOrHome = loginPaths.includes(route.path);
+    },
+    isPublicRoute(route) {
+      if (this.publicRoutes.includes(route.path)) return true;
+      const verifyRegex = /^\/email\/verify\/\d+\/[^/]+$/;
+      return verifyRegex.test(route.path);
+    },
+    isVerifyRoute(route) {
+      // Detectar /email/verify/:id/:hash
+      const verifyRegex = /^\/email\/verify\/(\d+)\/([^/]+)$/;
+      return verifyRegex.test(route.path);
+    },
+    async handleEmailVerification(route) {
+      // Extraer id y hash de la ruta
+      const match = route.path.match(/^\/email\/verify\/(\d+)\/([^/]+)$/);
+      if (!match) return;
+      const [ , id, hash ] = match;
+      // Extraer query params de la ruta
+      const query = route.fullPath.split('?')[1] || '';
+      const url = `/api/email/verify/${id}/${hash}` + (query ? `?${query}` : '');
+      try {
+        const response = await axios.get(url);
+        this.verificationStatus = {
+          type: 'success',
+          title: '¡Correo verificado!',
+          message: response.data?.message || 'Tu correo electrónico ha sido verificado correctamente. Ahora puedes iniciar sesión.',
+          raw: JSON.stringify(response.data, null, 2)
+        };
+        // Obtener usuario actualizado tras verificar
+        const userResp = await axios.get(`/api/user-by-id/${id}`);
+        console.log('Usuario verificado:', userResp.data);
+        this.user = userResp.data;
+        sessionStorage.setItem('user', JSON.stringify(this.user));
+        // Notificar a otras pestañas que el usuario fue verificado
+        localStorage.setItem('email_verified', id);
+        // Redirigir a la pantalla de éxito
+        this.$router.replace({ name: 'EmailVerifiedSuccess', query: { id } });
+      } catch (error) {
+        this.verificationStatus = {
+          type: 'error',
+          title: 'Error de verificación',
+          message: error?.response?.data?.message || 'No se pudo verificar el correo. El enlace puede haber expirado o ya fue usado.',
+          raw: error?.response ? JSON.stringify(error.response.data, null, 2) : String(error)
+        };
+      }
+    },
+    showToast(message) {
+      // Crea un toast simple y autodestructible
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '32px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.background = '#22c55e';
+      toast.style.color = '#fff';
+      toast.style.padding = '14px 28px';
+      toast.style.borderRadius = '8px';
+      toast.style.fontSize = '16px';
+      toast.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
+      toast.style.zIndex = 9999;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
     }
   },
   mounted() {
     axios.defaults.withCredentials = true;
+    // Eliminar listeners de localStorage y Pusher/Echo
+    // Si necesitas refrescar el usuario tras verificación, hazlo solo localmente
   }
 };
 </script>
@@ -93,6 +178,30 @@ body {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
+}
+
+/* Verification Message Styles */
+.verification-message {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 2rem 1.5rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  text-align: center;
+  h2 {
+    margin-bottom: 0.5rem;
+  }
+  &.success {
+    border: 1.5px solid #22c55e;
+    color: #166534;
+    background: #f0fdf4;
+  }
+  &.error {
+    border: 1.5px solid #ef4444;
+    color: #991b1b;
+    background: #fef2f2;
+  }
 }
 
 /* Responsive Breakpoints */

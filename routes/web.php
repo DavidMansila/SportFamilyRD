@@ -1,35 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
 
-// --- RUTAS DE VERIFICACIÓN DE EMAIL ---
-Route::get('/api/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
-    $user = \App\Models\User::findOrFail($id);
-    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-        return response()->json(['message' => 'Enlace de verificación inválido.'], 403);
-    }
-    if ($user->hasVerifiedEmail()) {
-        return response()->json(['message' => 'El correo ya está verificado.'], 200);
-    }
-    $user->markEmailAsVerified();
-    return response()->json(['message' => 'Correo verificado con éxito.'], 200);
-});
-
+// Ruta para mostrar la vista de aviso de verificación (solo para flujo web tradicional)
 Route::get('/email/verify', function () {
-    return view('auth.verify-email');
+    return view('app'); // Carga el SPA para cualquier /email/verify
 })->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/');
+// Servir la SPA en /email/verify/{id}/{hash} para que Vue maneje la verificación
+Route::get('/email/verify/{id}/{hash}', function () {
+    return view('app');
 })->name('verification.verify');
 
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['throttle:6,1'])->name('verification.send');
+// --- ANTERIOR: Redirigir /email/verify/{id}/{hash} a la API (ya no se usa, solo referencia) ---
+// Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+//     $query = http_build_query(request()->query());
+//     $url = "/api/email/verify/$id/$hash" . ($query ? ("?" . $query) : "");
+//     return redirect($url);
+// })->name('verification.verify');
+
+// Servir la SPA en /email/verified-success para que Vue maneje la pantalla de éxito
+Route::get('/email/verified-success', function () {
+    return view('app');
+});
 
 // --- RUTA CATCH-ALL PARA EL SPA ---
 Route::get('/{any}', function () {
