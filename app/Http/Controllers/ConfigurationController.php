@@ -6,6 +6,8 @@ use App\Models\Configuration;
 use App\Models\ConfigurationUser;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
 
 class ConfigurationController extends Controller
 {
@@ -89,7 +91,7 @@ class ConfigurationController extends Controller
             $user = User::findOrFail($userId);
 
             // Actualizar la contraseña
-            $user->password = bcrypt($password);
+            $user->password = Hash::make($password);
             $user->save();
 
             return response()->json([
