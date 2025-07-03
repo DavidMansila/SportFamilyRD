@@ -42,7 +42,7 @@
 
             <div class="item-details">
               <h3>{{ item.name }}</h3>
-              <div v-if="item.type === 'ticket'" class="event-details">
+              <div v-if="item.type === 'event'" class="event-details">
                 <div class="event-date">🗓 {{ formatDate(item.eventDate) }}</div>
                 <div class="ticket-type">🎫 {{ item.ticketType }}</div>
               </div>
@@ -111,46 +111,52 @@ const fetchCart = async () => {
     const response = await axios.get('/cart', {
       params: { user_id: user.id }
     });
-    console.log("Respuesta del carrito:", response.data);
 
-    cartItems.value = response.data.items.map(item => {
-      if (item.product) {
+    // Verificar si la respuesta tiene items
+    if (!response.data || !Array.isArray(response.data.items)) {
+      throw new Error('Formato de respuesta inválido');
+    }
+
+       cartItems.value = response.data.items.map(item => {
+      if (!item) return null;
+      
+      const itemData = item.item;
+      const itemType = item.type;
+
+      if (itemData && itemData.id) {
         return {
-          id: item.product.id,
-          name: item.product.name,
-          price: parseFloat(item.product.price) || 0,
-          image: item.product.image || '',
+          id: itemData.id,
+          name: itemType === 'product' 
+            ? itemData.name 
+            : itemData.title || itemData.place || 'Evento sin nombre',
+          price: parseFloat(itemData.price) || 0,
+          image: itemData.image || '',
           quantity: item.quantity,
           cart_item_id: item.id,
-          type: 'product'
+          type: itemType,
+          ...(itemType === 'event' && { 
+            eventDate: itemData.date 
+          })
         };
-      } else if (item.event) {
+      }
+      else {
+        console.warn('Item inválido en el carrito:', item);
         return {
-          id: item.event.id,
-          name: item.event.place || 'Evento sin nombre',
-          price: parseFloat(item.event.price) || 0,
-          image: item.event.image || '',
-          quantity: item.quantity,
-          cart_item_id: item.id,
-          type: 'event'
-        };
-      } else {
-        return {
-          id: 0,
-          name: 'Sin nombre',
+          id: 'invalid-' + Math.random().toString(36).substr(2, 9),
+          name: 'Item no disponible',
           price: 0,
           image: '',
           quantity: item.quantity,
           cart_item_id: item.id,
-          type: 'unknown'
+          type: 'invalid'
         };
       }
-    });
+    }).filter(Boolean);
 
-    console.log("Items procesados:", cartItems.value);
-    window.addEventListener('cart-updated', fetchCart);
   } catch (error) {
     console.error('Error fetching cart:', error);
+    // Mostrar mensaje de error al usuario
+    cartItems.value = [];
   } finally {
     isLoading.value = false;
   }
@@ -206,7 +212,14 @@ const cartTotal = computed(() => {
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString();
 };
+
+
+const cleanId = (id) => {
+  return id.replace('PROD-', '').replace('EVT-', '');
+};
+
 </script>
+
 
 <style scoped>
 .cart-overlay {
