@@ -101,7 +101,7 @@
             </div>
           </div>
 
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label class="custom-label">Sube tus certificados (PDF, JPG, PNG)</label>
             <div class="file-upload-area" @click="triggerFileInput('certificados')" @dragover.prevent
               @drop="handleDrop($event, 'certificados')">
@@ -128,7 +128,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <div class="form-actions">
             <button type="button" class="btn btn-prev" @click="pasoAnterior">Anterior</button>
