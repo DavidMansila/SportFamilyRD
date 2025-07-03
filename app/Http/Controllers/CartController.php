@@ -33,13 +33,14 @@ class CartController extends Controller
                 return [
                     'id' => $item->id,
                     'quantity' => $item->quantity,
-                    'product' => $item->product,
-                    'event' => $item->event
+                    'item' => $item->item_type === 'product'
+                        ? $item->product
+                        : $item->event,
+                    'type' => $item->item_type
                 ];
             })
         ]);
     }
-
 
 
     public function updateItem(Request $request, CartItem $item)
@@ -67,7 +68,7 @@ class CartController extends Controller
             'quantity' => 'nullable|integer|min:1'
         ]);
 
-        
+
         $user = User::findOrFail($request['user_id']);
 
         if (!$user) {
@@ -80,7 +81,7 @@ class CartController extends Controller
         ]);
 
         $existingItem = $cart->items()
-            ->whereIn('item_type', ['product', 'event'])
+            ->where('item_type', $request->item_type)
             ->where('item_id', $request->item_id)
             ->first();
 

@@ -184,6 +184,7 @@ export default {
     Navbar
   },
   data() {
+
     return {
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
@@ -197,11 +198,11 @@ export default {
       user: null,
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-      eventos: [ ],
+      eventos: [],
       scrapEvents: []
     };
   },
-  
+
   computed: {
 
     daysInMonth() {

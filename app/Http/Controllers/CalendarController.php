@@ -96,7 +96,7 @@ class CalendarController extends Controller
             ->get()
             ->map(function($event) {
                 return [
-                    'id' => $event->id,
+                    'event_id' => 'EVT-' . $event->id,
                     'title' => $event->title ?? 'Evento Deportivo',
                     'date' => date('d/M', strtotime($event->date)),
                     'time' => $event->time,

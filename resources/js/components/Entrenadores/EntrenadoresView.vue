@@ -61,12 +61,12 @@
           <div class="card-content">
             <div class="card-header">
               <h3>{{ entrenador.nombre }}</h3>
-              <div class="rating">
+              <!-- <div class="rating">
                 <span v-for="star in 5" :key="star" :class="{ filled: star <= entrenador.rating }">★</span>
-              </div>
+              </div> -->
             </div>
 
-            <p class="experiencia">{{ entrenador.experiencia }}</p>
+            <p class="experiencia"> Años de Experiencia: {{ entrenador.experiencia }}</p>
             <!-- <p class="testimonio">"{{ entrenador.testimonio }}"</p> -->
 
             <div v-if="user" class="card-footer">
@@ -102,14 +102,16 @@
             <div class="profile-info">
               <h2>{{ entrenadorSeleccionado.nombre }}</h2>
               <div class="deporte-badge">{{ entrenadorSeleccionado.deporte }}</div>
-              <div class="modal-rating">
+              
+              <!-- <div class="modal-rating">
                 <div class="stars">
                   <span v-for="star in 5" :key="star"
                     :class="{ filled: star <= entrenadorSeleccionado.rating }">★</span>
                 </div>
                 <span class="rating-text">{{ entrenadorSeleccionado.rating }}.0 ({{ entrenadorSeleccionado.reseñas }}
                   reseñas)</span>
-              </div>
+              </div> -->
+
             </div>
           </div>
 

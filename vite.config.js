@@ -27,16 +27,17 @@ export default defineConfig({
             vue: "vue/dist/vue.esm-bundler.js",
         },
     },
-    server: {
-        allowedHosts: true,
-    },
+    
+    // server: {
+    //     allowedHosts: true,
+    // },
 
-    //  server: {
-    //      host: '10.0.0.6',           // <--mansi aqui pon tu ip
-    //      port: 5173,
-    //      strictPort: true,
-    //      allowedHosts: 'all',
-    //  },
+    server: {
+        host: "10.0.0.6", // <--mansi aqui pon tu ip
+        port: 5173,
+        strictPort: true,
+        allowedHosts: "all",
+    },
 
     // server: {
     //     host: '10.0.0.7',

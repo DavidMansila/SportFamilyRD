@@ -10,7 +10,7 @@ export default createStore({
         },
         ADD_TO_CART(state, product) {
             const existingItem = state.cartItems.find(
-                (item) => item.id === product.id
+                (i) => i.id === product.id // Corregido a 'product'
             );
             if (existingItem) {
                 existingItem.quantity += product.quantity;

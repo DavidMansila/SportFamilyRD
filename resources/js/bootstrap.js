@@ -1,6 +1,8 @@
 import axios from "axios";
 
-axios.defaults.baseURL = 'http://localhost:8000/api';
+// axios.defaults.baseURL = 'http://localhost:8000/api';
+
+axios.defaults.baseURL = 'http://10.0.0.6:8000/api';
 
 // Interceptor para agregar token
 axios.interceptors.request.use((config) => {
