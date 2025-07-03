@@ -28,19 +28,26 @@ export default defineConfig({
         },
     },
     
-    // server: {
-    //     allowedHosts: true,
-    // },
-
     server: {
-        host: "10.0.0.6", // <--mansi aqui pon tu ip
-        port: 5173,
-        strictPort: true,
-        allowedHosts: "all",
+        allowedHosts: true,
     },
 
+    //  server: {
+    //      host: '10.0.0.6',           // <--mansi wifi
+    //      port: 5173,
+    //      strictPort: true,
+    //      allowedHosts: 'all',
+    //  },
+    
+    //  server: {
+    //     host: '192.168.48.172',           // <--yirbel wifi celular
+    //     port: 5173,
+    //     strictPort: true,
+    //     allowedHosts: 'all',
+    //  },
+
     // server: {
-    //     host: '10.0.0.7',
+    //     host: '10.0.0.7', //yirbel wifi casa
     //     port: 5173,
     //     strictPort: true,
     //     allowedHosts: 'all',
