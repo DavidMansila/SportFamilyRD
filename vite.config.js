@@ -40,7 +40,7 @@ export default defineConfig({
     //  },
     
     //  server: {
-    //     host: '192.168.48.172',           // <--yirbel wifi celular
+    //     host: '10.193.2.172',           // <--yirbel wifi celular
     //     port: 5173,
     //     strictPort: true,
     //     allowedHosts: 'all',
