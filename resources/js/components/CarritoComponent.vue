@@ -44,7 +44,7 @@
               <h3>{{ item.name }}</h3>
               <div v-if="item.type === 'event'" class="event-details">
                 <div class="event-date">🗓 {{ formatDate(item.eventDate) }}</div>
-                <div class="ticket-type">🎫 {{ item.ticketType }}</div>
+                <div class="ticket-type"> 🎫 {{ item.quantity }}</div>
               </div>
               <div class="price">💲{{ (item.price || 0).toFixed(2) }}</div>
             </div>

@@ -13,19 +13,28 @@
     </div>
 
     <!-- Sección CTA -->
-    <div class="cta-container">
+    <div class="cta-container" v-if="user_type == 'user'">
       <div class="cta-card">
         <div class="cta-text">
           <h2>¿Tienes lo necesario para ser entrenador?</h2>
           <p>Únete a nuestra red de profesionales y comparte tu conocimiento</p>
         </div>
-        <router-link v-if="user" to="/Solicitud" class="cta-button">
+        <router-link to="/Solicitud" class="cta-button">
           Aplicar Ahora
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" />
           </svg>
         </router-link>
+      </div>
+    </div>
+
+    <div class="cta-container" v-if="user_type == 'entrenador'">
+      <div class="cta-card">
+        <div class="cta-text">
+          <h2>Bienvenido de nuevo: {{ user.name }}</h2>
+          <p>Puedes actualizar tus datos profesionales actualizando tu perfil</p>
+        </div>
       </div>
     </div>
 
@@ -102,7 +111,7 @@
             <div class="profile-info">
               <h2>{{ entrenadorSeleccionado.nombre }}</h2>
               <div class="deporte-badge">{{ entrenadorSeleccionado.deporte }}</div>
-              
+
               <!-- <div class="modal-rating">
                 <div class="stars">
                   <span v-for="star in 5" :key="star"
@@ -320,7 +329,7 @@ export default {
   },
   data() {
     return {
-      user: [],
+      user: { user_type: '' },
       scrollPosition: 0,
       busqueda: '',
       deporteActivo: 'Todos',
@@ -729,6 +738,7 @@ export default {
   },
   mounted() {
     this.user = JSON.parse(sessionStorage.getItem('user'));
+    this.user_type = this.user.user_type;
     this.cargarEntrenadores();
     this.loadChats();
   },

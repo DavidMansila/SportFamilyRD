@@ -93,6 +93,14 @@
       </div>
     </div>
 
+    <transition name="fade">
+      <div v-if="showEventSuccess" class="success-notification">
+        <div class="notification-content">
+          <i class="fas fa-check-circle"></i>
+          {{ successEventMessage }}
+        </div>
+      </div>
+    </transition>
 
     <!-- Vista detallada del evento -->
     <div class="event-detail-view" v-if="selectedEvent" @click.self="closeEventDetail">
@@ -191,7 +199,7 @@ export default {
       selectedDay: null, // Cambiado de new Date().getDate() a null
       selectedDayEvents: [],
       selectedEvent: null,
-      ticketQuantity: 1,
+      ticketQuantity: '',
       showCartPopup: false,
       calendarData: [],
       cartItems: [],
@@ -199,7 +207,10 @@ export default {
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       daysOfWeek: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
       eventos: [],
-      scrapEvents: []
+      scrapEvents: [],
+      showEventSuccess: false,
+      successEventMessage: '',
+      successEventTimer: null
     };
   },
 
@@ -405,27 +416,25 @@ export default {
           quantity: this.ticketQuantity,
           user_id: this.user.id
         });
-        alert(`${this.selectedEvent.nombre} ha sido añadido al carrito`);
+
+        // Mostrar mensaje de éxito
+        this.successEventMessage = `¡${this.selectedEvent.nombre} agregado al carrito!`;
+        this.showEventSuccess = true;
+
+        // Ocultar después de 3 segundos
+        clearTimeout(this.successEventTimer);
+        this.successEventTimer = setTimeout(() => {
+          this.showEventSuccess = false;
+        }, 3000);
+
         window.dispatchEvent(new CustomEvent('cart-updated'));
-        // Lógica visual local (opcional, para UX inmediata)
-        const existingItem = this.cartItems.find(item => item.id === this.selectedEvent.id);
-        if (existingItem) {
-          existingItem.quantity += this.ticketQuantity;
-        } else {
-          this.cartItems.push({
-            id: this.selectedEvent.id,
-            name: this.selectedEvent.nombre,
-            price: this.selectedEvent.precio,
-            quantity: this.ticketQuantity
-          });
-        }
+
         // Actualizar disponibilidad local
         const event = this.eventos.find(e => e.id === this.selectedEvent.id);
         if (event) {
           event.boletosDisponibles -= this.ticketQuantity;
         }
         this.closeEventDetail();
-        this.showCartPopup = true;
       } catch (error) {
         console.error('Error al agregar al carrito:', error);
         alert('No se pudo agregar el evento al carrito');
@@ -504,4 +513,51 @@ export default {
 <style scoped>
 @import '../../../scss/Calendario/calendario_navbar.scss';
 @import '../../../scss/Calendario/calendario.scss';
+
+
+/* Notificación de éxito */
+.success-notification {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #4CAF50;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fa-check-circle {
+  font-size: 1.5rem;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

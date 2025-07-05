@@ -29,7 +29,7 @@
 
     <div class="Imagenes">
 
-      <div class="carrito-container">
+      <div class="carrito-container" title="Carrito">
         <button @click="handleCartClick" class="Carrito">
           <img src="/imagenes/Carrito-Icon.png" alt="Carrito" class="carrito-icon" />
           <span v-if="user && cartItems.length > 0" class="cart-badge">{{ cartItems.length }}</span>
@@ -44,16 +44,16 @@
       </div>
 
       <router-link v-if="user" to="/ajustes" class="Ajustes">
-        <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" />
+        <img src="/imagenes/Ajustes-Icon.png" alt="Ajustes" class="ajustes-icon" title="Ajustes" />
       </router-link>
 
-      <router-link v-if="user" to="/perfil" class="Perfil">
+      <router-link v-if="user" to="/perfil" class="Perfil" title="Perfil">
         <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
       </router-link>
 
 
       <template v-if="user">
-        <div class="logout-container">
+        <div class="logout-container" title="Cerrar sesión">
           <button @click="showLogoutConfirm = true" class="Logout">
             <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
           </button>
@@ -72,7 +72,7 @@
 
       <template v-else>
         <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="Signup">
-          <img src="/imagenes/Logout-Icon.png" alt="Registrarse" class="signup-icon" />
+          <img src="/imagenes/Signup-icon.png" alt="Registrarse" title="Iniciar sesión" class="signup-icon-thick"/>
         </router-link>
       </template>
 
@@ -125,7 +125,7 @@ export default {
         try {
           const parsedUser = JSON.parse(userData);
           this.user = parsedUser;
-          this.user_type = parsedUser.user_type || ''; // Asume que user_type está en el objeto user
+          this.user_type = parsedUser.user_type || '';
         } catch (e) {
           console.error('Error parsing user data:', e);
           this.clearAuthData();
@@ -620,18 +620,4 @@ export default {
   transition: transform 0.3s ease-in-out;
 }
 
-/* Estilo específico para el ícono de Signup */
-.Signup .signup-icon {
-  transform: rotate(180deg);
-}
-
-/* Efecto hover general para todos los íconos excepto Signup */
-.Imagenes a:not(.Signup):hover img {
-  transform: rotate(10deg) scale(1.2);
-}
-
-/* Efecto hover específico para Signup */
-.Imagenes a.Signup:hover img {
-  transform: rotate(180deg) scale(1.2);
-}
 </style>
