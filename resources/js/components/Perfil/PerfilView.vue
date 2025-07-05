@@ -41,12 +41,12 @@
                             <span class="stat-label">Likes</span>
                         </div>
 
-                        <div class="stat-item" v-if="user.user_type === 'entrenador'">
+                        <div class="stat-item" v-if="user?.user_type == 'entrenador'">
                             <span class="stat-number">{{ stats.training_requests }}</span>
                             <span class="stat-label">Solicitudes Usuarios</span>
                         </div>
 
-                        <div class="stat-item" v-if="user.user_type === 'admin'">
+                        <div class="stat-item" v-if="user?.user_type == 'admin'">
                             <span class="stat-number">{{ stats.trainer_requests }}</span>
                             <span class="stat-label">Solicitudes Entrenadores</span>
                         </div>
@@ -71,7 +71,7 @@
                 <!-- Sección de Información Básica -->
                 <div class="profile-section">
 
-                    <template v-if="user.user_type === 'entrenador'">
+                    <template v-if="user?.user_type == 'entrenador'">
                         <h2>Información de Entrenador</h2>
                     </template>
 
@@ -113,10 +113,10 @@
                         <div class="info-item">
                             <span class="info-label">Fecha Nacimiento:</span>
                             <span v-if="!editMode" class="info-value">{{ user.birthdate || 'No especificada' }}</span>
-                            <input v-else type="date" v-model="user.birthdate">
+                            <input v-else type="date" v-model="user.birthdate" required>
                         </div>
 
-                        <div class="info-item" v-if="user.user_type === 'entrenador'">
+                        <div class="info-item" v-if="user?.user_type == 'entrenador'">
                             <span class="info-label">Deporte:</span>
 
                             <span v-if="!editMode" class="info-value">
@@ -189,23 +189,21 @@
 
 
                 <!-- Sección de Horario -->
-                <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                <div class="profile-section" v-if="user?.user_type == 'entrenador'">
                     <h2>Horario Disponible</h2>
 
                     <!-- Mostrar horario -->
                     <div v-if="!editMode" class="schedule-display">
                         <div v-if="hasSchedule" class="schedule-grid">
-                            <div v-for="dia in diasSemana" :key="dia" class="schedule-day-card"
-                                :class="{ 'available': user.schedule[dia] && user.schedule[dia].start }">
+                            <div v-for="item in formattedSchedule" :key="`${item.dia}-${item.disponible}`"
+                                class="schedule-day-card" :class="{ 'available': item.disponible }">
                                 <div class="day-header">
-                                    <span>{{ dia }}</span>
-                                    <span v-if="user.schedule[dia] && user.schedule[dia].start"
-                                        class="available-indicator"></span>
+                                    <span>{{ item.dia }}</span>
+                                    <span v-if="item.disponible" class="available-indicator"></span>
                                     <span v-else class="unavailable-indicator"></span>
                                 </div>
-                                <div v-if="user.schedule[dia] && user.schedule[dia].start" class="time-slot">
-                                    {{ formatTime(user.schedule[dia].start) }} - {{ formatTime(user.schedule[dia].end)
-                                    }}
+                                <div v-if="item.disponible" class="time-slot">
+                                    {{ item.start }} - {{ item.end }}
                                 </div>
                                 <div v-else class="time-slot unavailable">
                                     No disponible
@@ -248,7 +246,7 @@
 
 
                 <!-- Sección de Especialidades -->
-                <div class="specialties-section" v-if="user.user_type === 'entrenador'">
+                <div class="specialties-section" v-if="user?.user_type == 'entrenador'">
                     <div class="section-header">
                         <h2 class="section-title">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -308,7 +306,7 @@
 
 
                 <!-- Sección de Logros -->
-                <div class="profile-section" v-if="user.user_type === 'entrenador'">
+                <div class="profile-section" v-if="user?.user_type == 'entrenador'">
                     <h2>Mis Logros</h2>
                     <div class="achievements">
                         <div v-for="(achievement, index) in user.achievements" :key="index" class="achievement-item">
@@ -412,88 +410,119 @@ export default {
                     Domingo: { start: '', end: '' },
                 },
             },
+            isLoading: false
         }
     },
     computed: {
         hasSchedule() {
-            return this.user.schedule && Object.keys(this.user.schedule).length > 0 &&
+            if (!this.user.schedule || typeof this.user.schedule !== 'object') {
+                return false;
+            }
+            return Object.keys(this.user.schedule).length > 0 &&
                 Object.values(this.user.schedule).some(day => day && day.start);
+        },
+        formattedSchedule() {
+            return this.diasSemana.map(dia => ({
+                dia,
+                disponible: this.user.schedule[dia]?.start || '',
+                start: this.formatTime(this.user.schedule[dia]?.start),
+                end: this.formatTime(this.user.schedule[dia]?.end)
+            }));
         }
     },
     methods: {
 
-        cargarEntrenadores() {
-            axios.get('/trainer/approved')
-                .then(response => {
-                    this.entrenadores = response.data.trainer;
-                    this.filtroEntrenadores();
-
-                    this.originalTrainerData = JSON.parse(JSON.stringify(this.trainer));
-                })
-                .catch(error => {
-                    console.error('Error al cargar entrenadores:', error);
-                });
+        async cargarEntrenadores() {
+            this.isLoading = true;
+            try {
+                const response = await axios.get('/trainer/approved');
+                this.entrenadores = response.data.trainer;
+                await this.filtroEntrenadores();
+            } catch (error) {
+                console.error('Error al cargar entrenadores:', error);
+            } finally {
+                this.isLoading = false;
+            }
         },
 
-        filtroEntrenadores() {
-            // Buscar entrenador con el mismo ID de usuario
+        async filtroEntrenadores() {
             const entrenador = this.entrenadores.find(e => e.user_id === this.user.id);
-
             if (entrenador) {
                 this.trainer = { ...entrenador };
                 this.originalTrainerData = JSON.parse(JSON.stringify(entrenador));
-
-                // Asignar propiedades de entrenador
                 this.user.categoria = this.trainer.sport_category;
 
-                // Manejar especialidades
                 this.user.especialidades = this.trainer.specialties
                     ? this.trainer.specialties.map(s => s.description)
                     : [];
 
-                // Manejar logros
                 this.user.achievements = this.trainer.achievements
-                    ? [...this.trainer.achievements]
+                    ? this.trainer.achievements.map(ach => ({
+                        ...ach,
+                        achievement_date: ach.achievement_date?.split('T')[0] || ''
+                    }))
                     : [];
 
-                // Manejar horario
                 this.user.schedule = this.parseSchedule(this.trainer.schedule);
             }
+            // Si no existe entrenador, creamos uno básico
+            else if (this.user.user_type === 'entrenador') {
+                this.trainer = {
+                    id: null,
+                    user_id: this.user.id,
+                    sport_category: this.user.categoria || '',
+                    specialties: [],
+                    achievements: [],
+                    schedule: '{}'
+                };
+            }
+
+            this.originalUserData = JSON.parse(JSON.stringify(this.user));
         },
 
-        // Nuevo método para parsear el horario
         parseSchedule(scheduleData) {
-            if (!scheduleData) return {};
+            const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const defaultSchedule = {};
 
-            let parsedSchedule;
-            if (typeof scheduleData === 'string') {
-                try {
-                    parsedSchedule = JSON.parse(scheduleData);
-                } catch (e) {
-                    console.error('Error parsing schedule JSON:', e);
-                    return {};
+            // Inicializar estructura vacía para todos los días
+            dias.forEach(dia => {
+                defaultSchedule[dia] = { start: '', end: '' };
+            });
+
+            if (!scheduleData) return defaultSchedule;
+
+            try {
+                const parsed = typeof scheduleData === 'string'
+                    ? JSON.parse(scheduleData)
+                    : scheduleData;
+
+                // Crear nuevo objeto en lugar de mutar el existente
+                const transformed = { ...defaultSchedule };
+
+                for (const dia in parsed) {
+                    if (parsed[dia]?.available && parsed[dia]?.hours) {
+                        transformed[dia] = {
+                            start: parsed[dia].hours.desde || '',
+                            end: parsed[dia].hours.hasta || ''
+                        };
+                    }
                 }
-            } else {
-                parsedSchedule = scheduleData;
+                return transformed;
+            } catch (e) {
+                console.error('Error parseando horario:', e);
+                return defaultSchedule;
             }
-
-            // Convertir estructura del backend a formato frontend
-            const transformedSchedule = {};
-            for (const dia in parsedSchedule) {
-                if (parsedSchedule[dia].available && parsedSchedule[dia].hours) {
-                    transformedSchedule[dia] = {
-                        start: parsedSchedule[dia].hours.desde,
-                        end: parsedSchedule[dia].hours.hasta
-                    };
-                }
-            }
-
-            return transformedSchedule;
         },
 
 
         async saveProfile() {
             try {
+                // Validación de campos obligatorios
+                if (!this.user.birthdate) {
+                    alert('Por favor complete la fecha de nacimiento');
+                    return;
+                }
+
                 // 1. Actualizar datos básicos del usuario
                 const userFormData = new FormData();
                 userFormData.append('_method', 'PUT');
@@ -514,17 +543,17 @@ export default {
 
                 // Actualizar datos básicos del usuario
                 this.user = { ...this.user, ...userResponse.data.user };
-                sessionStorage.setItem('user', JSON.stringify(this.user));
 
                 // 2. Si es entrenador, actualizar datos específicos
-                if (this.user.user_type === 'entrenador' && this.trainer) {
-                    // Obtener horario para guardar
-                    const scheduleToSave = this.getScheduleToSave();
-                    console.log("Horario a guardar:", scheduleToSave);
+                if (this.user.user_type === 'entrenador') {
+                    // Si no tenemos datos de entrenador, cargarlos
+                    if (!this.trainer) {
+                        await this.cargarEntrenadores();
+                    }
 
-                    // Convertir a JSON string
+                    // Preparar datos del entrenador
+                    const scheduleToSave = this.getScheduleToSave();
                     const scheduleString = JSON.stringify(scheduleToSave);
-                    console.log("Horario como string:", scheduleString);
 
                     const trainerData = {
                         sport_category: this.user.categoria,
@@ -537,32 +566,41 @@ export default {
                         schedule: scheduleString
                     };
 
-                    console.log("Datos a enviar:", trainerData);
+                    // Determinar si es creación o actualización
+                    let trainerResponse;
+                    if (this.trainer && this.trainer.id) {
+                        trainerResponse = await axios.put(`/trainer/${this.trainer.id}`, trainerData);
+                    } else {
+                        trainerResponse = await axios.post('/trainer', trainerData);
+                    }
 
-                    const trainerResponse = await axios.put(`/trainer/${this.trainer.id}`, trainerData);
-                    console.log("Respuesta del servidor:", trainerResponse.data);
+                    // OBTENER DATOS ACTUALIZADOS DEL SERVIDOR
+                    const updatedTrainer = await axios.get(`/trainer/${trainerResponse.data.id}`);
+                    this.trainer = updatedTrainer.data;
 
-                    this.trainer = trainerResponse.data.trainer;
-
-                    // Actualizar el horario en el objeto de usuario
-                    this.user.schedule = this.parseSchedule(trainerResponse.data.trainer.schedule);
+                    // Actualizar el horario con datos reales del servidor
+                    this.user.schedule = this.parseSchedule(updatedTrainer.data.schedule);
                 }
 
+                // Guardar en sessionStorage DESPUÉS de actualizar el horario
+                sessionStorage.setItem('user', JSON.stringify(this.user));
+
+                // Actualizar datos originales
                 this.originalUserData = JSON.parse(JSON.stringify(this.user));
                 if (this.user.user_type === 'entrenador' && this.trainer) {
                     this.originalTrainerData = JSON.parse(JSON.stringify(this.trainer));
                 }
 
                 this.editMode = false;
-                alert('¡Perfil actualizado correctamente!');
+                this.$forceUpdate();
+                this.cargarEntrenadores();
 
+                alert('¡Perfil actualizado correctamente!');
             } catch (error) {
                 console.error('Error al guardar perfil:', error);
                 alert('Error al guardar los cambios. Por favor intenta nuevamente.');
             }
         },
-
-
 
 
         handleAvatarChange(event) {
@@ -627,17 +665,26 @@ export default {
         },
 
         discardChanges() {
+            // Restaurar datos del usuario
             this.user = JSON.parse(JSON.stringify(this.originalUserData));
 
-            // Si es entrenador, restaurar también los datos específicos
+            // Si es entrenador, restaurar datos específicos con fechas formateadas
             if (this.user.user_type === 'entrenador' && this.originalTrainerData) {
                 this.user.categoria = this.originalTrainerData.sport_category;
                 this.user.especialidades = this.originalTrainerData.specialties
                     ? this.originalTrainerData.specialties.map(s => s.description)
                     : [];
+
+                // Formatear fechas de logros al restaurar
                 this.user.achievements = this.originalTrainerData.achievements
-                    ? [...this.originalTrainerData.achievements]
+                    ? this.originalTrainerData.achievements.map(ach => ({
+                        ...ach,
+                        achievement_date: ach.achievement_date
+                            ? ach.achievement_date.split('T')[0]
+                            : new Date().toISOString().split('T')[0]
+                    }))
                     : [];
+
                 this.user.schedule = this.parseSchedule(this.originalTrainerData.schedule);
             }
 
@@ -707,7 +754,7 @@ export default {
             this.user.achievements.push({
                 title: '',
                 description: '',
-                achievement_date: new Date().toISOString().split('T')[0] // Fecha actual por defecto
+                achievement_date: new Date().toISOString().split('T')[0]
             });
         },
 
@@ -778,27 +825,25 @@ export default {
 
         // Construir objeto de horario para guardar
         getScheduleToSave() {
-            const schedule = {};
+            // Asegurar que siempre tenemos un objeto válido
+            const schedule = this.user.schedule || {};
+
+            const result = {};
             this.diasSemana.forEach(dia => {
-                // Crear estructura que espera el backend
-                schedule[dia] = {
-                    available: this.formulario.disponibilidad[dia],
+                // Verificar si el día está marcado como disponible
+                const isAvailable = this.formulario.disponibilidad[dia] &&
+                    this.formulario.horarios[dia].start &&
+                    this.formulario.horarios[dia].end;
+
+                result[dia] = {
+                    available: isAvailable,
                     hours: {
-                        desde: '',
-                        hasta: ''
+                        desde: isAvailable ? this.formulario.horarios[dia].start.substring(0, 5) : '',
+                        hasta: isAvailable ? this.formulario.horarios[dia].end.substring(0, 5) : ''
                     }
                 };
-
-                if (this.formulario.disponibilidad[dia]) {
-                    const start = this.formulario.horarios[dia].start;
-                    const end = this.formulario.horarios[dia].end;
-
-                    // Formatear horas (quitar segundos si existen)
-                    schedule[dia].hours.desde = start ? start.substring(0, 5) : '';
-                    schedule[dia].hours.hasta = end ? end.substring(0, 5) : '';
-                }
             });
-            return schedule;
+            return result;
         },
 
         // Formatear hora para visualización (HH:MM)
@@ -853,20 +898,31 @@ export default {
 
     },
     mounted() {
-
         const userData = sessionStorage.getItem('user');
-
         if (userData) {
-            this.user = JSON.parse(userData);
+            const parsedUser = JSON.parse(userData);
+
+            this.user = parsedUser;
             document.title = 'Perfil de ' + this.user.name;
+
             this.fetchUserStats();
+            this.originalUserData = JSON.parse(JSON.stringify(this.user));
 
             if (this.user.user_type === 'entrenador') {
                 this.cargarEntrenadores();
+
+                // Inicializa el horario si no existe
+                if (!this.user.schedule || typeof this.user.schedule !== 'object') {
+                    this.user.schedule = this.parseSchedule('{}');
+                }
+
+                // Inicializar y validar estructura del horario
+                parsedUser.schedule = parsedUser.schedule || {};
+                if (typeof parsedUser.schedule !== 'object' || parsedUser.schedule === null) {
+                    parsedUser.schedule = {};
+                }
             }
-            this.originalUserData = JSON.parse(JSON.stringify(this.user));
         } else {
-            // Redirige a login si no hay usuario
             this.$router.push('/login');
         }
     }
