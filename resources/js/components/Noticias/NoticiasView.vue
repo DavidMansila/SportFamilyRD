@@ -214,6 +214,11 @@
     </transition>
 
   </div>
+
+  <!-- Burbuja de Mensajes Flotante -->
+  <ChatBubbleComponent v-if="user" :user="user" />
+
+
 </template>
 
 
@@ -221,12 +226,14 @@
 import axios from 'axios';
 import paginatorComponent from '@/components/paginatorComponent.vue';
 import Navbar from '../navbarComponent.vue';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
 export default {
   name: 'NoticiasComponent',
   components: {
     paginatorComponent,
-    Navbar
+    Navbar,
+    ChatBubbleComponent
   },
   data() {
     return {

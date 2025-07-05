@@ -40,7 +40,7 @@ class TrainingController extends Controller
         $user = User::findOrFail($request['user_id']);
 
         $validated = $request->validate([
-            'trainer_id' => 'required|exists:users,id',
+            'trainer_id' => 'required|exists:trainer,id',
             'sport_level' => 'required|in:Principiante,Intermedio,Avanzado,Profesional',
             'description' => 'required|string|max:500',
             'status' => 'required|in:pending,accepted,rejected'

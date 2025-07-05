@@ -19,7 +19,7 @@ class TrainerController extends Controller
             $query->where('status', $status);
         }
 
-        $trainers = $query->get()->map(function ($trainer) {
+        $trainer = $query->get()->map(function ($trainer) {
             return [
                 'id' => $trainer->id,
                 'name' => $trainer->name,
@@ -49,17 +49,17 @@ class TrainerController extends Controller
 
         return response()->json([
             'message' => 'Solicitudes obtenidas exitosamente',
-            'trainers' => $trainers
+            'trainer' => $trainer
         ], 200);
     }
 
     public function getAprovedTrainers()
     {
-        $approvedTrainers = Trainer::with(['achievements', 'specialties'])
+        $approvedTrainer = Trainer::with(['achievements', 'specialties'])
             ->where('status', 'approved')
             ->get();
 
-        $approvedTrainers->transform(function ($trainer) {
+        $approvedTrainer->transform(function ($trainer) {
             $trainer->image = optional($trainer->user)->image;
             $trainer->image = $trainer->image
                 ? url('storage/users/' . $trainer->user_id . '/' . $trainer->image)
@@ -69,7 +69,7 @@ class TrainerController extends Controller
 
         return response()->json([
             'message' => 'Entrenadores aprobados obtenidos exitosamente',
-            'trainers' => $approvedTrainers
+            'trainer' => $approvedTrainer
         ], 200);
     }
 

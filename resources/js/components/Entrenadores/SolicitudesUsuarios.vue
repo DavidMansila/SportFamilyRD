@@ -127,18 +127,24 @@
                 </div>
             </transition>
         </div>
+
+        <!-- Burbuja de Mensajes Flotante -->
+        <ChatBubbleComponent v-if="user" :user="user" />
+
     </template>
 
 <script>
+import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
-import axios from 'axios';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
 export default {
     name: 'SolicitudesEntrenamientos',
     components: {
         Navbar,
         paginatorComponent,
+        ChatBubbleComponent
     },
     data() {
         return {

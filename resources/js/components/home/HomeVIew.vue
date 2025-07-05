@@ -365,8 +365,11 @@
     <button class="back-to-top" @click="scrollToTop">
       <i class="fas fa-arrow-up"></i>
     </button>
-
   </div>
+
+  <!-- Burbuja de Mensajes Flotante -->
+  <ChatBubbleComponent v-if="user" :user="user" />
+
 </template>
 
 
@@ -375,6 +378,7 @@
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
 function throttle(func, wait) {
   let timeout = null;
@@ -403,7 +407,8 @@ function throttle(func, wait) {
 
 export default {
   components: {
-    Navbar
+    Navbar,
+    ChatBubbleComponent
   },
   data() {
     return {

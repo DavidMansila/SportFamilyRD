@@ -425,17 +425,14 @@
 
 
 
-
-
-
     <!-- Botón flotante para crear post -->
-    <button @click="abrirModal" class="floating-btn" v-if="user">
+    <!-- <button @click="abrirModal" class="floating-btn" v-if="user">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12"></line>
       </svg>
-    </button>
+    </button> -->
 
 
 
@@ -528,6 +525,10 @@
       :max-pages-shown="5" @page-changed="handlePageChange" />
 
   </div>
+
+  <!-- Burbuja de Mensajes Flotante -->
+  <ChatBubbleComponent v-if="user" :user="user" />
+
 </template>
 
 
@@ -535,12 +536,14 @@
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
 export default {
   name: 'ForoComponent',
   components: {
     paginatorComponent,
-    Navbar
+    Navbar,
+    ChatBubbleComponent
   },
   data() {
     return {

@@ -177,19 +177,24 @@
         </div>
       </div>
     </div>
-
-
   </div>
+
+  <!-- Burbuja de Mensajes Flotante -->
+  <ChatBubbleComponent v-if="user" :user="user" />
+
+  
 </template>
 
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
 export default {
   name: 'Calendario',
   components: {
-    Navbar
+    Navbar,
+    ChatBubbleComponent
   },
   data() {
 

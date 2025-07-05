@@ -13,7 +13,7 @@
     </div>
 
     <!-- Sección CTA -->
-    <div class="cta-container" v-if="user_type == 'user'">
+    <div class="cta-container"  v-if="user?.user_type == 'user'">
       <div class="cta-card">
         <div class="cta-text">
           <h2>¿Tienes lo necesario para ser entrenador?</h2>
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="cta-container" v-if="user_type == 'entrenador'">
+    <div class="cta-container"  v-if="user?.user_type == 'entrenador'">
       <div class="cta-card">
         <div class="cta-text">
           <h2>Bienvenido de nuevo: {{ user.name }}</h2>
@@ -247,7 +247,7 @@
                   d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              <template v-if="user.user_type === 'entrenador'">
+              <template  v-if="user?.user_type == 'entrenador'">
                 Los entrenadores no pueden enviar solicitudes de entrenamiento.
               </template>
               <template v-else>
@@ -261,57 +261,11 @@
       </div>
     </transition>
 
-
-
     <!-- Burbuja de Mensajes Flotante -->
-    <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': mostrarMensajes }">
-      <div class="message-icon-container" @click="toggleMensajes">
-        <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span class="notification-badge" v-if="nuevosMensajes > 0">{{ nuevosMensajes }}</span>
-      </div>
-
-      <div v-if="mostrarMensajes" class="messages-container">
-        <div class="messages-header" v-if="!activeChat">
-          <h3>Chats</h3>
-          <button class="close-btn" @click="toggleMensajes">×</button>
-        </div>
-
-        <div v-if="!activeChat" class="contact-list">
-          <div v-for="chat in chatsAprobados" :key="chat.id" class="contact-item" @click="openChat(chat)">
-            <img :src="chat.other_participant.image" class="message-avatar" />
-            <div class="message-content">
-              <div class="message-header">
-                <span class="sender-name">{{ chat.other_participant.name }}</span>
-                <span v-if="chat.unread" class="unread-badge">{{ chat.unread }}</span>
-              </div>
-              <p v-if="chat.last_message" class="message-preview">
-                <span v-if="chat.last_message.sender_id === user.id">Tú: </span>
-                {{ truncateText(chat.last_message.message, 30) }}
-              </p>
-              <p v-else class="no-messages">No hay mensajes aún</p>
-            </div>
-          </div>
-
-          <div v-if="chatsAprobados.length === 0" class="empty-chats">
-            <p>Aun no tienes Chats</p>
-          </div>
-        </div>
-
-        <div v-else class="active-chat-container">
-          <ChatComponent ref="chatComponent" :active-chat="activeChat" :user="user" @close-chat="cerrarChat"
-            @messages-read="loadChats" />
-        </div>
-      </div>
-    </div>
-
-
-
+    <ChatBubbleComponent v-if="user" :user="user" />
 
   </div>
+  
 </template>
 
 
@@ -319,17 +273,17 @@
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
-import ChatComponent from '../ChatComponent.vue';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
 export default {
   name: 'Entrenadores',
   components: {
     Navbar,
-    ChatComponent
+    ChatBubbleComponent
   },
   data() {
     return {
-      user: { user_type: '' },
+      user: null,
       scrollPosition: 0,
       busqueda: '',
       deporteActivo: 'Todos',
@@ -343,13 +297,6 @@ export default {
         objetivos: ''
       },
       entrenadores: [],
-
-      chats: [],
-      mostrarMensajes: false,
-      nuevosMensajes: 0,
-      activeChat: null,
-      echoListener: null,
-      presenceListener: null
     }
   },
   computed: {
@@ -370,18 +317,9 @@ export default {
       }
       return filtrados;
     },
-    chatsAprobados() {
-      return this.chats.filter(chat => chat.status === 'accepted');
-    }
   },
 
   methods: {
-
-    // async obtenerChats() {
-    //   const res = await axios.get('/chats', { params: { user_id: this.user.id } });
-    //   this.chats = res.data;
-    //   this.chatsAprobados = this.chats.filter(chat => chat.estado === 'aprobado');
-    // },
 
     filtrarPorDeporte(deporte) {
       this.deporteActivo = deporte;
@@ -520,7 +458,7 @@ export default {
     cargarEntrenadores() {
       axios.get('/trainer/approved')
         .then(response => {
-          this.entrenadores = response.data.trainers.map(trainer => ({
+          this.entrenadores = response.data.trainer.map(trainer => ({
             trainer_id: trainer.id,
             user_id: trainer.user_id,
             nombre: trainer.name,
@@ -596,155 +534,11 @@ export default {
       }
     },
 
-
-    toggleMensajes() {
-      this.mostrarMensajes = !this.mostrarMensajes;
-      if (this.mostrarMensajes) {
-        this.loadChats();
-        document.body.classList.add('chat-open');
-      } else {
-        document.body.classList.remove('chat-open');
-      }
-    },
-
-    truncateText(text, maxLength) {
-      if (!text) return '';
-      if (text.length <= maxLength) return text;
-      return text.substring(0, maxLength) + '...';
-    },
-
-    async openChat(chat) {
-      this.activeChat = chat;
-      await this.$nextTick();
-
-      if (this.$refs.chatComponent?.initializeChat) {
-        await this.$refs.chatComponent.initializeChat();
-      }
-    },
-
-    cerrarChat() {
-      if (this.$refs.chatComponent && this.$refs.chatComponent.leaveChannels) {
-        this.$refs.chatComponent.leaveChannels();
-      }
-
-      this.activeChat = null;
-      this.loadChats();
-      document.body.classList.remove('chat-open');
-    },
-
-
-    async loadChats() {
-      if (!this.user) return;
-      try {
-        const response = await axios.get('/chats',
-          { params: { user_id: this.user.id } }
-        );
-        console.log('Respuesta de /chats:', response.data);
-
-        this.chats = response.data.map(chat => {
-          // Verifica si el usuario actual es el usuario o el entrenador
-          const isUser = this.user.user_type === 'user';
-
-          // Para usuario normal: el otro participante es el entrenador
-          if (isUser && chat.trainer && chat.trainer.user) {
-            return {
-              id: chat.id,
-              user_id: chat.user_id,
-              trainer_id: chat.trainer_id,
-              status: chat.status,
-              unread: chat.unread_count || 0,
-              last_message: chat.last_message,
-              other_participant: {
-                id: chat.trainer.user.id,
-                name: chat.trainer.user.name,
-                image: chat.trainer.user.image
-                  ? `/storage/users/${chat.trainer.user.id}/${chat.trainer.user.image}`
-                  : 'public/storage/users/Perfil-Icon.png',
-                type: 'trainer'
-              }
-            };
-          }
-          // Para entrenador: el otro participante es el usuario
-          else if (!isUser && chat.user) {
-            return {
-              id: chat.id,
-              user_id: chat.user_id,
-              trainer_id: chat.trainer_id,
-              status: chat.status,
-              unread: chat.unread_count || 0,
-              last_message: chat.last_message,
-              other_participant: {
-                id: chat.user.id,
-                name: chat.user.name,
-                image: chat.user.image
-                  ? `/storage/users/${chat.user.id}/${chat.user.image}`
-                  : 'public/storage/users/Perfil-Icon.png',
-                type: 'user'
-              }
-            };
-          }
-          // Datos por defecto si algo falla
-          return {
-            id: chat.id,
-            user_id: chat.user_id,
-            trainer_id: chat.trainer_id,
-            status: chat.status,
-            unread: chat.unread_count || 0,
-            last_message: chat.last_message,
-            other_participant: {
-              name: 'Usuario desconocido',
-              image: 'public/storage/users/Perfil-Icon.png'
-            }
-          };
-        });
-
-        this.nuevosMensajes = this.chats.reduce((total, chat) => total + (chat.unread || 0), 0);
-      } catch (error) {
-        console.error('Error cargando chats', error.response ? error.response.data : error);
-      }
-    },
-
-
-
-    getChatAvatar(chat) {
-      return chat.other_participant?.image || 'public/storage/users/Perfil-Icon.png';
-    },
-
-    getChatName(chat) {
-      return chat.other_participant?.name || 'Usuario desconocido';
-    },
-
-    calculateUnreadMessages() {
-      this.nuevosMensajes = this.chatsAprobados.reduce((total, chat) => {
-        return total + (parseInt(chat.unread) || 0);
-      }, 0);
-    },
-
-    async markMessagesAsRead(chatId) {
-      try {
-        await axios.post(`/chats/${chatId}/read`);
-        // Actualizar solo el chat actual en lugar de recargar todos
-        this.chats = this.chats.map(chat => {
-          if (chat.id === chatId) {
-            return { ...chat, unread: 0 };
-          }
-          return chat;
-        });
-      } catch (error) {
-        console.error('Error marcando mensajes como leídos', error);
-      }
-    },
-
   },
   mounted() {
-    this.user = JSON.parse(sessionStorage.getItem('user'));
-    this.user_type = this.user.user_type;
+    this.user = JSON.parse(sessionStorage.getItem('user')) || {};
     this.cargarEntrenadores();
-    this.loadChats();
   },
-  beforeUnmount() {
-
-  }
 };
 </script>
 
