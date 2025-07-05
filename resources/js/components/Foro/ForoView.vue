@@ -547,7 +547,7 @@ export default {
   },
   data() {
     return {
-      user: [],
+      user: null,
       currentPage: 1,
       itemsPerPage: 9,
       posts: [],

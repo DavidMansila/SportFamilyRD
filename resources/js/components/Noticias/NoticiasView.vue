@@ -55,7 +55,7 @@
               <span class="news-category">{{ getCategoryName(noticia.categoria) }}</span>
             </div>
 
-            <button v-if="user.user_type === 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
+            <button v-if="user?.user_type == 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path d="M4 7H20" stroke="currentColor" stroke-width="2" />
                 <path d="M10 11V17" stroke="currentColor" />
@@ -254,7 +254,7 @@ export default {
         { value: 'swimming', label: 'Natacion' },
       ],
       saved: false,
-      user: []
+      user: null
     };
   },
   computed: {
@@ -593,11 +593,9 @@ export default {
   },
 
   async mounted() {
+
     // Cargar usuario
-    const userData = sessionStorage.getItem('user');
-    if (userData) {
-      this.user = JSON.parse(userData);
-    }
+    this.user = JSON.parse(sessionStorage.getItem('user')) || {};
 
     // Cargar noticias
     await this.cargarNoticias();

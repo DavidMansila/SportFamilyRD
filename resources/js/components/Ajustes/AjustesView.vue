@@ -144,7 +144,7 @@ export default {
         { id: 'privacy', label: 'Privacidad' }
       ],
 
-      user: [],
+      user: null,
 
       security: {
         currentPassword: '',

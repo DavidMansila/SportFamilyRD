@@ -4,14 +4,13 @@
     <!-- Navbar -->
     <Navbar />
 
-    <!-- Reemplaza el search-container existente con este nuevo header -->
     <div class="store-header">
       <div class="header-overlay">
         <div class="header-content">
           <h1 class="store-title">Bienvenido a SportShop</h1>
           <p class="store-subtitle">Encuentra todo para tu rendimiento deportivo</p>
 
-          <!-- Barra de búsqueda mejorada -->
+          <!-- Barra de búsqueda -->
           <div class="search-wrapper animated-search">
             <input type="text" v-model="busqueda" placeholder="Buscar productos..." @input="filtrarProductos"
               class="search-input" />
@@ -56,7 +55,7 @@
     <!-- Productos -->
     <div class="products-grid">
       <div v-for="producto in productosFiltrados" :key="producto.id" class="product-card" @click="abrirPopup(producto)">
-        <div class="product-badge" v-if="producto.oferta">OFERTA</div>
+        <!-- <div class="product-badge" v-if="producto.oferta">OFERTA</div> -->
         <div class="product-image-container">
           <img :src="producto.image" :alt="producto.name" class="product-image" />
           <button class="quick-view-btn" @click.stop="abrirPopup(producto)">
@@ -224,7 +223,6 @@
   <!-- Burbuja de Mensajes Flotante -->
   <ChatBubbleComponent v-if="user" :user="user" />
 
-
 </template>
 
 <script>
@@ -306,9 +304,9 @@ export default {
       editingProduct: null,
       formProducto: this.resetForm(),
       categoriasFlat: [],
-      user: {},
+      user: null,
       isLoading: true,
-      user: [],
+      user: null,
       showSuccess: false,
       successMessage: '',
       successTimer: null
@@ -559,7 +557,7 @@ export default {
   mounted() {
     this.getProducts();
     window.addEventListener('keyup', this.handleKeyup);
-    this.user = JSON.parse(sessionStorage.getItem('user'));
+    this.user = JSON.parse(sessionStorage.getItem('user')) || {};
     this.generarCategoriasFlat()
     document.title = 'Tienda';
   },
