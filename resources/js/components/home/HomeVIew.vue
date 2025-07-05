@@ -100,7 +100,7 @@
           <div class="featured-content">
             <div class="news-meta">
               <span class="date"><i class="far fa-calendar-alt"></i> {{ formatNewsDate(recentNews[0].published_at)
-              }}</span>
+                }}</span>
               <span class="author"><i class="far fa-user"></i> Por {{ recentNews[0].author }}</span>
             </div>
             <h3 class="news-title">{{ recentNews[0].title }}</h3>
@@ -365,8 +365,11 @@
     <button class="back-to-top" @click="scrollToTop">
       <i class="fas fa-arrow-up"></i>
     </button>
-
   </div>
+
+  <!-- Burbuja de Mensajes Flotante -->
+  <ChatBubbleComponent v-if="user" :user="user" />
+
 </template>
 
 
@@ -375,6 +378,7 @@
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
 function throttle(func, wait) {
   let timeout = null;
@@ -403,7 +407,8 @@ function throttle(func, wait) {
 
 export default {
   components: {
-    Navbar
+    Navbar,
+    ChatBubbleComponent
   },
   data() {
     return {
@@ -828,7 +833,7 @@ img {
   align-items: center;
   justify-content: center;
   padding: 1rem 2rem;
-  background: linear-gradient(to right, #000000, #a10013);
+  background: #830d1b;
   color: white;
   font-weight: bold;
   font-size: 1.2rem;
@@ -867,7 +872,7 @@ img {
     opacity: 1;
     transform: translateY(0);
   }
-} 
+}
 
 
 .no-products {

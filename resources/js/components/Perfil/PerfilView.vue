@@ -373,7 +373,7 @@ export default {
                 location: '',
                 birthdate: '',
                 bio: '',
-                image: '',
+                image: null,
                 user_type: '',
                 categoria: '',
                 especialidades: [],
@@ -425,7 +425,7 @@ export default {
         cargarEntrenadores() {
             axios.get('/trainer/approved')
                 .then(response => {
-                    this.entrenadores = response.data.trainers;
+                    this.entrenadores = response.data.trainer;
                     this.filtroEntrenadores();
 
                     this.originalTrainerData = JSON.parse(JSON.stringify(this.trainer));
@@ -853,18 +853,22 @@ export default {
 
     },
     mounted() {
-        this.user = JSON.parse(sessionStorage.getItem('user'));
-        document.title = 'Perfil de ' + this.user.name;
 
-        // Obtener estadísticas
-        this.fetchUserStats();
+        const userData = sessionStorage.getItem('user');
 
-        if (this.user.user_type === 'entrenador') {
-            this.cargarEntrenadores();
+        if (userData) {
+            this.user = JSON.parse(userData);
+            document.title = 'Perfil de ' + this.user.name;
+            this.fetchUserStats();
+
+            if (this.user.user_type === 'entrenador') {
+                this.cargarEntrenadores();
+            }
+            this.originalUserData = JSON.parse(JSON.stringify(this.user));
+        } else {
+            // Redirige a login si no hay usuario
+            this.$router.push('/login');
         }
-
-        // Guardar copia de seguridad para descartar cambios
-        this.originalUserData = JSON.parse(JSON.stringify(this.user));
     }
 }
 </script>

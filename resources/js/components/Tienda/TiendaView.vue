@@ -4,14 +4,13 @@
     <!-- Navbar -->
     <Navbar />
 
-    <!-- Reemplaza el search-container existente con este nuevo header -->
     <div class="store-header">
       <div class="header-overlay">
         <div class="header-content">
           <h1 class="store-title">Bienvenido a SportShop</h1>
           <p class="store-subtitle">Encuentra todo para tu rendimiento deportivo</p>
 
-          <!-- Barra de búsqueda mejorada -->
+          <!-- Barra de búsqueda -->
           <div class="search-wrapper animated-search">
             <input type="text" v-model="busqueda" placeholder="Buscar productos..." @input="filtrarProductos"
               class="search-input" />
@@ -56,7 +55,7 @@
     <!-- Productos -->
     <div class="products-grid">
       <div v-for="producto in productosFiltrados" :key="producto.id" class="product-card" @click="abrirPopup(producto)">
-        <div class="product-badge" v-if="producto.oferta">OFERTA</div>
+        <!-- <div class="product-badge" v-if="producto.oferta">OFERTA</div> -->
         <div class="product-image-container">
           <img :src="producto.image" :alt="producto.name" class="product-image" />
           <button class="quick-view-btn" @click.stop="abrirPopup(producto)">
@@ -67,7 +66,7 @@
           <span class="product-category">{{ getCategoryName(producto.categoria) }}</span>
           <h3 class="product-name">{{ producto.name }}</h3>
           <div class="product-price-container">
-            <span class="product-price">{{ producto.price }} RD$</span>
+            <span class="product-price"> RD$ {{ producto.price }}</span>
             <!-- <span class="product-old-price" v-if="producto.oldPrice">{{ producto.oldPrice }} RD$</span> -->
           </div>
           <button v-if="user" class="add-to-cart-btn" @click.stop="agregarAlCarrito(producto)">
@@ -138,12 +137,12 @@
             </div>
 
             <div class="price-container">
-              <span class="current-price">{{ productoSeleccionado.price }} RD$</span>
-              <span class="old-price" v-if="productoSeleccionado.oldPrice">{{ productoSeleccionado.oldPrice }}
+              <span class="current-price"> RD$ {{ productoSeleccionado.price }} </span>
+              <!-- <span class="old-price" v-if="productoSeleccionado.oldPrice">{{ productoSeleccionado.oldPrice }}
                 RD$</span>
               <span class="discount" v-if="productoSeleccionado.oldPrice">
                 {{ calculateDiscount(productoSeleccionado.price, productoSeleccionado.oldPrice) }}% OFF
-              </span>
+              </span> -->
             </div>
 
             <p class="product-description">{{ productoSeleccionado.description }}</p>
@@ -165,7 +164,14 @@
       </div>
     </div>
 
-
+    <transition name="fade">
+      <div v-if="showSuccess" class="success-notification">
+        <div class="notification-content">
+          <i class="fas fa-check-circle"></i>
+          {{ successMessage }}
+        </div>
+      </div>
+    </transition>
 
     <!-- Botón flotante admin -->
     <button v-if="user?.user_type === 'admin'" @click="abrirFormularioProducto" class="floating-admin-btn">
@@ -212,21 +218,23 @@
         </form>
       </div>
     </div>
-
-
-
-
   </div>
+
+  <!-- Burbuja de Mensajes Flotante -->
+  <ChatBubbleComponent v-if="user" :user="user" />
+
 </template>
 
 <script>
-import Navbar from '../navbarComponent.vue';
 import axios from 'axios';
+import Navbar from '../navbarComponent.vue';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
 export default {
   name: 'TiendaComponent',
   components: {
-    Navbar
+    Navbar,
+    ChatBubbleComponent
   },
   data() {
     return {
@@ -296,9 +304,12 @@ export default {
       editingProduct: null,
       formProducto: this.resetForm(),
       categoriasFlat: [],
-      user: {},
+      user: null,
       isLoading: true,
-      user: []
+      user: null,
+      showSuccess: false,
+      successMessage: '',
+      successTimer: null
     };
   },
 
@@ -518,10 +529,17 @@ export default {
           user_id: this.user.id
         });
 
-      
+        // Mostrar mensaje de éxito
+        this.successMessage = `¡${producto.name} agregado al carrito!`;
+        this.showSuccess = true;
+
+        // Ocultar después de 3 segundos
+        clearTimeout(this.successTimer);
+        this.successTimer = setTimeout(() => {
+          this.showSuccess = false;
+        }, 3000);
 
         window.dispatchEvent(new CustomEvent('cart-updated'));
-
       } catch (error) {
         console.error('Error al agregar al carrito:', error);
         alert('No se pudo agregar el producto al carrito');
@@ -539,7 +557,7 @@ export default {
   mounted() {
     this.getProducts();
     window.addEventListener('keyup', this.handleKeyup);
-    this.user = JSON.parse(sessionStorage.getItem('user'));
+    this.user = JSON.parse(sessionStorage.getItem('user')) || {};
     this.generarCategoriasFlat()
     document.title = 'Tienda';
   },
@@ -591,5 +609,52 @@ export default {
   font-size: 1rem;
   max-width: 400px;
   margin: 0 auto;
+}
+
+
+/* Notificación de éxito */
+.success-notification {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #4CAF50;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fa-check-circle {
+  font-size: 1.5rem;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
