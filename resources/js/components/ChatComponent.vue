@@ -24,12 +24,12 @@
       <div v-for="(message, index) in messages" :key="message.id"
         :class="['message', isMessageFromMe(message) ? 'sent' : 'received']">
         <p>{{ message.message }}</p>
-        <span class="time">{{ formatTime(message.created_at) }}</span>
-
-        <!-- Indicador de estado de lectura -->
-        <div v-if="isMessageFromMe(message)" class="message-status">
-          <span v-if="message.read" class="read-indicator">✓✓</span>
-          <span v-else class="unread-indicator">✓</span>
+        <div class="message-footer">
+          <span class="time">{{ formatTime(message.created_at) }}</span>
+          <div v-if="isMessageFromMe(message)" class="message-status">
+            <span v-if="message.read" class="read-indicator">✓✓</span>
+            <span v-else class="unread-indicator">✓</span>
+          </div>
         </div>
       </div>
 
@@ -81,34 +81,13 @@ export default {
     },
 
     otherUser() {
-      if (!this.activeChat) return null;
-
-      try {
-        const isUser = this.user.user_type === 'user';
-        const target = isUser ?
-          (this.activeChat.trainer || this.activeChat.trainer_id) :
-          (this.activeChat.user || this.activeChat.user_id);
-
-        if (!target) return null;
-
-        return {
-          id: target.id || target,
-          name: target.user?.name || target.name || (isUser ? 'Entrenador' : 'Usuario'),
-          trainer_id: target.trainer_id,
-          image: this.getUserImage(target)
-        };
-      } catch (error) {
-        console.error('Error al obtener otherUser:', error);
-        return null;
-      }
+      return this.activeChat?.other_participant || null;
     },
-
     otherUserAvatar() {
       return this.otherUser?.image || '/storage/users/Perfil-Icon.png';
     },
-
     otherUserName() {
-      return this.otherUser?.name || (this.user.id === this.activeChat?.user_id ? 'Entrenador' : 'Usuario');
+      return this.otherUser?.name || 'Usuario';
     }
   },
   watch: {
@@ -335,27 +314,17 @@ export default {
         this.isOnline = false;
         return;
       }
-
-      this.isOnline = users.some(user =>
-        user.id === this.otherUser.id ||
-        user.trainer_id === this.otherUser.id
-      );
+      this.isOnline = users.some(user => user.id === this.otherUser.id);
     },
 
     userJoined(user) {
-      if (!this.otherUser || !user) return;
-
-      if ((user.id && user.id === this.otherUser.id) ||
-        (user.trainer_id && user.trainer_id === this.otherUser.id)) {
+      if (user.id === this.otherUser?.id) {
         this.isOnline = true;
       }
     },
 
     userLeft(user) {
-      if (!this.otherUser || !user) return;
-
-      if ((user.id && user.id === this.otherUser.id) ||
-        (user.trainer_id && user.trainer_id === this.otherUser.id)) {
+      if (user.id === this.otherUser?.id) {
         this.isOnline = false;
       }
     },
@@ -386,4 +355,53 @@ export default {
 
 <style scoped>
 @import '../../scss/Entrenadores/chatcomponent.scss';
+
+/* Estilos mejorados para el pie de mensaje */
+.message .message-footer {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.message.sent .message-footer {
+  justify-content: flex-end;
+}
+
+.message.received .message-footer {
+  justify-content: flex-start;
+}
+
+/* Estilos específicos para alinear tiempo y estado */
+.time {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.5);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.message-status {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  vertical-align: middle;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.read-indicator {
+  color: #4fc3f7;
+  font-weight: bold;
+  letter-spacing: -1px;
+}
+
+.unread-indicator {
+  color: #b0bec5;
+  font-weight: bold;
+}
+
+.time,
+.message-status {
+  top: 35px;
+  left: 73px;
+}
 </style>
