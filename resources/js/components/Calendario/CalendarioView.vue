@@ -180,9 +180,9 @@
   </div>
 
   <!-- Burbuja de Mensajes Flotante -->
-  <ChatBubbleComponent v-if="user" :user="user" />
+  <ChatBubbleComponent v-if="user && !selectedEvent" :user="user" />
 
-  
+
 </template>
 
 <script>

@@ -241,7 +241,7 @@
                       <div class="comment-header">
 
                         <span class="comment-author">{{ comentario.user?.name || `Usuario${comentario.user_id}`
-                        }}</span>
+                          }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.replies && comentario.replies.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -527,7 +527,7 @@
   </div>
 
   <!-- Burbuja de Mensajes Flotante -->
-  <ChatBubbleComponent v-if="user" :user="user" />
+  <ChatBubbleComponent v-if="user && !mostrarModal && !postSeleccionado" :user="user" />
 
 </template>
 
