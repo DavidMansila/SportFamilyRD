@@ -781,4 +781,5 @@ export default {
   line-height: 1.6;
   resize: vertical;
 }
+
 </style>
