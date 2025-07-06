@@ -16,7 +16,7 @@
     </header>
 
     <!-- Barra de búsqueda y filtros -->
-    <div class="controls">
+    <!-- <div class="controls">
       <div class="search-container">
         <input type="text" v-model="searchTerm" placeholder="Buscar deporte..." class="search-input">
         <button class="search-button">
@@ -30,7 +30,7 @@
           {{ region }}
         </button>
       </div>
-    </div>
+    </div> -->
 
     <!-- Contenido principal -->
     <main class="main-content">
