@@ -1,4 +1,4 @@
-/* ------------------- MODAL MODERNO MEJORADO ------------------- */
+/* ------------------- MODAL ------------------- */
 .product-modal {
     position: fixed;
     top: 0;
@@ -24,13 +24,13 @@
 .modal-content {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 18px;
-    padding: 30px; /* Reducido de 40px */
-    max-width: 800px; /* Reducido de 1000px */
+    padding: 30px;
+    max-width: 800px;
     width: 90%;
-    max-height: 85vh; /* Reducido de 90vh */
+    max-height: 85vh;
     overflow: hidden;
     position: relative;
-    transform: scale(0.95) translateY(30px); /* Ajustado de 50px */
+    transform: scale(0.95) translateY(30px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
@@ -97,7 +97,7 @@
     grid-template-columns: 1.1fr 0.9fr;
     gap: 30px;
     padding: 25px;
-    align-items: center; /* Centrado vertical del grid */
+    align-items: center;
 }
 
 .modal-images {
@@ -108,14 +108,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px; /* Espaciado uniforme */
-    background: #f8f9fa; /* Fondo para áreas transparentes */
-    min-height: 300px; /* Altura mínima garantizada */
-    height: 100%; /* Ocupa todo el espacio disponible */
+    padding: 20px;
+    background: #f8f9fa;
+    min-height: 300px;
+    height: 100%;
 }
 
 .main-image {
-    object-fit: contain; /* Muestra toda la imagen sin recortar */
+    object-fit: contain;
     max-height: 100%;
     max-width: 100%;
     width: auto;
@@ -123,8 +123,8 @@
     border-radius: 15px;
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(45deg, #f8f8f8 0%, #f0f0f0 100%);
-    image-rendering: -webkit-optimize-contrast; /* Mejor calidad en Chrome */
-    image-rendering: crisp-edges; /* HD en Firefox */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
 
 .modal-details {
@@ -147,8 +147,8 @@
 }
 
 .product-title {
-    font-size: 2rem; /* Reducido de 2.4rem */
-    margin-bottom: 15px; /* Reducido de 20px */
+    font-size: 2rem;
+    margin-bottom: 15px;
     color: #222;
     line-height: 1.2;
     font-weight: 700;
@@ -182,7 +182,7 @@
 }
 
 .current-price {
-    font-size: 1.8rem; /* Reducido de 2.4rem */
+    font-size: 1.8rem;
     font-weight: 800;
     color: #17a2b8;
     letter-spacing: -1px;
@@ -193,14 +193,14 @@
         position: absolute;
         bottom: -5px;
         left: 0;
-        width: 40px; /* Reducido de 50px */
-        height: 2px; /* Reducido de 3px */
+        width: 40px;
+        height: 2px;
         background: #17a2b8;
     }
 }
 
 .old-price {
-    font-size: 1.2rem; /* Reducido de 1.4rem */
+    font-size: 1.2rem;
     color: #aaa;
     text-decoration: line-through;
 }
@@ -208,9 +208,9 @@
 .discount {
     background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
     color: white;
-    padding: 6px 18px; /* Ajustado de 8px 20px */
+    padding: 6px 18px;
     border-radius: 30px;
-    font-size: 0.9rem; /* Reducido de 1rem */
+    font-size: 0.9rem;
     font-weight: 700;
     align-self: center;
     box-shadow: 0 5px 20px rgba(255, 71, 87, 0.2);
@@ -218,11 +218,11 @@
 
 .product-description {
     color: #555;
-    line-height: 1.6; /* Reducido de 1.8 */
+    line-height: 1.6;
     margin-bottom: 35px;
     padding-bottom: 30px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    font-size: 1rem; /* Reducido de 1.1rem */
+    font-size: 1rem;
 }
 
 .product-actions {
@@ -242,11 +242,11 @@
 }
 
 .quantity-selector button {
-    width: 30px; /* Reducido de 50px */
-    height: 40px; /* Reducido de 50px */
+    width: 30px;
+    height: 40px;
     background: rgba(255, 255, 255, 0.8);
     border: none;
-    font-size: 1.2rem; /* Reducido de 1.4rem */
+    font-size: 1.2rem;
     color: #666;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -258,11 +258,11 @@
 }
 
 .quantity-selector span {
-    width: 60px; /* Reducido de 70px */
+    width: 60px;
     text-align: center;
     font-weight: 700;
     color: #333;
-    font-size: 1.1rem; /* Reducido de 1.2rem */
+    font-size: 1.1rem;
 }
 
 .add-to-cart {
@@ -271,8 +271,8 @@
     color: white;
     border: none;
     border-radius: 15px;
-    padding: 0 25px; /* Reducido de 0 30px */
-    font-size: 1.1rem; /* Reducido de 1.2rem */
+    padding: 0 25px;
+    font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -324,15 +324,15 @@
 .meta-item {
     display: flex;
     align-items: center;
-    gap: 12px; /* Reducido de 15px */
+    gap: 12px;
     color: #444;
-    font-size: 0.9rem; /* Reducido de 1rem */
+    font-size: 0.9rem;
 
     i {
         color: #17a2b8;
-        font-size: 1.2rem; /* Reducido de 1.4rem */
-        width: 40px; /* Reducido de 45px */
-        height: 40px; /* Reducido de 45px */
+        font-size: 1.2rem;
+        width: 40px;
+        height: 40px;
         border-radius: 12px;
         background: rgba(23, 162, 184, 0.1);
         display: flex;
@@ -725,4 +725,170 @@
 
 .product-modal.active .modal-content {
     filter: none; /* Elimina cualquier desenfoque en la imagen */
+}
+
+
+
+
+
+/* ------------------- MODAL RESPONSIVE PARA MÓVILES ------------------- */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    padding: 0;
+    overflow-y: auto;
+  }
+  
+  .modal-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  .modal-images {
+    min-height: 40vh;
+    max-height: 50vh;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 10px;
+    background: #f0f0f0;
+  }
+  
+  .main-image {
+    max-height: 45vh;
+    object-fit: contain;
+  }
+  
+  .modal-details {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(60vh - 40px);
+  }
+  
+  .close-modal {
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 100;
+  }
+  
+  .close-icon path {
+    fill: white;
+  }
+  
+  .product-title {
+    font-size: 1.6rem;
+    margin-top: 0;
+  }
+  
+  .current-price {
+    font-size: 1.5rem;
+  }
+  
+  .product-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .quantity-selector {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .quantity-selector button {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .add-to-cart {
+    width: 100%;
+    height: 60px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+  }
+  
+  .product-meta {
+    grid-template-columns: 1fr;
+    padding: 15px;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-images {
+    min-height: 35vh;
+    max-height: 40vh;
+  }
+  
+  .main-image {
+    max-height: 35vh;
+  }
+  
+  .modal-details {
+    padding: 15px;
+    max-height: calc(65vh - 30px);
+  }
+  
+  .product-title {
+    font-size: 1.4rem;
+  }
+  
+  .current-price {
+    font-size: 1.3rem;
+  }
+  
+  .product-description {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  
+  .quantity-selector button {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .add-to-cart {
+    height: 55px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .modal-images {
+    min-height: 30vh;
+    max-height: 35vh;
+  }
+  
+  .product-title {
+    font-size: 1.3rem;
+  }
+  
+  .current-price {
+    font-size: 1.2rem;
+  }
+}
+
+/* ------------------- ORIENTACIÓN HORIZONTAL ------------------- */
+@media (max-width: 768px) and (orientation: landscape) {
+  .modal-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+  }
+  
+  .modal-images {
+    max-height: 100vh;
+    min-height: auto;
+  }
+  
+  .modal-details {
+    max-height: 100vh;
+    overflow-y: auto;
+  }
 }
