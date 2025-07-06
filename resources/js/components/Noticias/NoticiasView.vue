@@ -216,7 +216,7 @@
   </div>
 
   <!-- Burbuja de Mensajes Flotante -->
-  <ChatBubbleComponent v-if="user" :user="user" />
+  <ChatBubbleComponent v-if="user && !noticiaSeleccionada" :user="user" />
 
 
 </template>
@@ -781,4 +781,5 @@ export default {
   line-height: 1.6;
   resize: vertical;
 }
+
 </style>

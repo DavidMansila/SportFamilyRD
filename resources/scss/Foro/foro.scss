@@ -33,7 +33,7 @@
     overflow-x: hidden;
 }
 
-/* Hero Section mejorada */
+/* Hero Section */
 .hero-section {
     position: relative;
     height: 500px;
@@ -90,8 +90,8 @@
     background-color: #6a11cb;
     color: white;
     font-weight: bold;
-    padding: 12px 30px;
-    border-radius: 30px;
+    padding: 15px;
+    border-radius: 40px;
     border: none;
     font-size: 1.1rem;
     cursor: pointer;
@@ -99,8 +99,8 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     top: 0;
     left: 0;
-    width: 40%;
-    height: 40%;
+    width: 55%;
+    height: 100%;
 }
 
 .hero-btn:hover {
@@ -210,7 +210,7 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: rotate(90deg);
 }
 
-/* Animaciones mejoradas */
+/* Animaciones*/
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -250,10 +250,10 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
 /* ------------------- RESPONSIVE DESIGN ------------------ */
 
-/* Contenedor principal - Grid completo */
+/* Contenedor principal*/
 .no-posts-container {
     display: grid;
-    grid-column: 1 / -1; /* Obliga a ocupar todas las columnas */
+    grid-column: 1 / -1;
     min-height: 80vh;
     place-items: center;
     background: var(--white);

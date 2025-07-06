@@ -783,6 +783,9 @@ const selectSport = (sport) => {
 
 
 <style scoped>
-@import '../../../scss/Home/home_navbar.scss';
 @import '../../../scss/Directorio/directorio.scss';
+
+.navbar {
+    background: linear-gradient(to right, #000000, #a13300);
+}
 </style>
