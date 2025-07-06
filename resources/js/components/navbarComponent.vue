@@ -21,6 +21,7 @@
     <div class="nav-links desktop-only">
 
       <!-- Secciones para usuarios -->
+      <router-link to="/directorio" class="nav-link">Deportes</router-link>
       <router-link to="/noticias" class="nav-link">Noticias</router-link>
       <router-link to="/calendario" class="nav-link">Calendario</router-link>
       <router-link to="/tienda" class="nav-link">Tienda</router-link>
@@ -99,6 +100,10 @@
       <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">
         <i class="fas fa-home"></i>
         <span>Inicio</span>
+      </router-link>
+      <router-link to="/directorio" class="mobile-nav-link" @click="closeMobileMenu">
+        <i class="fas fa-home"></i>
+        <span>Deportes</span>
       </router-link>
       <router-link to="/noticias" class="mobile-nav-link" @click="closeMobileMenu">
         <i class="fas fa-newspaper"></i>
@@ -869,7 +874,7 @@ export default {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  
+
   &:hover {
     .hamburger-icon .line {
       background: #ffffff;
@@ -901,15 +906,14 @@ export default {
   .top {
     transform: translateY(9px) rotate(45deg);
   }
-  
+
   .middle {
     opacity: 0;
     transform: scaleX(0);
   }
-  
+
   .bottom {
     transform: translateY(-9px) rotate(-45deg);
   }
 }
-
 </style>
