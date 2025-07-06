@@ -1,13 +1,23 @@
 <template>
-  <div class="container" ref="container">
 
+  <!-- Tabs para móvil -->
+  <div class="mobile-tabs">
+    <button :class="['tab-button', { 'active': activeTab === 'signIn' }]" @click="showSignIn">Iniciar Sesión</button>
+    <button :class="['tab-button', { 'active': activeTab === 'signUp' }]" @click="showSignUp">Registrarse</button>
+  </div>
+
+  <div class="container" ref="container">
+    
+    <!-- Mensaje de cierre de sesión -->
     <div v-if="showLogoutMessage" class="logout-message">
       ✅ Sesión cerrada exitosamente
     </div>
 
+    <!-- Formulario de Registro -->
     <div class="form-container sign-up-container">
       <form>
         <h1>Crear Cuenta</h1>
+
         <div class="social-container">
           <a href="https://www.instagram.com" target="_blank" class="social">
             <img src="imagenes/SocialMedia-Instagram.png" alt="Instagram" width="40">
@@ -66,6 +76,7 @@
       </form>
     </div>
 
+    <!-- Formulario de Login -->
     <div class="form-container sign-in-container">
       <form @submit.prevent="submitLoginForm">
         <h1>Iniciar Sesión</h1>
@@ -105,21 +116,22 @@
       </form>
     </div>
 
+    <!-- Overlay con botones para cambiar entre formularios -->
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
+          <h1>¡Bienvenido de nuevo!</h1>
           <router-link to="/" class="mb-6">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
           </router-link>
-          <h1>¡Bienvenido de nuevo!</h1>
           <p>Para mantenerte conectado con nosotros, inicia sesión con tu información personal</p>
           <button class="ghost" @click="toggleForm('signIn')">Iniciar Sesión</button>
         </div>
         <div class="overlay-panel overlay-right">
+          <h1>¡Hola, Amigo!</h1>
           <router-link to="/" class="mb-6">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
           </router-link>
-          <h1>¡Hola, Amigo!</h1>
           <p>Ingresa tus detalles y comienza tu viaje con nosotros</p>
           <button class="ghost" @click="toggleForm('signUp')">Registrarse</button>
         </div>
@@ -127,7 +139,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from 'axios';
@@ -139,13 +150,13 @@ export default {
       showRegisterPassword: false,
       showRegisterConfirm: false,
       showLoginPassword: false,
+      activeTab: 'signIn',
       registerForm: {
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
       },
-
       loginForm: {
         email: '',
         password: '',
@@ -154,90 +165,146 @@ export default {
     };
   },
   methods: {
-
     toggleForm(form) {
       this.$router.replace({ query: null });
 
       if (form === 'signIn') {
         this.$refs.container.classList.remove('right-panel-active');
+        this.activeTab = 'signIn';
       } else {
         this.$refs.container.classList.add('right-panel-active');
+        this.activeTab = 'signUp';
       }
     },
 
+    showSignIn() {
+      this.toggleForm('signIn');
+    },
+
+    showSignUp() {
+      this.toggleForm('signUp');
+    },
 
     async submitForm() {
       try {
-        console.log('Registering:', this.registerForm);
-
-        axios.post('/user', this.registerForm)
-          .then(response => {
-            sessionStorage.setItem('token', response.data.token);
-            sessionStorage.setItem('user', JSON.stringify(response.data.user));
-            this.$router.push('/');
-          })
-          .catch((error) => {
-            console.log(error);
-            alert('Algo salió mal, por favor intenta de nuevo');
-          });
+        this.isSubmitting = true;
+        const response = await axios.post('/user', this.registerForm);
+        sessionStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('user', JSON.stringify(response.data.user));
+        this.$router.push('/');
       } catch (error) {
         console.error(error);
+        alert('Algo salió mal, por favor intenta de nuevo');
+      } finally {
+        this.isSubmitting = false;
       }
     },
 
-
     async submitLoginForm() {
       try {
+        this.isSubmitting = true;
         const response = await axios.post('/login', {
           email: this.loginForm.email,
           password: this.loginForm.password
         });
-
         sessionStorage.setItem('user', JSON.stringify(response.data.user));
         sessionStorage.setItem('token', response.data.token);
         this.$router.push('/');
       } catch (error) {
         console.error('Login error:', error);
         alert('Credenciales inválidas');
+      } finally {
+        this.isSubmitting = false;
       }
     },
-
 
     checkLogoutMessage() {
       if (this.$route.query.logoutSuccess || sessionStorage.getItem('logoutMessage')) {
         this.showLogoutMessage = true;
         sessionStorage.removeItem('logoutMessage');
-
         setTimeout(() => {
           this.showLogoutMessage = false;
         }, 5000);
       }
     }
-
   },
   mounted() {
     this.checkLogoutMessage();
-
     if (this.$route.query.panel === 'signup') {
       this.$refs.container.classList.add('right-panel-active');
+      this.activeTab = 'signUp';
+    } else {
+      this.activeTab = 'signIn';
     }
   },
   watch: {
     $route(to) {
       if (to.query.panel === 'signup') {
         this.$refs.container.classList.add('right-panel-active');
+        this.activeTab = 'signUp';
       } else {
         this.$refs.container.classList.remove('right-panel-active');
+        this.activeTab = 'signIn';
       }
     }
   }
 };
 </script>
 
-
-<style scoped>
+<style scoped lang="scss">
 @import '../../../scss/Login/signup.scss';
 
+// Variables
+$primary-color: #000000;
+$secondary-color: #ff3149;
+$light-color: #ffffff;
+$dark-color: #333333;
+$gray-light: #f5f5f5;
+$gray-medium: #e0e0e0;
+$gray-dark: #c3c2c2;
+$font-main: "Montserrat", sans-serif;
+$transition-speed: 0.3s;
+$breakpoint-tablet: 768px;
+$breakpoint-mobile: 480px;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin box-shadow {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+@mixin gradient-bg {
+  background: linear-gradient(135deg, $primary-color, $secondary-color);
+}
+
+// Estilos base
+body {
+  @include gradient-bg;
+  font-family: $font-main;
+  min-height: 100vh;
+  @include flex-center;
+  padding: 1rem;
+}
+
+.container {
+  background-color: $light-color;
+  border-radius: 1rem;
+  @include box-shadow;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 60rem;
+  min-height: 35rem;
+  display: flex;
+  margin: auto;
+}
+
+// Mensaje de logout
 .logout-message {
   position: fixed;
   top: 20px;
@@ -262,42 +329,449 @@ export default {
   }
 }
 
+// Tabs para móvil
+.mobile-tabs {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 200;
+  padding: 10px;
+  justify-content: space-around;
 
+  .tab-button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+
+    &.active {
+      border-bottom: 3px solid $secondary-color;
+      color: $secondary-color;
+    }
+  }
+}
+
+// Formularios
+.form-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s ease-in-out;
+  width: 50%;
+  padding: 2rem;
+  @include flex-center;
+}
+
+.sign-in-container {
+  left: 0;
+  z-index: 2;
+}
+
+.sign-up-container {
+  left: 0;
+  opacity: 0;
+  z-index: 1;
+}
+
+form {
+  background-color: $light-color;
+  @include flex-center;
+  flex-direction: column;
+  padding: 1.5rem;
+  height: 100%;
+  text-align: center;
+  border-radius: 1rem;
+  @include box-shadow;
+  width: 100%;
+}
+
+h1 {
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+  font-size: 1.75rem;
+}
+
+input {
+  background-color: $gray-light;
+  border: none;
+  margin: 0.5rem 0;
+  padding: 0.875rem 1.25rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all $transition-speed;
+  border: 2px solid transparent;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    background-color: $light-color;
+    @include box-shadow;
+  }
+}
+
+button {
+  border-radius: 2rem;
+  border: 2px solid $primary-color;
+  background-color: $primary-color;
+  color: $light-color;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all $transition-speed;
+  cursor: pointer;
+  margin: 0.5rem 0;
+  min-width: 120px;
+
+  &:hover {
+    background-color: $secondary-color;
+    border-color: $secondary-color;
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  &.ghost {
+    background-color: transparent;
+    border-color: $light-color;
+    color: $light-color;
+
+    &:hover {
+      background-color: rgba($light-color, 0.1);
+    }
+  }
+}
+
+// Social buttons
+.social-container {
+  margin: 1.5rem 0;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+
+  a {
+    border: 1px solid $light-color;
+    border-radius: 50%;
+    @include flex-center;
+    height: 2.5rem;
+    width: 2.5rem;
+    color: $light-color;
+    transition: all $transition-speed;
+
+    &:hover {
+      background-color: rgba($light-color, 0.2);
+      transform: translateY(-2px);
+    }
+
+    img {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+// Overlay
+.overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.6s ease-in-out;
+  z-index: 100;
+}
+
+.overlay {
+  @include gradient-bg;
+  color: $light-color;
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+}
+
+.overlay-panel {
+  position: absolute;
+  @include flex-center;
+  flex-direction: column;
+  padding: 2rem;
+  text-align: center;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+
+  h1 {
+    color: $light-color;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: rgba($light-color, 0.8);
+    margin-bottom: 2rem;
+    max-width: 80%;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+}
+
+.overlay-left {
+  transform: translateX(-20%);
+}
+
+.overlay-right {
+  right: 0;
+  transform: translateX(0);
+}
+
+.logo-main {
+  background-color: #000000;
+  padding: 8px;
+  border-radius: 50px;
+  width: 10rem;
+  height: auto;
+  transition: transform $transition-speed;
+  margin-bottom: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Password toggle
 .password-wrapper {
   position: relative;
   width: 100%;
+
+  input {
+    padding-right: 40px;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+  }
 }
 
-.password-wrapper input {
-  padding-right: 40px;
-  /* Espacio para el ojo */
-  width: 100%;
+// Animaciones
+.container.right-panel-active {
+  .sign-in-container {
+    transform: translateX(100%);
+  }
+
+  .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: show 0.6s;
+  }
+
+  .overlay-container {
+    transform: translateX(-100%);
+  }
+
+  .overlay {
+    transform: translateX(50%);
+  }
+
+  .overlay-left {
+    transform: translateX(0);
+  }
+
+  .overlay-right {
+    transform: translateX(20%);
+  }
 }
 
-.toggle-password {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.3s;
+@keyframes show {
+
+  0%,
+  49.99% {
+    opacity: 0;
+    z-index: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 1;
+    z-index: 5;
+  }
 }
 
-.toggle-password:hover {
-  opacity: 1;
-}
+// Estilos responsivos
+@media (max-width: $breakpoint-tablet) {
+  .container {
+    flex-direction: column;
+    min-height: auto;
+    max-height: unset;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
 
-.toggle-password svg {
-  width: 20px;
-  height: 20px;
-  display: block;
-}
+  .mobile-tabs {
+    position: relative;
+    background: rgb(0, 0, 0);
+    padding: 15px 10px;
+    margin-top: 0;
+    z-index: 10;
+    display: flex;
+  }
 
-/* Estilos responsivos */
-@media (max-width: 768px) {
-  .password-wrapper {
+  .form-container {
+    position: relative;
     width: 100%;
+    height: auto;
+    min-height: 50vh;
+    padding: 1.5rem;
+    display: none;
+
+    &.sign-in-container {
+      display: flex;
+    }
+  }
+
+  .overlay-container {
+    position: relative;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    order: -1;
+  }
+
+  .overlay {
+    left: 0;
+    width: 100%;
+    height: 200%;
+  }
+
+  .overlay-panel {
+    width: 100%;
+    padding: 1.5rem;
+    height: 50%;
+
+    p {
+      max-width: 100%;
+    }
+
+    .ghost {
+      display: none;
+    }
+  }
+
+  .overlay-left {
+    top: 0;
+    transform: translateY(0) !important;
+  }
+
+  .overlay-right {
+    top: 50%;
+    transform: translateY(0) !important;
+  }
+
+  .container.right-panel-active {
+    .sign-in-container {
+      display: none;
+    }
+
+    .sign-up-container {
+      display: flex;
+    }
+
+    .overlay {
+      transform: translateY(-50%) !important;
+    }
+  }
+
+  .logo-main {
+    width: 150px !important;
+    height: auto;
+    margin-bottom: 0;
+    display: block;
+  }
+
+  .social-container a {
+    width: 35px;
+    height: 35px;
+  }
+
+  form {
+    padding: 1.2rem;
+  }
+
+  .password-wrapper .toggle-password {
+    right: 10px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .overlay-panel {
+    h1 {
+      margin-top: 10px;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  form {
+    h1 {
+      font-size: 1.6rem;
+    }
+
+    input {
+      padding: 12px 15px;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 0.85rem;
+    }
   }
 }
 </style>
