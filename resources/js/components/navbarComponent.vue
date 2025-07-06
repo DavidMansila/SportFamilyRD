@@ -2,13 +2,23 @@
 
   <!-- Navbar -->
   <nav class="navbar">
-    <div class="logo-container">
+
+    <div class="logo-container desktop-only">
       <router-link to="/" class="logo-container">
         <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
       </router-link>
     </div>
 
-    <div class="nav-links">
+    <!-- Botón de menú móvil -->
+    <button class="mobile-menu-btn mobile-only" @click="toggleMobileMenu" :class="{ active: isMobileMenuOpen }">
+      <div class="hamburger-icon">
+        <span class="line top"></span>
+        <span class="line middle"></span>
+        <span class="line bottom"></span>
+      </div>
+    </button>
+
+    <div class="nav-links desktop-only">
 
       <!-- Secciones para usuarios -->
       <router-link to="/noticias" class="nav-link">Noticias</router-link>
@@ -72,14 +82,58 @@
 
       <template v-else>
         <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="Signup">
-          <img src="/imagenes/Signup-icon.png" alt="Registrarse" title="Iniciar sesión" class="signup-icon-thick"/>
+          <img src="/imagenes/Signup-icon.png" alt="Registrarse" title="Iniciar sesión" class="signup-icon-thick" />
         </router-link>
       </template>
 
     </div>
 
-    <CarritoComponent v-if="user" :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" :user="user" @close="closeCart"
-      @update-quantity="handleUpdateQuantity" @remove-item="handleRemoveItem" @checkout="handleCheckout" />
+    <CarritoComponent v-if="user" :isVisible="isCartVisible" :cartItems="$store.getters.cartItems" :user="user"
+      @close="closeCart" @update-quantity="handleUpdateQuantity" @remove-item="handleRemoveItem"
+      @checkout="handleCheckout" />
+
+
+
+    <!-- Menú móvil desplegable -->
+    <div class="mobile-nav" :class="{ active: isMobileMenuOpen }">
+      <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">
+        <i class="fas fa-home"></i>
+        <span>Inicio</span>
+      </router-link>
+      <router-link to="/noticias" class="mobile-nav-link" @click="closeMobileMenu">
+        <i class="fas fa-newspaper"></i>
+        <span>Noticias</span>
+      </router-link>
+      <router-link to="/calendario" class="mobile-nav-link" @click="closeMobileMenu">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Calendario</span>
+      </router-link>
+      <router-link to="/tienda" class="mobile-nav-link" @click="closeMobileMenu">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Tienda</span>
+      </router-link>
+      <router-link to="/entrenadores" class="mobile-nav-link" @click="closeMobileMenu">
+        <i class="fas fa-users"></i>
+        <span>Entrenadores</span>
+      </router-link>
+      <router-link to="/foro" class="mobile-nav-link" @click="closeMobileMenu">
+        <i class="fas fa-comments"></i>
+        <span>Foro</span>
+      </router-link>
+
+      <!-- Enlaces condicionales -->
+      <router-link v-if="user?.user_type == 'entrenador'" to="/solicitudes-usuarios" class="mobile-nav-link"
+        @click="closeMobileMenu">
+        <i class="fas fa-file-signature"></i>
+        <span>Solicitudes-U</span>
+      </router-link>
+
+      <router-link v-if="user?.user_type == 'admin'" to="/solicitudes-entrenadores" class="mobile-nav-link"
+        @click="closeMobileMenu">
+        <i class="fas fa-file-contract"></i>
+        <span>Solicitudes-E</span>
+      </router-link>
+    </div>
 
   </nav>
 </template>
@@ -103,18 +157,22 @@ export default {
       authMessage: '',
 
       showLogoutConfirm: false,
-
+      isMobileMenuOpen: false
     }
   },
   created() {
     this.checkAuthStatus();
     window.addEventListener('user-authenticated', this.checkAuthStatus);
     window.addEventListener('user-logged-out', this.checkAuthStatus);
+
+    // Escuchar cambios de tamaño para cerrar menú móvil
+    window.addEventListener('resize', this.handleResize);
   },
   beforeDestroy() {
     // Limpiar event listeners
     window.removeEventListener('user-authenticated', this.checkAuthStatus);
     window.removeEventListener('user-logged-out', this.checkAuthStatus);
+    window.removeEventListener('resize', this.handleResize);
   },
   methods: {
 
@@ -140,7 +198,7 @@ export default {
       this.user_type = '';
     },
 
-    
+
     async logout() {
       try {
         sessionStorage.removeItem('user');
@@ -209,13 +267,30 @@ export default {
       // this.$router.push('/checkout');
     },
 
+
+    // Nuevos métodos para menú móvil
+    toggleMobileMenu() {
+      this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    },
+
+    closeMobileMenu() {
+      this.isMobileMenuOpen = false;
+    },
+
+    handleResize() {
+      // Cerrar menú móvil si la pantalla es grande
+      if (window.innerWidth > 768) {
+        this.closeMobileMenu();
+      }
+    }
+
   }
 }
 </script>
 
 
 <style lang="scss">
-@import '/resources/scss/Navbar/Navbar_responsive.scss';
+@import '../../scss/Navbar/Navbar_responsive.scss';
 
 /* Navbar */
 .navbar {
@@ -618,6 +693,223 @@ export default {
   width: 24px;
   height: 24px;
   transition: transform 0.3s ease-in-out;
+}
+
+
+
+/* Encabezado móvil */
+.mobile-header.mobile-only {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+
+  .home-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+
+    i {
+      font-size: 1.8rem;
+      color: #ff3149;
+      margin-bottom: 5px;
+    }
+
+    span {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+  }
+}
+
+/* Botón de menú móvil */
+.mobile-menu-btn.mobile-only {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+/* Menú móvil */
+.mobile-nav {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  background: rgba(10, 10, 30, 0.98);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  display: none;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+
+  &.active {
+    display: flex;
+  }
+
+  .mobile-nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 49, 73, 0.3);
+      transform: translateX(5px);
+    }
+
+    i {
+      color: #ffcc00;
+      font-size: 1.2rem;
+      width: 25px;
+    }
+
+    span {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .navbar {
+    padding: 12px 15px;
+  }
+
+  .mobile-header.mobile-only {
+    flex-grow: 1;
+    justify-content: center;
+    margin: 0 10px;
+  }
+
+  .mobile-menu-btn.mobile-only {
+    display: block;
+  }
+
+  .Imagenes {
+    gap: 8px;
+
+    a,
+    button {
+      width: 36px;
+      height: 36px;
+
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .mobile-nav {
+    top: 70px;
+  }
+}
+
+/* Estilos para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .mobile-header.mobile-only {
+    span {
+      font-size: 0.8rem;
+    }
+
+    i {
+      font-size: 1.5rem;
+    }
+  }
+
+  .mobile-menu-btn.mobile-only {
+    font-size: 1.5rem;
+  }
+
+  .Imagenes {
+    gap: 6px;
+
+    a,
+    button {
+      width: 34px;
+      height: 34px;
+
+      img {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+
+.mobile-menu-btn {
+  background: transparent;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    .hamburger-icon .line {
+      background: #ffffff;
+    }
+  }
+}
+
+.hamburger-icon {
+  width: 30px;
+  height: 21px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.line {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: white;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+/* Animación cuando el menú está abierto */
+.mobile-menu-btn.active {
+  .top {
+    transform: translateY(9px) rotate(45deg);
+  }
+  
+  .middle {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  
+  .bottom {
+    transform: translateY(-9px) rotate(-45deg);
+  }
 }
 
 </style>
