@@ -13,7 +13,7 @@
     </div>
 
     <!-- Sección CTA -->
-    <div class="cta-container"  v-if="user?.user_type == 'user'">
+    <div class="cta-container" v-if="user?.user_type == 'user'">
       <div class="cta-card">
         <div class="cta-text">
           <h2>¿Tienes lo necesario para ser entrenador?</h2>
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="cta-container"  v-if="user?.user_type == 'entrenador'">
+    <div class="cta-container" v-if="user?.user_type == 'entrenador'">
       <div class="cta-card">
         <div class="cta-text">
           <h2>Bienvenido de nuevo: {{ user.name }}</h2>
@@ -247,7 +247,7 @@
                   d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              <template  v-if="user?.user_type == 'entrenador'">
+              <template v-if="user?.user_type == 'entrenador'">
                 Los entrenadores no pueden enviar solicitudes de entrenamiento.
               </template>
               <template v-else>
@@ -262,10 +262,10 @@
     </transition>
 
     <!-- Burbuja de Mensajes Flotante -->
-    <ChatBubbleComponent v-if="user" :user="user" />
+    <ChatBubbleComponent v-if="user && !entrenadorSeleccionado && !mostrarFormularioContacto" :user="user" />
 
   </div>
-  
+
 </template>
 
 
@@ -752,5 +752,4 @@ export default {
   color: #6c757d;
   margin-top: 10px;
 }
-
 </style>

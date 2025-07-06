@@ -85,6 +85,22 @@
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
+  .quick-view-btn {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    background: rgba(42, 77, 105, 0.9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  
 .product-card:hover .quick-view-btn {
     bottom: 20px;
     opacity: 1;

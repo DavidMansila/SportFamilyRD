@@ -52,6 +52,43 @@
       </div>
     </div>
 
+
+    <!-- Botón de filtros para móviles -->
+    <button class="mobile-filter-btn" @click="showMobileFilters = true">
+      <i class="fas fa-filter"></i> Filtros
+    </button>
+
+    <!-- Menú de filtros móviles -->
+    <div class="mobile-filters-menu" :class="{ active: showMobileFilters }">
+      <div class="mobile-filters-header">
+        <h3>Filtrar Productos</h3>
+        <button class="close-mobile-filters" @click="showMobileFilters = false">
+          <i class="fas fa-times"></i>X
+        </button>
+      </div>
+
+      <div class="mobile-filters-content">
+        <button class="mobile-filter-option" @click="seleccionarSubcategoria(''); showMobileFilters = false;">
+          Todos los productos
+        </button>
+
+        <div v-for="(categoria, index) in categorias" :key="index" class="mobile-category">
+          <div class="mobile-category-header" @click="toggleMobileCategory(index)">
+            {{ categoria.nombre }}
+            <i class="fas fa-chevron-down" :class="{ 'fa-rotate-180': mobileCategoryOpen === index }"></i>
+          </div>
+
+          <div class="mobile-subcategories" v-show="mobileCategoryOpen === index">
+            <button v-for="(opcion, i) in categoria.opciones" :key="i"
+              @click="seleccionarSubcategoria(opcion.valor); showMobileFilters = false;">
+              {{ opcion.texto }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Productos -->
     <div class="products-grid">
       <div v-for="producto in productosFiltrados" :key="producto.id" class="product-card" @click="abrirPopup(producto)">
@@ -239,6 +276,8 @@ export default {
   data() {
     return {
       productos: [],
+      showMobileFilters: false,
+      mobileCategoryOpen: null,
       categorias: [
         {
           nombre: 'Deportes',
@@ -320,6 +359,17 @@ export default {
   },
 
   methods: {
+
+    toggleMobileCategory(index) {
+      this.mobileCategoryOpen = this.mobileCategoryOpen === index ? null : index;
+    },
+
+    // Mantenemos el método existente para seleccionar subcategoría
+    seleccionarSubcategoria(subcategoria) {
+      this.subcategoriaSeleccionada = subcategoria;
+      this.filtrarProductos();
+    },
+
 
     getProducts() {
       this.isLoading = true;
@@ -656,5 +706,377 @@ export default {
 
 .fade-leave-to {
   opacity: 0;
+}
+
+
+
+/* ==================== FILTROS MÓVILES ==================== */
+.mobile-filter-btn {
+  display: none;
+  background: #2a4d69;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin: 15px auto;
+  width: 90%;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  font-size: 1.1rem;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.mobile-filter-btn:hover {
+  background: #3a6d99;
+  transform: translateY(-2px);
+}
+
+.mobile-filter-btn i {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.mobile-filters-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  z-index: 1000;
+  padding: 25px 20px;
+  overflow-y: auto;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%);
+  transition: transform 0.4s ease;
+}
+
+.mobile-filters-menu.active {
+  display: block;
+  transform: translateX(0);
+}
+
+.mobile-filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.mobile-filters-header h3 {
+  font-size: 1.6rem;
+  color: #2a4d69;
+  font-weight: 700;
+}
+
+.close-mobile-filters {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.close-mobile-filters:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+.close-mobile-filters i {
+  font-size: 1.3rem;
+}
+
+.mobile-filters-content {
+  padding: 10px 5px;
+}
+
+.mobile-filter-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #f8f9fa;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #2a4d69;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-filter-option:hover {
+  background: #e3f2fd;
+  transform: translateX(5px);
+}
+
+.mobile-category {
+  margin-bottom: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.mobile-category-header {
+  padding: 16px 20px;
+  font-weight: 600;
+  background: #2a4d69;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mobile-category-header:hover {
+  background: #3a6d99;
+}
+
+.mobile-category-header i {
+  transition: transform 0.3s ease;
+}
+
+.mobile-subcategories {
+  background: white;
+  padding: 10px 0;
+}
+
+.mobile-subcategories button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 14px 25px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #333;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.mobile-subcategories button:hover {
+  background: #f0f7ff;
+  color: #2a4d69;
+}
+
+.mobile-subcategories button:before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: #2a4d69;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mobile-subcategories button:hover:before {
+  opacity: 1;
+}
+
+/* Animación para el icono de flecha */
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Responsive para filtros */
+@media (max-width: 768px) {
+  .filter-tabs {
+    display: none;
+  }
+
+  .mobile-filter-btn {
+    display: block;
+  }
+}
+
+/* Ajustes para diferentes resoluciones */
+@media (max-width: 480px) {
+  .mobile-filters-menu {
+    padding: 20px 15px;
+  }
+
+  .mobile-filters-header h3 {
+    font-size: 1.4rem;
+  }
+
+  .mobile-filter-option {
+    padding: 12px 15px;
+    font-size: 1rem;
+  }
+
+  .mobile-category-header {
+    padding: 14px 15px;
+    font-size: 1.1rem;
+  }
+
+  .mobile-subcategories button {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 720px) {
+  .mobile-filters-menu {
+    padding: 25px;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .filters-section {
+    display: none;
+  }
+
+  .mobile-filter-btn {
+    display: block;
+  }
+}
+
+
+.product-card:hover .quick-view-btn {
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 720px) {
+  .modal-grid {
+    flex-direction: column;
+  }
+
+  .quick-view-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 5%;
+    background: rgba(42, 77, 105, 0.9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2;
+    white-space: nowrap;
+  }
+
+  .modal-images {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .modal-details {
+    width: 100%;
+  }
+
+  .product-title {
+    font-size: 1.5rem;
+  }
+
+  .current-price {
+    font-size: 1.4rem;
+  }
+
+  .product-description {
+    font-size: 0.95rem;
+  }
+
+  .quantity-selector {
+    margin-bottom: 15px;
+  }
+
+  .add-to-cart {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .store-title {
+    font-size: 1.6rem;
+  }
+
+  .store-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .product-card {
+    margin-bottom: 20px;
+  }
+
+  .product-name {
+    font-size: 1.1rem;
+    height: auto;
+  }
+
+  .product-price {
+    font-size: 1.2rem;
+  }
+
+  .add-to-cart-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .main-image {
+    height: 200px;
+  }
+
+  .quantity-selector button {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .quantity-selector span {
+    font-size: 16px;
+    padding: 0 12px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 720px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+
+  .product-image-container {
+    height: 200px;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+
+}
+
+button,
+input,
+select,
+textarea {
+  font-size: 16px !important;
 }
 </style>
