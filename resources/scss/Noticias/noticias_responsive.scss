@@ -671,6 +671,7 @@
         .page-title {
             font-size: 1.7rem;
             margin-bottom: 5px;
+            margin-top: 20px;
         }
 
         .page-subtitle {
@@ -679,9 +680,16 @@
     }
 
     .filtro-deportes {
+        display: flex;
+        justify-content: center; /* Centrado horizontal */
+        flex-wrap: wrap; /* Permitir múltiples líneas */
+        gap: 8px; /* Espaciado entre botones */
+        padding: 5px 0; /* Espaciado vertical */
+
         .filtro-btn {
             padding: 7px 14px;
             font-size: 0.85rem;
+            flex: 0 0 auto; /* Evitar que se estiren */
         }
     }
 
