@@ -268,6 +268,7 @@
             max-width: 100%;
             padding: 15px;
             box-sizing: border-box;
+            height: 80vh;
 
             .modal-header {
                 flex-direction: column;
@@ -288,14 +289,21 @@
 
                 .section {
                     margin-bottom: 15px;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
 
                     h3 {
                         font-size: 1.1rem;
+                        justify-content: center;
+                        align-items: center;
                     }
 
                     p,
                     li {
                         font-size: 13px;
+                        justify-content: center;
+                        align-items: center;
                     }
                 }
 
@@ -303,7 +311,15 @@
                     span {
                         padding: 4px 8px;
                         font-size: 12px;
-                        margin: 2px; /* Menor margen */
+                        margin: 2px;
+                    }
+                }
+
+                .logros {
+                    li {
+                        padding: 4px 8px;
+                        font-size: 12px;
+                        margin: 2px;
                     }
                 }
             }

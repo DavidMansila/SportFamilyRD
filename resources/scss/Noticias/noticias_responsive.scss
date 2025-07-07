@@ -9,7 +9,7 @@
 .header-section {
     text-align: center;
     margin-bottom: 30px;
-    padding-top: 20px; /* Espacio adicional arriba del título */
+    padding-top: 20px;
 
     .page-title {
         font-size: 2.5rem;
@@ -297,7 +297,7 @@
     background: white;
     border-radius: 12px;
     width: 100%;
-    max-width: 900px;
+    max-width: 1100px;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
@@ -335,7 +335,6 @@
 
     .popup-category {
         display: inline-block;
-        background: #3498db;
         color: white;
         padding: 6px 18px;
         border-radius: 20px;
@@ -358,7 +357,6 @@
         .author-avatar {
             width: 40px;
             height: 40px;
-            background: #3498db;
             color: white;
             border-radius: 50%;
             display: flex;
@@ -412,60 +410,10 @@
         }
 
         a {
-            color: #3498db;
             text-decoration: none;
 
             &:hover {
                 text-decoration: underline;
-            }
-        }
-    }
-
-    .popup-actions {
-        display: flex;
-        gap: 15px;
-        margin-top: 30px;
-
-        button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 25px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-
-            svg {
-                margin-right: 8px;
-            }
-        }
-
-        .popup-share {
-            background: #f1f2f6;
-            color: #2c3e50;
-
-            &:hover {
-                background: #dfe4ea;
-            }
-        }
-
-        .popup-save {
-            background: #3498db;
-            color: white;
-
-            &:hover {
-                background: #2980b9;
-            }
-        }
-
-        .popup-cancel {
-            background: #95a5a6;
-            color: white;
-
-            &:hover {
-                background: #7f8c8d;
             }
         }
     }
@@ -612,8 +560,10 @@
     }
 
     .popup-content {
-        max-height: 95vh;
+        max-height: 80vh;
+        max-width: 70vh;
         border-radius: 10px;
+        padding: 10px;
 
         .popup-header {
             padding: 25px 20px 15px;
@@ -626,7 +576,6 @@
         .popup-image-container {
             height: 200px;
             margin: 0 20px;
-            border-radius: 8px;
         }
 
         .popup-body {
