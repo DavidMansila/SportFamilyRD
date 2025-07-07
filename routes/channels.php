@@ -7,40 +7,35 @@ use App\Models\Chat;
 
 // Canal privado
 Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
-    $chat = Chat::with('trainer')->find($chatId);
+    $chat = Chat::with(['user', 'trainer'])->find($chatId);
 
-    if (!$chat) {
-        Log::warning("Chat no encontrado: $chatId");
-        return false;
-    }
+    if (!$chat) return false;
 
-    $isMember = $user->id == $chat->user_id ||
+    // Verificar si el usuario es participante del chat
+    $isParticipant = $user->id == $chat->user_id ||
         ($chat->trainer && $user->id == $chat->trainer->user_id);
 
-    return $isMember;
+    Log::info("Autenticando usuario {$user->id} para chat {$chatId}: " .
+        ($isParticipant ? 'APROBADO' : 'RECHAZADO'));
+
+    return $isParticipant;
 });
 
 
 // Presencia en el canal
 Broadcast::channel('online.{chatId}', function ($user, $chatId) {
     $chat = Chat::find($chatId);
+    if (!$chat) return false;
 
-    if (!$chat) {
-        Log::warning("Chat not found: $chatId");
-        return false;
-    }
+    $isMember = $user->id == $chat->user_id
+        || ($chat->trainer && $user->id == $chat->trainer->user_id);
+    if (!$isMember) return false;
 
-    $isMember = $user->id == $chat->user_id ||
-        ($chat->trainer && $user->id == $chat->trainer->user_id);
-
-    if (!$isMember) {
-        return false;
-    }
-
+    // Devuelve la info que quieres compartir
     return [
-        'id' => $user->id,
-        'name' => $user->name,
-        'trainer_id' => optional($user->trainer)->id,
-        'user_type' => $user->user_type
+        'id'        => $user->id,
+        'name'      => $user->name,
+        'avatar'    => $user->image,
+        'user_type' => $user->user_type,
     ];
 });
