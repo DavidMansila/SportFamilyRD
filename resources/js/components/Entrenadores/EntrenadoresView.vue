@@ -125,6 +125,7 @@
           </div>
 
           <div class="modal-body">
+            
             <div class="section">
               <h3>Biografía</h3>
               <p>{{ entrenadorSeleccionado.biografia }}</p>

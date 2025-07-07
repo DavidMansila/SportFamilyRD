@@ -143,21 +143,19 @@
                                     stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg>
-                            Biografía Profesional
+                            Biografía {{ user.user_type === 'entrenador' ? 'Profesional' : '' }}
                         </h2>
-                        <div v-if="!editMode && !user.bio" class="edit-hint">
-                        </div>
                     </div>
 
                     <!-- Vista normal -->
                     <div v-if="!editMode" class="bio-content">
-                        <div v-if="user.bio" class="bio-text">
-                            <p>{{ user.bio }}</p>
+                        <div v-if="currentBio" class="bio-text">
+                            <p>{{ currentBio }}</p>
                         </div>
                         <div v-else class="empty-bio">
                             <svg class="empty-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
-                                    d="M12 8V12V16M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 4 12 4C7.02944 4 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z"
+                                    d="M12 8V12V16M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z"
                                     stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg>
@@ -168,14 +166,16 @@
                     <!-- Modo edición -->
                     <div v-else class="bio-edit">
                         <div class="editor-container">
-                            <textarea v-model="user.bio"
-                                placeholder="Cuéntanos sobre tu experiencia, metodología de entrenamiento, logros profesionales y enfoque pedagógico..."
+                            <textarea v-model="editableBio" :placeholder="user.user_type === 'entrenador'
+                                ? 'Cuéntanos sobre tu experiencia, metodología de entrenamiento, logros profesionales y enfoque pedagógico...'
+                                : 'Cuéntanos sobre tus intereses deportivos, objetivos y experiencia...'"
                                 class="bio-textarea" rows="6"></textarea>
-                            <div class="char-counter" :class="{ 'limit-reached': user.bio && user.bio.length > 500 }">
-                                {{ user.bio ? user.bio.length : 0 }}/500
+                            <div class="char-counter"
+                                :class="{ 'limit-reached': editableBio && editableBio.length > 500 }">
+                                {{ editableBio ? editableBio.length : 0 }}/500
                             </div>
                         </div>
-                        <div class="formatting-tips">
+                        <div v-if="user.user_type === 'entrenador'" class="formatting-tips">
                             <p>Consejos para una buena biografía:</p>
                             <ul>
                                 <li>Menciona tus años de experiencia</li>
@@ -186,7 +186,6 @@
                         </div>
                     </div>
                 </div>
-
 
                 <!-- Sección de Horario -->
                 <div class="profile-section" v-if="user?.user_type == 'entrenador'">
@@ -410,7 +409,10 @@ export default {
                     Domingo: { start: '', end: '' },
                 },
             },
-            isLoading: false
+            isLoading: false,
+            editableBio: '',
+            currentBio: '',
+            trainerBio: '',
         }
     },
     computed: {
@@ -451,6 +453,11 @@ export default {
                 this.trainer = { ...entrenador };
                 this.originalTrainerData = JSON.parse(JSON.stringify(entrenador));
                 this.user.categoria = this.trainer.sport_category;
+
+                // Guardar la biografía del entrenador
+                this.trainerBio = this.trainer.description || '';
+                this.currentBio = this.trainerBio;
+                this.editableBio = this.trainerBio;
 
                 this.user.especialidades = this.trainer.specialties
                     ? this.trainer.specialties.map(s => s.description)
@@ -528,7 +535,7 @@ export default {
                     ...this.user,
                     phone: this.user.phone || '',
                     location: this.user.location || '',
-                    bio: this.user.bio || '',
+                    bio: this.user.user_type === 'user' ? this.editableBio : this.user.bio || '',
                     categoria: this.user.categoria || '',
                     especialidades: this.user.especialidades || []
                 };
@@ -541,7 +548,11 @@ export default {
                 userFormData.append('phone', normalizedUser.phone);
                 userFormData.append('location', normalizedUser.location);
                 userFormData.append('birthdate', normalizedUser.birthdate);
-                userFormData.append('bio', normalizedUser.bio);
+
+                // Solo enviar bio si es usuario normal
+                if (this.user.user_type === 'user') {
+                    userFormData.append('bio', normalizedUser.bio);
+                }
 
                 if (this.$refs.avatarInput.files[0]) {
                     userFormData.append('image', this.$refs.avatarInput.files[0]);
@@ -566,6 +577,7 @@ export default {
                     const scheduleString = JSON.stringify(scheduleToSave);
 
                     const trainerData = {
+                        description: this.editableBio || '',
                         sport_category: normalizedUser.categoria,
                         specialties: normalizedUser.especialidades.map(e => ({ description: e || '' })),
                         achievements: (normalizedUser.achievements || []).map(ach => ({
@@ -590,9 +602,15 @@ export default {
 
                     // Actualizar el horario con datos reales del servidor
                     this.user.schedule = this.parseSchedule(updatedTrainer.data.schedule);
+
+                    this.trainerBio = trainerData.description;
+                    this.currentBio = this.trainerBio;
+                    this.editableBio = this.trainerBio;
+
+                } else {
+                    this.currentBio = normalizedUser.bio;
                 }
 
-                // Guardar en sessionStorage DESPUÉS de actualizar el horario
                 sessionStorage.setItem('user', JSON.stringify(this.user));
 
                 // Actualizar datos originales
@@ -918,15 +936,18 @@ export default {
             this.fetchUserStats();
             this.originalUserData = JSON.parse(JSON.stringify(this.user));
 
+            if (this.user.user_type === 'user') {
+                this.currentBio = this.user.bio || '';
+                this.editableBio = this.user.bio || '';
+            }
+
             if (this.user.user_type === 'entrenador') {
                 this.cargarEntrenadores();
 
-                // Inicializa el horario si no existe
                 if (!this.user.schedule || typeof this.user.schedule !== 'object') {
                     this.user.schedule = this.parseSchedule('{}');
                 }
 
-                // Inicializar y validar estructura del horario
                 parsedUser.schedule = parsedUser.schedule || {};
                 if (typeof parsedUser.schedule !== 'object' || parsedUser.schedule === null) {
                     parsedUser.schedule = {};
