@@ -932,17 +932,17 @@ export default {
 
 
 <style scoped>
-@import '/resources/scss/Perfil/perfil.scss';
+@import '../../../scss/Perfil/perfil.scss';
 
-@import '/resources/scss/Perfil/perfil_navbar.scss';
+@import '../../../scss/Perfil/perfil_navbar.scss';
 
-@import '/resources/scss/Perfil/perfil_contenido.scss';
+@import '../../../scss/Perfil/perfil_contenido.scss';
 
-@import '/resources/scss/Perfil/perfil_social_links.scss';
+@import '../../../scss/Perfil/perfil_social_links.scss';
 
-@import '/resources/scss/Perfil/perfil_logros.scss';
+@import '../../../scss/Perfil/perfil_logros.scss';
 
-@import '/resources/scss/Perfil/perfil_responsive.scss';
+@import '../../../scss/Perfil/perfil_responsive.scss';
 
 /* Estilos mejorados para el horario */
 .schedule-grid {
@@ -1044,4 +1044,117 @@ export default {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+
+
+   .profile-view {
+        background-color: #f5f7fa;
+        min-height: 100vh;
+        padding-bottom: 2rem;
+    }
+
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    /* ========== HEADER ========== */
+    .profile-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        padding: 25px 15px;
+        margin: 20px 0;
+        position: relative;
+    }
+
+    .avatar-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #e0e7ff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .edit-avatar {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #c4a600;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    .profile-info {
+        width: 100%;
+        text-align: center;
+    }
+
+    .profile-name {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 5px;
+    }
+
+    .profile-role {
+        font-size: 1rem;
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 90px;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-number {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #c4a600;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 5px;
+    }
+
 </style>
