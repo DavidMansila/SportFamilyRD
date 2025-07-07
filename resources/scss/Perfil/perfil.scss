@@ -1,7 +1,7 @@
 /* Contenedor de perfil */
 
 .profile-container {
-    background: #ffffff;
+    background: white;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     overflow: hidden;
@@ -17,25 +17,134 @@
 
 /* Cabezera de perfil */
 
-    .edit-profile-btn {
-        padding: 12px 25px;
-        background: #c4a600;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 1rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 50px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    color: #2d3748;
+    position: relative;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
 
-        &:hover {
-            background: #816e00;
-        }
+.avatar-container {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.profile-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transition: transform 0.3s ease;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.03);
+}
+
+.edit-avatar {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: #3498db;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+    transition: all 0.3s ease;
+}
+
+.edit-avatar:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.edit-avatar svg {
+    width: 22px;
+    height: 22px;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-size: 2.5rem;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+.profile-role {
+    font-size: 1.3rem;
+    opacity: 0.9;
+    margin: 0 0 25px 0;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 40px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    padding-right: 20px;
+}
+
+.stat-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px;
+    width: 1px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: #718096;
+    font-weight: 500;
+}
+
+.edit-profile-btn {
+    padding: 12px 25px;
+    background: #c4a600;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+        background: #7e6b00;
     }
-
-
-
+}
 
 /* Elementos del form */
 
@@ -205,17 +314,11 @@ select:focus {
     font-size: 0.9rem;
 }
 
-
-
-
 .profile-actions {
     display: flex;
     gap: 10px;
     margin-top: 15px;
 }
-
-
-
 
 /* MULTISELECT */
 .multiselect {
@@ -231,17 +334,13 @@ select:focus {
 }
 
 .multiselect__option--highlight {
-    background: #4CAF50;
+    background: #4caf50;
     color: white;
 }
 
-
-
-
-
 /* Botón Subir Información */
 .upload-info-btn {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
     border: none;
     padding: 12px 20px;
@@ -266,13 +365,3 @@ select:focus {
     gap: 15px;
     margin-top: 20px;
 }
-
-
-
-
-
-
-
-
-
-
