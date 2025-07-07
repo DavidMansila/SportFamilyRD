@@ -523,15 +523,25 @@ export default {
                     return;
                 }
 
+                // Normalizar campos opcionales para evitar valores null
+                const normalizedUser = {
+                    ...this.user,
+                    phone: this.user.phone || '',
+                    location: this.user.location || '',
+                    bio: this.user.bio || '',
+                    categoria: this.user.categoria || '',
+                    especialidades: this.user.especialidades || []
+                };
+
                 // 1. Actualizar datos básicos del usuario
                 const userFormData = new FormData();
                 userFormData.append('_method', 'PUT');
-                userFormData.append('name', this.user.name);
-                userFormData.append('email', this.user.email);
-                userFormData.append('phone', this.user.phone);
-                userFormData.append('location', this.user.location);
-                userFormData.append('birthdate', this.user.birthdate);
-                userFormData.append('bio', this.user.bio);
+                userFormData.append('name', normalizedUser.name);
+                userFormData.append('email', normalizedUser.email);
+                userFormData.append('phone', normalizedUser.phone);
+                userFormData.append('location', normalizedUser.location);
+                userFormData.append('birthdate', normalizedUser.birthdate);
+                userFormData.append('bio', normalizedUser.bio);
 
                 if (this.$refs.avatarInput.files[0]) {
                     userFormData.append('image', this.$refs.avatarInput.files[0]);
@@ -551,17 +561,17 @@ export default {
                         await this.cargarEntrenadores();
                     }
 
-                    // Preparar datos del entrenador
+                    // Preparar datos del entrenador (normalizando valores)
                     const scheduleToSave = this.getScheduleToSave();
                     const scheduleString = JSON.stringify(scheduleToSave);
 
                     const trainerData = {
-                        sport_category: this.user.categoria,
-                        specialties: this.user.especialidades.map(e => ({ description: e })),
-                        achievements: this.user.achievements.map(ach => ({
-                            title: ach.title,
-                            description: ach.description,
-                            achievement_date: ach.achievement_date
+                        sport_category: normalizedUser.categoria,
+                        specialties: normalizedUser.especialidades.map(e => ({ description: e || '' })),
+                        achievements: (normalizedUser.achievements || []).map(ach => ({
+                            title: ach.title || '',
+                            description: ach.description || '',
+                            achievement_date: ach.achievement_date || ''
                         })),
                         schedule: scheduleString
                     };
@@ -1047,114 +1057,113 @@ export default {
 
 
 
-   .profile-view {
-        background-color: #f5f7fa;
-        min-height: 100vh;
-        padding-bottom: 2rem;
+.profile-view {
+    background-color: #f5f7fa;
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* ========== HEADER ========== */
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 25px 15px;
+    margin: 20px 0;
+    position: relative;
+}
+
+.avatar-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #e0e7ff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.edit-avatar {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #c4a600;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+    svg {
+        width: 18px;
+        height: 18px;
     }
+}
 
-    .profile-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 15px;
-    }
+.profile-info {
+    width: 100%;
+    text-align: center;
+}
 
-    /* ========== HEADER ========== */
-    .profile-header {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        padding: 25px 15px;
-        margin: 20px 0;
-        position: relative;
-    }
+.profile-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
 
-    .avatar-container {
-        position: relative;
-        margin-bottom: 1.5rem;
-    }
+.profile-role {
+    font-size: 1rem;
+    color: #64748b;
+    margin-bottom: 1.5rem;
+}
 
-    .profile-avatar {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid #e0e7ff;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
+.profile-stats {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 1.5rem;
+}
 
-    .edit-avatar {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: #c4a600;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
 
-        svg {
-            width: 18px;
-            height: 18px;
-        }
-    }
+.stat-number {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #c4a600;
+}
 
-    .profile-info {
-        width: 100%;
-        text-align: center;
-    }
-
-    .profile-name {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 5px;
-    }
-
-    .profile-role {
-        font-size: 1rem;
-        color: #64748b;
-        margin-bottom: 1.5rem;
-    }
-
-    .profile-stats {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 1.5rem;
-    }
-
-    .stat-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-width: 90px;
-        padding: 12px;
-        background: #f8fafc;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .stat-number {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #c4a600;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-        color: #64748b;
-        margin-top: 5px;
-    }
-
+.stat-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 5px;
+}
 </style>
