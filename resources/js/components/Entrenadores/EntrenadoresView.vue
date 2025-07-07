@@ -773,4 +773,10 @@ export default {
   color: #6c757d;
   margin-top: 10px;
 }
+
+
+
+
+
+
 </style>

@@ -332,42 +332,6 @@
             }
         }
     }
-
-    .contact-modal {
-        .modal-content {
-            width: 95%;
-            max-width: 100%;
-            padding: 15px;
-            box-sizing: border-box;
-
-            .modal-title {
-                font-size: 1.2rem;
-            }
-
-            .contact-form {
-                .form-group {
-                    label {
-                        font-size: 13px;
-                    }
-
-                    input,
-                    select,
-                    textarea {
-                        padding: 10px;
-                        font-size: 14px;
-                        width: 100%;
-                        box-sizing: border-box;
-                    }
-                }
-
-                .submit-btn {
-                    padding: 12px;
-                    font-size: 14px;
-                    width: 100%;
-                }
-            }
-        }
-    }
 }
 
 @media (max-width: 576px) {
@@ -449,4 +413,298 @@ textarea {
 * {
     box-sizing: border-box;
     max-width: 100%;
+}
+
+
+
+
+
+.contact-modal {
+  .profile-info {
+    text-align: center; /* Contenido centrado */
+    
+    .user-details {
+      display: flex;
+      flex-direction: column; /* Apilamiento vertical */
+      align-items: center; /* Centrado horizontal */
+      justify-content: center; /* Centrado vertical */
+      gap: 15px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+      
+      .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        margin: 0 auto; /* Centrar avatar */
+        
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      
+      .user-info {
+        text-align: center; /* Texto centrado */
+        width: 100%; /* Ocupa todo el ancho disponible */
+        
+        p {
+          margin: 8px 0;
+          font-size: 1rem;
+          color: #495057;
+          line-height: 1.5;
+          text-align: center; /* Asegurar centrado */
+          
+          strong {
+            color: #2c3e50;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+    
+    .mensaje {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 15px;
+      background: #e8f4fd;
+      padding: 12px;
+      border-radius: 8px;
+      line-height: 1.5;
+      text-align: center;
+    }
+  }
+
+  /* Ajustes específicos para pantallas pequeñas */
+  @media (max-width: 768px) {
+    .profile-info {
+      .user-details {
+        padding: 15px;
+        
+        .user-avatar {
+          width: 70px;
+          height: 70px;
+        }
+        
+        .user-info p {
+          font-size: 0.95rem;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .profile-info {
+      .user-details {
+        .user-info p {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+/* Mantener estilos originales para el resto del componente */
+/* ... (otros estilos responsive) ... */
+
+// Media queries para ajustes en pantallas pequeñas
+@media (max-width: 768px) {
+  // Estilos base para el contenedor de contacto
+  .contact-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 20px;
+
+    .modal-content {
+      background-color: white;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      padding: 30px;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      max-height: 70vh;
+
+      @media (max-width: 768px) {
+        min-height: 80vh;
+        padding: 20px;
+      }
+
+      .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #6c757d;
+        z-index: 10;
+
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
+    }
+  }
+
+  // Estilos para el formulario dentro del modal
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #34495e;
+        font-size: 0.95rem;
+      }
+
+      input,
+      select,
+      textarea {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+        background-color: #fff;
+
+        &:focus {
+          border-color: #3498db;
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+    }
+
+    .submit-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+
+      &:hover {
+        background-color: #2980b9;
+      }
+
+      &:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // Aviso de datos
+  .data-notice {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center; // Centrado
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e8f4fd;
+    border-radius: 8px;
+    line-height: 1.5;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
+
+  .contact-modal {
+    padding: 10px;
+
+    .modal-content {
+      padding: 20px;
+      min-height: 80vh;
+    }
+  }
+
+  .contact-form .form-group textarea {
+    min-height: 80px; // Reducir un poco la altura mínima del textarea en móviles
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-modal .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+    padding: 0 15px;
+  }
+
+  .contact-form {
+    gap: 15px;
+
+    .form-group {
+      label {
+        font-size: 0.9rem;
+      }
+
+      input,
+      select,
+      textarea {
+        padding: 10px 12px;
+        font-size: 0.95rem;
+      }
+    }
+
+    .submit-btn {
+      padding: 12px;
+      font-size: 0.95rem;
+    }
+  }
+
+  .data-notice {
+    font-size: 0.8rem;
+  }
+}
+
+// Animación para la transición del modal
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
 }
