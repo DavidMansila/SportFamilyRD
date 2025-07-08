@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Mail\SolicitudAprobadaMail;
 use App\Mail\SolicitudRechazadaMail;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\NuevaSolicitudEntrenadorMail;
 
 use App\Models\Training;
 use App\Models\User;
@@ -86,6 +87,15 @@ class TrainingController extends Controller
             'description' => $validated['description'],
             'status' => $validated['status']
         ]);
+
+        // Obtener el entrenador (User)
+        $entrenador = User::whereHas('trainer', function($q) use ($validated) {
+            $q->where('id', $validated['trainer_id']);
+        })->first();
+
+        if ($entrenador) {
+            Mail::to($entrenador->email)->send(new NuevaSolicitudEntrenadorMail($entrenador, $user));
+        }
 
         return response()->json($training, 201);
     }
