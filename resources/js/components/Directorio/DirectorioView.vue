@@ -60,11 +60,6 @@
 
         <div class="detail-header">
           <h2>{{ selectedSport.name }}</h2>
-          <!-- <div class="detail-meta">
-            <span><i class="fas fa-map-marker-alt"></i> {{ selectedSport.region }}</span>
-            <span><i class="fas fa-users"></i> {{ selectedSport.type }}</span>
-            <span><i class="fas fa-star"></i> {{ selectedSport.popularity }}</span>
-          </div> -->
           <img :src="selectedSport.image" :alt="selectedSport.name" class="detail-image">
         </div>
 
@@ -90,9 +85,6 @@
                 <h4>{{ place.name }}</h4>
                 <p><i class="fas fa-location-dot"></i> {{ place.location }}</p>
                 <p v-if="place.cost"><i class="fas fa-money-bill-wave"></i> {{ place.cost }}</p>
-                <!-- <a v-if="place.website" :href="place.website" target="_blank">
-                  <i class="fas fa-globe"></i> Sitio web
-                </a> -->
               </div>
             </div>
           </div>
@@ -102,20 +94,19 @@
       </div>
     </main>
 
+
+    <!-- Burbuja de Mensajes Flotante -->
+    <ChatBubbleComponent v-if="user" :user="user" />
+
   </div>
 </template>
 
 
 <script setup>
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed, nextTick, onMounted } from 'vue';
 import Navbar from '../navbarComponent.vue';
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
-
-// export default {
-//   name: 'Directorio',
-//   components: {
-//     Navbar
-//   },
 
 const appContainer = ref(null);
 const searchTerm = ref('')
@@ -792,6 +783,21 @@ const selectSport = async (sport) => {
     sportTitle.focus();
   }
 };
+
+
+
+const user = ref(null);
+
+onMounted(() => {
+  try {
+    const userData = sessionStorage.getItem('user');
+    if (userData) {
+      user.value = JSON.parse(userData);
+    }
+  } catch (error) {
+    console.error('Error al obtener datos del usuario:', error);
+  }
+});
 
 
 </script>

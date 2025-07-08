@@ -102,10 +102,10 @@ export default {
   },
 
   methods: {
+
     getUserImage(user) {
       if (!user) return '/storage/users/Perfil-Icon.png';
 
-      // Si es un objeto completo
       if (user.user?.image) {
         return `/storage/users/${user.user.id}/${user.user.image}`;
       }
@@ -113,7 +113,6 @@ export default {
         return `/storage/users/${user.id}/${user.image}`;
       }
 
-      // Si es solo un ID (caso de respaldo)
       return '/storage/users/Perfil-Icon.png';
     },
 
@@ -130,7 +129,7 @@ export default {
         const token = sessionStorage.getItem('token');
         if (!token) throw new Error('Token not found');
 
-        // Importación dinámica corregida
+        // Importación dinámica
         const { default: Echo } = await import('laravel-echo');
         const { default: Pusher } = await import('pusher-js');
 
@@ -151,7 +150,6 @@ export default {
 
       } catch (error) {
         console.error('Error inicializando Echo:', error);
-        // Manejo de error simplificado
       }
     },
 
@@ -159,7 +157,6 @@ export default {
     isMessageFromMe(message) {
       if (!message || !this.user) return false;
 
-      // Corrección crítica: usar el mismo formato que el backend
       const myType = this.user.user_type === 'entrenador' ? 'trainer' : 'user';
       return message.sender_id === this.user.id && message.sender_type === myType;
     },
@@ -174,7 +171,6 @@ export default {
 
         this.$nextTick(() => {
           this.scrollToBottom(true);
-          // this.markMessagesAsRead();
         });
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -182,6 +178,7 @@ export default {
         this.loadingMessages = false;
       }
     },
+
 
     scrollToBottom(force = false) {
       const container = this.$refs.messagesContainer;
@@ -193,6 +190,7 @@ export default {
         }
       });
     },
+
 
     async sendMessage() {
       if (!this.newMessage.trim() || this.sendingMessage) return;
@@ -218,6 +216,7 @@ export default {
       }
     },
 
+
     formatTime(time) {
       if (!time) return '';
       try {
@@ -228,7 +227,8 @@ export default {
       }
     },
 
-    // En setupChannels
+
+
     setupChannels() {
       if (!this.chatId || !window.Echo) return;
       this.leaveChannels();
@@ -256,6 +256,7 @@ export default {
         .error(err => console.error('Error en presencia:', err));
     },
 
+
     handleIncomingMessage(data) {
       if (data.sender_id === this.user.id) {
         return;
@@ -269,6 +270,7 @@ export default {
       }
     },
 
+
     leaveChannels() {
       if (this.echoChannel) {
         this.echoChannel.stopListening('.message-sent');
@@ -280,6 +282,7 @@ export default {
         this.presenceChannel = null;
       }
     },
+
 
     async markMessagesAsRead() {
       if (!this.chatId) return;
@@ -299,19 +302,23 @@ export default {
       }
     },
 
+
     updateOnlineStatus(users) {
       this.isOnline = users.some(u => u.id === this.otherUser.id);
     },
+
     userJoined(user) {
       if (user.id === this.otherUser.id) {
         this.isOnline = true;
       }
     },
+
     userLeft(user) {
       if (user.id === this.otherUser.id) {
         this.isOnline = false;
       }
     },
+
 
     leaveChatChannel() {
       this.leaveChannels();

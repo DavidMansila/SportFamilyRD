@@ -297,10 +297,12 @@ export default {
             } catch (error) {
                 console.error('Error creando chat:', error);
 
-                if (error.response?.status === 200 && error.response.data?.message === 'Ya existe un chat entre estos usuarios') {
+                if (error.response?.status === 200 && error.response.data?.message
+                    === 'Ya existe un chat entre estos usuarios') {
                     this.mostrarNotificacion('Ya existe un chat con este usuario');
                 } else {
-                    this.mostrarNotificacion('Error creando chat: ' + (error.response?.data?.message || error.message));
+                    this.mostrarNotificacion('Error creando chat: ' +
+                        (error.response?.data?.message || error.message));
                 }
             }
         },

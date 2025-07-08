@@ -19,9 +19,6 @@ class ChatController extends Controller
     {
         $userId = $request->user_id;
 
-        // Log::info($request->all());
-        // return response()->json(['debug' => $request->all()]);
-
         $chats = Chat::with([
             'user:id,name,image',
             'trainer.user:id,name,image',
@@ -33,7 +30,7 @@ class ChatController extends Controller
                         $q->where('user_id', $userId);
                     });
             })
-            ->where('status', 'accepted') // Mover el where aquí
+            ->where('status', 'accepted')
             ->get()
             ->map(function ($chat) use ($userId) {
                 return [
@@ -59,7 +56,6 @@ class ChatController extends Controller
                 ];
             });
 
-        // Depuración
         Log::info('Chats encontrados: ' . count($chats));
         Log::info('User ID: ' . $userId);
 
