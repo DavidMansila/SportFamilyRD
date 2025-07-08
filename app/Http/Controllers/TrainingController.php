@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Mail\SolicitudAprobadaMail;
+use App\Mail\SolicitudRechazadaMail;
+use Illuminate\Support\Facades\Mail;
 
 use App\Models\Training;
 use App\Models\User;
@@ -114,13 +117,29 @@ class TrainingController extends Controller
     public function update(Request $request, $id)
     {
         $training = Training::findOrFail($id);
+
         $validated = $request->validate([
             'user_id' => 'sometimes|exists:users,id',
             'sport_level' => 'sometimes',
             'description' => 'nullable|string',
             'status' => 'sometimes',
         ]);
+
         $training->update($validated);
+
+         // Asegúrate de tener la relación user cargada
+            $training->load('user');
+
+            // Enviar correo solo si se actualizó el status
+            if (isset($validated['status'])) {
+                if ($validated['status'] === 'accepted') {
+                    Mail::to($training->user->email)->send(new SolicitudAprobadaMail($training->user));
+                }
+                if ($validated['status'] === 'rejected') {
+                    Mail::to($training->user->email)->send(new SolicitudRechazadaMail($training->user));
+                }
+            }
+
         return response()->json($training);
     }
 
