@@ -231,7 +231,7 @@ const cleanId = (id) => {
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: flex-end;
-  z-index: 1000;
+  z-index: 2000;
   backdrop-filter: blur(5px);
 }
 
@@ -580,4 +580,8 @@ h2 {
     height: 150px;
   }
 }
+
+
+
+
 </style>

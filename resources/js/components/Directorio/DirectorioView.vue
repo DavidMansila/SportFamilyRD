@@ -33,7 +33,7 @@
     </div> -->
 
     <!-- Contenido principal -->
-    <main class="main-content">
+    <main class="main-content" ref="appContainer">
       <!-- Listado de deportes -->
       <div class="sports-list" v-if="!selectedSport">
         <div v-for="sport in filteredSports" :key="sport.id" class="sport-card" @click="selectSport(sport)">
@@ -60,11 +60,6 @@
 
         <div class="detail-header">
           <h2>{{ selectedSport.name }}</h2>
-          <div class="detail-meta">
-            <span><i class="fas fa-map-marker-alt"></i> {{ selectedSport.region }}</span>
-            <span><i class="fas fa-users"></i> {{ selectedSport.type }}</span>
-            <span><i class="fas fa-star"></i> {{ selectedSport.popularity }}</span>
-          </div>
           <img :src="selectedSport.image" :alt="selectedSport.name" class="detail-image">
         </div>
 
@@ -90,9 +85,6 @@
                 <h4>{{ place.name }}</h4>
                 <p><i class="fas fa-location-dot"></i> {{ place.location }}</p>
                 <p v-if="place.cost"><i class="fas fa-money-bill-wave"></i> {{ place.cost }}</p>
-                <!-- <a v-if="place.website" :href="place.website" target="_blank">
-                  <i class="fas fa-globe"></i> Sitio web
-                </a> -->
               </div>
             </div>
           </div>
@@ -102,21 +94,21 @@
       </div>
     </main>
 
+
+    <!-- Burbuja de Mensajes Flotante -->
+    <ChatBubbleComponent v-if="user" :user="user" />
+
   </div>
 </template>
 
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick, onMounted } from 'vue';
 import Navbar from '../navbarComponent.vue';
-  
+import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 
-// export default {
-//   name: 'Directorio',
-//   components: {
-//     Navbar
-//   },
 
+const appContainer = ref(null);
 const searchTerm = ref('')
 const activeRegion = ref('Todas')
 const selectedSport = ref(null);
@@ -771,10 +763,41 @@ const filterByRegion = (region) => {
   activeRegion.value = region;
 };
 
-const selectSport = (sport) => {
+const selectSport = async (sport) => {
   selectedSport.value = sport;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  await nextTick();
+
+  // 2. Desplazar el contenedor principal en lugar de window
+  if (appContainer.value) {
+    appContainer.value.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  // 3. Enfocar el título del deporte para accesibilidad
+  const sportTitle = document.querySelector('.detail-header h2');
+  if (sportTitle) {
+    sportTitle.tabIndex = -1;
+    sportTitle.focus();
+  }
 };
+
+
+
+const user = ref(null);
+
+onMounted(() => {
+  try {
+    const userData = sessionStorage.getItem('user');
+    if (userData) {
+      user.value = JSON.parse(userData);
+    }
+  } catch (error) {
+    console.error('Error al obtener datos del usuario:', error);
+  }
+});
 
 
 </script>
@@ -786,6 +809,13 @@ const selectSport = (sport) => {
 @import '../../../scss/Directorio/directorio.scss';
 
 .navbar {
-    background: linear-gradient(to right, #000000, #a13300);
+  background: linear-gradient(to right, #000000, #a13300);
+}
+
+.sports-app {
+  height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Scroll suave en iOS */
 }
 </style>

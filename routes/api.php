@@ -154,7 +154,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chats/{id}/messages', [ChatController::class, 'storeMessage']);
     Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
     Route::post('/messages/send', [ChatController::class, 'sendMessage']);
-    Route::post('/chats/{chat}/messages', [MessageController::class, 'store']);
+    Route::post('/chats/{chat}/messages', [ChatController::class, 'store']);
 
 
     Route::put('/news/{id}', [NewsController::class, 'update']);

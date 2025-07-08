@@ -3,14 +3,16 @@
 namespace App\Events;
 
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Message;
+use Illuminate\Support\Facades\Log;
 
-class NewMessage implements ShouldBroadcast
+class NewMessage implements ShouldBroadcastNow
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
 
@@ -19,30 +21,27 @@ class NewMessage implements ShouldBroadcast
         $this->message = $message;
     }
 
-    public function broadcastOn()
-    {
-        return [
-            new PrivateChannel('chat.' . $this->message->chat_id),
-            new PrivateChannel('online.' . $this->message->chat_id)
-        ];
-    }
-
-
     public function broadcastAs()
     {
         return 'message-sent';
     }
 
+    public function broadcastOn()
+    {
+        Log::info("Broadcasting message {$this->message->id} on chat.{$this->message->chat_id}");
+        return new PrivateChannel('chat.' . $this->message->chat_id);
+    }
+
     public function broadcastWith()
     {
         return [
-            'id' => $this->message->id,
-            'chat_id' => $this->message->chat_id,
-            'sender_id' => $this->message->sender_id,
-            'sender_type' => $this->message->sender_type,
-            'message' => $this->message->message,
-            'created_at' => $this->message->created_at->toDateTimeString(),
-            'read' => $this->message->read
+            'id'          => $this->message->id,
+            'chat_id'     => $this->message->chat_id,
+            'sender_id'   => $this->message->sender_id,
+            'sender_type' => $this->message->sender_type === 'trainer' ? 'trainer' : 'user',
+            'message'     => $this->message->message,
+            'created_at'  => $this->message->created_at->toDateTimeString(),
+            'read'        => $this->message->read,
         ];
     }
 }

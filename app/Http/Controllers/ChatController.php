@@ -19,9 +19,6 @@ class ChatController extends Controller
     {
         $userId = $request->user_id;
 
-        // Log::info($request->all());
-        // return response()->json(['debug' => $request->all()]);
-
         $chats = Chat::with([
             'user:id,name,image',
             'trainer.user:id,name,image',
@@ -33,7 +30,7 @@ class ChatController extends Controller
                         $q->where('user_id', $userId);
                     });
             })
-            ->where('status', 'accepted') // Mover el where aquí
+            ->where('status', 'accepted')
             ->get()
             ->map(function ($chat) use ($userId) {
                 return [
@@ -59,7 +56,6 @@ class ChatController extends Controller
                 ];
             });
 
-        // Depuración
         Log::info('Chats encontrados: ' . count($chats));
         Log::info('User ID: ' . $userId);
 
@@ -73,16 +69,16 @@ class ChatController extends Controller
         $request->validate(['message' => 'required|string']);
 
         $user = User::findOrFail($request->user_id);
-        $senderType = $user->user_type === 'user' ? 'user' : 'trainer';
 
         $message = Message::create([
             'chat_id' => $chatId,
             'sender_id' => $user->id,
-            'sender_type' => $senderType,
+            'sender_type' => $user->user_type === 'user' ? 'user' : 'trainer',
             'message' => $request->message
         ]);
 
-        event(new NewMessage($message));
+        // Disparar evento después de crear el mensaje
+        broadcast(new NewMessage($message))->toOthers();
 
         return response()->json($message);
     }
@@ -98,11 +94,12 @@ class ChatController extends Controller
             ->where('read', false)
             ->update(['read' => true]);
 
-        // Disparar evento de mensaje leído
         broadcast(new MessageRead($chatId))->toOthers();
 
         return response()->json(['success' => true]);
     }
+
+
 
     public function store(Request $request)
     {

@@ -125,7 +125,7 @@
           </div>
 
           <div class="modal-body">
-            
+
             <div class="section">
               <h3>Biografía</h3>
               <p>{{ entrenadorSeleccionado.biografia }}</p>
@@ -469,7 +469,7 @@ export default {
             rating: trainer.rating || 5,
             reseñas: trainer.reviews || 0,
             biografia: trainer.description || '',
-            horario: trainer.schedule,
+            horario: this.parseSchedule(trainer.schedule),
             especialidades: trainer.specialties ? trainer.specialties.map
               (e => e.description || e.name) : [],
             logros: trainer.achievements ? trainer.achievements.map
@@ -498,42 +498,62 @@ export default {
 
     // Devuelve true si el día está disponible
     isDisponible(diaAbrev) {
-      if (!this.entrenadorSeleccionado || !this.entrenadorSeleccionado.horario) return false;
-      try {
-        const horario = typeof this.entrenadorSeleccionado.horario === 'string'
-          ? JSON.parse(this.entrenadorSeleccionado.horario)
-          : this.entrenadorSeleccionado.horario;
-
-        const dia = this.diaCompleto(diaAbrev);
-        return horario[dia]?.available === true;
-      } catch (error) {
-        console.error('Error parseando horario:', error);
-        return false;
-      }
+      if (!this.entrenadorSeleccionado?.horario) return false;
+      const dia = this.diaCompleto(diaAbrev);
+      return this.entrenadorSeleccionado.horario[dia]?.start !== '';
     },
 
     // Devuelve objeto {desde, hasta} con horas para ese día o vacíos si no disponible
     getHorario(diaAbrev) {
-      if (!this.entrenadorSeleccionado || !this.entrenadorSeleccionado.horario) return { desde: '', hasta: '' };
-      try {
-        const horario = typeof this.entrenadorSeleccionado.horario === 'string'
-          ? JSON.parse(this.entrenadorSeleccionado.horario)
-          : this.entrenadorSeleccionado.horario;
+      if (!this.entrenadorSeleccionado?.horario) return { desde: '', hasta: '' };
+      const dia = this.diaCompleto(diaAbrev);
+      const horarioDia = this.entrenadorSeleccionado.horario[dia];
 
-        const dia = this.diaCompleto(diaAbrev);
-        if (horario[dia]?.available) {
-          return {
-            desde: horario[dia].hours?.desde || '',
-            hasta: horario[dia].hours?.hasta || ''
-          };
-        } else {
-          return { desde: '', hasta: '' };
+      return {
+        desde: horarioDia?.start || '',
+        hasta: horarioDia?.end || ''
+      };
+    },
+
+
+    // Función para parsear el horario
+    parseSchedule(scheduleData) {
+      const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+      const defaultSchedule = {};
+
+      dias.forEach(dia => {
+        defaultSchedule[dia] = { start: '', end: '' };
+      });
+
+      if (!scheduleData) return defaultSchedule;
+
+      try {
+        const parsed = typeof scheduleData === 'object'
+          ? scheduleData
+          : JSON.parse(scheduleData);
+
+        const transformed = { ...defaultSchedule };
+
+        for (const dia in parsed) {
+          if (parsed[dia]?.available && parsed[dia]?.hours) {
+            transformed[dia] = {
+              start: parsed[dia].hours.desde || '',
+              end: parsed[dia].hours.hasta || ''
+            };
+          }
         }
-      } catch (error) {
-        console.error('Error parseando horario:', error);
-        return { desde: '', hasta: '' };
+        return transformed;
+      } catch (e) {
+        console.error('Error parseando horario:', e);
+        return defaultSchedule;
       }
     },
+
+    // Función para formatear la hora
+    formatScheduleTime(time) {
+      if (!time) return '';
+      return time.length > 5 ? time.substring(0, 5) : time;
+    }
 
   },
   mounted() {
@@ -753,4 +773,10 @@ export default {
   color: #6c757d;
   margin-top: 10px;
 }
+
+
+
+
+
+
 </style>

@@ -99,12 +99,17 @@
     background: linear-gradient(135deg, #dc3545, #a71d2a);
 }
 
-.popup-category.beisbol {
+.popup-category.baseball {
     background: linear-gradient(135deg, #28a745, #1e7e34);
 }
 
 .popup-category.volleyball {
     background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #333;
+}
+
+.popup-category.swimming {
+    background: linear-gradient(135deg, #07daff, #00849b);
     color: #333;
 }
 
@@ -158,20 +163,19 @@
 
 /* Contenedor de imagen optimizado */
 .popup-image-container {
-    width: 100%;
-    height: 350px; /* Reducido para mejor calidad */
+    width: 95%;
+    height: 350px;
+    margin: 22px;
     overflow: hidden;
     position: relative;
-    border-radius: 0;
-    margin: 0;
 }
 
 .popup-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* Cambiado a contain para mejor calidad */
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
     object-position: center;
-    background: #f8f8f8; /* Fondo para imágenes con transparencia */
+    background: #f8f8f8;
 }
 
 .popup-body {

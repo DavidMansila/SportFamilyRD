@@ -1,62 +1,60 @@
-<template>
-  <div class="chat-container">
-    <div class="chat-header">
-      <button class="back-btn" @click="closeChat">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-      </button>
-      <div class="user-info">
-        <img :src="otherUserAvatar" class="avatar">
-        <div class="user-details">
-          <h4>{{ otherUserName }}</h4>
-          <div class="status-indicator">
-            <span :class="['status-dot', isOnline ? 'online' : 'offline']"></span>
-            <span class="status-text">{{ isOnline ? 'En línea' : 'Desconectado' }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div class="messages" ref="messagesContainer" v-if="!loadingMessages">
-      <div v-for="(message, index) in messages" :key="message.id"
-        :class="['message', isMessageFromMe(message) ? 'sent' : 'received']">
-        <p>{{ message.message }}</p>
-        <div class="message-footer">
-          <span class="time">{{ formatTime(message.created_at) }}</span>
-          <div v-if="isMessageFromMe(message)" class="message-status">
-            <span v-if="message.read" class="read-indicator">✓✓</span>
-            <span v-else class="unread-indicator">✓</span>
+  <template>
+    <div class="chat-container">
+      <div class="chat-header">
+        <button class="back-btn" @click="closeChat">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="user-info">
+          <img :src="otherUserAvatar" class="avatar">
+          <div class="user-details">
+            <h4>{{ otherUserName }}</h4>
+            <div class="status-indicator">
+              <span :class="['status-dot', isOnline ? 'online' : 'offline']"></span>
+              <span class="status-text">
+                {{ isOnline ? 'En línea' : 'Desconectado' }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Indicador de mensajes nuevos -->
-      <div v-if="newMessagesIndicator" class="new-messages-indicator">
-        Nuevos mensajes
+
+      <div class="messages" ref="messagesContainer" v-if="!loadingMessages">
+        <div v-for="(message, index) in messages" :key="message.id"
+          :class="['message', isMessageFromMe(message) ? 'sent' : 'received']">
+          <p>{{ message.message }}</p>
+          <div class="message-footer">
+            <span class="time">{{ formatTime(message.created_at) }}</span>
+            <div v-if="isMessageFromMe(message)" class="message-status">
+              <span v-if="message.read" class="read-indicator">✓✓</span>
+              <span v-else class="unread-indicator">✓</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div v-else class="loading-messages">
+        <div class="spinner"></div>
+        <p>Cargando mensajes...</p>
+      </div>
+
+      <div class="message-input">
+        <input v-model="newMessage" @keyup.enter="sendMessage" :disabled="sendingMessage"
+          placeholder="Escribe un mensaje...">
+        <button @click="sendMessage" :disabled="!newMessage.trim() || sendingMessage">
+          <svg v-if="!sendingMessage" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <div v-else class="sending-spinner"></div>
+        </button>
       </div>
     </div>
-
-    <div v-else class="loading-messages">
-      <div class="spinner"></div>
-      <p>Cargando mensajes...</p>
-    </div>
-
-    <div class="message-input">
-      <input v-model="newMessage" @keyup.enter="sendMessage" :disabled="sendingMessage"
-        placeholder="Escribe un mensaje...">
-      <button @click="sendMessage" :disabled="!newMessage.trim() || sendingMessage">
-        <svg v-if="!sendingMessage" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-        <div v-else class="sending-spinner"></div>
-      </button>
-    </div>
-  </div>
-</template>
+  </template>
 
 <script>
 import axios from 'axios';
@@ -104,10 +102,10 @@ export default {
   },
 
   methods: {
+
     getUserImage(user) {
       if (!user) return '/storage/users/Perfil-Icon.png';
 
-      // Si es un objeto completo
       if (user.user?.image) {
         return `/storage/users/${user.user.id}/${user.user.image}`;
       }
@@ -115,7 +113,6 @@ export default {
         return `/storage/users/${user.id}/${user.image}`;
       }
 
-      // Si es solo un ID (caso de respaldo)
       return '/storage/users/Perfil-Icon.png';
     },
 
@@ -132,18 +129,12 @@ export default {
         const token = sessionStorage.getItem('token');
         if (!token) throw new Error('Token not found');
 
-        // Verify token validity
-        await axios.get('/user', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        // Importación dinámica
+        const { default: Echo } = await import('laravel-echo');
+        const { default: Pusher } = await import('pusher-js');
 
-        const [EchoModule, PusherModule] = await Promise.all([
-          import('laravel-echo'),
-          import('pusher-js')
-        ]);
-
-        window.Pusher = PusherModule.default;
-        window.Echo = new EchoModule.default({
+        window.Pusher = Pusher;
+        window.Echo = new Echo({
           broadcaster: 'pusher',
           key: import.meta.env.VITE_PUSHER_APP_KEY,
           cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
@@ -156,28 +147,18 @@ export default {
             }
           }
         });
+
       } catch (error) {
-        console.error('Echo init error:', error);
-        try {
-          const refreshResponse = await axios.post('/api/auth/refresh');
-          sessionStorage.setItem('token', refreshResponse.data.token);
-          await this.loadEchoLibrary();
-        } catch (refreshError) {
-          console.error('Token refresh failed:', refreshError);
-          this.$emit('auth-error');
-        }
+        console.error('Error inicializando Echo:', error);
       }
     },
+
 
     isMessageFromMe(message) {
       if (!message || !this.user) return false;
 
-      if (this.user.user_type === 'user') {
-        return message.sender_type === 'user';
-      } else if (this.user.user_type === 'entrenador') {
-        return message.sender_type === 'trainer';
-      }
-      return false;
+      const myType = this.user.user_type === 'entrenador' ? 'trainer' : 'user';
+      return message.sender_id === this.user.id && message.sender_type === myType;
     },
 
     async fetchMessages() {
@@ -190,7 +171,6 @@ export default {
 
         this.$nextTick(() => {
           this.scrollToBottom(true);
-          this.markMessagesAsRead();
         });
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -198,6 +178,7 @@ export default {
         this.loadingMessages = false;
       }
     },
+
 
     scrollToBottom(force = false) {
       const container = this.$refs.messagesContainer;
@@ -209,6 +190,7 @@ export default {
         }
       });
     },
+
 
     async sendMessage() {
       if (!this.newMessage.trim() || this.sendingMessage) return;
@@ -234,6 +216,7 @@ export default {
       }
     },
 
+
     formatTime(time) {
       if (!time) return '';
       try {
@@ -244,52 +227,62 @@ export default {
       }
     },
 
-    async setupChannels() {
+
+
+    setupChannels() {
       if (!this.chatId || !window.Echo) return;
+      this.leaveChannels();
 
-      this.leaveChannels(); // Clean up previous channels
-
-      // Message channel
+      // 1) Mensajes
       this.echoChannel = window.Echo.private(`chat.${this.chatId}`)
-        .listen('message-sent', this.handleIncomingMessage)
-        .error(console.error);
+        .listen('.message-sent', this.handleIncomingMessage);
 
-      // Presence channel - match backend naming
+      // 2) Presencia + read receipts
       this.presenceChannel = window.Echo.join(`online.${this.chatId}`)
-        .here(this.updateOnlineStatus)
-        .joining(this.userJoined)
-        .leaving(this.userLeft)
-        .error(console.error);
+        .here(users => {
+          // Actualiza estado online
+          this.updateOnlineStatus(users);
+
+          this.markMessagesAsRead();
+        })
+        .joining(user => { this.userJoined(user); })
+        .leaving(user => { this.userLeft(user); })
+        .listen('.message.read', () => {
+          this.messages = this.messages.map(msg => ({
+            ...msg,
+            read: this.isMessageFromMe(msg) ? true : msg.read
+          }));
+        })
+        .error(err => console.error('Error en presencia:', err));
     },
+
 
     handleIncomingMessage(data) {
-      if (!data || !data.id) return;
+      if (data.sender_id === this.user.id) {
+        return;
+      }
 
-      // Evitar duplicados usando el ID del mensaje
-      const messageExists = this.messages.some(msg => msg.id === data.id);
-      if (!messageExists) {
+      const exists = this.messages.some(m => m.id === data.id);
+      if (!exists) {
         this.messages.push(data);
         this.scrollToBottom();
-
-        // Marcar como leído si es necesario
-        if (!this.isMessageFromMe(data)) {
-          this.markMessagesAsRead();
-        }
+        this.markMessagesAsRead();
       }
     },
+
 
     leaveChannels() {
       if (this.echoChannel) {
-        this.echoChannel.stopListening('message-sent');
+        this.echoChannel.stopListening('.message-sent');
         window.Echo.leave(`chat.${this.chatId}`);
         this.echoChannel = null;
       }
-
       if (this.presenceChannel) {
         window.Echo.leave(`online.${this.chatId}`);
         this.presenceChannel = null;
       }
     },
+
 
     async markMessagesAsRead() {
       if (!this.chatId) return;
@@ -309,25 +302,23 @@ export default {
       }
     },
 
+
     updateOnlineStatus(users) {
-      if (!this.otherUser || !users) {
-        this.isOnline = false;
-        return;
-      }
-      this.isOnline = users.some(user => user.id === this.otherUser.id);
+      this.isOnline = users.some(u => u.id === this.otherUser.id);
     },
 
     userJoined(user) {
-      if (user.id === this.otherUser?.id) {
+      if (user.id === this.otherUser.id) {
         this.isOnline = true;
       }
     },
 
     userLeft(user) {
-      if (user.id === this.otherUser?.id) {
+      if (user.id === this.otherUser.id) {
         this.isOnline = false;
       }
     },
+
 
     leaveChatChannel() {
       this.leaveChannels();
