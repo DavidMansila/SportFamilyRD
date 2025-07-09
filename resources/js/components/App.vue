@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
-    <VerificaCorreo v-if="user && !user.email_verified_at && !isLoginOrHome" :user="user" />
+    <VerificaCorreo v-if="user && !user.email_verified_at && $route.path !== '/signup'" :user="user" @logout="handleLogout" />
     <div v-else-if="verificationStatus" class="verification-message" :class="verificationStatus.type">
       <h2>{{ verificationStatus.title }}</h2>
       <p>{{ verificationStatus.message }}</p>
       <pre v-if="verificationStatus.raw" style="text-align:left; background:#f3f4f6; color:#334155; padding:10px; border-radius:6px; font-size:13px; overflow-x:auto;">{{ verificationStatus.raw }}</pre>
-      <router-link v-if="verificationStatus.type==='success'" to="/login">Iniciar sesión</router-link>
+      <router-link v-if="verificationStatus.type==='success'" to="/signup">Iniciar sesión</router-link>
     </div>
     <router-view v-else-if="user || isPublicRoute($route)" />
   </div>
@@ -124,6 +124,11 @@ export default {
           raw: error?.response ? JSON.stringify(error.response.data, null, 2) : String(error)
         };
       }
+    },
+    handleLogout() {
+      sessionStorage.removeItem('user');
+      this.user = null;
+      this.$router.replace('/signup');
     },
     showToast(message) {
       // Crea un toast simple y autodestructible

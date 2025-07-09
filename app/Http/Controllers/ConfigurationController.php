@@ -6,6 +6,8 @@ use App\Models\Configuration;
 use App\Models\ConfigurationUser;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
 
 class ConfigurationController extends Controller
 {
@@ -82,15 +84,26 @@ class ConfigurationController extends Controller
     public function changePassword(Request $request)
     {
         try {
+            // dd($request->all());
             $userId = $request->user_id;
-            $password = $request->password;
+            $currentPassword = $request->current_password;
+            $newPassword = $request->new_password;
+            
 
             // Verificar si el usuario existe
             $user = User::findOrFail($userId);
 
             // Actualizar la contraseña
-            $user->password = bcrypt($password);
-            $user->save();
+            if (Hash::check($currentPassword, $user->password)) {
+                
+                $user->password = Hash::make($newPassword);
+                $user->save();
+            }else{
+            
+                return response()->json([
+                    'message' => 'La contraseña actual es incorrecta',
+                ], 400);
+            }
 
             return response()->json([
                 'message' => 'Contraseña actualizada exitosamente',

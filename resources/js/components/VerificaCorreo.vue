@@ -9,6 +9,7 @@
       <span v-if="reenviando">Enviando...</span>
       <span v-else>Reenviar correo de verificación</span>
     </button>
+    <button @click="logout" style="margin-top: 1rem; background:#ef4444;">Cerrar sesión</button>
   </div>
 </template>
 
@@ -19,6 +20,7 @@ import axios from 'axios';
 const props = defineProps({
   user: { type: Object, required: true }
 });
+const emit = defineEmits(['logout']);
 
 const reenviando = ref(false);
 const reenviado = ref(false);
@@ -35,6 +37,10 @@ async function reenviarCorreo() {
     alert('Error al reenviar el correo.');
   }
   reenviando.value = false;
+}
+
+function logout() {
+  emit('logout');
 }
 </script>
 
