@@ -130,7 +130,7 @@ export default {
                 name: chat.trainer.user.name,
                 image: chat.trainer.user.image
                   ? `/storage/users/${chat.trainer.user.id}/${chat.trainer.user.image}`
-                  : 'public/storage/users/Perfil-Icon.png',
+                  : '/storage/users/Perfil-Icon.png',
                 type: 'trainer'
               }
             };
@@ -147,7 +147,7 @@ export default {
                 name: chat.user.name,
                 image: chat.user.image
                   ? `/storage/users/${chat.user.id}/${chat.user.image}`
-                  : 'public/storage/users/Perfil-Icon.png',
+                  : '/storage/users/Perfil-Icon.png',
                 type: 'user'
               }
             };

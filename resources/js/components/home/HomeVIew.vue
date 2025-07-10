@@ -273,13 +273,13 @@
             <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo">
           </div>
           <p class="brand-slogan">Conectando la comunidad deportiva dominicana</p>
-          <div class="social-links">
+          <!-- <div class="social-links">
             <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
             <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
             <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
             <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
             <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
-          </div>
+          </div> -->
         </div>
 
         <div class="footer-links">
@@ -294,7 +294,7 @@
               <li><a href="#">Foro Deportivo</a></li>
             </ul>
           </div>
-          <div class="link-column">
+          <!-- <div class="link-column">
             <h3 class="links-title">Comunidad</h3>
             <ul>
               <li><a href="#">Foro</a></li>
@@ -303,8 +303,8 @@
               <li><a href="#">Testimonios</a></li>
               <li><a href="#">Patrocinadores</a></li>
             </ul>
-          </div>
-          <div class="link-column">
+          </div> -->
+          <!-- <div class="link-column">
             <h3 class="links-title">Empresa</h3>
             <ul>
               <li><a href="#">Nosotros</a></li>
@@ -313,8 +313,8 @@
               <li><a href="#">Prensa</a></li>
               <li><a href="#">Partners</a></li>
             </ul>
-          </div>
-          <div class="link-column">
+          </div> -->
+          <!-- <div class="link-column">
             <h3 class="links-title">Legal</h3>
             <ul>
               <li><a href="#">Términos</a></li>
@@ -323,7 +323,7 @@
               <li><a href="#">DMCA</a></li>
               <li><a href="#">Aviso Legal</a></li>
             </ul>
-          </div>
+          </div> -->
         </div>
 
         <div class="footer-contact">

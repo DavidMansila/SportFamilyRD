@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('saved_news', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('news_id')->constrained('newsscrapping')->onDelete('cascade');
+            $table->foreignId('news_id')->constrained('NewsScrapping')->onDelete('cascade');
             $table->timestamp('saved_at')->useCurrent();
             $table->unique(['user_id', 'news_id']);
             $table->timestamps();

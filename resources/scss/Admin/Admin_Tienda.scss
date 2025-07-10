@@ -1,3 +1,4 @@
+
 .floating-admin-btn {
     position: fixed;
     bottom: 30px;
@@ -5,7 +6,7 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: #17a2b8;
+    background: #46696f;
     color: white;
     border: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -19,7 +20,7 @@
 }
 
 .floating-admin-btn:hover {
-    background: #148fa3;
+    background: #35545a;
     transform: scale(1.08);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
@@ -53,17 +54,17 @@
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  width: 90%; /* Cambiado a porcentaje para responsividad */
-  max-width: 700px; /* Máximo ancho en pantallas grandes */
-  max-height: 80vh; /* Altura máxima relativa al viewport */
-  height: auto; /* Altura automática */
-  min-height: 200px; /* Altura mínima para contenido básico */
+  width: 90%; 
+  max-width: 700px;
+  max-height: 80vh;
+  height: auto;
+  min-height: 200px;
   transform: translateY(-20px);
   animation: contentSlideUp 0.3s ease;
   display: flex;
   flex-direction: column;
-  margin: 20px auto; /* Margen superior/inferior para evitar choques */
-  overflow-y: auto; /* Scroll interno si es necesario */
+  margin: 20px auto;
+  overflow-y: auto;
 }
 
 .admin-modal-content form {
@@ -71,7 +72,7 @@
   gap: 1rem;
   padding: 20px;
   height: 100%;
-  box-sizing: border-box; /* Incluir padding en el cálculo del tamaño */
+  box-sizing: border-box;
 }
 
 @keyframes contentSlideUp {
@@ -165,12 +166,12 @@
 
 .btn-editar {
   right: 50px;
-  background: #73dc70;
+  background: #aeffb2;
 }
 
 .btn-eliminar {
   right: 10px;
-  background: #f05757;
+  background: #ffaeae;
 }
 
 .btn-editar:hover,

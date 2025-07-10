@@ -91,7 +91,7 @@
 
     <!-- Productos -->
     <div class="products-grid">
-      <div v-for="producto in productosFiltrados" :key="producto.id" class="product-card" @click="abrirPopup(producto)">
+      <div v-for="producto in paginatedProducts" :key="producto.id" class="product-card" @click="abrirPopup(producto)">
         <!-- <div class="product-badge" v-if="producto.oferta">OFERTA</div> -->
         <div class="product-image-container">
           <img :src="producto.image" :alt="producto.name" class="product-image" />
@@ -139,6 +139,12 @@
       <p>Actualmente no hay productos para mostrar.</p>
     </div>
 
+
+    <!-- Paginación -->
+    <div v-if="productosFiltrados.length > itemsPerPage">
+      <paginatorComponent v-model="currentPage" :total-items="productosFiltrados.length" :items-per-page="itemsPerPage"
+        :max-pages-shown="5" />
+    </div>
 
     <!-- Modal de producto -->
     <div class="product-modal" :class="{ active: popupVisible }" @click.self="cerrarPopup">
@@ -255,6 +261,7 @@
         </form>
       </div>
     </div>
+
   </div>
 
   <!-- Burbuja de Mensajes Flotante -->
@@ -266,12 +273,14 @@
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
+import paginatorComponent from '@/components/paginatorComponent.vue';
 
 export default {
   name: 'TiendaComponent',
   components: {
     Navbar,
-    ChatBubbleComponent
+    ChatBubbleComponent,
+    paginatorComponent
   },
   data() {
     return {
@@ -348,7 +357,9 @@ export default {
       user: null,
       showSuccess: false,
       successMessage: '',
-      successTimer: null
+      successTimer: null,
+      currentPage: 1,
+      itemsPerPage: 12,
     };
   },
 
@@ -358,6 +369,14 @@ export default {
     }
   },
 
+  computed: {
+
+    paginatedProducts() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.productosFiltrados.slice(start, end);
+    },
+  },
   methods: {
 
     toggleMobileCategory(index) {
@@ -375,7 +394,8 @@ export default {
       this.isLoading = true;
       axios.get('/products')
         .then(response => {
-          this.productos = response.data.products.map(product => ({
+          // Mapear productos como antes
+          let products = response.data.products.map(product => ({
             ...product,
             categoria: product.category.toLowerCase(),
             name: product.name.toLowerCase(),
@@ -383,6 +403,9 @@ export default {
             images: product.images || [product.image],
             oferta: !!product.oldPrice
           }));
+
+          // Mezclar los productos aleatoriamente
+          this.productos = this.shuffleArray(products);
           this.productosFiltrados = this.productos;
         })
         .catch(error => {
@@ -418,6 +441,8 @@ export default {
 
         const matchSearch = producto.name.toLowerCase().includes(searchTerm) ||
           (producto.description && producto.description.toLowerCase().includes(searchTerm));
+
+        this.currentPage = 1;
 
         return matchCategory && matchSearch;
       });
@@ -601,6 +626,16 @@ export default {
         this.agregarAlCarrito(this.productoSeleccionado);
         this.cerrarPopup();
       }
+    },
+
+
+    shuffleArray(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
     }
 
   },
