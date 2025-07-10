@@ -204,11 +204,11 @@
               <span class="current-price">${{ product.price }}</span>
               <span class="original-price" v-if="product.originalPrice">${{ product.originalPrice }}</span>
             </div>
-            <div class="product-actions">
+            <!-- <div class="product-actions">
               <button v-if="user" class="add-to-cart">
                 <i class="fas fa-shopping-cart"></i> Añadir
               </button>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
