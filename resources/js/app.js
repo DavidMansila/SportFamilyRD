@@ -6,7 +6,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import App from "./components/App.vue";
 import SignUpView from "./components/Login/SignUpView.vue";
 // import HomeView from "./components/Home/HomeView.vue";
-import HomeView from "./components/Home/HomeVIew.vue";
+import HomeView from './components/home/HomeVIew.vue'
+
 import DirectorioView from "./components/Directorio/DirectorioView.vue";
 import NoticiasView from "./components/Noticias/NoticiasView.vue";
 import CalendarioView from "./components/Calendario/CalendarioView.vue";
