@@ -5,7 +5,7 @@
 
     <div class="logo-container desktop-only">
       <router-link to="/" class="logo-container">
-        <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo" class="logo" />
+        <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo" />
       </router-link>
     </div>
 
