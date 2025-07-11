@@ -112,6 +112,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Posts
     Route::resource('/post', PostController::class);
+    Route::post('/post', [PostController::class, 'store']);
     Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
 
     // Funcionalidades completas de posts
