@@ -226,7 +226,9 @@ export default {
                     params: { status: status }
                 });
 
-                this.solicitudes = response.data.trainers.map(trainer => ({
+                const lista = response.data.trainer || [];
+
+                this.solicitudes = lista.map(trainer => ({
                     ...trainer,
                     status: trainer.status.toLowerCase(),
                     achievements: Array.isArray(trainer.achievements)
