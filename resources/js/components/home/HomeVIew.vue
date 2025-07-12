@@ -270,7 +270,7 @@
       <div class="footer-content">
         <div class="footer-brand">
           <div class="brand-logo">
-            <img src="/imagenes/logo2.png" alt="SportFamilyRD Logo">
+            <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo">
           </div>
           <p class="brand-slogan">Conectando la comunidad deportiva dominicana</p>
           <!-- <div class="social-links">
@@ -283,7 +283,7 @@
         </div>
 
         <div class="footer-links">
-          <div class="link-column">
+          <!-- <div class="link-column">
             <h3 class="links-title">Explorar</h3>
             <ul>
               <li><a href="#">Deportes</a></li>
@@ -293,7 +293,7 @@
               <li><a href="#">Entrenadores</a></li>
               <li><a href="#">Foro Deportivo</a></li>
             </ul>
-          </div>
+          </div> -->
           <!-- <div class="link-column">
             <h3 class="links-title">Comunidad</h3>
             <ul>
