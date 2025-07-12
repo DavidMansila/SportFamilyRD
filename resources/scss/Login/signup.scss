@@ -114,6 +114,9 @@ a {
     text-decoration: none;
     transition: color $transition-speed;
 
+    .margin-pc {
+        margin-bottom: 1rem;
+    }
     &:hover {
         color: $secondary-color;
     }
