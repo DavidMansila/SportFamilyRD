@@ -194,7 +194,7 @@ export default {
         this.$router.push('/');
       } catch (error) {
         console.error(error);
-        alert('Algo salió mal, por favor intenta de nuevo');
+        alert('Contraseña debe tener al menos 4 caracteres');
       } finally {
         this.isSubmitting = false;
       }
