@@ -70,6 +70,25 @@
               <span class="event-price" v-if="event.precio">${{ event.precio }}</span>
               <span class="event-price free" v-else>Gratis</span>
             </div>
+            <div v-if="user?.user_type === 'admin'" class="event-actions">
+
+              <button class="btn-editar" @click.stop="openEventForm(event)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+
+              <button class="btn-eliminar" @click.stop="deleteEvent(event.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+
+            </div>
           </div>
         </div>
         <div v-else-if="selectedDay" class="no-events">
@@ -177,12 +196,70 @@
         </div>
       </div>
     </div>
+
+    <!-- Botón flotante admin -->
+    <button v-if="user?.user_type === 'admin'" @click="openEventForm" class="floating-admin-btn">
+      <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Modal formulario evento -->
+    <div class="admin-modal" v-if="showEventForm" @click.self="closeEventForm">
+      <div class="admin-modal-content">
+        <h2>{{ editingEvent ? 'Editar Evento' : 'Nuevo Evento' }}</h2>
+
+        <form @submit.prevent="saveEvent">
+          <div class="form-group">
+            <input v-model="formEvent.place" placeholder="Nombre del evento" required>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" v-model="formEvent.date" required>
+          </div>
+
+          <div class="form-group time-group">
+            <div>
+              <label>Hora</label>
+              <input type="time" v-model="formEvent.time" required>
+            </div>
+          </div>
+
+          <!-- <div class="form-group">
+            <textarea v-model="formEvent.descripcion" placeholder="Descripción"></textarea>
+          </div> -->
+
+          <div class="form-group">
+            <input type="number" v-model="formEvent.price" placeholder="Precio" step="0.01" required>
+          </div>
+
+          <div class="form-group">
+            <input type="number" v-model="formEvent.boletosDisponibles" placeholder="Boletos disponibles" required>
+          </div>
+
+          <div class="form-group">
+            <input v-model="formEvent.location" placeholder="Ubicación" required>
+          </div>
+
+          <div class="form-group">
+            <input v-model="formEvent.image" placeholder="URL de imagen">
+          </div>
+
+          <div class="form-actions">
+            <button type="button" @click="closeEventForm" class="btn-cancelar">Cancelar</button>
+            <button type="submit" class="btn-guardar">{{ editingEvent ? 'Actualizar' : 'Crear' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+
   </div>
 
   <!-- Burbuja de Mensajes Flotante -->
-    <ChatBubbleComponent v-if="user && !selectedEvent" :user="user" />
+  <ChatBubbleComponent v-if="user && !selectedEvent" :user="user" />
 
-  
+
 </template>
 
 <script>
@@ -215,7 +292,10 @@ export default {
       scrapEvents: [],
       showEventSuccess: false,
       successEventMessage: '',
-      successEventTimer: null
+      successEventTimer: null,
+      showEventForm: false,
+      editingEvent: null,
+      formEvent: this.resetEventForm(),
     };
   },
 
@@ -491,13 +571,81 @@ export default {
         .catch(error => {
           console.error('Error obteniendo eventos desde la base de datos:', error);
         });
-    }
+    },
 
     // FUNCIONES PARA ADMINISTRADOR
 
-    // EDITAR EVENTO
-    // ELIMINAR EVENTO
-    // AGREGAR EVENTO
+    resetEventForm() {
+      return {
+        nombre: '',
+        fecha: new Date().toISOString().split('T')[0],
+        startTime: '18:00',
+        endTime: '20:00',
+        descripcion: '',
+        precio: 0,
+        boletosDisponibles: 100,
+        location: '',
+        image: ''
+      };
+    },
+
+    openEventForm(event = null) {
+      if (event) {
+        this.editingEvent = event.id;
+        this.formEvent = { ...event };
+      } else {
+        this.editingEvent = null;
+        this.formEvent = this.resetEventForm();
+      }
+      this.showEventForm = true;
+    },
+
+    closeEventForm() {
+      this.showEventForm = false;
+    },
+
+    async saveEvent() {
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        };
+
+        if (this.editingEvent) {
+          await axios.put(`/calendar/${this.editingEvent}`, this.formEvent, config);
+        } else {
+          await axios.post('/calendar', this.formEvent, config);
+        }
+
+        this.getCalendarFromDB();
+        this.closeEventForm();
+        this.showEventSuccess = true;
+        this.successEventMessage = `Evento ${this.editingEvent ? 'actualizado' : 'creado'} correctamente`;
+
+        setTimeout(() => {
+          this.showEventSuccess = false;
+        }, 3000);
+      } catch (error) {
+        console.error('Error guardando evento:', error);
+        alert(error.response?.data?.message || 'Error al guardar');
+      }
+    },
+
+    async deleteEvent(eventId) {
+      if (confirm('¿Eliminar este evento permanentemente?')) {
+        try {
+          await axios.delete(`/calendar/${eventId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          this.getCalendarFromDB();
+        } catch (error) {
+          console.error('Error eliminando evento:', error);
+        }
+      }
+    },
 
   },
   mounted() {
@@ -564,5 +712,205 @@ export default {
 
 .fade-leave-to {
   opacity: 0;
+}
+
+
+
+
+
+
+
+/* Estilos para el botón flotante */
+.floating-admin-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #357e36;
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.floating-admin-btn:hover {
+  background: #0f6110;
+  transform: scale(1.1);
+}
+
+/* Estilos para el modal de admin */
+.admin-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.admin-modal-content h2 {
+  margin-top: 0;
+  color: #2a4d69;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.time-group {
+  display: flex;
+  gap: 15px;
+}
+
+.time-group>div {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-cancelar {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-guardar {
+  background: #2a4d69;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Botones admin en tarjetas de eventos */
+.event-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+
+
+/* Botones de edición en tarjetas */
+.btn-editar,
+.btn-eliminar {
+  bottom: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #46696f;
+  color: rgb(0, 0, 0);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-editar {
+  right: 50px;
+  background: #aeffb2;
+}
+
+.btn-eliminar {
+  right: 10px;
+  background: #ffaeae;
+}
+
+.btn-editar:hover,
+.btn-eliminar:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.btn-editar i {
+  font-size: 14px;
+}
+
+.btn-eliminar i {
+  font-size: 14px;
+}
+
+.btn-editar i::before {
+  content: "\f304";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+.btn-eliminar i::before {
+  content: "\f2ed";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+.floating-admin-btn i::before {
+  content: "\2b";
+  /* Icono de más */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 1.4rem;
+  /* Un poco más grande porque es un botón flotante */
+  padding: 4px;
 }
 </style>

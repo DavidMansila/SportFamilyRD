@@ -66,7 +66,7 @@
               <div class="card-badge" v-if="category.popular">Popular</div>
               <div class="participation-rate">
                 <div class="rate-bar" :style="{ width: category.participation + '%' }"></div>
-                <span>{{ category.participation }}% participación</span>
+                <span>{{ category.participation }}% popularidad</span>
               </div>
             </div>
 

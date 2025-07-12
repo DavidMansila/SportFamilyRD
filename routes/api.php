@@ -86,9 +86,7 @@ Route::resource('/user', UserController::class);
 
 // RUTAS PROTEGIDAS POR TOKEN
 Route::middleware('auth:sanctum')->group(function () {
-    
-    //calendario
-    Route::resource('/calendar', CalendarController::class);
+
 
     // Usuarios
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
@@ -96,8 +94,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     // Calendario
+    Route::resource('/calendar', CalendarController::class);
     Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
     Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
+    Route::get('/', [CalendarController::class, 'index']);
+    Route::post('/', [CalendarController::class, 'store']);
+    Route::put('/{calendar}', [CalendarController::class, 'update']);
+    Route::delete('/{calendar}', [CalendarController::class, 'destroy']);
 
     // Productos
     Route::resource('/products', ProductController::class);
@@ -161,9 +164,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/news/{id}', [NewsController::class, 'update']);
 
     Route::delete('/news/{id}', [NewsController::class, 'destroy']);
-
-    
-});    
+});
 
 // --- RUTAS DE VERIFICACIÓN DE EMAIL (API) ---
 // Reenviar correo de verificación
