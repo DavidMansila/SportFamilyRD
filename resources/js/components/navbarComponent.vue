@@ -1,5 +1,4 @@
 <template>
-
   <!-- Navbar -->
   <nav class="navbar">
 
@@ -21,21 +20,21 @@
     <div class="nav-links desktop-only">
 
       <!-- Secciones para usuarios -->
-      <router-link to="/directorio" class="nav-link">Deportes</router-link>
-      <router-link to="/noticias" class="nav-link">Noticias</router-link>
-      <router-link to="/calendario" class="nav-link">Calendario</router-link>
-      <router-link to="/tienda" class="nav-link">Tienda</router-link>
-      <router-link to="/entrenadores" class="nav-link">Entrenadores</router-link>
-      <router-link to="/foro" class="nav-link">Foro</router-link>
+      <span class="nav-link" @click="handleNavClick('/directorio')">Deportes</span>
+      <span class="nav-link" @click="handleNavClick('/noticias')">Noticias</span>
+      <span class="nav-link" @click="handleNavClick('/calendario')">Calendario</span>
+      <span class="nav-link" @click="handleNavClick('/tienda')">Tienda</span>
+      <span class="nav-link" @click="handleNavClick('/entrenadores')">Entrenadores</span>
+      <span class="nav-link" @click="handleNavClick('/foro')">Foro</span>
 
       <!-- Secciones condicionales -->
-      <router-link v-if="user?.user_type == 'entrenador'" to="/solicitudes-usuarios" class="nav-link">
+      <span v-if="user?.user_type == 'entrenador'" class="nav-link" @click="handleNavClick('/solicitudes-usuarios')">
         Solicitudes-U
-      </router-link>
+      </span>
 
-      <router-link v-if="user?.user_type == 'admin'" to="/solicitudes-entrenadores" class="nav-link">
+      <span v-if="user?.user_type == 'admin'" class="nav-link" @click="handleNavClick('/solicitudes-entrenadores')">
         Solicitudes-E
-      </router-link>
+      </span>
     </div>
 
     <div class="Imagenes">
@@ -65,7 +64,7 @@
 
       <template v-if="user">
         <div class="logout-container" title="Cerrar sesión">
-          <button @click="showLogoutConfirm = true" class="Logout">
+          <button @click="openLogoutModal" class="Logout">
             <img src="/imagenes/Logout-Icon.png" alt="Logout" class="logout-icon" />
           </button>
         </div>
@@ -75,7 +74,7 @@
             <h3>¿Estás seguro de cerrar sesión?</h3>
             <div class="dialog-buttons">
               <button @click="logout" class="confirm-btn">Confirmar</button>
-              <button @click="showLogoutConfirm = false" class="cancel-btn">Cancelar</button>
+              <button @click="closeLogoutModal" class="cancel-btn">Cancelar</button>
             </div>
           </div>
         </div>
@@ -93,56 +92,73 @@
       @close="closeCart" @update-quantity="handleUpdateQuantity" @remove-item="handleRemoveItem"
       @checkout="handleCheckout" />
 
-
+    <!-- Mensaje de navegación -->
+    <transition name="fade">
+      <div v-if="navAuthMessage" class="nav-auth-alert">
+        <div class="message-content">
+          <div class="icon-container">
+            <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="Signup">
+            <img src="/imagenes/Signup-icon.png" alt="Información" class="info-icon" />
+            </router-link>
+          </div>
+          <div class="text-container">
+            <h3>Acceso Requerido</h3>
+            <p>{{ navAuthMessage }}</p>
+          </div>
+          <!-- <button @click="navAuthMessage = ''" class="close-btn">
+            <img src="/imagenes/Close-Icon.png" alt="Cerrar" class="close-icon" />
+          </button> -->
+        </div>
+      </div>
+    </transition>
 
     <!-- Menú móvil desplegable -->
     <div class="mobile-nav" :class="{ active: isMobileMenuOpen }">
-      <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">
+      <span class="mobile-nav-link" @click="handleNavClick('/')">
         <i class="fas fa-home"></i>
         <span>Inicio</span>
-      </router-link>
-      <router-link to="/directorio" class="mobile-nav-link" @click="closeMobileMenu">
+      </span>
+      <span class="mobile-nav-link" @click="handleNavClick('/directorio')">
         <i class="fas fa-home"></i>
         <span>Deportes</span>
-      </router-link>
-      <router-link to="/noticias" class="mobile-nav-link" @click="closeMobileMenu">
+      </span>
+      <span class="mobile-nav-link" @click="handleNavClick('/noticias')">
         <i class="fas fa-newspaper"></i>
         <span>Noticias</span>
-      </router-link>
-      <router-link to="/calendario" class="mobile-nav-link" @click="closeMobileMenu">
+      </span>
+      <span class="mobile-nav-link" @click="handleNavClick('/calendario')">
         <i class="fas fa-calendar-alt"></i>
         <span>Calendario</span>
-      </router-link>
-      <router-link to="/tienda" class="mobile-nav-link" @click="closeMobileMenu">
+      </span>
+      <span class="mobile-nav-link" @click="handleNavClick('/tienda')">
         <i class="fas fa-shopping-cart"></i>
         <span>Tienda</span>
-      </router-link>
-      <router-link to="/entrenadores" class="mobile-nav-link" @click="closeMobileMenu">
+      </span>
+      <span class="mobile-nav-link" @click="handleNavClick('/entrenadores')">
         <i class="fas fa-users"></i>
         <span>Entrenadores</span>
-      </router-link>
-      <router-link to="/foro" class="mobile-nav-link" @click="closeMobileMenu">
+      </span>
+      <span class="mobile-nav-link" @click="handleNavClick('/foro')">
         <i class="fas fa-comments"></i>
         <span>Foro</span>
-      </router-link>
+      </span>
 
       <!-- Enlaces condicionales -->
-      <router-link v-if="user?.user_type == 'entrenador'" to="/solicitudes-usuarios" class="mobile-nav-link"
-        @click="closeMobileMenu">
+      <span v-if="user?.user_type == 'entrenador'" class="mobile-nav-link"
+        @click="handleNavClick('/solicitudes-usuarios')">
         <i class="fas fa-file-signature"></i>
         <span>Solicitudes-U</span>
-      </router-link>
+      </span>
 
-      <router-link v-if="user?.user_type == 'admin'" to="/solicitudes-entrenadores" class="mobile-nav-link"
-        @click="closeMobileMenu">
+      <span v-if="user?.user_type == 'admin'" class="mobile-nav-link"
+        @click="handleNavClick('/solicitudes-entrenadores')">
         <i class="fas fa-file-contract"></i>
         <span>Solicitudes-E</span>
-      </router-link>
+      </span>
     </div>
 
   </nav>
 </template>
-
 
 <script>
 import axios from 'axios';
@@ -160,6 +176,7 @@ export default {
       cartItems: [],
 
       authMessage: '',
+      navAuthMessage: '',
 
       showLogoutConfirm: false,
       isMobileMenuOpen: false
@@ -169,20 +186,40 @@ export default {
     this.checkAuthStatus();
     window.addEventListener('user-authenticated', this.checkAuthStatus);
     window.addEventListener('user-logged-out', this.checkAuthStatus);
-
-    // Escuchar cambios de tamaño para cerrar menú móvil
     window.addEventListener('resize', this.handleResize);
   },
   beforeDestroy() {
-    // Limpiar event listeners
     window.removeEventListener('user-authenticated', this.checkAuthStatus);
     window.removeEventListener('user-logged-out', this.checkAuthStatus);
     window.removeEventListener('resize', this.handleResize);
   },
+
+  watch: {
+    showLogoutConfirm(newVal) {
+      if (newVal) {
+        document.body.classList.add('no-scroll');
+      } else {
+        document.body.classList.remove('no-scroll');
+      }
+    }
+  },
+
   methods: {
 
+    handleNavClick(route) {
+      this.closeMobileMenu();
+
+      if (!this.user) {
+        this.navAuthMessage = 'Debes iniciar sesión o registrarte para acceder a esta sección.';
+        setTimeout(() => {
+          this.navAuthMessage = '';
+        }, 4000);
+      } else {
+        this.$router.push(route);
+      }
+    },
+
     checkAuthStatus() {
-      // Verificar si hay usuario en sessionStorage
       const userData = sessionStorage.getItem('user');
       if (userData) {
         try {
@@ -202,7 +239,6 @@ export default {
       this.user = null;
       this.user_type = '';
     },
-
 
     async logout() {
       try {
@@ -225,6 +261,8 @@ export default {
           window.location.reload();
         });
 
+        this.closeLogoutModal();
+
       } catch (error) {
         console.warn('Error en logout frontend:', error.message);
         this.$router.push('/').then(() => {
@@ -232,8 +270,6 @@ export default {
         });
       }
     },
-
-
 
     toggleCart() {
       this.isCartVisible = !this.isCartVisible;
@@ -255,11 +291,9 @@ export default {
         }, 3000);
         return;
       }
-      // Forzar actualización del carrito
       if (this.isCartVisible && this.$refs.cartComponent) {
         this.$refs.cartComponent.fetchCart();
       }
-
       this.toggleCart();
     },
 
@@ -269,11 +303,8 @@ export default {
 
     handleCheckout() {
       this.closeCart();
-      // this.$router.push('/checkout');
     },
 
-
-    // Nuevos métodos para menú móvil
     toggleMobileMenu() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
     },
@@ -283,12 +314,18 @@ export default {
     },
 
     handleResize() {
-      // Cerrar menú móvil si la pantalla es grande
       if (window.innerWidth > 768) {
         this.closeMobileMenu();
       }
-    }
+    },
 
+    openLogoutModal() {
+      this.showLogoutConfirm = true;
+    },
+
+    closeLogoutModal() {
+      this.showLogoutConfirm = false;
+    },
   }
 }
 </script>
@@ -325,9 +362,7 @@ export default {
   display: flex;
   gap: 2rem;
   flex-grow: 1;
-  /* Ocupa el espacio disponible */
   justify-content: center;
-  /* Centra los enlaces */
 }
 
 .nav-link {
@@ -762,12 +797,12 @@ export default {
   .mobile-nav-link {
     color: white;
     text-decoration: none;
-    padding: 12px 20px;
-    border-radius: 10px;
+    padding: 12px 0px;
+    border-radius: 15px;
     background: rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
-    gap: 15px;
+    text-align: center;
     transition: all 0.3s ease;
 
     &:hover {
@@ -914,6 +949,160 @@ export default {
 
   .bottom {
     transform: translateY(-9px) rotate(-45deg);
+  }
+}
+
+
+.no-scroll {
+  overflow: hidden;
+}
+
+
+@media (max-width: 768px) {
+  .dialog-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .confirm-btn,
+  .cancel-btn {
+    padding: 25px 20px;
+    min-width: 300px;
+    white-space: nowrap;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .confirm-btn {
+    background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+    color: white;
+
+    &::after {
+      content: '✓';
+      font-size: 1.2rem;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+    }
+  }
+
+  .cancel-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+
+    &::after {
+      content: '✕';
+      font-size: 1.2rem;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+    }
+  }
+}
+
+
+
+.nav-auth-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 99999;
+  width: 90%;
+  max-width: 500px;
+  color: white;
+  text-align: center;
+  animation: pulse 2s infinite;
+
+  .message-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    .icon-container {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      padding: 15px;
+
+      .info-icon {
+        width: 40px;
+        height: 40px;
+        filter: invert(1);
+      }
+    }
+
+    .text-container {
+      flex: 1;
+
+      h3 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      p {
+        font-size: 1.2rem;
+        line-height: 1.5;
+      }
+    }
+
+    .close-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+      }
+
+      .close-icon {
+        width: 20px;
+        height: 20px;
+        filter: invert(1);
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(26, 42, 108, 0.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 15px rgba(26, 42, 108, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(26, 42, 108, 0);
   }
 }
 </style>

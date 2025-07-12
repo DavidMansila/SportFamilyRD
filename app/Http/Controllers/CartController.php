@@ -105,4 +105,26 @@ class CartController extends Controller
             'cart' => $cart
         ]);
     }
+
+
+    public function clearCart(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id'
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+
+        $cart = Cart::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->first();
+
+        if (!$cart) {
+            return response()->json(['message' => 'Cart not found'], 404);
+        }
+
+        $cart->items()->delete();
+
+        return response()->json(['message' => 'Cart cleared successfully']);
+    }
 }
