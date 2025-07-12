@@ -121,7 +121,7 @@
       <div class="overlay">
         <div class="overlay-panel overlay-left">
           <h1>¡Bienvenido de nuevo!</h1>
-          <router-link to="/" class="">
+          <router-link to="/" class="margin-pc">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
           </router-link>
           <p>Para mantenerte conectado con nosotros, inicia sesión con tu información personal</p>
@@ -129,7 +129,7 @@
         </div>
         <div class="overlay-panel overlay-right">
           <h1>¡Hola, Amigo!</h1>
-          <router-link to="/" class="">
+          <router-link to="/" class="margin-pc">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
           </router-link>
           <p>Ingresa tus detalles y comienza tu viaje con nosotros</p>
