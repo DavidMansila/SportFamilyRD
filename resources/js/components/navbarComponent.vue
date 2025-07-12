@@ -371,6 +371,7 @@ export default {
   font-size: 1.1rem;
   font-weight: 500;
   transition: color 0.3s ease-in-out;
+  cursor: pointer;
 }
 
 .nav-link:hover {
