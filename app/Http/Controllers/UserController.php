@@ -48,7 +48,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:4|confirmed',
         ]);
 
         try {
@@ -73,7 +73,7 @@ class UserController extends Controller
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => 'Contraseña debe contener al menos 4 caracteres: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -125,15 +125,16 @@ class ProductController extends Controller
     public function recentProducts()
     {
         try {
-            $products = Product::orderBy('created_at', 'desc')->take(4)->get();
+            $products = Product::inRandomOrder()->take(4)->get();
+
             return response()->json([
-                'message' => 'Productos recientes obtenidos con éxito',
+                'message'  => 'Productos aleatorios obtenidos con éxito',
                 'products' => $products
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al obtener productos recientes',
-                'error' => $e->getMessage()
+                'message' => 'Error al obtener productos aleatorios',
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
