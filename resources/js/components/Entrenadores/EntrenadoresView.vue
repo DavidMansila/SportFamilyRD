@@ -60,7 +60,7 @@
     <!-- Lista de Entrenadores -->
     <div class="entrenadores-container">
       <transition-group name="cards" tag="div" class="entrenadores-grid">
-        <div v-for="entrenador in entrenadoresFiltrados" :key="entrenador.trainer_id" class="entrenador-card"
+        <div v-for="entrenador in paginatedEntrenadores" :key="entrenador.trainer_id" class="entrenador-card"
           @click="verPerfil(entrenador)">
           <div class="card-image-container">
             <img :src="entrenador.foto" :alt="`${entrenador.nombre} - ${entrenador.deporte}`">
@@ -92,6 +92,13 @@
         </div>
       </transition-group>
     </div>
+
+
+    <div v-if="entrenadoresFiltrados.length > itemsPerPage" class="pagination-container">
+      <paginatorComponent v-model="currentPage" :total-items="entrenadoresFiltrados.length"
+        :items-per-page="itemsPerPage" :max-pages-shown="5" />
+    </div>
+
 
     <!-- Modal de Perfil -->
     <transition name="modal">
@@ -275,12 +282,14 @@
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
+import paginatorComponent from '@/components/paginatorComponent.vue';
 
 export default {
   name: 'Entrenadores',
   components: {
     Navbar,
-    ChatBubbleComponent
+    ChatBubbleComponent,
+    paginatorComponent
   },
   data() {
     return {
@@ -298,6 +307,8 @@ export default {
         objetivos: ''
       },
       entrenadores: [],
+      currentPage: 1,
+      itemsPerPage: 9,
     }
   },
   computed: {
@@ -318,12 +329,27 @@ export default {
       }
       return filtrados;
     },
+
+    paginatedEntrenadores() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.entrenadoresFiltrados.slice(start, end);
+    }
   },
 
   methods: {
 
+    shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    },
+
     filtrarPorDeporte(deporte) {
       this.deporteActivo = deporte;
+      this.currentPage = 1;
     },
 
     verPerfil(entrenador) {
@@ -459,7 +485,7 @@ export default {
     cargarEntrenadores() {
       axios.get('/trainer/approved')
         .then(response => {
-          this.entrenadores = response.data.trainer.map(trainer => ({
+          let trainers = response.data.trainer.map(trainer => ({
             trainer_id: trainer.id,
             user_id: trainer.user_id,
             nombre: trainer.name,
@@ -475,6 +501,18 @@ export default {
             logros: trainer.achievements ? trainer.achievements.map
               (a => `${a.title}${a.date ? ` (${a.date})` : ''}`) : []
           }));
+
+          trainers = this.shuffleArray(trainers);
+
+          if (this.user?.user_type === 'entrenador') {
+            const userIndex = trainers.findIndex(t => t.user_id === this.user.id);
+            if (userIndex !== -1) {
+              const userTrainer = trainers.splice(userIndex, 1)[0];
+              trainers.unshift(userTrainer);
+            }
+          }
+
+          this.entrenadores = trainers;
         })
         .catch(error => {
           console.error('Error al cargar entrenadores aprobados:', error);
@@ -554,7 +592,11 @@ export default {
       if (!time) return '';
       return time.length > 5 ? time.substring(0, 5) : time;
     }
-
+  },
+  watch: {
+    busqueda() {
+      this.currentPage = 1;
+    },
   },
   mounted() {
     this.user = JSON.parse(sessionStorage.getItem('user')) || {};
@@ -577,6 +619,13 @@ export default {
 
 @import '../../../scss/Entrenadores/entrenadores_responsive.scss';
 
+/* Nuevo estilo para la paginación */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  padding-bottom: 30px;
+}
 
 /* Nuevos estilos para el modal de contacto */
 .contact-modal {
@@ -773,10 +822,4 @@ export default {
   color: #6c757d;
   margin-top: 10px;
 }
-
-
-
-
-
-
 </style>
