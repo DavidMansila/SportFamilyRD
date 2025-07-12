@@ -514,6 +514,10 @@ input {
 .overlay-right {
     right: 0;
     transform: translateX(0);
+    
+    .margin-pc {
+      margin-bottom: 1rem;
+    }
 
     .margin-pc {
         margin-bottom: 1rem;
