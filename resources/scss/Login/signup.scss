@@ -114,9 +114,7 @@ a {
     text-decoration: none;
     transition: color $transition-speed;
 
-    .margin-pc {
-        margin-bottom: 1rem;
-    }
+  
     &:hover {
         color: $secondary-color;
     }
@@ -385,6 +383,10 @@ input {
     .overlay-left {
         transform: translateX(0);
 
+        .margin-pc {
+          margin-bottom: 1rem;
+        }
+
         @media (max-width: $breakpoint-tablet) {
             transform: translateY(0);
 
@@ -393,7 +395,11 @@ input {
 
     .overlay-right {
         transform: translateX(20%);
-
+        
+        .margin-pc {
+          margin-bottom: 1rem;
+        }
+        
         @media (max-width: $breakpoint-tablet) {
             transform: translateY(20%);
         }
