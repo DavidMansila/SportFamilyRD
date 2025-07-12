@@ -339,7 +339,6 @@ export default {
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
-  /* Distribuye el espacio entre los elementos */
   align-items: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -352,7 +351,6 @@ export default {
 
 .logo {
   width: 200px;
-  /* Tamaño del logo */
   height: 70px;
 }
 
@@ -371,6 +369,7 @@ export default {
   font-size: 1.1rem;
   font-weight: 500;
   transition: color 0.3s ease-in-out;
+  cursor: pointer;
 }
 
 .nav-link:hover {
