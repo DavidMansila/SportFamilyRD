@@ -179,6 +179,17 @@ export default {
     window.removeEventListener('user-logged-out', this.checkAuthStatus);
     window.removeEventListener('resize', this.handleResize);
   },
+
+  watch: {
+    showLogoutConfirm(newVal) {
+      if (newVal) {
+        document.body.classList.add('no-scroll');
+      } else {
+        document.body.classList.remove('no-scroll');
+      }
+    }
+  },
+
   methods: {
 
     checkAuthStatus() {
@@ -224,6 +235,8 @@ export default {
         this.$router.push('/').then(() => {
           window.location.reload();
         });
+
+        this.closeLogoutModal();
 
       } catch (error) {
         console.warn('Error en logout frontend:', error.message);
@@ -287,8 +300,15 @@ export default {
       if (window.innerWidth > 768) {
         this.closeMobileMenu();
       }
-    }
+    },
 
+    openLogoutModal() {
+      this.showLogoutConfirm = true;
+    },
+
+    closeLogoutModal() {
+      this.showLogoutConfirm = false;
+    },
   }
 }
 </script>
@@ -916,4 +936,69 @@ export default {
     transform: translateY(-9px) rotate(-45deg);
   }
 }
+
+
+.no-scroll {
+  overflow: hidden;
+}
+
+
+@media (max-width: 768px) {
+  .dialog-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .confirm-btn,
+  .cancel-btn {
+    padding: 25px 20px;
+    min-width: 300px;
+    white-space: nowrap;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .confirm-btn {
+    background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+    color: white;
+
+    &::after {
+      content: '✓';
+      font-size: 1.2rem;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+    }
+  }
+
+  .cancel-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+
+    &::after {
+      content: '✕';
+      font-size: 1.2rem;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+    }
+  }
+}
+
 </style>
