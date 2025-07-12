@@ -227,7 +227,7 @@
 
           <div class="forum-thread" v-for="post in popularPosts" :key="post.id">
             <div class="thread-header">
-              <img :src="post.user?.image_url || '/default-avatar.png'" :alt="post.user?.name || 'Usuario'"
+              <img :src="post.user?.image_url || '/storage/users/Perfil-Icon.png'" :alt="post.user?.name || 'Usuario'"
                 class="author-avatar">
 
               <div class="author-info">
