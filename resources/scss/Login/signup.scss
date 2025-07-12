@@ -502,6 +502,11 @@ input {
 .overlay-left {
     transform: translateX(-20%);
 
+    .margin-pc {
+        margin-bottom: 1rem;
+    }
+
+
     @media (max-width: $breakpoint-tablet) {
         transform: translateY(-20%);
     }
@@ -510,6 +515,11 @@ input {
 .overlay-right {
     right: 0;
     transform: translateX(0);
+
+    .margin-pc {
+        margin-bottom: 1rem;
+    }
+
 
     @media (max-width: $breakpoint-tablet) {
         transform: translateY(0);
