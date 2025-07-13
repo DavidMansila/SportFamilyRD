@@ -55,10 +55,10 @@
                                 <span class="info-value">{{ solicitud.experience }}</span>
                             </div>
 
-                            <div class="info-item">
+                            <!-- <div class="info-item">
                                 <span class="info-label">Costo:</span>
                                 <span class="info-value">{{ formatCurrency(solicitud.cost) }}</span>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="details-section">
@@ -536,8 +536,9 @@ export default {
 .info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: 7rem;
+    margin-bottom: 2rem;
+    margin-left: 90px;
 }
 
 .info-item {

@@ -29,6 +29,7 @@ class TrainerController extends Controller
                 'experience' => $trainer->experience,
                 'city_country' => $trainer->city_country,
                 'cost' => $trainer->cost,
+                'level_of_certification' => $trainer->level_of_certification,
                 'certificates_linked' => $trainer->certificates_linked,
                 'status' => $trainer->status,
                 'created_at' => $trainer->created_at,

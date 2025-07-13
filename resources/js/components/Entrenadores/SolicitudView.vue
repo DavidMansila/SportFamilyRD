@@ -287,14 +287,14 @@
             </div>
           </div>
 
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label class="custom-label">Tarifa por sesión (opcional)</label>
             <div class="price-input">
               <span class="currency">$</span>
               <input type="number" v-model="formulario.tarifa" placeholder="Ejemplo: 25" min="0" />
               <span class="per-session">/sesión</span>
             </div>
-          </div>
+          </div> -->
 
           <div class="form-actions">
             <button type="button" class="btn btn-prev" @click="pasoAnterior">Anterior</button>
