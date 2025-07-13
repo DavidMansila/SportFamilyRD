@@ -61,7 +61,7 @@
           <h2 class="privacy-heading">Configuración de Privacidad</h2>
 
 
-          <div class="settings-container">
+          <!-- <div class="settings-container">
             <div v-for="config in userConfigs" :key="config.id" class="setting-item">
               <div class="setting-content">
                 <span class="setting-label">{{ config.configuration }}</span>
@@ -73,7 +73,7 @@
                 <span class="slider round"></span>
               </label>
             </div>
-          </div>
+          </div> -->
 
           <section class="data-section" aria-labelledby="data-heading">
             <h3 id="data-heading" class="section-title">Gestión de datos</h3>
@@ -81,9 +81,7 @@
             <div class="data-option danger-zone">
               <h4>Eliminar cuenta</h4>
               <p>Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.</p>
-              <button class="btn btn-danger" @click="deleteAccount" aria-describedby="delete-warning">
-                Eliminar Cuenta
-              </button>
+              <button class="btn btn-danger" @click="showDeleteModal = true">Eliminar Cuenta</button>
               <p id="delete-warning" class="warning-text">
                 <i class="icon-warning"></i> Advertencia: Esta acción eliminará todos tus datos de forma permanente.
               </p>
@@ -285,7 +283,9 @@ export default {
     },
 
     deleteAccount() {
-      axios.delete(`/user/${this.user.id}`,)
+      this.showDeleteModal = false;
+
+      axios.delete(`/user/${this.user.id}`)
         .then(response => {
           this.showToast('Cuenta eliminada exitosamente', 'success');
           sessionStorage.removeItem('user');
@@ -369,5 +369,44 @@ export default {
 .form-group {
   margin-bottom: 1.5rem;
   position: relative;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-danger {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #cbd5e0;
 }
 </style>
