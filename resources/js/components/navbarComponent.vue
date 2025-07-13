@@ -98,7 +98,7 @@
         <div class="message-content">
           <div class="icon-container">
             <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="Signup">
-            <img src="/imagenes/Signup-icon.png" alt="Información" class="info-icon" />
+              <img src="/imagenes/Signup-icon.png" alt="Información" class="info-icon" />
             </router-link>
           </div>
           <div class="text-container">
@@ -195,14 +195,34 @@ export default {
   },
 
   watch: {
+
     showLogoutConfirm(newVal) {
       if (newVal) {
         document.body.classList.add('no-scroll');
       } else {
         document.body.classList.remove('no-scroll');
       }
+    },
+
+    isCartVisible(newVal) {
+      if (newVal) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    },
+
+    $route() {
+      if (this.isCartVisible) {
+        this.closeCart();
+      }
     }
   },
+
+  beforeUnmount() {
+    document.body.style.overflow = '';
+  },
+
 
   methods: {
 
