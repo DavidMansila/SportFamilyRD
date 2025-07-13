@@ -130,6 +130,7 @@ const regions = ref([
 ]);
 
 const sports = ref([
+  /* --- 1. BÉISBOL --- */
   {
     id: 1,
     name: 'Béisbol',
@@ -137,30 +138,31 @@ const sports = ref([
     type: 'Equipo',
     popularity: 'Muy popular',
     image: 'imagenes/DirectorioDeDeportes/baseball.jpg',
-    shortDescription: 'El deporte rey de República Dominicana',
-    description: 'El béisbol es el deporte más popular en República Dominicana, con una gran tradición y numerosos peloteros en las Grandes Ligas. Cada ciudad tiene sus equipos locales y ligas amateur.',
+    shortDescription: 'Pasión nacional con presencia en MLB',
+    description:
+      'El béisbol es el deporte insignia dominicano. Desde ligas infantiles hasta la LIDOM, forma parte de la identidad cultural y ha producido decenas de peloteros de Grandes Ligas.',
     requirements: [
-      'Guante de béisbol',
-      'Bate',
-      'Pelota',
-      'Zapatos de tacos',
+      'Guante y bate reglamentarios',
+      'Pelota de béisbol',
+      'Zapatos con tacos',
       'Casco para batear'
     ],
     places: [
       {
         name: 'Estadio Quisqueya Juan Marichal',
         location: 'Santo Domingo',
-        cost: 'Desde RD$300 para partidos profesionales',
+        cost: 'Boletas RD$150 – 1 550 (según sección y rival)',
         website: 'https://quisqueya.com'
       },
       {
-        name: 'Academia de Béisbol Prospecto',
+        name: 'Play municipal Batey Esperanza',
         location: 'San Pedro de Macorís',
-        cost: 'RD$2,000/mes para entrenamiento',
-        website: 'https://prospectoacademy.com'
+        cost: 'Gratis (ligas barriales)'
       }
-    ],
+    ]
   },
+
+  /* --- 2. DOMINÓ --- */
   {
     id: 2,
     name: 'Dominó',
@@ -168,328 +170,328 @@ const sports = ref([
     type: 'Parejas',
     popularity: 'Muy popular',
     image: 'imagenes/DirectorioDeDeportes/Domino.jpg',
-    shortDescription: 'El juego nacional dominicano',
-    description: 'Más que un juego, el dominó es una tradición social en RD. Se juega en parques, colmados y casas por todo el país, con torneos importantes y mucha pasión.',
-    requirements: [
-      'Juego de dominó (28 fichas)',
-      'Mesa adecuada',
-      '4 jugadores (2 parejas)'
-    ],
+    shortDescription: 'Juego de mesa emblemático',
+    description:
+      'El dominó es la actividad social por excelencia: se juega en parques, colmados y clubes. Existen torneos municipales y nacionales organizados por la Asociación de Clubes de Dominó.',
+    requirements: ['Juego de 28 fichas', 'Mesa o superficie plana', '4 jugadores'],
     places: [
       {
         name: 'Parque Colón',
         location: 'Zona Colonial, Santo Domingo',
-        cost: 'Gratis'
+        cost: 'Gratis (mesas públicas)'
       },
       {
-        name: 'Club de Domino RD',
+        name: 'Club de Dominó Santiago',
         location: 'Santiago de los Caballeros',
         cost: 'RD$500 membresía anual'
       }
-    ],
+    ]
   },
+
+  /* --- 3. WINDSURF / KITESURF --- */
   {
     id: 3,
     name: 'Windsurf y Kitesurf',
     region: 'Cabarete, Puerto Plata',
     type: 'Individual',
-    popularity: 'Popular entre turistas y locales',
+    popularity: 'Popular entre locales y turistas',
     image: 'imagenes/DirectorioDeDeportes/WindsurfyKitesurf.jpg',
-    shortDescription: 'Deporte acuático de aventura en las playas del norte',
-    description: 'Cabarete es conocida internacionalmente por sus condiciones ideales para windsurf y kitesurf, con escuelas que ofrecen clases para todos los niveles.',
+    shortDescription: 'Capital del viento en el Caribe',
+    description:
+      'Cabarete es reconocido mundialmente por sus vientos consistentes y su arrecife protector. Escuelas certificadas ofrecen cursos para todos los niveles durante todo el año.',
     requirements: [
-      'Tabla de windsurf/kitesurf',
-      'Vela/cometa',
-      'Traje de neopreno (opcional)',
-      'Chaleco salvavidas'
+      'Tabla y vela/cometa',
+      'Arnés',
+      'Chaleco salvavidas',
+      'Neopreno (invierno)'
     ],
     places: [
       {
-        name: 'Cabarete Kite Beach',
-        location: 'Cabarete, Puerto Plata',
-        cost: 'RD$3,500 por clase de 2 horas',
-        website: 'https://cabaretekite.com'
+        name: 'Kite Beach (Kite Club / Champion Kite School)',
+        location: 'Cabarete',
+        cost: 'Clases desde RD$3 200 (2 h)',
+        website: 'https://championkite.com'
       },
       {
         name: 'Vela Cabarete',
-        location: 'Playa de Cabarete',
-        cost: 'RD$4,000 alquiler equipo por día',
+        location: 'Playa Cabarete',
+        cost: 'Alquiler equipo RD$4 000/día',
         website: 'https://velacabarete.com'
       }
-    ],
+    ]
   },
+
+  /* --- 4. SÓFTBOL --- */
   {
     id: 4,
-    name: 'Sofbol',
+    name: 'Sóftbol',
     region: 'Santo Domingo y Santiago',
     type: 'Equipo',
     popularity: 'Popular',
     image: 'imagenes/DirectorioDeDeportes/Sofbol.jpg',
-    shortDescription: 'Variante del béisbol muy practicada en ligas locales',
-    description: 'El sóftbol es muy popular en ligas recreativas y empresariales, especialmente en Santo Domingo. Se juega con una pelota más grande y lanzamiento por debajo del brazo.',
-    requirements: [
-      'Guante de sóftbol',
-      'Bate de sóftbol',
-      'Pelota de sóftbol',
-      'Zapatos de tacos'
-    ],
+    shortDescription: 'Variante recreativa del béisbol',
+    description:
+      'Muy practicado en ligas empresariales y universitarias; se juega con pelota más grande y lanzamientos sub‑mano.',
+    requirements: ['Guante', 'Bate especial', 'Pelota de sóftbol', 'Zapatos con tacos'],
     places: [
       {
-        name: 'Parque Mirador Sur',
+        name: 'Campo de Sóftbol – Centro Olímpico',
         location: 'Santo Domingo',
-        cost: 'Gratis (ligas organizadas tienen costos)'
+        cost: 'Entrenamiento gratuito; ligas desde RD$1 500 / temporada'
       },
       {
-        name: 'Complejo Deportivo de Santiago',
-        location: 'Santiago',
-        cost: 'RD$1,500 por temporada en ligas locales'
+        name: 'Play Los Mameyes',
+        location: 'Santo Domingo Este',
+        cost: 'Gratis (uso comunitario)'
       }
-    ],
+    ]
   },
+
+  /* --- 5. PESCA DEPORTIVA --- */
   {
     id: 5,
     name: 'Pesca Deportiva',
-    region: 'Samaná, Punta Cana, Barahona',
+    region: 'La Romana, Samaná, Punta Cana',
     type: 'Individual/Grupo',
     popularity: 'Media',
     image: 'imagenes/DirectorioDeDeportes/Pesca.jpg',
-    shortDescription: 'Deporte de aventura en las costas dominicanas',
-    description: 'RD ofrece excelentes lugares para pesca deportiva, especialmente de pez vela, dorado y atún. Torneos internacionales se realizan cada año.',
+    shortDescription: 'Marlin, dorado y atún en aguas azules',
+    description:
+      'RD alberga torneos internacionales de marlin y pez vela. Las temporadas altas son entre junio y septiembre.',
     requirements: [
-      'Caña de pescar',
-      'Carrete',
-      'Carnadas',
-      'Licencia de pesca (para torneos)'
+      'Caña y carrete tipo salt‑water',
+      'Arnés y cinturón de pelea',
+      'Licencia de pesca (en torneos)'
     ],
     places: [
       {
-        name: 'Marina de Casa de Campo',
+        name: 'Marina Casa de Campo',
         location: 'La Romana',
-        cost: 'Desde RD$15,000 por excursión',
+        cost: 'Charters desde RD$15 000 el día',
         website: 'https://casadecampo.com.do'
       },
       {
-        name: 'Pesca en Samaná',
+        name: 'Excursiones Samaná Fishing',
         location: 'Samaná',
-        cost: 'RD$12,000 por excursión compartida'
+        cost: 'RD$12 000 excursión compartida'
       }
-    ],
+    ]
   },
+
+  /* --- 6. BALONCESTO --- */
   {
     id: 6,
     name: 'Baloncesto',
-    region: 'Santo Domingo, Santiago, San Pedro de Macorís',
+    region: 'Santo Domingo, Santiago, San Pedro',
     type: 'Equipo',
     popularity: 'Muy popular',
     image: 'imagenes/DirectorioDeDeportes/Baloncesto.jpg',
-    shortDescription: 'Segundo deporte más popular en RD',
-    description: 'Con fuerte influencia de la NBA, tiene ligas locales y canchas en casi todos los barrios. La Liga Nacional de Baloncesto (LNB) es la competencia profesional.',
-    requirements: [
-      'Balón de baloncesto',
-      'Zapatos deportivos',
-      'Cancha adecuada'
-    ],
+    shortDescription: 'Canastas en cada barrio',
+    description:
+      'La influencia NBA se siente en todo el país; existen ligas escolares y la Liga Nacional de Baloncesto (LNB) profesional.',
+    requirements: ['Balón oficial', 'Zapatillas', 'Cancha'],
     places: [
       {
-        name: 'Palacio de los Deportes Virgilio Travieso Soto',
+        name: 'Palacio de los Deportes',
         location: 'Santo Domingo',
-        cost: 'RD$200 entrada general'
+        cost: 'Boletas desde RD$200'
       },
       {
-        name: 'Polideportivo de San Pedro de Macorís',
-        location: 'San Pedro de Macorís',
-        cost: 'Gratis para entrenamientos'
+        name: 'Canchas Parque Mirador Sur',
+        location: 'Santo Domingo',
+        cost: 'Gratis (uso abierto)'
       }
-    ],
+    ]
   },
+
+  /* --- 7. VOLEIBOL --- */
   {
     id: 7,
-    name: 'Volleyball',
-    region: 'Boca Chica, Juan Dolio, Punta Cana',
+    name: 'Voleibol',
+    region: 'Playas y clubes nacionales',
     type: 'Equipo',
-    popularity: 'Media-Alta',
+    popularity: 'Media‑Alta',
     image: 'imagenes/DirectorioDeDeportes/Volleyball.jpg',
-    shortDescription: 'Popular en playas y ligas universitarias',
-    description: 'El voleibol playero es común en zonas costeras, mientras el de sala se practica en clubes y universidades. Existen ligas competitivas nacionales.',
-    requirements: [
-      'Balón de volleyball',
-      'Red',
-      'Zapatos deportivos'
-    ],
+    shortDescription: 'Playero y de sala con tradición olímpica',
+    description:
+      'El voleibol femenino es potencia en NORCECA; en playas de Boca Chica y Juan Dolio se celebran torneos open.',
+    requirements: ['Balón de vóley', 'Red', 'Calzado (o pies descalzos en playa)'],
     places: [
       {
-        name: 'Playa Boca Chica',
+        name: 'Playa Boca Chica (cancha pública)',
         location: 'Boca Chica',
-        cost: 'Gratis (torneos informales)'
+        cost: 'Gratis (torneos veraniegos)'
       },
       {
-        name: 'Centro Olímpico Juan Pablo Duarte',
+        name: 'Pabellón de Voleibol – Centro Olímpico',
         location: 'Santo Domingo',
         cost: 'RD$500 por sesión de entrenamiento'
       }
-    ],
+    ]
   },
+
+  /* --- 8. ATLETISMO --- */
   {
     id: 8,
     name: 'Atletismo',
-    region: 'San Cristóbal, Santo Domingo',
+    region: 'Santo Domingo',
     type: 'Individual',
     popularity: 'Media',
     image: 'imagenes/DirectorioDeDeportes/Atletismo.jpg',
-    shortDescription: 'Con tradición de medallistas olímpicos',
-    description: 'RD ha destacado en carreras de velocidad y maratones. Luguelín Santos (medallista olímpico) es uno de sus máximos exponentes.',
-    requirements: [
-      'Zapatos para correr',
-      'Ropa deportiva'
-    ],
+    shortDescription: 'Velocidad y fondo dominicanos',
+    description:
+      'La pista Félix Sánchez ha moldeado medallistas olímpicos; la práctica recreativa es gratuita en horarios abiertos.',
+    requirements: ['Zapatillas de correr', 'Ropa ligera'],
     places: [
       {
-        name: 'Pista Atlética del Centro Olímpico',
+        name: 'Pista Félix Sánchez – Centro Olímpico',
         location: 'Santo Domingo',
-        cost: 'Gratis para entrenamientos'
+        cost: 'Gratis para público (horarios libres)'
+      },
+      {
+        name: 'Avenida de la Salud (Mirador Sur)',
+        location: 'Santo Domingo',
+        cost: 'Gratis (circuito 5 km)'
       }
-    ],
+    ]
   },
+
+  /* --- 9. BOXEO --- */
   {
     id: 9,
     name: 'Boxeo',
-    region: 'Santo Domingo, San Cristóbal, La Romana',
+    region: 'Santo Domingo, San Cristóbal',
     type: 'Individual',
     popularity: 'Alta',
     image: 'imagenes/DirectorioDeDeportes/Boxeo.jpg',
-    shortDescription: 'Tradición de campeones mundiales',
-    description: 'Con figuras como Joan Guzmán y Javier Fortuna. El Gimnasio Nacional ofrece programas gratuitos para jóvenes.',
-    requirements: [
-      'Guantes de boxeo',
-      'Vendas',
-      'Saco de boxeo'
-    ],
+    shortDescription: 'Semillero de campeones mundiales',
+    description:
+      'Gimnasios públicos y de federación ofrecen programas gratuitos para niños y jóvenes; figuras como Joan Guzmán salieron de aquí.',
+    requirements: ['Guantes homologados', 'Vendas', 'Bucal'],
     places: [
       {
-        name: 'Gimnasio de Boxeo del Centro Olímpico',
-        location: 'Santo Domingo',
-        cost: 'Gratis'
+        name: 'Gimnasio Nacional de Boxeo',
+        location: 'Centro Olímpico, Santo Domingo',
+        cost: 'Gratis (programa MIDEREC)'
       }
-    ],
+    ]
   },
+
+  /* --- 10. GOLF --- */
   {
     id: 10,
     name: 'Golf',
-    region: 'Punta Cana, La Romana, Santo Domingo',
+    region: 'Punta Cana, La Romana',
     type: 'Individual',
-    popularity: 'Media-Alta',
+    popularity: 'Media‑Alta',
     image: 'imagenes/DirectorioDeDeportes/Golf.jpg',
-    shortDescription: 'En resorts y clubes exclusivos',
-    description: 'RD cuenta con campos de clase mundial como Punta Espada (top 10 global) y Teeth of the Dog. Ideal para turismo deportivo.',
-    requirements: [
-      'Palos de golf',
-      'Zapatos especiales',
-      'Bolas'
-    ],
+    shortDescription: 'Campos de clase mundial frente al mar',
+    description:
+      'RD es destino top del Caribe con diseños de Nicklaus, Dye y Fazio. Punta Espada y Teeth of the Dog figuran en rankings globales.',
+    requirements: ['Juego de palos', 'Bolas', 'Zapatos con soft spikes'],
     places: [
       {
         name: 'Punta Espada Golf Club',
-        location: 'Punta Cana',
-        cost: 'RD$8,000 por ronda',
+        location: 'Cap Cana, Punta Cana',
+        cost: 'Green‑fee desde RD$8 000',
         website: 'https://puntaspada.com'
       },
       {
         name: 'Teeth of the Dog',
         location: 'Casa de Campo',
-        cost: 'RD$6,500 por ronda',
+        cost: 'Green‑fee desde RD$6 500',
         website: 'https://casadecampo.com.do'
       }
-    ],
+    ]
   },
+
+  /* --- 11. SURF --- */
   {
     id: 11,
     name: 'Surf',
-    region: 'Cabarete, Encuentro, Macao',
+    region: 'Playa Encuentro, Macao, Cabarete',
     type: 'Individual',
     popularity: 'Creciente',
     image: 'imagenes/DirectorioDeDeportes/Surf.jpg',
-    shortDescription: 'Aprovechando las olas del Caribe',
-    description: 'Playa Encuentro en Puerto Plata es el epicentro del surf nacional, con escuelas para todos los niveles y competencias internacionales.',
-    requirements: [
-      'Tabla de surf',
-      'Traje de neopreno (opcional)',
-      'Leash'
-    ],
+    shortDescription: 'Olas todo el año en la costa norte',
+    description:
+      'Playa Encuentro es considerada la “cuna del surf dominicano”. Escuelas profesionales enseñan desde principiantes hasta nivel avanzado.',
+    requirements: ['Tabla de surf', 'Leash', 'Rashguard o neopreno'],
     places: [
       {
-        name: 'Playa Encuentro',
+        name: 'Cabarete Surf Company – Encuentro',
         location: 'Puerto Plata',
-        cost: 'RD$2,500 por clase',
-        website: 'https://surfencuentro.com'
+        cost: 'Lección 2 h RD$2 800',
+        website: 'https://cabaretesurf.com'
       }
-    ],
+    ]
   },
+
+  /* --- 12. TENIS --- */
   {
     id: 12,
     name: 'Tenis',
-    region: 'Santo Domingo, Santiago, Punta Cana',
+    region: 'Santo Domingo, Santiago',
     type: 'Individual/Parejas',
     popularity: 'Media',
     image: 'imagenes/DirectorioDeDeportes/Tenis.jpg',
-    shortDescription: 'Practicado en clubes privados',
-    description: 'Con canchas de calidad en resorts y clubes exclusivos. La Asociación Dominicana de Tenis organiza torneos nacionales.',
-    requirements: [
-      'Raqueta',
-      'Pelotas',
-      'Zapatos de tenis'
-    ],
+    shortDescription: 'Canchas de arcilla y hard court',
+    description:
+      'Clubes sociales albergan academias; la Federación Dominicana organiza torneos FUT y Challenger.',
+    requirements: ['Raqueta', 'Pelotas', 'Zapatillas específicas'],
     places: [
       {
-        name: 'Club de Tenis de Santo Domingo',
-        location: 'La Julia',
-        cost: 'RD$1,500 por hora',
-        website: 'https://clubtenis.com.do'
+        name: 'Santo Domingo Tennis Club “La Bocha”',
+        location: 'Santo Domingo',
+        cost: 'Invitados RD$300‑1 000/h',
+        website: 'http://labocha.org'
       }
-    ],
+    ]
   },
+
+  /* --- 13. CICLISMO --- */
   {
     id: 13,
     name: 'Ciclismo',
-    region: 'Jarabacoa, Constanza, Santo Domingo',
+    region: 'Jarabacoa, Constanza, Sto. Dgo.',
     type: 'Individual/Grupo',
     popularity: 'Media',
     image: 'imagenes/DirectorioDeDeportes/Ciclismo.jpg',
-    shortDescription: 'Rutas de montaña y competencias',
-    description: 'Las montañas del Cibao ofrecen rutas desafiantes. La Vuelta a la Independencia es el evento más importante.',
-    requirements: [
-      'Bicicleta',
-      'Casco',
-      'Ropa adecuada'
-    ],
+    shortDescription: 'Rutas de montaña y carretera',
+    description:
+      'La Cordillera Central ofrece ascensos exigentes; la Vuelta Independencia es la prueba reina del calendario nacional.',
+    requirements: ['Bicicleta ajustada', 'Casco obligatorio', 'Kit de reparación'],
     places: [
       {
-        name: 'Ruta Jarabacoa-Constanza',
+        name: 'Ruta Jarabacoa – Constanza (Carretera La Vega‑El Río)',
         location: 'Jarabacoa',
-        cost: 'Gratis'
+        cost: 'Gratis (ruta escénica, 60 km ida)'
       }
-    ],
+    ]
   },
+
+  /* --- 14. JUDO --- */
   {
     id: 14,
     name: 'Judo',
-    region: 'Santo Domingo, Santiago',
+    region: 'Santo Domingo y Santiago',
     type: 'Individual',
     popularity: 'Media',
     image: 'imagenes/DirectorioDeDeportes/Judo.jpg',
     shortDescription: 'Arte marcial olímpico',
-    description: 'Practicado en academias y centros deportivos. La Federación Dominicana organiza torneos nacionales.',
-    requirements: [
-      'Kimono',
-      'Tatami'
-    ],
+    description:
+      'Dojos federados ofrecen clases infantiles y adultas; la selección nacional compite en Panamericanos y Centroamericanos.',
+    requirements: ['Judogi', 'Cinturón'],
     places: [
       {
-        name: 'Dojo Central de Judo',
-        location: 'Santo Domingo',
-        cost: 'RD$1,500/mes'
+        name: 'Dojo Central – Federación de Judo',
+        location: 'Centro Olímpico, Santo Domingo',
+        cost: 'RD$1 500/mes'
       }
-    ],
+    ]
   },
+
+  /* --- 15. EQUITACIÓN --- */
   {
     id: 15,
     name: 'Equitación',
@@ -497,111 +499,86 @@ const sports = ref([
     type: 'Individual',
     popularity: 'Media',
     image: 'imagenes/DirectorioDeDeportes/Equitacion.jpg',
-    shortDescription: 'Deporte ecuestre tradicional',
-    description: 'Practicado en clubes hípicos y fincas privadas. Las carreras de caballos son populares los domingos.',
-    requirements: [
-      'Equipo de montar',
-      'Caballo'
-    ],
+    shortDescription: 'Salto y adiestramiento clásico',
+    description:
+      'Clubes hípicos ofrecen salto, doma clásica y paseos guiados; carreras ecuestres se celebran los domingos.',
+    requirements: ['Casco ecuestre', 'Bota y pantalón de montar'],
     places: [
       {
         name: 'Club Hípico Santo Domingo',
         location: 'Santo Domingo',
-        cost: 'RD$2,000 por clase',
+        cost: 'Lección RD$2 000',
         website: 'https://clubhipico.com.do'
       }
-    ],
+    ]
   },
+
+  /* --- 16. PALO ENSEBADO --- */
   {
     id: 16,
     name: 'Palo Ensebado',
-    region: 'San Juan de la Maguana',
+    region: 'San Juan de la Maguana',
     type: 'Individual',
     popularity: 'Tradicional',
-    image: 'https://deblogsyjuegos.wordpress.com/wp-content/uploads/2015/10/10999718_1071777816183272_8268205380560369201_o.jpg?w=1536&h=1500&crop=1',
-    shortDescription: 'Juego tradicional de destreza física',
-    description: 'Competencia donde participantes escalan un poste engrasado para alcanzar premios en la cima. Muy popular en fiestas patronales como las de San Juan Bautista.',
-    requirements: [
-      'Poste de madera de 5-6 metros',
-      'Grasa o aceite',
-      'Premios (generalmente dinero en efectivo)'
-    ],
+    image: 'https://deblogsyjuegos.wordpress.com/wp-content/uploads/2015/10/10999718_1071777816183272_8268205380560369201_o.jpg',
+    shortDescription: 'Juego patrimonial en fiestas patronales',
+    description:
+      'Competencia donde se escala un tronco engrasado para alcanzar premios. Suele celebrarse cada junio en las fiestas de San Juan Bautista.',
+    requirements: ['Poste de 6 m', 'Grasa', 'Premio en la cima'],
     places: [
       {
-        name: 'Fiestas Patronales de San Juan',
-        location: 'San Juan de la Maguana',
-        cost: 'Gratis para espectadores'
+        name: 'Fiestas Patronales de San Juan',
+        location: 'San Juan de la Maguana',
+        cost: 'Gratis para público'
       }
-    ],
+    ]
   },
-  // {
-  //   id: 17,
-  //   name: 'Gallera',
-  //   region: 'Santiago, San Cristóbal, Higüey',
-  //   type: 'Individual',
-  //   popularity: 'Tradicional',
-  //   image: 'http://e00-elmundo.uecdn.es/assets/multimedia/imagenes/2017/02/24/14879512766963.jpg',
-  //   shortDescription: 'Deporte tradicional controvertido',
-  //   description: 'Aunque polémico, es parte de la cultura rural dominicana. Las peleas de gallos se realizan en coliseos especializados llamados "galleras".',
-  //   requirements: [
-  //     'Gallos de pelea',
-  //     'Espuelas especiales',
-  //     'Gallera autorizada'
-  //   ],
-  //   places: [
-  //     {
-  //       name: 'Coliseo Gallístico de Santiago',
-  //       location: 'Santiago',
-  //       cost: 'RD$300-1,000 entrada'
-  //     }
-  //   ],
-  // },
+
+  /* --- 18. BUCEO --- */
   {
     id: 18,
     name: 'Buceo',
-    region: 'Bayahibe, Punta Cana, Sosúa',
+    region: 'Bayahibe, Sosúa, Punta Cana',
     type: 'Individual/Grupo',
     popularity: 'Alta en zonas turísticas',
     image: 'imagenes/DirectorioDeDeportes/Buceo.jpg',
-    shortDescription: 'Exploración del Caribe submarino',
-    description: 'RD ofrece arrecifes vibrantes y naufragios históricos. Bayahibe es el punto de partida para el Parque Nacional Cotubanamá con su famoso "Wall".',
-    requirements: [
-      'Certificación PADI (para buceo profundo)',
-      'Equipo de snorkel/buceo',
-      'Guía local'
-    ],
+    shortDescription: 'Arrecifes y pecios del Caribe',
+    description:
+      'Bayahibe es la base para el Parque Cotubanamá y naufragios como “Saint George”. Centros PADI ofrecen cursos desde Discover hasta Divemaster.',
+    requirements: ['Certificación PADI (para buceo guiado >12 m)', 'Equipo completo o alquiler'],
     places: [
       {
-        name: 'Scuba Dive Bayahibe',
+        name: 'Coral Point Diving',
         location: 'Bayahibe',
-        cost: 'RD$4,500 por inmersión',
-        website: 'https://scubadivebayahibe.com'
+        cost: 'Inmersión guiada RD$4 500',
+        website: 'https://coralpointdiving.com'
       }
-    ],
+    ]
   },
+
+  /* --- 19. PARAPENTE --- */
   {
     id: 19,
     name: 'Parapente',
-    region: 'Constanza, Jarabacoa',
+    region: 'Constanza y Jarabacoa',
     type: 'Individual',
     popularity: 'Emergente',
     image: 'imagenes/DirectorioDeDeportes/Parapente.jpg',
-    shortDescription: 'Vuelo libre en las montañas',
-    description: 'Las montañas de Constanza y Jarabacoa ofrecen condiciones ideales para parapente. Escuelas certificadas ofrecen cursos y vuelos tandem.',
-    requirements: [
-      'Equipo de parapente',
-      'Casco',
-      'Paracaídas de emergencia'
-    ],
+    shortDescription: 'Vuelos en la Cordillera Central',
+    description:
+      'Tándems certificados despegan desde La Vega o El Jamito. Condiciones térmicas ideales casi todo el año.',
+    requirements: ['Arnés y vela homologada', 'Casco', 'Paracaídas de emergencia'],
     places: [
       {
         name: 'EcoParapente RD',
         location: 'Jarabacoa',
-        cost: 'RD$6,000 vuelo tandem',
+        cost: 'Vuelo tándem RD$6 000',
         website: 'https://ecoparapenterd.com'
       }
-    ],
+    ]
   },
+
+  /* --- 20. RAFTING YAQUE --- */
   {
     id: 20,
     name: 'Yaque Rafting',
@@ -609,44 +586,43 @@ const sports = ref([
     type: 'Grupo',
     popularity: 'Alta en temporada',
     image: 'imagenes/DirectorioDeDeportes/YaqueRafting.jpg',
-    shortDescription: 'Aventura en aguas blancas',
-    description: 'El río Yaque del Norte ofrece rápidos clase II-IV. Operadores como Rancho Baiguate tienen paquetes para todos los niveles.',
-    requirements: [
-      'Chaleco salvavidas',
-      'Casco',
-      'Remo'
-    ],
+    shortDescription: 'Rápidos clase II‑IV',
+    description:
+      'El río Yaque del Norte es el más largo del Caribe; operadores certificados conducen balsas en secciones seguras para principiantes y avanzados.',
+    requirements: ['Chaleco salvavidas', 'Casco', 'Remo'],
     places: [
       {
         name: 'Rancho Baiguate',
         location: 'Jarabacoa',
-        cost: 'RD$3,500 por persona',
+        cost: 'Paquete rafting RD$3 500',
         website: 'https://ranchobaiguate.com'
       }
-    ],
+    ]
   },
+
+  /* --- 21. CARRERAS DE CABALLOS --- */
   {
     id: 21,
     name: 'Carreras de Caballos',
-    region: 'Santo Domingo, Santiago, Higüey',
+    region: 'Santo Domingo, Santiago',
     type: 'Individual',
     popularity: 'Tradicional',
     image: 'imagenes/DirectorioDeDeportes/CarreraDeCaballos.jpg',
-    shortDescription: 'Emoción ecuestre dominicana',
-    description: 'Las carreras se realizan en hipódromos profesionales (como el de Santo Domingo) y en eventos informales llamados "corridas" en zonas rurales.',
-    requirements: [
-      'Caballo de carrera',
-      'Jinete profesional'
-    ],
+    shortDescription: 'Velocidad en pista de arena',
+    description:
+      'El Hipódromo V Centenario acoge reuniones semanales; también se realizan “corridas” populares en el interior.',
+    requirements: ['Caballo inscrito', 'Jinete licenciado'],
     places: [
       {
-        name: 'Hipódromo V Centenario',
+        name: 'Hipódromo V Centenario',
         location: 'Santo Domingo',
-        cost: 'RD$200 entrada general',
+        cost: 'Entrada RD$200',
         website: 'https://hipodromord.com'
       }
-    ],
+    ]
   },
+
+  /* --- 22. TIRO DEPORTIVO --- */
   {
     id: 22,
     name: 'Tiro Deportivo',
@@ -654,22 +630,21 @@ const sports = ref([
     type: 'Individual',
     popularity: 'Media',
     image: 'imagenes/DirectorioDeDeportes/TiroDeportivo.jpg',
-    shortDescription: 'Precisión y concentración',
-    description: 'Practicado en clubes especializados. La Federación Dominicana organiza competencias nacionales de tiro con pistola, rifle y escopeta.',
-    requirements: [
-      'Arma registrada',
-      'Equipo de protección auditiva',
-      'Carnet de tirador'
-    ],
+    shortDescription: 'Precisión con pistola, rifle y escopeta',
+    description:
+      'Clubes federados cumplen normas ISSF; se compite en modalidades de 10 m / 25 m / 50 m.',
+    requirements: ['Arma registrada', 'Protección auditiva y ocular', 'Licencia de tirador'],
     places: [
       {
-        name: 'Club de Tiro de Santo Domingo',
+        name: 'Club de Tiro Santo Domingo',
         location: 'Santo Domingo Este',
-        cost: 'RD$1,500 por sesión',
+        cost: 'RD$1 500 por sesión',
         website: 'https://clubtiro.com.do'
       }
-    ],
+    ]
   },
+
+  /* --- 23. YOGA EN PLAYA --- */
   {
     id: 23,
     name: 'Yoga en Playa',
@@ -677,43 +652,43 @@ const sports = ref([
     type: 'Individual/Grupo',
     popularity: 'Creciente',
     image: 'imagenes/DirectorioDeDeportes/YogaEnPlaya.jpg',
-    shortDescription: 'Bienestar con vista al mar',
-    description: 'Clases al amanecer o atardecer en playas paradisíacas. Combinación perfecta de deporte y relajación.',
-    requirements: [
-      'Mat de yoga',
-      'Ropa cómoda'
-    ],
+    shortDescription: 'Bienestar con el sonido del mar',
+    description:
+      'Clases al amanecer o atardecer combinan vinyasa suave y meditación guiada. Populares entre turistas de bienestar.',
+    requirements: ['Mat antideslizante', 'Ropa cómoda'],
     places: [
       {
         name: 'Yoga Punta Cana',
         location: 'Playa Bávaro',
-        cost: 'RD$800 por clase',
+        cost: 'Clase grupal RD$800',
         website: 'https://yogapuntacana.com'
       }
-    ],
+    ]
   },
+
+  /* --- 24. PÁDEL --- */
   {
     id: 24,
-    name: 'Padel',
+    name: 'Pádel',
     region: 'Santo Domingo, Punta Cana',
     type: 'Parejas',
     popularity: 'Emergente',
     image: 'imagenes/DirectorioDeDeportes/Padel.jpg',
-    shortDescription: 'Deporte de raqueta en auge',
-    description: 'Mezcla de tenis y squash, muy popular en clubes privados y resorts. La Federación Dominicana organiza torneos desde 2021.',
-    requirements: [
-      'Raqueta de padel',
-      'Pelotas específicas'
-    ],
+    shortDescription: 'Deporte de raqueta en expansión',
+    description:
+      'Desde 2021 la Federación Dominicana organiza rankings; clubes invierten en canchas panorámicas.',
+    requirements: ['Pala de pádel', 'Pelotas presurizadas', 'Zapatillas de court'],
     places: [
       {
         name: 'Padel Center SD',
         location: 'Santo Domingo',
-        cost: 'RD$1,200 por hora',
+        cost: 'Alquiler cancha RD$1 200/h',
         website: 'https://padelcenterrd.com'
       }
-    ],
+    ]
   },
+
+  /* --- 25. ULTIMATE FRISBEE --- */
   {
     id: 25,
     name: 'Ultimate Frisbee',
@@ -721,21 +696,20 @@ const sports = ref([
     type: 'Equipo',
     popularity: 'Emergente',
     image: 'imagenes/DirectorioDeDeportes/UltimateFrisbee.jpg',
-    shortDescription: 'Deporte universitario en crecimiento',
-    description: 'Combinación de fútbol americano y baloncesto con frisbee. Popular en universidades como INTEC y PUCMM.',
-    requirements: [
-      'Disco volador',
-      'Conos para demarcar'
-    ],
+    shortDescription: 'Espíritu deportivo sin árbitros',
+    description:
+      'Universidades como INTEC y PUCMM impulsan ligas; el juego combina resistencia, estrategia y fair‑play.',
+    requirements: ['Disco oficial (175 g)', 'Conos para marcar líneas'],
     places: [
       {
-        name: 'Parque Mirador Sur',
+        name: 'Parque Mirador Sur – campo central',
         location: 'Santo Domingo',
         cost: 'Gratis'
       }
-    ],
+    ]
   }
 ]);
+
 
 
 const filteredSports = computed(() => {
