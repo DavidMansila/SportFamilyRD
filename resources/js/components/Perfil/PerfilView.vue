@@ -106,8 +106,15 @@
 
                         <div class="info-item">
                             <span class="info-label">Ubicación:</span>
-                            <span v-if="!editMode" class="info-value">{{ user.location || 'No especificada' }}</span>
-                            <input v-else type="text" v-model="user.location" placeholder="Añade tu ubicación">
+                            <span v-if="!editMode" class="info-value">
+                                {{ user.location || 'No especificada' }}
+                            </span>
+                            <select v-else v-model="user.location" class="location-select">
+                                <option value="" disabled>Selecciona una provincia</option>
+                                <option v-for="provincia in provinciasRD" :key="provincia" :value="provincia">
+                                    {{ provincia }}
+                                </option>
+                            </select>
                         </div>
 
                         <div class="info-item">
@@ -413,6 +420,41 @@ export default {
             editableBio: '',
             currentBio: '',
             trainerBio: '',
+
+            provinciasRD: [
+                'Distrito Nacional',
+                'Azua',
+                'Bahoruco',
+                'Barahona',
+                'Dajabón',
+                'Duarte',
+                'Elías Piña',
+                'El Seibo',
+                'Espaillat',
+                'Hato Mayor',
+                'Hermanas Mirabal',
+                'Independencia',
+                'La Altagracia',
+                'La Romana',
+                'La Vega',
+                'María Trinidad Sánchez',
+                'Monseñor Nouel',
+                'Monte Cristi',
+                'Monte Plata',
+                'Pedernales',
+                'Peravia',
+                'Puerto Plata',
+                'Samaná',
+                'Sánchez Ramírez',
+                'San Cristóbal',
+                'San José de Ocoa',
+                'San Juan',
+                'San Pedro de Macorís',
+                'Santiago',
+                'Santiago Rodríguez',
+                'Santo Domingo',
+                'Valverde'
+            ],
         }
     },
     computed: {
@@ -1186,5 +1228,23 @@ export default {
     font-size: 0.85rem;
     color: #64748b;
     margin-top: 5px;
+}
+
+
+.location-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 1rem;
+  color: #333;
+  transition: border-color 0.3s;
+}
+
+.location-select:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 </style>
