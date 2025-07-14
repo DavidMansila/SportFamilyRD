@@ -18,7 +18,7 @@
       <form>
         <h1>Crear Cuenta</h1>
 
-        <div class="social-container">
+        <!-- <div class="social-container">
           <a href="https://www.instagram.com" target="_blank" class="social">
             <img src="imagenes/SocialMedia-Instagram.png" alt="Instagram" width="40">
           </a>
@@ -28,7 +28,7 @@
           <a href="https://x.com" target="_blank" class="social">
             <img src="imagenes/SocialMedia-X.png" alt="Twitter" width="40">
           </a>
-        </div>
+        </div> -->
         <input type="text" v-model="registerForm.name" placeholder="Nombre" required />
         <input type="email" v-model="registerForm.email" placeholder="Correo" required />
 
@@ -80,7 +80,7 @@
     <div class="form-container sign-in-container">
       <form @submit.prevent="submitLoginForm">
         <h1>Iniciar Sesión</h1>
-        <div class="social-container">
+        <!-- <div class="social-container">
           <a href="https://www.instagram.com" target="_blank" class="social">
             <img src="imagenes/SocialMedia-Instagram.png" alt="Instagram" width="40">
           </a>
@@ -90,7 +90,7 @@
           <a href="https://x.com" target="_blank" class="social">
             <img src="imagenes/SocialMedia-X.png" alt="Twitter" width="40">
           </a>
-        </div>
+        </div> -->
         <input type="email" v-model="loginForm.email" placeholder="Correo" required />
 
         <!-- Campo de contraseña con ojo -->
