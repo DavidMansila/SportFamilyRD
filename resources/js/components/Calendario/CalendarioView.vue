@@ -56,7 +56,7 @@
         <div v-if="selectedDayEvents.length > 0" class="events-list">
           <div v-for="event in selectedDayEvents" :key="event.id" class="event-card" @click="openEventDetail(event)"
             :style="{ borderLeft: `4px solid ${event.categoryColor || '#3498db'}` }">
-            <div class="event-time">{{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}</div>
+            <div class="event-time">{{ formatTime(event.time) }} - {{ formatTime(event.endTime) }}</div>
             <h3 class="event-title">{{ event.Title }}</h3>
             <div class="event-meta">
               <span class="event-location">
@@ -146,7 +146,7 @@
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                {{ formatTime(selectedEvent.startTime) }} - {{ formatTime(selectedEvent.endTime) }}
+                {{ formatTime(selectedEvent.time) }} - {{ formatTime(selectedEvent.endTime) }}
               </span>
               <span class="event-location">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -220,7 +220,7 @@
           <div class="form-group time-group">
             <div>
               <label>Hora</label>
-              <input type="time" v-model="formEvent.startTime" required>
+              <input type="time" v-model="formEvent.time" required>
             </div>
           </div>
 
@@ -350,7 +350,7 @@ export default {
       const mappedEvents = scrapRawEvents.map(e => ({
         Title: e.title,
         date: this.parseScrapDate(e.date),
-        startTime: e.hour ? this.parseScrapHour(e.hour) : '',
+        time: e.hour ? this.parseScrapHour(e.hour) : '',
         endTime: '',
         Description: '',
         quantity: 100, // valor por defecto
@@ -559,7 +559,7 @@ export default {
             id: e.id,
             Title: e.Title || e.place || 'Sin nombre',
             date: e.date,
-            startTime: e.time || '',
+            time: e.time || '',
             endTime: '',
             Description: e.Description || '',
             quantity: e.quantity || 100,
@@ -582,7 +582,7 @@ export default {
       return {
         Title: '',
         date: new Date().toISOString().split('T')[0],
-        startTime: '18:00',
+        time: '18:00',
         endTime: '20:00',
         Description: '',
         price: 0,
