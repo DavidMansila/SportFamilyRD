@@ -161,10 +161,10 @@
         </div>
 
         <div class="event-content">
-          <!-- <div class="event-description">
+          <div class="event-description">
             <h3>Descripción</h3>
-            <p>{{ selectedEvent.descripcion }}</p>
-          </div> -->
+            <p> {{ selectedEvent.Description || 'No hay descripcion'}}</p>
+          </div>
 
           <div class="event-tickets">
             <h3>Boletos</h3>
@@ -348,11 +348,11 @@ export default {
     saveScrapEventsToDB(scrapRawEvents) {
       // Mapear los eventos al formato esperado por el backend
       const mappedEvents = scrapRawEvents.map(e => ({
-        nombre: e.title,
+        Title: e.title,
         fecha: this.parseScrapDate(e.date),
         startTime: e.hour ? this.parseScrapHour(e.hour) : '',
         endTime: '',
-        descripcion: '',
+        description: '',
         boletosDisponibles: 100, // valor por defecto
         price: this.parseScrapPrice(e.price),
         place: e.place || '',
@@ -360,10 +360,13 @@ export default {
         links: e.links || [],
         image: e.image || ''
       }));
+
+
       axios.post('/scrap-calendar', { events: mappedEvents })
         .then(saveRes => {
           this.scrapEvents = saveRes.data;
           this.updateSelectedDayEvents();
+          console.log('Eventos scrappeados guardados correctamente:', this.scrapEvents);
         })
         .catch(saveErr => {
           console.error('Error guardando eventos scrappeados:', saveErr);
@@ -554,11 +557,11 @@ export default {
           // Mapear los eventos al formato esperado por el frontend
           this.scrapEvents = response.data.events.map(e => ({
             id: e.id,
-            nombre: e.name || e.title || e.place || 'Sin nombre',
+            nombre: e.Title || e.place || 'Sin nombre',
             fecha: e.date,
             startTime: e.time || '',
             endTime: '',
-            descripcion: e.description || '',
+            Description: e.Description || '',
             boletosDisponibles: e.quantity || 100,
             precio: parseFloat(e.price) || 0,
             location: e.place || '',
@@ -650,7 +653,7 @@ export default {
   },
   mounted() {
     document.title = 'Calendario';
-    // this.getCalendarScrap(); // usar para cuando vayas a pasar el scrap a la base de datos
+    //this.getCalendarScrap(); // usar para cuando vayas a pasar el scrap a la base de datos
     this.getCalendarFromDB();
 
     this.user = JSON.parse(sessionStorage.getItem('user'));
