@@ -50,7 +50,7 @@ async function reenviarCorreo() {
     alertType.value = 'error';
     alertMessage.value = 'Error al reenviar el correo.';
     openModal.value = true;
-    // alert('Error al reenviar el correo.');
+    
   }
   reenviando.value = false;
 }

@@ -195,21 +195,33 @@
             </div>
         </main>
     </div>
+    
+    <Alert
+        v-if="openModal"
+        :message="alertMessage"
+        :type="alertType"
+        @closed="openModal = null"
+    />
 </template>
 
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
+import Alert from '../Alert.vue';
 
 export default {
     name: 'SolicitudesEntrenadores',
     components: {
-        Navbar
+        Navbar,
+        Alert
     },
     data() {
         return {
             filtroEstado: 'all',
-            solicitudes: []
+            solicitudes: [],
+            openModal: false,
+            alertMessage: "",
+            alertType: "", // 'error', 'success', 'alert'.
         }
     },
     computed: {
@@ -240,7 +252,11 @@ export default {
                 })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             } catch (error) {
                 console.error('Error al cargar solicitudes:', error);
-                alert('Error al cargar las solicitudes');
+
+                this.alertType = "error";
+                this.alertMessage = "Error al cargar las solicitudes";
+                this.openModal = true;
+                
             }
         },
 
@@ -298,6 +314,7 @@ export default {
                     .catch(error => {
                         console.error('Error al aprobar la solicitud:', error);
                         alert('Error al aprobar la solicitud');
+                        
                     });
             }
         },
