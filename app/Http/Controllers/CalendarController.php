@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Calendar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 
 class CalendarController extends Controller
 {
@@ -37,12 +39,37 @@ class CalendarController extends Controller
     public function store(Request $request)
     {
         $calendar = Calendar::create($request->validate([
+            'Title'=> 'required|string|max:255',
             'date' => 'required|date',
             'time' => 'required',
             'place' => 'required|string',
             'price' => 'required|numeric',
+            'Description' => 'string',
+            'image'=> 'string|max:255',
+            'quantity' => 'required|integer|min:1',
         ]));
-        return response()->json($calendar, 201);
+
+        if ($request->hasFile('imagen')) {
+            $image = $request->file('imagen');
+            $path = "calendars/{$calendar->id}";
+
+            if (!Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->makeDirectory($path);
+            }
+
+            $imageName = time() . '.' . $image->extension();
+            $image->storeAs($path, $imageName, 'public');
+           
+            $calendar->image = $imageName;
+            $calendar->save();
+        }
+
+        return response()->json(
+            [
+                'message' => 'Evento creado correctamente',
+                'event' => $calendar,
+            ],200
+        );
     }
 
     /**

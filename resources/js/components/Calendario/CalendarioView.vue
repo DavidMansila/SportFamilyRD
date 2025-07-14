@@ -56,8 +56,8 @@
         <div v-if="selectedDayEvents.length > 0" class="events-list">
           <div v-for="event in selectedDayEvents" :key="event.id" class="event-card" @click="openEventDetail(event)"
             :style="{ borderLeft: `4px solid ${event.categoryColor || '#3498db'}` }">
-            <div class="event-time">{{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}</div>
-            <h3 class="event-title">{{ event.nombre }}</h3>
+            <div class="event-time">{{ formatTime(event.time) }} - {{ formatTime(event.endTime) }}</div>
+            <h3 class="event-title">{{ event.Title }}</h3>
             <div class="event-meta">
               <span class="event-location">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -65,9 +65,9 @@
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                {{ event.location || 'Ubicación no especificada' }}
+                {{ event.place || 'Ubicación no especificada' }}
               </span>
-              <span class="event-price" v-if="event.precio">${{ event.precio }}</span>
+              <span class="event-price" v-if="event.price">${{ event.price }}</span>
               <span class="event-price free" v-else>Gratis</span>
             </div>
             <div v-if="user?.user_type === 'admin'" class="event-actions">
@@ -134,11 +134,11 @@
 
         <div class="event-header">
           <div class="event-date">
-            <div class="event-day">{{ new Date(selectedEvent.fecha).getDate() }}</div>
-            <div class="event-month">{{ monthNames[new Date(selectedEvent.fecha).getMonth()].substring(0, 3) }}</div>
+            <div class="event-day">{{ new Date(selectedEvent.date).getDate() }}</div>
+            <div class="event-month">{{ monthNames[new Date(selectedEvent.date).getMonth()].substring(0, 3) }}</div>
           </div>
           <div class="event-title-container">
-            <h2>{{ selectedEvent.nombre }}</h2>
+            <h2>{{ selectedEvent.Title }}</h2>
             <div class="event-meta">
               <span class="event-time">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -146,7 +146,7 @@
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                {{ formatTime(selectedEvent.startTime) }} - {{ formatTime(selectedEvent.endTime) }}
+                {{ formatTime(selectedEvent.time) }} - {{ formatTime(selectedEvent.endTime) }}
               </span>
               <span class="event-location">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -154,7 +154,7 @@
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                {{ selectedEvent.location || 'Ubicación no especificada' }}
+                {{ selectedEvent.place || 'Ubicación no especificada' }}
               </span>
             </div>
           </div>
@@ -169,19 +169,19 @@
           <div class="event-tickets">
             <h3>Boletos</h3>
             <div class="ticket-info">
-              <span class="ticket-price">${{ selectedEvent.precio }} <small>c/u</small></span>
-              <span class="ticket-available">{{ selectedEvent.boletosDisponibles }} disponibles</span>
+              <span class="ticket-price">${{ selectedEvent.price }} <small>c/u</small></span>
+              <span class="ticket-available">{{ selectedEvent.quantity }} disponibles</span>
             </div>
 
-            <div class="ticket-controls" v-if="selectedEvent.boletosDisponibles > 0">
+            <div class="ticket-controls" v-if="selectedEvent.quantity > 0">
               <div class="quantity-selector">
                 <button @click="decrementTicket" :disabled="ticketQuantity <= 1">-</button>
                 <span>{{ ticketQuantity }}</span>
                 <button @click="incrementTicket"
-                  :disabled="ticketQuantity >= selectedEvent.boletosDisponibles">+</button>
+                  :disabled="ticketQuantity >= selectedEvent.quantity">+</button>
               </div>
               <button class="add-to-cart-btn" @click="addToCart">
-                Añadir al carrito - ${{ selectedEvent.precio * ticketQuantity }}
+                Añadir al carrito - ${{ selectedEvent.price * ticketQuantity }}
               </button>
             </div>
             <div v-else class="sold-out">
@@ -209,7 +209,7 @@
 
         <form @submit.prevent="saveEvent">
           <div class="form-group">
-            <input v-model="formEvent.place" placeholder="Nombre del evento" required>
+            <input v-model="formEvent.Title" placeholder="Nombre del evento" required>
           </div>
 
           <div class="form-group">
@@ -224,20 +224,20 @@
             </div>
           </div>
 
-          <!-- <div class="form-group">
-            <textarea v-model="formEvent.descripcion" placeholder="Descripción"></textarea>
-          </div> -->
+          <div class="form-group">
+            <textarea v-model="formEvent.Description" placeholder="Descripción"></textarea>
+          </div>
 
           <div class="form-group">
             <input type="number" v-model="formEvent.price" placeholder="Precio" step="0.01" required>
           </div>
 
           <div class="form-group">
-            <input type="number" v-model="formEvent.boletosDisponibles" placeholder="Boletos disponibles" required>
+            <input type="number" v-model="formEvent.quantity" placeholder="Boletos disponibles" required>
           </div>
 
           <div class="form-group">
-            <input v-model="formEvent.location" placeholder="Ubicación" required>
+            <input v-model="formEvent.place" placeholder="Ubicación" required>
           </div>
 
           <div class="form-group">
@@ -349,11 +349,11 @@ export default {
       // Mapear los eventos al formato esperado por el backend
       const mappedEvents = scrapRawEvents.map(e => ({
         Title: e.title,
-        fecha: this.parseScrapDate(e.date),
-        startTime: e.hour ? this.parseScrapHour(e.hour) : '',
+        date: this.parseScrapDate(e.date),
+        time: e.hour ? this.parseScrapHour(e.hour) : '',
         endTime: '',
-        description: '',
-        boletosDisponibles: 100, // valor por defecto
+        Description: '',
+        quantity: 100, // valor por defecto
         price: this.parseScrapPrice(e.price),
         place: e.place || '',
         categoryColor: '#3498db',
@@ -430,7 +430,7 @@ export default {
     updateSelectedDayEvents() {
       // Usar eventosToShow para filtrar los eventos del día
       this.selectedDayEvents = this.eventosToShow.filter(evento => {
-        const eventDate = new Date(evento.fecha);
+        const eventDate = new Date(evento.date);//cualquier cosa se le pone date
         return eventDate.getDate() === this.selectedDay &&
           eventDate.getMonth() === this.currentMonth &&
           eventDate.getFullYear() === this.currentYear;
@@ -439,7 +439,7 @@ export default {
 
     hasEvents(day) {
       return this.eventosToShow.some(evento => {
-        const eventDate = new Date(evento.fecha);
+        const eventDate = new Date(evento.date);
         return eventDate.getDate() === day &&
           eventDate.getMonth() === this.currentMonth &&
           eventDate.getFullYear() === this.currentYear;
@@ -448,7 +448,7 @@ export default {
 
     getEventsForDay(day) {
       return this.eventosToShow.filter(evento => {
-        const eventDate = new Date(evento.fecha);
+        const eventDate = new Date(evento.date);
         return eventDate.getDate() === day &&
           eventDate.getMonth() === this.currentMonth &&
           eventDate.getFullYear() === this.currentYear;
@@ -481,7 +481,7 @@ export default {
     },
 
     incrementTicket() {
-      if (this.ticketQuantity < this.selectedEvent.boletosDisponibles) {
+      if (this.ticketQuantity < this.selectedEvent.quantity) {
         this.ticketQuantity++;
       }
     },
@@ -506,7 +506,7 @@ export default {
         });
 
         // Mostrar mensaje de éxito
-        this.successEventMessage = `¡${this.selectedEvent.nombre} agregado al carrito!`;
+        this.successEventMessage = `¡${this.selectedEvent.Title} agregado al carrito!`;
         this.showEventSuccess = true;
 
         // Ocultar después de 3 segundos
@@ -520,7 +520,7 @@ export default {
         // Actualizar disponibilidad local
         const event = this.eventos.find(e => e.id === this.selectedEvent.id);
         if (event) {
-          event.boletosDisponibles -= this.ticketQuantity;
+          event.quantity -= this.ticketQuantity;
         }
         this.closeEventDetail();
       } catch (error) {
@@ -535,7 +535,7 @@ export default {
       // Devolver boletos al evento
       const event = this.eventos.find(e => e.id === removedItem.id);
       if (event) {
-        event.boletosDisponibles += removedItem.quantity;
+        event.quantity += removedItem.quantity;
       }
 
       this.cartItems.splice(index, 1);
@@ -557,14 +557,14 @@ export default {
           // Mapear los eventos al formato esperado por el frontend
           this.scrapEvents = response.data.events.map(e => ({
             id: e.id,
-            nombre: e.Title || e.place || 'Sin nombre',
-            fecha: e.date,
-            startTime: e.time || '',
+            Title: e.Title || e.place || 'Sin nombre',
+            date: e.date,
+            time: e.time || '',
             endTime: '',
             Description: e.Description || '',
-            boletosDisponibles: e.quantity || 100,
-            precio: parseFloat(e.price) || 0,
-            location: e.place || '',
+            quantity: e.quantity || 100,
+            price: parseFloat(e.price) || 0,
+            place: e.place || '',
             categoryColor: '#3498db',
             image: e.image || '',
             links: e.links || []
@@ -580,20 +580,21 @@ export default {
 
     resetEventForm() {
       return {
-        nombre: '',
-        fecha: new Date().toISOString().split('T')[0],
-        startTime: '18:00',
+        Title: '',
+        date: new Date().toISOString().split('T')[0],
+        time: '18:00',
         endTime: '20:00',
-        descripcion: '',
-        precio: 0,
-        boletosDisponibles: 100,
-        location: '',
+        Description: '',
+        price: 0,
+        quantity: 100,
+        place: '',
         image: ''
       };
     },
 
     openEventForm(event = null) {
       if (event) {
+        console.log("🚀 ~ openEventForm ~ event:", event)
         this.editingEvent = event.id;
         this.formEvent = { ...event };
       } else {
