@@ -163,7 +163,7 @@
         <div class="event-content">
           <div class="event-description">
             <h3>Descripción</h3>
-            <p> {{ selectedEvent.Description || 'no hay'}}</p>
+            <p> {{ selectedEvent.Description || 'No hay descripcion'}}</p>
           </div>
 
           <div class="event-tickets">
