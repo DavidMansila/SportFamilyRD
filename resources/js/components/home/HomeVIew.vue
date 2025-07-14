@@ -19,7 +19,7 @@
             <span class="title-line highlight">Comunidad Deportiva</span>
             <span class="title-line">Dominicana</span>
           </h1>
-          <p class="hero-subtitle">Eventos • Entrenamiento • Tienda • Comunidad</p>
+          <!-- <p class="hero-subtitle">Eventos • Entrenamiento • Tienda • Comunidad</p> -->
 
           <div v-if="!user" class="hero-cta">
             <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="cta-button">
@@ -34,6 +34,10 @@
             <div class="stat-number">{{ stats.users || 0 }}</div>
             <div class="stat-label">Miembros</div>
           </div>
+          <!-- <div class="stat-item">
+            <div class="stat-number">{{ stats.news || 0 }}</div>
+            <div class="stat-label">Eventos</div>
+          </div> -->
           <div class="stat-item">
             <div class="stat-number">{{ stats.events || 0 }}</div>
             <div class="stat-label">Eventos</div>
@@ -100,7 +104,7 @@
           <div class="featured-content">
             <div class="news-meta">
               <span class="date"><i class="far fa-calendar-alt"></i> {{ formatNewsDate(recentNews[0].published_at)
-                }}</span>
+              }}</span>
               <span class="author"><i class="far fa-user"></i> Por {{ recentNews[0].author }}</span>
             </div>
             <h3 class="news-title">{{ recentNews[0].title }}</h3>
