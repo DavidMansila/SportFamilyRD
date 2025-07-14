@@ -362,11 +362,33 @@ export default {
   justify-content: flex-start;
 }
 
+.message-footer {
+  display: flex;
+  justify-content: flex-end; /* Empuja todo a la derecha */
+  align-items: center;
+  gap: 4px; /* Espacio entre hora y ticks */
+  margin-top: 4px;
+}
+
+.message-footer .time {
+  font-size: 0.7rem;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+.message-footer .message-status {
+  display: flex;
+  align-items: center;
+  position: static; /* Elimina absolute para que flex lo maneje bien */
+}
+
+
+
 /* Estilos específicos para alinear tiempo y estado */
 .time {
   font-size: 11px;
   color: rgba(0, 0, 0, 0.5);
-  display: inline-block;
+  /* display: inline-block; */
   vertical-align: middle;
 }
 

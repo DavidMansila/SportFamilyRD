@@ -11,11 +11,20 @@
     </button>
     <button @click="logout" style="margin-top: 1rem; background:#ef4444;">Cerrar sesión</button>
   </div>
+
+  <Alert
+    v-if="openModal"
+    :message="alertMessage"
+    :type="alertType"
+    @closed="openModal = null"
+  />
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
+import Alert from './Alert.vue';
+
 
 const props = defineProps({
   user: { type: Object, required: true }
@@ -24,6 +33,10 @@ const emit = defineEmits(['logout']);
 
 const reenviando = ref(false);
 const reenviado = ref(false);
+
+const alertMessage = ref('');
+const alertType = ref('');
+const openModal = ref(false);
 
 async function reenviarCorreo() {
   reenviando.value = true;
@@ -34,7 +47,10 @@ async function reenviarCorreo() {
     await axios.post('/email/verification-notification', data);
     reenviado.value = true;
   } catch (e) {
-    alert('Error al reenviar el correo.');
+    alertType.value = 'error';
+    alertMessage.value = 'Error al reenviar el correo.';
+    openModal.value = true;
+    // alert('Error al reenviar el correo.');
   }
   reenviando.value = false;
 }

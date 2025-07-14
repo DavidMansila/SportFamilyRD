@@ -170,10 +170,30 @@ $color-error: #ff4757;
       color: rgba($color-white, 0.8);
     }
 
-    .message-status {
-      position: absolute;
-      bottom: 6px;
-      right: 10px;
+    // .message-status {
+    //   position: absolute;
+    //   bottom: 6px;
+    //   right: 10px;
+    //   font-size: 0.7rem;
+
+    //   .read-indicator {
+    //     color: lighten($color-success, 20%);
+    //   }
+
+    //   .unread-indicator {
+    //     color: rgba($color-white, 0.6);
+    //   }
+    // }
+    .message.sent .message-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .message.sent .message-status {
+      position: static; // eliminamos absolute
       font-size: 0.7rem;
 
       .read-indicator {
@@ -184,6 +204,7 @@ $color-error: #ff4757;
         color: rgba($color-white, 0.6);
       }
     }
+
   }
 
   // Mensajes recibidos (izquierda)

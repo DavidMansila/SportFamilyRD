@@ -452,6 +452,13 @@
             :user="user"
         />
     </div>
+
+    <Alert
+      v-if="openModal"
+      :message="alertMessage"
+      :type="alertType"
+      @closed="openModal = null"
+    />
 </template>
 
 <script>
@@ -459,6 +466,7 @@ import axios from "axios";
 import Navbar from "../navbarComponent.vue";
 import ChatBubbleComponent from "../ChatBubbleComponent.vue";
 import paginatorComponent from "@/components/paginatorComponent.vue";
+import Alert from '../Alert.vue';
 
 export default {
     name: "Entrenadores",
@@ -466,9 +474,13 @@ export default {
         Navbar,
         ChatBubbleComponent,
         paginatorComponent,
+        Alert,
     },
     data() {
         return {
+            openModal: false,
+            alertMessage: "",
+            alertType: "", // 'error', 'success', 'alert'.
             user: null,
             scrollPosition: 0,
             busqueda: "",
@@ -618,17 +630,22 @@ export default {
         },
 
         async enviarFormularioContacto() {
+            
             if (!this.user?.id) {
-                alert("Debes iniciar sesión para contactar a un entrenador");
-                return;
+              this.alertType = "alert";
+              this.alertMessage = "Debes iniciar sesión para contactar a un entrenador";
+              this.openModal = true;
+        
+              return;
             }
 
             // Verificar si el usuario es entrenador
             if (this.user.user_type === "entrenador") {
-                alert(
-                    "Los entrenadores no pueden enviar solicitudes a otros entrenadores"
-                );
-                return;
+              this.alertType = "error";
+              this.alertMessage = "Los entrenadores no pueden enviar solicitudes a otros entrenadores.";
+              this.openModal = true;
+              
+              return;
             }
 
             try {
@@ -648,10 +665,11 @@ export default {
                             `/training/${checkResponse.data.id}`
                         );
                     } else {
-                        alert(
-                            `Ya tienes una solicitud pendiente con ${this.contactoEntrenador.nombre}`
-                        );
-                        return;
+                      this.alertType = "error";
+                      this.alertMessage = `Ya tienes una solicitud pendiente con ${this.contactoEntrenador.nombre}`;
+                      this.openModal = true;
+          
+                      return;
                     }
                 }
 
@@ -667,26 +685,37 @@ export default {
                 const response = await axios.post("/training", formData);
 
                 if (response.status === 201) {
-                    alert(
-                        `Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`
-                    );
-                    this.cerrarFormularioContacto();
+                  this.alertType = "success";
+                  this.alertMessage = `Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`;
+                  this.openModal = true;
+            
+                  this.cerrarFormularioContacto();
                 }
             } catch (error) {
                 // Manejo de errores
                 if (error.response?.status === 422) {
                     const errors = error.response.data.errors;
                     let errorMsg = Object.values(errors).flat().join("\n");
-                    alert(`Error de validación:\n${errorMsg}`);
+                    
+                    this.alertType = "error";
+                    this.alertMessage = `Error de validación:\n${errorMsg}`;
+                    this.openModal = true;
                 } else if (error.response?.status === 401) {
-                    alert(
-                        "Tu sesión ha expirado. Por favor inicia sesión nuevamente."
-                    );
+                    this.alertType = "error";
+                    this.alertMessage = "Tu sesión ha expirado. Por favor inicia sesión nuevamente.";
+                    this.openModal = true;
+
                 } else if (error.response?.data?.message) {
-                    alert(error.response.data.message);
+                   
+                    this.alertType = "error";
+                    this.alertMessage = `Error: ${error.response.data.message}`;
+                    this.openModal = true;
                 } else {
                     console.error("Error completo:", error);
-                    alert("Error al procesar la solicitud: " + error.message);
+                    
+                    this.alertType = "error";
+                    this.alertMessage = `Error al procesar la solicitud: ${error.message}`;
+                    this.openModal = true;
                 }
             }
         },
@@ -743,7 +772,10 @@ export default {
                         "Error al cargar entrenadores aprobados:",
                         error
                     );
-                    alert("Error al cargar entrenadores aprobados.");
+                    this.alertType = "error";
+                    this.alertMessage = "Error al cargar entrenadores aprobados.";
+                    this.openModal = true;
+                    this.entrenadores = []; // Asegurarse de que la lista esté vacía en caso de error
                 });
         },
 
