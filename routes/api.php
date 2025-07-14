@@ -97,6 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('/calendar', CalendarController::class);
     Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
     Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
+
     Route::get('/', [CalendarController::class, 'index']);
     Route::post('/', [CalendarController::class, 'store']);
     Route::put('/{calendar}', [CalendarController::class, 'update']);

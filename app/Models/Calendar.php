@@ -13,7 +13,7 @@ class Calendar extends Model
         'date',
         'time',
         'place',
-        'description',
+        'Description',
         'price',
         'image', 
         'quantity', 
