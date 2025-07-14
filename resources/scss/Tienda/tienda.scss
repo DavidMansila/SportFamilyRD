@@ -203,7 +203,7 @@
 
     &:focus {
       outline: none;
-      box-shadow: 0 0 0 2px #2196F3;
+      box-shadow: none !important;
     }
   }
 
@@ -304,6 +304,7 @@
 
     .search-input {
       padding: 1rem 1.5rem;
+      box-shadow: none !important;
       font-size: 1rem;
     }
 
