@@ -52,7 +52,7 @@
 
                             <div class="info-item">
                                 <span class="info-label">Experiencia:</span>
-                                <span class="info-value">{{ solicitud.experience }}</span>
+                                <span class="info-value">{{ solicitud.experience }} años</span>
                             </div>
 
                             <!-- <div class="info-item">
