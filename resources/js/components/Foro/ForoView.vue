@@ -530,25 +530,36 @@
 
   <!-- Burbuja de Mensajes Flotante -->
   <ChatBubbleComponent v-if="user && !mostrarModal && !postSeleccionado" :user="user" />
-
+  
+  <Alert 
+    v-if="openModal" 
+    :type="alertType" 
+    :message="alertMessage" 
+    @close="openModal = false" 
+  />  
 </template>
-
 
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
+import Alert from '../Alert.vue';
 
 export default {
   name: 'ForoComponent',
   components: {
     paginatorComponent,
     Navbar,
-    ChatBubbleComponent
+    ChatBubbleComponent,
+    Alert
   },
   data() {
     return {
+      openModal: false,
+      alertType: 'success', // 'success', 'error', 'alert'
+      alertMessage: '',
+
       user: null,
       currentPage: 1,
       itemsPerPage: 9,
@@ -598,7 +609,10 @@ export default {
     // Métodos de UI
     abrirModal() {
       if (!this.user) {
-        alert('Debes iniciar sesión para crear publicaciones');
+       
+        this.alertType = 'alert';
+        this.alertMessage = 'Por favor, inicia sesión para crear un nuevo post.';
+        this.openModal = true;
         return;
       }
       this.mostrarModal = true;
@@ -717,7 +731,10 @@ export default {
     async createPost() {
 
       if (!this.user?.id) {
-        alert('Debes iniciar sesión para crear posts');
+        
+        this.alertType = 'alert';
+        this.alertMessage = 'Por favor, inicia sesión para crear un nuevo post.';
+        this.openModal = true;
         return;
       }
 
@@ -739,7 +756,10 @@ export default {
         this.cerrarModal();
       } catch (error) {
         console.error('Error creando post:', error);
-        alert('Error al crear el post');
+        
+        this.alertType = 'error';
+        this.alertMessage = 'Error al crear el post. Por favor, inténtalo de nuevo.';
+        this.openModal = true;
       }
     },
 
@@ -794,7 +814,11 @@ export default {
       ];
 
       if (!allowedTypes.includes(file.type)) {
-        alert(`Tipo de archivo no válido: ${file.type}. Use JPEG, PNG o GIF.`);
+       
+        this.alertType = 'error';
+        this.alertMessage = `Tipo de archivo no válido: ${file.type}. Usa JPEG, PNG o GIF.`;
+        this.openModal = true;
+
         event.target.value = '';
         return;
       }
@@ -815,7 +839,10 @@ export default {
 
       try {
         if (!this.user) {
-          alert('Debes iniciar sesión para comentar');
+          
+          this.alertType = 'alert';
+          this.alertMessage = 'Por favor, inicia sesión para comentar.';
+          this.openModal = true;
           return;
         }
 
@@ -889,16 +916,20 @@ export default {
 
       } catch (error) {
         console.error('Error detallado:', error.response?.data || error.message);
-        alert(`Error al guardar: ${error.response?.data?.message || error.message}`);
+
+        this.alertType = 'error';
+        this.alertMessage = `Error al guardar el comentario: ${error.response?.data?.message || error.message}`;
+        this.openModal = true;
       }
     },
 
-
     // METODOS PARA LIKES
-
     async toggleLike(type, id) {
       if (!this.user) {
-        alert('Debes iniciar sesión para dar like');
+        
+        this.alertType = 'alert';
+        this.alertMessage = 'Por favor, inicia sesión para dar like.';
+        this.openModal = true;
         return;
       }
 
@@ -1011,7 +1042,10 @@ export default {
 
       } catch (error) {
         console.error('Error:', error.response?.data);
-        alert(error.response?.data?.message || 'Error al editar');
+        
+        this.alertType = 'error';
+        this.alertMessage = error.response?.data?.message || 'Error al editar el post. Por favor, inténtalo de nuevo.';
+        this.openModal = true;
       }
     },
 
@@ -1040,7 +1074,10 @@ export default {
           }
         } catch (error) {
           console.error('Error eliminando post:', error.response?.data || error.message);
-          alert('No se pudo eliminar el post');
+          
+          this.alertType = 'error';
+          this.alertMessage = error.response?.data?.message || 'Error al eliminar el post. Por favor, inténtalo de nuevo.';
+          this.openModal = true;
         }
       }
     },
@@ -1075,7 +1112,10 @@ export default {
     guardarEdicionComentario(comentario) {
 
       if (!this.comentarioEditado.trim()) {
-        alert('El comentario no puede estar vacío');
+        
+        this.alertType = 'alert';
+        this.alertMessage = 'El comentario no puede estar vacío';
+        this.openModal = true;
         return;
       }
 
@@ -1096,7 +1136,10 @@ export default {
         })
         .catch(error => {
           console.error('Error editando comentario:', error);
-          alert('Error al guardar cambios: ' + (error.response?.data?.message || error.message));
+          
+          this.alertType = 'error';
+          this.alertMessage = 'Error al guardar cambios: ' + (error.response?.data?.message || error.message);
+          this.openModal = true;
         });
 
 
@@ -1111,7 +1154,10 @@ export default {
     guardarEdicionReply(reply, comentarioID) {
 
       if (!this.replyEditado.trim()) {
-        alert('La respuesta no puede estar vacía');
+        
+        this.alertType = 'alert';
+        this.alertMessage = 'La respuesta no puede estar vacía';
+        this.openModal = true;
         return;
       }
 
@@ -1133,7 +1179,10 @@ export default {
         })
         .catch(error => {
           console.error('Error editando respuesta:', error);
-          alert('Error al guardar cambios: ' + (error.response?.data?.message || error.message));
+          
+          this.alertType = 'error';
+          this.alertMessage = 'Error al guardar cambios: ' + (error.response?.data?.message || error.message);
+          this.openModal = true;
         });
 
 
@@ -1173,7 +1222,10 @@ export default {
         })
         .catch(error => {
           console.error('Error eliminando comentario:', error);
-          alert('Error al eliminar');
+          
+          this.alertType = 'error';
+          this.alertMessage = 'Error al eliminar el comentario: ' + (error.response?.data?.message || error.message);
+          this.openModal = true;
         });
     },
 
@@ -1213,7 +1265,10 @@ export default {
         })
         .catch(error => {
           console.error('Error eliminando respuesta:', error);
-          alert('Error al eliminar');
+          
+          this.alertType = 'error';
+          this.alertMessage = 'Error al eliminar la respuesta: ' + (error.response?.data?.message || error.message);
+          this.openModal = true;
         });
     },
 

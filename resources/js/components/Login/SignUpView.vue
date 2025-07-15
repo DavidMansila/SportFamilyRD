@@ -138,14 +138,30 @@
       </div>
     </div>
   </div>
+
+  <Alert 
+    v-if="openModal" 
+    :type="alertType" 
+    :message="alertMessage" 
+    @close="openModal = false" 
+  />  
 </template>
 
 <script>
 import axios from 'axios';
+import Alert from '../Alert.vue';
 
 export default {
+  components: {
+    Alert
+  },
+
   data() {
     return {
+      alertType: 'success', // 'success', 'error', 'alert'
+      alertMessage: '',
+      openModal: false,
+
       showLogoutMessage: false,
       showRegisterPassword: false,
       showRegisterConfirm: false,
@@ -194,7 +210,11 @@ export default {
         this.$router.push('/');
       } catch (error) {
         console.error(error);
-        alert('Contraseña debe tener al menos 4 caracteres');
+        
+        this.alertType = 'alert';
+        this.alertMessage = 'Contraseña debe tener al menos 4 caracteres';
+        this.openModal = true;
+
       } finally {
         this.isSubmitting = false;
       }
@@ -212,7 +232,11 @@ export default {
         this.$router.push('/');
       } catch (error) {
         console.error('Login error:', error);
-        alert('Credenciales inválidas');
+        
+        this.alertType = 'error';
+        this.alertMessage = 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+        this.openModal = true;
+
       } finally {
         this.isSubmitting = false;
       }

@@ -38,6 +38,8 @@ export default {
       switch (this.type) {
         case 'success':
           return '✅';
+        case 'info':
+          return 'ℹ️';
         case 'alert':
           return '⚠️';
         case 'error':
@@ -75,10 +77,23 @@ export default {
 </script>
 
 <style scoped>
-.custom-alert {
+/* .custom-alert {
   position: fixed;
   top: 20px;
   right: 20px;
+  background: linear-gradient(to right, #000000, #a10013);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 9999;
+  transition: all 0.3s ease;
+} */
+.custom-alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   background: linear-gradient(to right, #000000, #a10013);
   color: white;
   padding: 16px 24px;

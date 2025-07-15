@@ -119,20 +119,30 @@
     </div>
   </div>
 
+  <Alert 
+    v-if="openModal" 
+    :type="alertType" 
+    :message="alertMessage" 
+    @close="openModal = false" 
+  />
 </template>
 
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
-
+import Alert from '../Alert.vue';
 export default {
   name: 'Ajustes',
   components: {
-    Navbar
+    Navbar,
+    Alert
   },
   data() {
 
     return {
+      alertType: '',
+      alertMessage: '',
+      openModal: false,
 
       activeTab: 'account',
 
@@ -237,7 +247,10 @@ export default {
     },
 
     showToast(message, type = 'info') {
-      alert(`${type.toUpperCase()}: ${message}`);
+      
+      this.alertType = type;
+      this.alertMessage = message;
+      this.openModal = true;
     },
 
     fetchUserConfigs() {

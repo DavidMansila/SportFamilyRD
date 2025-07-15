@@ -218,25 +218,35 @@
   <!-- Burbuja de Mensajes Flotante -->
   <ChatBubbleComponent v-if="user && !noticiaSeleccionada" :user="user" />
 
-
+  <Alert 
+    v-if="openModal" 
+    :type="alertType" 
+    :message="alertMessage" 
+    @close="openModal = false" 
+  />  
 </template>
-
 
 <script>
 import axios from 'axios';
 import paginatorComponent from '@/components/paginatorComponent.vue';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
+import Alert from '../Alert.vue';
 
 export default {
   name: 'NoticiasComponent',
   components: {
     paginatorComponent,
     Navbar,
-    ChatBubbleComponent
+    ChatBubbleComponent,
+    Alert
   },
   data() {
     return {
+      openModal: false,
+      alertType: 'success', // 'success', 'error', 'alert'
+      alertMessage: '',
+
       currentPage: 1,
       itemsPerPage: 9,
       noticias: [],
@@ -410,7 +420,10 @@ export default {
 
     async toggleSave(noticia) {
       if (!this.user || !this.user.id) {
-        alert('Debes iniciar sesión para guardar noticias');
+       
+        this.alertMessage = 'Inicia sesión para guardar noticias';
+        this.alertType = 'alert';
+        this.openModal = true;
         return;
       }
 
@@ -580,12 +593,18 @@ export default {
           });
         } else {
           await navigator.clipboard.writeText(shareText);
-          alert('¡Contenido copiado! Puedes compartir esta noticia:\n\n' + shareText);
+         
+          this.alertType = 'success';
+          this.alertMessage = '¡Contenido copiado! Puedes compartir esta noticia:\n\n' + shareText;
+          this.openModal = true;
         }
       } catch (error) {
         console.error('Error al compartir:', error);
         if (error.name !== 'AbortError') {
-          alert('Error al compartir. Por favor, inténtalo de nuevo.');
+          
+          this.alertType = 'error';
+          this.alertMessage = 'Error al compartir. Por favor, inténtalo de nuevo.';
+          this.openModal = true;
         }
       }
     }

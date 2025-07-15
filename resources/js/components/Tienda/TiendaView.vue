@@ -267,6 +267,12 @@
   <!-- Burbuja de Mensajes Flotante -->
   <ChatBubbleComponent v-if="user" :user="user" />
 
+  <Alert 
+    v-if="openModal" 
+    :type="alertType" 
+    :message="alertMessage" 
+    @close="openModal = false" 
+  />  
 </template>
 
 <script>
@@ -274,16 +280,22 @@ import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
+import Alert from '../Alert.vue';
 
 export default {
   name: 'TiendaComponent',
   components: {
     Navbar,
     ChatBubbleComponent,
-    paginatorComponent
+    paginatorComponent,
+    Alert
   },
   data() {
     return {
+      openModal: false,
+      alertType: 'success', // 'success', 'error', 'alert'
+      alertMessage: '',
+
       productos: [],
       showMobileFilters: false,
       mobileCategoryOpen: null,
@@ -536,22 +548,34 @@ export default {
           .then(() => {
             this.getProducts();
             this.cerrarAdminForm();
-            alert('Producto actualizado correctamente');
+            
+            this.alertType = 'success';
+            this.alertMessage = 'Producto actualizado correctamente';
+            this.openModal = true;
           })
           .catch(error => {
             console.error('Error:', error.response?.data);
-            alert(error.response?.data?.message || 'Error al actualizar');
+         
+            this.alertType = 'error';
+            this.alertMessage = error.response?.data?.message || 'Error al actualizar';
+            this.openModal = true;
           });
       } else {
         axios.post('/products', requestData, config)
           .then(() => {
             this.getProducts();
             this.cerrarAdminForm();
-            alert('Producto creado correctamente');
+            
+            this.alertType = 'success';
+            this.alertMessage = 'Producto creado correctamente';
+            this.openModal = true;
           })
           .catch(error => {
             console.error('Error:', error.response?.data);
-            alert(error.response?.data?.message || 'Error al crear');
+           
+            this.alertType = 'error';
+            this.alertMessage = error.response?.data?.message || 'Error al crear';
+            this.openModal = true;
           });
       }
     },
@@ -567,6 +591,9 @@ export default {
           this.getProducts()
         } catch (error) {
           console.error('Error eliminando producto:', error)
+          this.alertType = 'error';
+          this.alertMessage = 'Error eliminando producto';
+          this.openModal = true;
         }
       }
     },
@@ -593,7 +620,10 @@ export default {
     async agregarAlCarrito(producto) {
       try {
         if (!this.user) {
-          alert('Debes iniciar sesión para agregar productos al carrito');
+        
+          this.alertType = 'alert';
+          this.alertMessage = 'Debes iniciar sesión para agregar productos al carrito';
+          this.openModal = true;
           return;
         }
 
@@ -617,7 +647,10 @@ export default {
         window.dispatchEvent(new CustomEvent('cart-updated'));
       } catch (error) {
         console.error('Error al agregar al carrito:', error);
-        alert('No se pudo agregar el producto al carrito');
+        
+        this.alertType = 'error';
+        this.alertMessage = 'No se pudo agregar el producto al carrito';
+        this.openModal = true;
       }
     },
 
