@@ -343,29 +343,37 @@
                 <button @click="saveProfile" class="save-btn">Guardar Cambios</button>
                 <button @click="discardChanges" class="discard-btn">Descartar Cambios</button>
             </div>
-
-
-
         </div>
-
     </div>
-</template>
 
+    <Alert 
+        v-if="openModal" 
+        :type="alertType" 
+        :message="alertMessage" 
+        @close="openModal = false" 
+    />  
+</template>
 
 <script>
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.css'
 import Navbar from '../navbarComponent.vue';
 import axios from 'axios';
+import Alert from '../Alert.vue';
 
 export default {
     name: 'ProfileView',
     components: {
         Navbar,
-        Multiselect
+        Multiselect,
+        Alert
     },
     data() {
         return {
+            openModal: false,
+            alertType: 'success', // 'success', 'error', 'alert'
+            alertMessage: '',
+
             editMode: false,
             entrenadores: [],
             trainer: null,
@@ -568,7 +576,10 @@ export default {
             try {
                 // Validación de campos obligatorios
                 if (!this.user.birthdate) {
-                    alert('Por favor complete la fecha de nacimiento');
+                    
+                    this.alertType = 'alert';
+                    this.alertMessage = 'Por favor complete la fecha de nacimiento';
+                    this.openModal = true;
                     return;
                 }
 
@@ -664,11 +675,16 @@ export default {
                 this.editMode = false;
                 this.$forceUpdate();
                 this.cargarEntrenadores();
-
-                alert('¡Perfil actualizado correctamente!');
+               
+                this.alertType = 'success';
+                this.alertMessage = 'Perfil actualizado correctamente';
+                this.openModal = true;
             } catch (error) {
                 console.error('Error al guardar perfil:', error);
-                alert('Error al guardar los cambios. Por favor intenta nuevamente.');
+                
+                this.alertType = 'error';
+                this.alertMessage = 'Error al guardar los cambios. Por favor intenta nuevamente.';
+                this.openModal = true;
             }
         },
 
@@ -689,13 +705,19 @@ export default {
         validarYActualizarAvatar(file) {
             // Validar tipo de archivo
             if (!file.type.startsWith('image/')) {
-                alert('Por favor selecciona un archivo de imagen válido')
+                
+                this.alertType = 'alert';
+                this.alertMessage = 'Por favor selecciona un archivo de imagen válido';
+                this.openModal = true;
                 return
             }
             // Validar tamaño (ejemplo: 2MB máximo)
             const maxSize = 2 * 1024 * 1024
             if (file.size > maxSize) {
-                alert('El tamaño máximo permitido es 2MB')
+                
+                this.alertType = 'alert';
+                this.alertMessage = 'El tamaño máximo permitido es 2MB';
+                this.openModal = true;
                 return
             }
             // Crear previsualización
@@ -730,7 +752,10 @@ export default {
 
             } catch (error) {
                 console.error('Error al actualizar la imagen:', error);
-                alert('Error al actualizar la imagen. Por favor intenta nuevamente.');
+                
+                this.alertType = 'error';
+                this.alertMessage = 'Error al actualizar la imagen. Por favor intenta nuevamente.';
+                this.openModal = true;
             }
         },
 
@@ -832,7 +857,6 @@ export default {
             this.user.achievements.splice(index, 1);
         },
 
-
         formatAchievementDate(date) {
             if (!date) return 'Fecha no especificada';
             try {
@@ -843,8 +867,6 @@ export default {
             }
         },
 
-
-
         handleError(error, defaultMsg) {
             const errorMsg = error.response?.data?.message || defaultMsg;
             this.error = errorMsg;
@@ -853,8 +875,10 @@ export default {
         },
 
         showToast(message, type = 'info') {
-            // Implementar lógica de tu sistema de notificaciones
-            alert(`${type.toUpperCase()}: ${message}`);
+            
+            this.alertType = type;
+            this.alertMessage = message;
+            this.openModal = true;
         },
 
 

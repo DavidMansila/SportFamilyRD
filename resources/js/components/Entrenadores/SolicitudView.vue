@@ -331,8 +331,14 @@
         </div>
       </div>
     </transition>
-    
   </div>
+
+  <Alert 
+    v-if="openModal" 
+    :type="alertType" 
+    :message="alertMessage" 
+    @close="openModal = false" 
+  />  
 </template>
 
 
@@ -340,14 +346,20 @@
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
+import Alert from '../Alert.vue';
 
 export default {
   name: 'SolicitudView',
   components: {
-    Navbar
+    Navbar,
+    Alert
   },
   data() {
     return {
+      openModal: false,
+      alertType: 'success', // 'success', 'error', 'alert'
+      alertMessage: '',
+
       user: null,
       pasoActual: 1,
       mostrarConfirmacion: false,
@@ -441,11 +453,19 @@ export default {
 
       if (this.pasoActual === 2) {
         if (!this.formulario.deporte) {
-          alert('Selecciona un deporte');
+          
+          alertType = 'alert';
+          alertMessage = 'Selecciona un deporte';
+          openModal = true;
+
           valido = false;
         }
         if (this.formulario.experiencia < 0 || this.formulario.experiencia > 50) {
-          alert('Experiencia debe ser entre 0-50 años');
+
+          alertType = 'alert';
+          alertMessage = 'Experiencia debe ser entre 0-50 años';
+          openModal = true;
+
           valido = false;
         }
       }
@@ -568,7 +588,10 @@ export default {
           })
           .catch(error => {
             console.error('Error:', error.response.data);
-            alert('Error al enviar la solicitud');
+            
+            this.openModal = true;
+            this.alertType = 'error';
+            this.alertMessage = 'Error al enviar la solicitud. Por favor, inténtalo de nuevo más tarde.';
           });
       }
     },

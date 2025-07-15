@@ -313,7 +313,9 @@ export default {
                     })
                     .catch(error => {
                         console.error('Error al aprobar la solicitud:', error);
-                        alert('Error al aprobar la solicitud');
+                        this.alertType = "error";
+                        this.alertMessage = "Error al aprobar la solicitud";
+                        this.openModal = true;
                         
                     });
             }
@@ -332,7 +334,10 @@ export default {
                     })
                     .catch(error => {
                         console.error('Error al rechazar la solicitud:', error);
-                        alert('Error al rechazar la solicitud');
+                        
+                        this.alertType = "error";
+                        this.alertMessage = "Error al rechazar la solicitud";
+                        this.openModal = true;
                     });
             }
         },

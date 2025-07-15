@@ -259,23 +259,33 @@
   <!-- Burbuja de Mensajes Flotante -->
   <ChatBubbleComponent v-if="user && !selectedEvent" :user="user" />
 
-
+  <Alert 
+    v-if="openModal" 
+    :type="alertType" 
+    :message="alertMessage" 
+    @close="openModal = false" 
+  />
 </template>
 
 <script>
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
+import Alert from '../Alert.vue';
 
 export default {
   name: 'Calendario',
   components: {
     Navbar,
-    ChatBubbleComponent
+    ChatBubbleComponent,
+    Alert
   },
   data() {
 
     return {
+      alertType: '',
+      alertMessage: '',
+      openModal: false,
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
       selectedDay: null, // Cambiado de new Date().getDate() a null
@@ -494,7 +504,10 @@ export default {
 
     async addToCart() {
       if (!this.user) {
-        alert('Debes iniciar sesión para agregar eventos al carrito');
+        
+        alertType = 'error';
+        alertMessage = 'Debes iniciar sesión para agregar eventos al carrito';
+        this.openModal = true;
         return;
       }
       try {
@@ -524,8 +537,10 @@ export default {
         }
         this.closeEventDetail();
       } catch (error) {
-        console.error('Error al agregar al carrito:', error);
-        alert('No se pudo agregar el evento al carrito');
+        
+        alertType = 'error';
+        alertMessage = 'Error al agregar al carrito. Inténtalo de nuevo más tarde.';
+        this.openModal = true;
       }
     },
 
@@ -543,8 +558,13 @@ export default {
     toggleCartPopup() {
       this.showCartPopup = !this.showCartPopup;
     },
+
     checkout() {
-      alert(`Compra realizada por $${this.cartTotal}. ¡Gracias por tu compra!`);
+      
+      alertType = 'success';
+      alertMessage = `Compra realizada por $${this.cartTotal}. ¡Gracias por tu compra!`;
+      this.openModal = true;
+
       this.cartItems = [];
       this.showCartPopup = false;
     },
@@ -632,7 +652,10 @@ export default {
         }, 3000);
       } catch (error) {
         console.error('Error guardando evento:', error);
-        alert(error.response?.data?.message || 'Error al guardar');
+        
+        alertType = 'error';
+        alertMessage = error.response?.data?.message || 'Error al guardar';
+        this.openModal = true;
       }
     },
 
