@@ -56,7 +56,7 @@
         <div v-if="selectedDayEvents.length > 0" class="events-list">
           <div v-for="event in selectedDayEvents" :key="event.id" class="event-card" @click="openEventDetail(event)"
             :style="{ borderLeft: `4px solid ${event.categoryColor || '#3498db'}` }">
-            <div class="event-time">{{ formatTime(event.time) }} - {{ formatTime(event.endTime) }}</div>
+            <div class="event-time">{{ formatTime(event.time) }}</div>
             <h3 class="event-title">{{ event.Title }}</h3>
             <div class="event-meta">
               <span class="event-location">
@@ -146,7 +146,7 @@
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                {{ formatTime(selectedEvent.time) }} - {{ formatTime(selectedEvent.endTime) }}
+                {{ formatTime(selectedEvent.time) }}
               </span>
               <span class="event-location">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
