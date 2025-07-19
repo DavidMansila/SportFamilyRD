@@ -31,7 +31,6 @@ Broadcast::channel('online.{chatId}', function ($user, $chatId) {
         || ($chat->trainer && $user->id == $chat->trainer->user_id);
     if (!$isMember) return false;
 
-    // Devuelve la info que quieres compartir
     return [
         'id'        => $user->id,
         'name'      => $user->name,
