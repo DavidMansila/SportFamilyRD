@@ -163,7 +163,7 @@
         <div class="event-content">
           <div class="event-description">
             <h3>Descripción</h3>
-            <p> {{ selectedEvent.Description || 'No hay descripcion'}}</p>
+            <p> {{ selectedEvent.Description || 'No hay descripcion' }}</p>
           </div>
 
           <div class="event-tickets">
@@ -177,8 +177,7 @@
               <div class="quantity-selector">
                 <button @click="decrementTicket" :disabled="ticketQuantity <= 1">-</button>
                 <span>{{ ticketQuantity }}</span>
-                <button @click="incrementTicket"
-                  :disabled="ticketQuantity >= selectedEvent.quantity">+</button>
+                <button @click="incrementTicket" :disabled="ticketQuantity >= selectedEvent.quantity">+</button>
               </div>
               <button class="add-to-cart-btn" @click="addToCart">
                 Añadir al carrito - ${{ selectedEvent.price * ticketQuantity }}
@@ -354,6 +353,18 @@ export default {
     // },
 
 
+    openEventDetail(event) {
+      this.selectedEvent = event;
+      this.ticketQuantity = 1;
+      document.body.classList.add('no-scroll');
+    },
+
+    closeEventDetail() {
+      this.selectedEvent = null;
+      document.body.classList.remove('no-scroll');
+    },
+
+
     // Guarda los eventos scrappeados en la base de datos y actualiza scrapEvents con los IDs reales
     saveScrapEventsToDB(scrapRawEvents) {
       // Mapear los eventos al formato esperado por el backend
@@ -479,15 +490,6 @@ export default {
       const ampm = hour >= 12 ? 'PM' : 'AM';
       const hour12 = hour % 12 || 12;
       return `${hour12}:${minutes} ${ampm}`;
-    },
-
-    openEventDetail(event) {
-      this.selectedEvent = event;
-      this.ticketQuantity = 1;
-    },
-
-    closeEventDetail() {
-      this.selectedEvent = null;
     },
 
     incrementTicket() {
@@ -940,4 +942,10 @@ export default {
   /* Un poco más grande porque es un botón flotante */
   padding: 4px;
 }
+
+
+.no-scroll {
+  overflow: hidden;
+}
+
 </style>
