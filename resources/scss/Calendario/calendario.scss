@@ -518,11 +518,11 @@
     align-items: center;
 }
 
-.cart-header h3 {
-    font-size: 1.2rem;
-    color: #2c3e50;
-    margin: 0;
-}
+// .cart-header h3 {
+//     font-size: 1.2rem;
+//     color: #2c3e50;
+//     margin: 0;
+// }
 
 .close-cart {
     background: none;
@@ -897,7 +897,7 @@
     background: white;
     border-radius: 20px;
     width: 100%;
-    max-width: 500px;
+    max-width: 900px;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
@@ -1007,10 +1007,11 @@
 
 .event-tickets h3 {
     font-size: 1.4rem;
-    margin-bottom: 1.5rem;
-    color: #2d3748;
+    margin-bottom: 15px;
+    color: #2a4d69;
+    font-weight: 600;
     position: relative;
-    padding-bottom: 0.5rem;
+    padding-bottom: 8px;
 }
 
 .event-tickets h3::after {
@@ -1018,9 +1019,9 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 50px;
+    width: 60px;
     height: 3px;
-    background: #3498db;
+    background: linear-gradient(to right, #3498db, #2a4d69);
     border-radius: 3px;
 }
 
@@ -1214,6 +1215,13 @@
         font-size: 1.4rem;
     }
 }
+
+
+
+
+
+
+
 
 /* Teléfonos grandes - 576px-767px */
 @media (max-width: 767px) {
@@ -1449,105 +1457,293 @@
     }
 }
 
-
 @media (max-width: 480px) {
-  .event-detail-container {
-    max-height: 85vh;
-    border-radius: 18px;
-  }
-  
-  .event-header {
+    .event-detail-container {
+        max-height: 85vh;
+        border-radius: 18px;
+    }
+
+    .event-header {
+        flex-direction: column;
+        padding: 1.2rem 1.2rem 0;
+        align-items: center;
+        text-align: center;
+    }
+
+    .event-date {
+        width: 40%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .event-day {
+        font-size: 2rem;
+    }
+
+    .event-month {
+        font-size: 1.1rem;
+    }
+
+    .event-title-container h2 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+
+    .event-meta {
+        align-items: center;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .event-content {
+        padding: 1.2rem;
+    }
+
+    .event-tickets h3 {
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .event-tickets h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .ticket-info {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: center;
+        text-align: center;
+        padding: 1.2rem;
+    }
+
+    .quantity-selector {
+        gap: 0.8rem;
+        margin: 1rem 0;
+    }
+
+    .quantity-selector button {
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
+    }
+
+    .quantity-selector span {
+        font-size: 1.4rem;
+    }
+
+    .add-to-cart-btn {
+        padding: 1.1rem;
+        font-size: 1.05rem;
+    }
+
+    .sold-out {
+        padding: 1.1rem;
+        font-size: 1.05rem;
+    }
+
+    .close-btn {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .close-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+
+
+
+/* ------------------- RESPONSIVE CALENDARIO ------------------ */
+/* Ajustes generales para móviles */
+@media (max-width: 767px) {
+  .calendar-view {
     flex-direction: column;
-    padding: 1.2rem 1.2rem 0;
-    align-items: center;
-    text-align: center;
+    padding: 0.5rem;
   }
   
-  .event-date {
-    width: 40%;
-    display: flex;
-    align-items: center;
+  .calendar-main {
+    width: calc(100% - 1rem); /* Añadido para crear espacio */
+    margin: 0 auto 1rem; /* Centrado con margen inferior */
+    padding: 1rem; /* Aumentado el padding interno */
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sutil sombra para definir bordes */
+    background-color: white; /* Fondo para diferenciar del contenedor */
+  }
+  
+  .calendar-controls {
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 1.5rem;
-    padding: 0.8rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    padding: 0 0.5rem; /* Padding adicional para los controles */
   }
   
-  .event-day {
-    font-size: 2rem;
+  .calendar-title {
+    font-size: 1.2rem;
+    margin: 0 0.5rem;
+    text-align: center;
+    flex: 1 1 100%;
+    order: -1;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0; /* Espacio vertical adicional */
   }
   
-  .event-month {
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.15rem;
+    width: 100%;
+  }
+  
+  .calendar-day-header {
+    font-size: 0.7rem;
+    padding: 0.4rem 0;
+    text-align: center;
+    background-color: #f8f9fa; /* Fondo para mejor legibilidad */
+    border-radius: 6px;
+  }
+  
+  .calendar-day {
+    position: relative;
+    aspect-ratio: 1;
+    min-height: 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.2rem;
+    border-radius: 8px;
+    background-color: #ffffff; /* Fondo blanco para diferenciar */
+    border: 1px solid #f0f0f0; /* Borde sutil para definir celdas */
+  }
+  
+  .day-number {
+    font-size: 0.8rem;
+    font-weight: 500;
+    align-self: flex-start;
+    padding: 0.1rem 0.2rem; /* Pequeño padding para mejor aspecto */
+  }
+  
+  .event-dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.1rem;
+    align-self: flex-end;
+    width: 100%;
+    margin-top: auto;
+    padding: 0 0.1rem; /* Pequeño padding para evitar tocar bordes */
+  }
+  
+  .event-dots span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  
+  /* Asegurar que los días vacíos no tengan fondo ni borde */
+  .calendar-day:not(:has(.day-number)) {
+    background-color: transparent;
+    border: none;
+  }
+}
+
+/* Teléfonos medianos - 481px-575px */
+@media (max-width: 575px) {
+  .calendar-main {
+    padding: 0.8rem; /* Padding ligeramente reducido */
+  }
+  
+  .calendar-grid {
+    gap: 0.1rem;
+  }
+  
+  .calendar-day {
+    min-height: 30px;
+  }
+  
+  .day-number {
+    font-size: 0.75rem;
+  }
+}
+
+/* Teléfonos pequeños - 320px-480px */
+@media (max-width: 480px) {
+  .calendar-main {
+    width: calc(100% - 0.5rem); /* Ancho ligeramente reducido */
+    padding: 0.7rem; /* Padding ajustado */
+  }
+  
+  .calendar-title {
     font-size: 1.1rem;
   }
   
-  .event-title-container h2 {
-    font-size: 1.4rem;
-    text-align: center;
+  .control-btn {
+    padding: 0.3rem;
   }
   
-  .event-meta {
-    align-items: center;
-    text-align: center;
-    margin-top: 1rem;
+  .calendar-grid {
+    gap: 0.1rem;
   }
   
-  .event-content {
-    padding: 1.2rem;
+  .calendar-day-header {
+    font-size: 0.65rem;
   }
   
-  .event-tickets h3 {
-    font-size: 1.3rem;
-    text-align: center;
+  .calendar-day {
+    min-height: 25px;
   }
   
-  .event-tickets h3::after {
-    left: 50%;
-    transform: translateX(-50%);
+  .day-number {
+    font-size: 0.7rem;
+  }
+}
+
+/* Ajustes para pantallas muy estrechas */
+@media (max-width: 360px) {
+  .calendar-main {
+    padding: 0.6rem; /* Padding reducido */
   }
   
-  .ticket-info {
-    flex-direction: column;
-    gap: 0.8rem;
-    align-items: center;
-    text-align: center;
-    padding: 1.2rem;
+  .calendar-day {
+    min-height: 22px;
   }
   
-  .quantity-selector {
-    gap: 0.8rem;
-    margin: 1rem 0;
+  .day-number {
+    font-size: 0.65rem;
   }
   
-  .quantity-selector button {
-    width: 44px;
-    height: 44px;
-    font-size: 1.3rem;
+  .event-dots span {
+    width: 3px;
+    height: 3px;
+  }
+}
+
+/* Corrección específica para iPhone SE y dispositivos similares */
+@media (max-width: 320px) {
+  .calendar-main {
+    padding: 0.5rem; /* Padding mínimo */
   }
   
-  .quantity-selector span {
-    font-size: 1.4rem;
+  .calendar-grid {
+    gap: 0.05rem;
   }
   
-  .add-to-cart-btn {
-    padding: 1.1rem;
-    font-size: 1.05rem;
+  .calendar-day {
+    min-height: 20px;
   }
   
-  .sold-out {
-    padding: 1.1rem;
-    font-size: 1.05rem;
-  }
-  
-  .close-btn {
-    top: 10px;
-    right: 10px;
-    width: 36px;
-    height: 36px;
-  }
-  
-  .close-btn svg {
-    width: 18px;
-    height: 18px;
+  .calendar-day-header {
+    font-size: 0.6rem;
+    padding: 0.3rem 0;
   }
 }
