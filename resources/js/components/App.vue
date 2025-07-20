@@ -253,4 +253,8 @@ body {
     flex-direction: column;
   }
 }
+
+.no-scroll {
+  overflow: hidden;
+}
 </style>
