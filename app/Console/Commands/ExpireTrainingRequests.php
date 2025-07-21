@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\NuevaSolicitudExpirada;
 use Illuminate\Console\Command;
 use App\Models\Training;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class ExpireTrainingRequests extends Command
 {
@@ -19,6 +21,17 @@ class ExpireTrainingRequests extends Command
             ->where('created_at', '<', $cutoffDate)
             ->update(['status' => 'expired']);
 
+        if ($updatedCount > 0) {
+            $trainings = Training::where('status', 'expired')
+                ->where('created_at', '<', $cutoffDate)
+                ->get();    
+            foreach ($trainings as $training) {
+                $entrenador = $training->trainer;
+                $usuario = $training->user;
+                Mail::to($usuario->email)->send(new NuevaSolicitudExpirada($entrenador, $usuario));
+            }
+        }
+       
         $this->info('Solicitudes expiradas actualizadas: ' . $updatedCount);
     }
 }
