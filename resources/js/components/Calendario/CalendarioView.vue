@@ -948,4 +948,87 @@ export default {
   overflow: hidden;
 }
 
+  h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #2a4d69;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 8px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(to right, #3498db, #2a4d69);
+      border-radius: 3px;
+    }
+  }
+
+.event-description {
+  margin-bottom: 30px;
+  position: relative;
+
+
+  p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #4a5568;
+    text-align: justify;
+    position: relative;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #3498db;
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -15px;
+      left: 10px;
+      font-size: 4rem;
+      font-family: Georgia, serif;
+      color: #e0f0ff;
+      z-index: 0;
+    }
+  }
+
+  &.has-image {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+    
+    .image-container {
+      flex: 0 0 40%;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      
+      img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.4s ease;
+        
+        &:hover {
+          transform: scale(1.03);
+        }
+      }
+    }
+    
+    .description-text {
+      flex: 1;
+    }
+  }
+}
+
+
+
+
 </style>
