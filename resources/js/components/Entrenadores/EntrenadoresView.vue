@@ -455,6 +455,7 @@
 
     <Alert
       v-if="openModal"
+      :key="alertKey"
       :message="alertMessage"
       :type="alertType"
       @closed="openModal = null"
@@ -481,6 +482,7 @@ export default {
             openModal: false,
             alertMessage: "",
             alertType: "", // 'error', 'success', 'alert'.
+            alertKey: 0,
             user: null,
             scrollPosition: 0,
             busqueda: "",

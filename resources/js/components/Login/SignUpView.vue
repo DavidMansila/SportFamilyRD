@@ -141,6 +141,7 @@
 
   <Alert 
     v-if="openModal" 
+    :key="alertKey"
     :type="alertType" 
     :message="alertMessage" 
     @close="openModal = false" 
@@ -161,7 +162,7 @@ export default {
       alertType: 'success', // 'success', 'error', 'alert'
       alertMessage: '',
       openModal: false,
-
+      alertKey: 0, // Para forzar la re-renderización del componente Alert
       showLogoutMessage: false,
       showRegisterPassword: false,
       showRegisterConfirm: false,
@@ -213,6 +214,7 @@ export default {
         
         this.alertType = 'alert';
         this.alertMessage = 'Contraseña debe tener al menos 4 caracteres';
+        this.alertKey++;
         this.openModal = true;
 
       } finally {
@@ -235,6 +237,7 @@ export default {
         
         this.alertType = 'error';
         this.alertMessage = 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+        this.alertKey++;
         this.openModal = true;
 
       } finally {

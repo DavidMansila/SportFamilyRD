@@ -198,6 +198,7 @@
     
     <Alert
         v-if="openModal"
+        :key="alertKey"
         :message="alertMessage"
         :type="alertType"
         @closed="openModal = null"
@@ -222,6 +223,7 @@ export default {
             openModal: false,
             alertMessage: "",
             alertType: "", // 'error', 'success', 'alert'.
+            alertKey: 0,
         }
     },
     computed: {
@@ -255,6 +257,7 @@ export default {
 
                 this.alertType = "error";
                 this.alertMessage = "Error al cargar las solicitudes";
+                this.alertKey++;
                 this.openModal = true;
                 
             }
@@ -315,6 +318,7 @@ export default {
                         console.error('Error al aprobar la solicitud:', error);
                         this.alertType = "error";
                         this.alertMessage = "Error al aprobar la solicitud";
+                        this.alertKey++;
                         this.openModal = true;
                         
                     });
@@ -337,6 +341,7 @@ export default {
                         
                         this.alertType = "error";
                         this.alertMessage = "Error al rechazar la solicitud";
+                        this.alertKey++;
                         this.openModal = true;
                     });
             }

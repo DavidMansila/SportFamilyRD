@@ -229,14 +229,16 @@ export default {
     handleNavClick(route) {
       this.closeMobileMenu();
 
-      if (!this.user) {
-        this.navAuthMessage = 'Debes iniciar sesión o registrarte para acceder a esta sección.';
-        setTimeout(() => {
-          this.navAuthMessage = '';
-        }, 4000);
-      } else {
-        this.$router.push(route);
-      }
+      // if (!this.user) {
+      //   this.navAuthMessage = 'Debes iniciar sesión o registrarte para acceder a esta sección.';
+      //   setTimeout(() => {
+      //     this.navAuthMessage = '';
+      //   }, 4000);
+      // } else {
+      //   this.$router.push(route);
+      // }
+      this.$router.push(route);
+
     },
 
     checkAuthStatus() {

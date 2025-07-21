@@ -93,11 +93,18 @@ class CalendarController extends Controller
      */
     public function update(Request $request, Calendar $calendar)
     {
+        // dump($calendar);
+        // dd($request->all());
+
         $calendar->update($request->validate([
-            'date' => 'sometimes|date',
-            'time' => 'sometimes',
-            'place' => 'sometimes|string',
-            'price' => 'sometimes|numeric',
+            'Title'=> 'required|string|max:255',
+            'date' => 'required|date',
+            'time' => 'required',
+            'place' => 'required|string',
+            'price' => 'required|numeric',
+            'Description' => 'string',
+            'image'=> 'string|max:255',
+            'quantity' => 'required|integer|min:1',
         ]));
         return response()->json($calendar);
     }

@@ -1,6 +1,9 @@
 <template>
   <div class="app-container">
     <VerificaCorreo v-if="user && !user.email_verified_at && $route.path !== '/signup'" :user="user" @logout="handleLogout" />
+    
+    <router-view v-else-if="!user || (user && user.email_verified_at)" />
+    
     <div v-else-if="verificationStatus" class="verification-message" :class="verificationStatus.type">
       <h2>{{ verificationStatus.title }}</h2>
       <p>{{ verificationStatus.message }}</p>
@@ -8,7 +11,7 @@
       <router-link v-if="verificationStatus.type==='success'" to="/signup">Iniciar sesión</router-link>
     </div>
     <!-- <router-view v-else-if="user || isPublicRoute($route)" /> -->
-    <router-view  />
+   
   </div>
 </template>
 
@@ -49,9 +52,11 @@ export default {
         this.user = null;
       }
       // Redirigir a / si intenta acceder a ruta protegida sin estar logeado y no es pública
-      if (!this.user && !this.isPublicRoute(to)) {
-        this.$router.replace('/');
-      }
+
+      // if (!this.user && !this.isPublicRoute(to)) {
+      //   this.$router.replace('/');
+      // }
+
       // Limpiar mensaje de verificación si cambia de ruta
       this.verificationStatus = null;
       // Si es ruta de verificación, intentar verificar

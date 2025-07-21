@@ -533,6 +533,7 @@
   
   <Alert 
     v-if="openModal" 
+    :key="alertKey"
     :type="alertType" 
     :message="alertMessage" 
     @close="openModal = false" 
@@ -559,7 +560,7 @@ export default {
       openModal: false,
       alertType: 'success', // 'success', 'error', 'alert'
       alertMessage: '',
-
+      alertKey: 0, // Para forzar la re-renderización del componente Alert
       user: null,
       currentPage: 1,
       itemsPerPage: 9,

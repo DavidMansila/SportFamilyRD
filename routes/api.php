@@ -80,30 +80,44 @@ Route::get('/news', function () {
 });
 
 
-
 Route::resource('/user', UserController::class);
 
+// Calendariosin middleware
+    Route::resource('/calendar', CalendarController::class);
+    Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
+    Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
 
-// RUTAS PROTEGIDAS POR TOKEN
+    Route::get('/', [CalendarController::class, 'index']);
+
+// Productos sin middleware
+    Route::resource('/products', ProductController::class);
+//post sin middleware
+    Route::get('/post', [PostController::class, 'index']);
+//trainer sin middleware
+    Route::get('/trainer', [TrainerController::class, 'index']);
+    Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
+    Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
+
+
+    // RUTAS PROTEGIDAS POR TOKEN
 Route::middleware('auth:sanctum')->group(function () {
-
 
     // Usuarios
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
     Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
 
 
-    // Calendario
-    Route::resource('/calendar', CalendarController::class);
-    Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
-    Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
+   // Calendario
+        // Route::resource('/calendar', CalendarController::class);
+        // Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
+        // Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
 
-    Route::get('/', [CalendarController::class, 'index']);
+       // Route::get('/', [CalendarController::class, 'index']);
     Route::post('/', [CalendarController::class, 'store']);
     Route::put('/{calendar}', [CalendarController::class, 'update']);
     Route::delete('/{calendar}', [CalendarController::class, 'destroy']);
 
-    // Productos
+    //Productos
     Route::resource('/products', ProductController::class);
     Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
     Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
@@ -116,9 +130,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('cart/clear', [CartController::class, 'clearCart']);
 
     // Posts
-    Route::resource('/post', PostController::class);
-    Route::post('/post', [PostController::class, 'store']);
-    Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
+    // Route::resource('/post', PostController::class);
+    // Route::post('/post', [PostController::class, 'store']);
+    // Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
 
     // Funcionalidades completas de posts
     Route::post('/post/create-comment', [PostController::class, 'createComment']);
@@ -136,8 +150,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Trainer
     Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
     Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus']);
-    Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
-    Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
+    
     Route::resource('/trainer', TrainerController::class);
     Route::get('/trainer-requests', [TrainerController::class, 'getAllTrainerRequests']);
 
