@@ -7,7 +7,8 @@
       <pre v-if="verificationStatus.raw" style="text-align:left; background:#f3f4f6; color:#334155; padding:10px; border-radius:6px; font-size:13px; overflow-x:auto;">{{ verificationStatus.raw }}</pre>
       <router-link v-if="verificationStatus.type==='success'" to="/signup">Iniciar sesión</router-link>
     </div>
-    <router-view v-else-if="user || isPublicRoute($route)" />
+    <!-- <router-view v-else-if="user || isPublicRoute($route)" /> -->
+    <router-view  />
   </div>
 </template>
 
