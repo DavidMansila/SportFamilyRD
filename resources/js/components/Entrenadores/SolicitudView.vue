@@ -54,9 +54,15 @@
             </div>
 
             <div class="form-group floating-label">
-              <input type="text" id="ubicacion" v-model="formulario.ubicacion" placeholder=" " required />
+              <select id="ubicacion" v-model="formulario.ubicacion" required class="location-select">
+                <option value="" disabled selected></option>
+                <option v-for="provincia in provinciasRD" :key="provincia" :value="provincia">
+                  {{ provincia }}
+                </option>
+              </select>
               <label for="ubicacion">Ciudad/Región</label>
             </div>
+
           </div>
 
           <div class="form-actions">
@@ -142,14 +148,65 @@
         <div v-if="pasoActual === 3" class="form-step">
           <h2 class="step-title">Detalles Adicionales</h2>
 
-          <div class="form-group">
-            <label class="custom-label">Describe tu enfoque de entrenamiento</label>
-            <textarea v-model="formulario.enfoque"
-              placeholder="Ejemplo: 'Me enfoco en desarrollar la técnica fundamental mientras fomento el amor por el deporte...'"
-              rows="4" required></textarea>
+          <!-- Sección de Enfoque de Entrenamiento -->
+          <div class="achievements-section">
+            <h2 class="section-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17 3.34a10 10 0 1 1-14.995 8.984L2 12l.005-.324A10 10 0 0 1 17 3.34z" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M12 8v4l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              Tu Filosofía de Entrenamiento
+            </h2>
+
+            <div class="approach-card">
+              <div class="form-description">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 16v-4m0-4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <p>Comparte tu metodología única. ¿Qué te diferencia como entrenador?</p>
+              </div>
+
+              <div class="form-group floating-label">
+                <textarea id="enfoque" v-model="formulario.enfoque" placeholder=" " rows="5" required
+                  class="styled-textarea"></textarea>
+                <label for="enfoque">Describe tu enfoque de entrenamiento</label>
+                <div class="input-hint">
+                  Ejemplo: "Me enfoco en desarrollar habilidades técnicas fundamentales mientras fomento el amor por el
+                  deporte y
+                  trabajo en el desarrollo personal de cada atleta..."
+                </div>
+              </div>
+
+              <div class="approach-tips">
+                <div class="tip-card">
+                  <svg class="tip-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <p>Menciona tu metodología de enseñanza</p>
+                </div>
+                <div class="tip-card">
+                  <svg class="tip-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <p>Destaca tus valores fundamentales</p>
+                </div>
+                <div class="tip-card">
+                  <svg class="tip-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <p>Explica cómo personalizas los entrenamientos</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Sección de Logros - Versión Modernizada -->
+          <!-- Sección de Logros -->
           <div class="achievements-section">
             <h2 class="section-title">
               <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -265,14 +322,30 @@
           </div>
 
 
-          <div class="form-group">
-            <label class="custom-label">Disponibilidad</label>
+          <div class="availability-section">
+            <div class="availability-header">
+              <h2 class="section-title">
+                <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+                Disponibilidad
+              </h2>
+            </div>
+
             <div class="availability-grid">
-              <div v-for="dia in diasSemana" :key="dia" class="availability-day">
+              <div v-for="dia in diasSemana" :key="dia" class="availability-day"
+                :class="{ 'active': formulario.disponibilidad[dia] }">
                 <label>
                   <input type="checkbox" v-model="formulario.disponibilidad[dia]" />
-                  {{ dia }}
+                  <span class="custom-checkbox"></span>
+                  <span class="day-label">{{ dia }}</span>
                 </label>
+                <div class="day-highlight"></div>
+
                 <div v-if="formulario.disponibilidad[dia]" class="time-slots">
                   <div class="time-slot">
                     <span>De</span>
@@ -331,7 +404,7 @@
         </div>
       </div>
     </transition>
-    
+
   </div>
 </template>
 
@@ -402,7 +475,41 @@ export default {
         nombre: '',
         email: '',
         telefono: ''
-      }
+      },
+      provinciasRD: [
+        'Distrito Nacional',
+        'Azua',
+        'Bahoruco',
+        'Barahona',
+        'Dajabón',
+        'Duarte',
+        'Elías Piña',
+        'El Seibo',
+        'Espaillat',
+        'Hato Mayor',
+        'Hermanas Mirabal',
+        'Independencia',
+        'La Altagracia',
+        'La Romana',
+        'La Vega',
+        'María Trinidad Sánchez',
+        'Monseñor Nouel',
+        'Monte Cristi',
+        'Monte Plata',
+        'Pedernales',
+        'Peravia',
+        'Puerto Plata',
+        'Samaná',
+        'Sánchez Ramírez',
+        'San Cristóbal',
+        'San José de Ocoa',
+        'San Juan',
+        'San Pedro de Macorís',
+        'Santiago',
+        'Santiago Rodríguez',
+        'Santo Domingo',
+        'Valverde'
+      ],
     }
   },
 
@@ -746,4 +853,398 @@ export default {
 @import '../../../scss/Entrenadores/entrenadores_navbar.scss';
 @import '../../../scss/Entrenadores/solicitud.scss';
 @import '/resources/scss/Entrenadores/solicitud_logrosyespecialidades.scss';
+
+
+.location-select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.location-select:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Ajustar el selector en formularios responsivos */
+@media (max-width: 767px) {
+  .location-select {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+}
+
+
+.training-approach-section {
+  margin-bottom: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.approach-card {
+  padding: 1.5rem;
+}
+
+.form-group.floating-label {
+  position: relative;
+  margin-bottom: 1.5rem;
+
+  label {
+    position: absolute;
+    top: 18px;
+    left: 15px;
+    font-size: 1rem;
+    color: #6c757d;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    background: white;
+    padding: 0 5px;
+  }
+
+  .styled-textarea {
+    width: 100%;
+    padding: 1.5rem;
+    border: 1px solid #e1e5eb;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    min-height: 150px;
+    resize: vertical;
+    background: #f8fafc;
+
+    &:focus {
+      border-color: #4a90e2;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+      background: white;
+    }
+
+    &:focus~label,
+    &:not(:placeholder-shown)~label {
+      top: -10px;
+      left: 12px;
+      font-size: 0.85rem;
+      color: #4a90e2;
+      font-weight: 500;
+    }
+  }
+}
+
+.input-hint {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 8px;
+  padding: 0 5px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.approach-tips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 1.5rem;
+}
+
+.tip-card {
+  background: #f0f7ff;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  align-items: flex-start;
+  border-left: 3px solid #4a90e2;
+
+  .tip-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    color: #4a90e2;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #495057;
+    line-height: 1.4;
+  }
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .approach-tips {
+    grid-template-columns: 1fr;
+  }
+
+  .training-approach-section {
+    border-radius: 10px;
+  }
+}
+
+
+
+
+/* sección de disponibilidad */
+.availability-section {
+  margin-top: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  padding: 5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.availability-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  .section-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+
+    svg.title-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+      color: #4a90e2;
+    }
+  }
+}
+
+.availability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  grid-auto-rows: min-content;
+  align-items: start;
+}
+
+.availability-day {
+  position: relative;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+
+  label {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    font-weight: 500;
+    color: #4a5568;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    min-height: 60px;
+    box-sizing: border-box;
+
+    input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+
+      &:checked ~ .day-highlight {
+        opacity: 1;
+        transform: scale(1);
+      }
+      
+    }
+
+    .custom-checkbox {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #cbd5e0;
+      border-radius: 6px;
+      margin-right: 10px;
+      position: relative;
+      transition: all 0.2s ease;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 6px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+    }
+
+    input:checked + .custom-checkbox {
+      background: #4a90e2;
+      border-color: #4a90e2;
+
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+
+  .day-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(74, 144, 226, 0.15);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.3s ease;
+    z-index: 1;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.time-slots {
+  padding: 0 15px 15px;
+  background: rgba(255, 255, 255, 0.95);
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(226, 232, 240, 0.5);
+  flex-grow: 1;
+
+  .time-slot {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    width: 100%;
+
+    span {
+      font-size: 0.8rem;
+      color: #4a5568;
+      min-width: 25px;
+    }
+
+    input[type="time"] {
+      flex: 1;
+      padding: 6px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      width: 50%;
+      max-width: 100%;
+
+      &:focus {
+        border-color: #4a90e2;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+      }
+    }
+  }
+}
+
+/* Diseño responsivo */
+@media (max-width: 992px) {
+  .availability-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .availability-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .availability-day label {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    min-height: 55px;
+  }
+
+  .time-slots {
+    padding: 0 10px 10px;
+
+    .time-slot {
+      flex-direction: row;
+      align-items: center;
+      margin-top: 8px;
+
+      span {
+        margin-bottom: 0;
+        font-size: 0.75rem;
+        min-width: 20px;
+      }
+
+      input[type="time"] {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+        max-width: 100px;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .availability-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .availability-section {
+    padding: 1rem;
+  }
+
+  .availability-day {
+    min-height: 55px;
+
+    label {
+      min-height: 55px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
+  }
+
+  .time-slots {
+    .time-slot {
+      input[type="time"] {
+        font-size: 0.7rem;
+        max-width: 90px;
+      }
+    }
+  }
+}
+
+@media (max-width: 380px) {
+  .availability-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .time-slots .time-slot input[type="time"] {
+    max-width: 100%;
+  }
+}
 </style>
