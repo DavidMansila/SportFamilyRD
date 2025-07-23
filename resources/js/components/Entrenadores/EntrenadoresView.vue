@@ -455,6 +455,7 @@
 
     <Alert
       v-if="openModal"
+      :key="alertKey"
       :message="alertMessage"
       :type="alertType"
       @closed="openModal = null"
@@ -481,6 +482,7 @@ export default {
             openModal: false,
             alertMessage: "",
             alertType: "", // 'error', 'success', 'alert'.
+            alertKey: 0,
             user: null,
             scrollPosition: 0,
             busqueda: "",
@@ -634,6 +636,7 @@ export default {
             if (!this.user?.id) {
               this.alertType = "alert";
               this.alertMessage = "Debes iniciar sesión para contactar a un entrenador";
+              this.alertKey++;
               this.openModal = true;
         
               return;
@@ -643,6 +646,7 @@ export default {
             if (this.user.user_type === "entrenador") {
               this.alertType = "error";
               this.alertMessage = "Los entrenadores no pueden enviar solicitudes a otros entrenadores.";
+              this.alertKey++;
               this.openModal = true;
               
               return;
@@ -667,6 +671,7 @@ export default {
                     } else {
                       this.alertType = "error";
                       this.alertMessage = `Ya tienes una solicitud pendiente con ${this.contactoEntrenador.nombre}`;
+                      this.alertKey++;
                       this.openModal = true;
           
                       return;
@@ -687,6 +692,7 @@ export default {
                 if (response.status === 201) {
                   this.alertType = "success";
                   this.alertMessage = `Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`;
+                  this.alertKey++;
                   this.openModal = true;
             
                   this.cerrarFormularioContacto();
@@ -699,22 +705,26 @@ export default {
                     
                     this.alertType = "error";
                     this.alertMessage = `Error de validación:\n${errorMsg}`;
+                    this.alertKey++;
                     this.openModal = true;
                 } else if (error.response?.status === 401) {
                     this.alertType = "error";
                     this.alertMessage = "Tu sesión ha expirado. Por favor inicia sesión nuevamente.";
+                    this.alertKey++;
                     this.openModal = true;
 
                 } else if (error.response?.data?.message) {
                    
                     this.alertType = "error";
                     this.alertMessage = `Error: ${error.response.data.message}`;
+                    this.alertKey++;
                     this.openModal = true;
                 } else {
                     console.error("Error completo:", error);
                     
                     this.alertType = "error";
                     this.alertMessage = `Error al procesar la solicitud: ${error.message}`;
+                    this.alertKey++;
                     this.openModal = true;
                 }
             }
@@ -774,6 +784,7 @@ export default {
                     );
                     this.alertType = "error";
                     this.alertMessage = "Error al cargar entrenadores aprobados.";
+                    this.alertKey++;
                     this.openModal = true;
                     this.entrenadores = []; // Asegurarse de que la lista esté vacía en caso de error
                 });

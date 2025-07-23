@@ -533,6 +533,7 @@
   
   <Alert 
     v-if="openModal" 
+    :key="alertKey"
     :type="alertType" 
     :message="alertMessage" 
     @close="openModal = false" 
@@ -559,7 +560,7 @@ export default {
       openModal: false,
       alertType: 'success', // 'success', 'error', 'alert'
       alertMessage: '',
-
+      alertKey: 0, // Para forzar la re-renderización del componente Alert
       user: null,
       currentPage: 1,
       itemsPerPage: 9,
@@ -612,6 +613,7 @@ export default {
        
         this.alertType = 'alert';
         this.alertMessage = 'Por favor, inicia sesión para crear un nuevo post.';
+        this.alertKey++;
         this.openModal = true;
         return;
       }
@@ -734,6 +736,7 @@ export default {
         
         this.alertType = 'alert';
         this.alertMessage = 'Por favor, inicia sesión para crear un nuevo post.';
+        this.alertKey++;
         this.openModal = true;
         return;
       }
@@ -759,6 +762,7 @@ export default {
         
         this.alertType = 'error';
         this.alertMessage = 'Error al crear el post. Por favor, inténtalo de nuevo.';
+        this.alertKey++;
         this.openModal = true;
       }
     },
@@ -817,6 +821,7 @@ export default {
        
         this.alertType = 'error';
         this.alertMessage = `Tipo de archivo no válido: ${file.type}. Usa JPEG, PNG o GIF.`;
+        this.alertKey++;
         this.openModal = true;
 
         event.target.value = '';
@@ -842,6 +847,7 @@ export default {
           
           this.alertType = 'alert';
           this.alertMessage = 'Por favor, inicia sesión para comentar.';
+          this.alertKey++;
           this.openModal = true;
           return;
         }
@@ -919,6 +925,7 @@ export default {
 
         this.alertType = 'error';
         this.alertMessage = `Error al guardar el comentario: ${error.response?.data?.message || error.message}`;
+        this.alertKey++;
         this.openModal = true;
       }
     },
@@ -929,6 +936,7 @@ export default {
         
         this.alertType = 'alert';
         this.alertMessage = 'Por favor, inicia sesión para dar like.';
+        this.alertKey++;
         this.openModal = true;
         return;
       }
@@ -1045,6 +1053,7 @@ export default {
         
         this.alertType = 'error';
         this.alertMessage = error.response?.data?.message || 'Error al editar el post. Por favor, inténtalo de nuevo.';
+        this.alertKey++;
         this.openModal = true;
       }
     },
@@ -1077,6 +1086,7 @@ export default {
           
           this.alertType = 'error';
           this.alertMessage = error.response?.data?.message || 'Error al eliminar el post. Por favor, inténtalo de nuevo.';
+          this.alertKey++;
           this.openModal = true;
         }
       }
@@ -1115,6 +1125,7 @@ export default {
         
         this.alertType = 'alert';
         this.alertMessage = 'El comentario no puede estar vacío';
+        this.alertKey++;
         this.openModal = true;
         return;
       }
@@ -1139,6 +1150,7 @@ export default {
           
           this.alertType = 'error';
           this.alertMessage = 'Error al guardar cambios: ' + (error.response?.data?.message || error.message);
+          this.alertKey++;
           this.openModal = true;
         });
 
@@ -1157,6 +1169,7 @@ export default {
         
         this.alertType = 'alert';
         this.alertMessage = 'La respuesta no puede estar vacía';
+        this.alertKey++;
         this.openModal = true;
         return;
       }
@@ -1182,6 +1195,7 @@ export default {
           
           this.alertType = 'error';
           this.alertMessage = 'Error al guardar cambios: ' + (error.response?.data?.message || error.message);
+          this.alertKey++;
           this.openModal = true;
         });
 
@@ -1225,6 +1239,7 @@ export default {
           
           this.alertType = 'error';
           this.alertMessage = 'Error al eliminar el comentario: ' + (error.response?.data?.message || error.message);
+          this.alertKey++;
           this.openModal = true;
         });
     },
@@ -1268,6 +1283,7 @@ export default {
           
           this.alertType = 'error';
           this.alertMessage = 'Error al eliminar la respuesta: ' + (error.response?.data?.message || error.message);
+          this.alertKey++;
           this.openModal = true;
         });
     },

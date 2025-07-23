@@ -14,6 +14,7 @@
 
   <Alert
     v-if="openModal"
+    :key="alertKey"
     :message="alertMessage"
     :type="alertType"
     @closed="openModal = null"
@@ -36,6 +37,7 @@ const reenviado = ref(false);
 
 const alertMessage = ref('');
 const alertType = ref('');
+const alertKey = ref(0);
 const openModal = ref(false);
 
 async function reenviarCorreo() {

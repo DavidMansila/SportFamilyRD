@@ -220,6 +220,7 @@
 
   <Alert 
     v-if="openModal" 
+    :key="alertKey"
     :type="alertType" 
     :message="alertMessage" 
     @close="openModal = false" 
@@ -246,7 +247,7 @@ export default {
       openModal: false,
       alertType: 'success', // 'success', 'error', 'alert'
       alertMessage: '',
-
+      alertKey: 0, // Para forzar la re-renderización del componente Alert
       currentPage: 1,
       itemsPerPage: 9,
       noticias: [],
@@ -423,6 +424,7 @@ export default {
        
         this.alertMessage = 'Inicia sesión para guardar noticias';
         this.alertType = 'alert';
+        this.alertKey++;
         this.openModal = true;
         return;
       }
@@ -596,6 +598,7 @@ export default {
          
           this.alertType = 'success';
           this.alertMessage = '¡Contenido copiado! Puedes compartir esta noticia:\n\n' + shareText;
+          this.alertKey++;
           this.openModal = true;
         }
       } catch (error) {
@@ -604,6 +607,7 @@ export default {
           
           this.alertType = 'error';
           this.alertMessage = 'Error al compartir. Por favor, inténtalo de nuevo.';
+          this.alertKey++;
           this.openModal = true;
         }
       }

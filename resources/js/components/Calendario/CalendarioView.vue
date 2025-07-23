@@ -260,6 +260,7 @@
 
   <Alert 
     v-if="openModal" 
+    :key="alertKey"
     :type="alertType" 
     :message="alertMessage" 
     @close="openModal = false" 
@@ -284,6 +285,7 @@ export default {
     return {
       alertType: '',
       alertMessage: '',
+      alertKey: 0,
       openModal: false,
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),

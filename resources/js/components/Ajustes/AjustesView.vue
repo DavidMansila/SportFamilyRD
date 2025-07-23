@@ -121,6 +121,7 @@
 
   <Alert 
     v-if="openModal" 
+    :key="alertKey"
     :type="alertType" 
     :message="alertMessage" 
     @close="openModal = false" 
@@ -143,7 +144,7 @@ export default {
       alertType: '',
       alertMessage: '',
       openModal: false,
-
+      alertKey: 0,
       activeTab: 'account',
 
       tabs: [
@@ -250,6 +251,7 @@ export default {
       
       this.alertType = type;
       this.alertMessage = message;
+      this.alertKey++; 
       this.openModal = true;
     },
 

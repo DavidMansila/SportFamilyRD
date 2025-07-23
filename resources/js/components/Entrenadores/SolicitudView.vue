@@ -409,6 +409,7 @@
 
   <Alert 
     v-if="openModal" 
+    :key="alertKey"
     :type="alertType" 
     :message="alertMessage" 
     @close="openModal = false" 
@@ -433,7 +434,7 @@ export default {
       openModal: false,
       alertType: 'success', // 'success', 'error', 'alert'
       alertMessage: '',
-
+      alertKey: 0, // Para forzar la re-renderización del componente Alert
       user: null,
       pasoActual: 1,
       mostrarConfirmacion: false,
@@ -700,6 +701,7 @@ export default {
             this.openModal = true;
             this.alertType = 'error';
             this.alertMessage = 'Error al enviar la solicitud. Por favor, inténtalo de nuevo más tarde.';
+            this.alertKey++;
           });
       }
     },
