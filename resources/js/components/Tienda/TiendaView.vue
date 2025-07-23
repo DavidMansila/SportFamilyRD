@@ -553,6 +553,7 @@ export default {
             
             this.alertType = 'success';
             this.alertMessage = 'Producto actualizado correctamente';
+            this.alertKey++;
             this.openModal = true;
           })
           .catch(error => {
@@ -560,6 +561,7 @@ export default {
          
             this.alertType = 'error';
             this.alertMessage = error.response?.data?.message || 'Error al actualizar';
+            this.alertKey++;
             this.openModal = true;
           });
       } else {
@@ -570,6 +572,7 @@ export default {
             
             this.alertType = 'success';
             this.alertMessage = 'Producto creado correctamente';
+            this.alertKey++;
             this.openModal = true;
           })
           .catch(error => {
@@ -577,6 +580,7 @@ export default {
            
             this.alertType = 'error';
             this.alertMessage = error.response?.data?.message || 'Error al crear';
+            this.alertKey++;
             this.openModal = true;
           });
       }
@@ -595,6 +599,7 @@ export default {
           console.error('Error eliminando producto:', error)
           this.alertType = 'error';
           this.alertMessage = 'Error eliminando producto';
+          this.alertKey++;
           this.openModal = true;
         }
       }
@@ -625,6 +630,7 @@ export default {
         
           this.alertType = 'alert';
           this.alertMessage = 'Debes iniciar sesión para agregar productos al carrito';
+          this.alertKey++;
           this.openModal = true;
           return;
         }
@@ -652,6 +658,7 @@ export default {
         
         this.alertType = 'error';
         this.alertMessage = 'No se pudo agregar el producto al carrito';
+        this.alertKey++;
         this.openModal = true;
       }
     },

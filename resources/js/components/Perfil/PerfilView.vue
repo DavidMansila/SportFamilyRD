@@ -581,6 +581,7 @@ export default {
                     
                     this.alertType = 'alert';
                     this.alertMessage = 'Por favor complete la fecha de nacimiento';
+                    this.alertKey++;
                     this.openModal = true;
                     return;
                 }
@@ -680,12 +681,14 @@ export default {
                
                 this.alertType = 'success';
                 this.alertMessage = 'Perfil actualizado correctamente';
+                this.alertKey++;
                 this.openModal = true;
             } catch (error) {
                 console.error('Error al guardar perfil:', error);
                 
                 this.alertType = 'error';
                 this.alertMessage = 'Error al guardar los cambios. Por favor intenta nuevamente.';
+                this.alertKey++;
                 this.openModal = true;
             }
         },
@@ -710,6 +713,7 @@ export default {
                 
                 this.alertType = 'alert';
                 this.alertMessage = 'Por favor selecciona un archivo de imagen válido';
+                this.alertKey++;
                 this.openModal = true;
                 return
             }
@@ -719,6 +723,7 @@ export default {
                 
                 this.alertType = 'alert';
                 this.alertMessage = 'El tamaño máximo permitido es 2MB';
+                this.alertKey++;
                 this.openModal = true;
                 return
             }
@@ -757,6 +762,7 @@ export default {
                 
                 this.alertType = 'error';
                 this.alertMessage = 'Error al actualizar la imagen. Por favor intenta nuevamente.';
+                this.alertKey++;
                 this.openModal = true;
             }
         },
@@ -880,6 +886,7 @@ export default {
             
             this.alertType = type;
             this.alertMessage = message;
+            this.alertKey++;
             this.openModal = true;
         },
 

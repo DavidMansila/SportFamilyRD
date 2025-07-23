@@ -251,7 +251,6 @@ export default {
       
       this.alertType = type;
       this.alertMessage = message;
-      this.alertKey++;
       this.alertKey++; 
       this.openModal = true;
     },
