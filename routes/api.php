@@ -91,13 +91,17 @@ Route::resource('/user', UserController::class);
 
 // Productos sin middleware
     Route::resource('/products', ProductController::class);
+
 //post sin middleware
     Route::get('/post', [PostController::class, 'index']);
+    Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
+
 //trainer sin middleware
     Route::get('/trainer', [TrainerController::class, 'index']);
     Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
     Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
 
+    
 
     // RUTAS PROTEGIDAS POR TOKEN
 Route::middleware('auth:sanctum')->group(function () {
@@ -130,15 +134,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('cart/clear', [CartController::class, 'clearCart']);
 
     // Posts
-    // Route::resource('/post', PostController::class);
-    // Route::post('/post', [PostController::class, 'store']);
-    // Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
+    Route::resource('/post', PostController::class);
+    Route::post('/post', [PostController::class, 'store']);
+    Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
 
     // Funcionalidades completas de posts
     Route::post('/post/create-comment', [PostController::class, 'createComment']);
     Route::put('/post/update-comment/{commentId}', [PostController::class, 'updateComment']);
     Route::delete('/post/delete-comment/{commentId}', [PostController::class, 'destroyComment']);
-    Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
+    
     Route::post('/post/create-reply/{commentId}', [PostController::class, 'createReply']);
     Route::put('/post/update-reply/{replyId}', [PostController::class, 'updateReply']);
     Route::delete('/post/destroy-reply/{replyId}', [PostController::class, 'destroyReply']);

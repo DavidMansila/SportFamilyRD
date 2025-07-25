@@ -213,7 +213,7 @@ export default {
         console.error(error);
         
         this.alertType = 'alert';
-        this.alertMessage = 'Contraseña debe tener al menos 4 caracteres';
+        this.alertMessage = 'Contraseña debe tener al menos 4 caracteres y ser igual a la confirmación.';
         this.alertKey++;
         this.openModal = true;
 
