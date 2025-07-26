@@ -90,7 +90,7 @@ Route::resource('/user', UserController::class);
     Route::get('/', [CalendarController::class, 'index']);
 
 // Productos sin middleware
-    Route::resource('/products', ProductController::class);
+    Route::get('/products', [ProductController::class, 'index']);
 
 //post sin middleware
     Route::get('/post', [PostController::class, 'index']);
@@ -101,7 +101,9 @@ Route::resource('/user', UserController::class);
     Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
     Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
 
-    
+Route::get('/prueba-publica', function () {
+    return response()->json(['mensaje' => 'Sin autenticación']);
+});
 
     // RUTAS PROTEGIDAS POR TOKEN
 Route::middleware('auth:sanctum')->group(function () {
@@ -109,7 +111,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Usuarios
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
     Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
-
 
    // Calendario
         // Route::resource('/calendar', CalendarController::class);
@@ -122,8 +123,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/{calendar}', [CalendarController::class, 'destroy']);
 
     //Productos
-    Route::resource('/products', ProductController::class);
-    Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
+    // Route::resource('/products', ProductController::class);
+    
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    // Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
     Route::delete('/products/{id}', [ProductController::class, 'destroyProduct']);
 
     // Carrito
@@ -134,7 +139,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('cart/clear', [CartController::class, 'clearCart']);
 
     // Posts
-    Route::resource('/post', PostController::class);
+    // Route::resource('/post', PostController::class);
+    Route::put('/post/{id}', [PostController::class, 'update']);
+    Route::delete('/post/{id}', [PostController::class, 'destroy']);
     Route::post('/post', [PostController::class, 'store']);
     Route::post('/toggle-like', [LikeController::class, 'toggleLike']);
 
@@ -178,7 +185,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
     Route::post('/messages/send', [ChatController::class, 'sendMessage']);
     Route::post('/chats/{chat}/messages', [ChatController::class, 'store']);
-
 
     Route::put('/news/{id}', [NewsController::class, 'update']);
 
