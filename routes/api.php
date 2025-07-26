@@ -106,7 +106,7 @@ Route::get('/prueba-publica', function () {
 });
 
     // RUTAS PROTEGIDAS POR TOKEN
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
 
     // Usuarios
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
@@ -189,7 +189,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/news/{id}', [NewsController::class, 'update']);
 
     Route::delete('/news/{id}', [NewsController::class, 'destroy']);
-});
+// });
 
 // --- RUTAS DE VERIFICACIÓN DE EMAIL (API) ---
 // Reenviar correo de verificación
