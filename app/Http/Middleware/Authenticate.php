@@ -10,10 +10,6 @@ class Authenticate
 {
     public function handle($request, Closure $next)
     {
-        if (!$request->bearerToken()) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
-        }
-
         return $next($request);
     }
 }
