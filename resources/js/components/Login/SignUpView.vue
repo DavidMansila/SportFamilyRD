@@ -16,7 +16,7 @@
     <!-- Formulario de Registro -->
     <div class="form-container sign-up-container">
       <form>
-        <h1>Crear Cuenta</h1>
+        <h1>Registrarse</h1>
 
         <!-- <div class="social-container">
           <a href="https://www.instagram.com" target="_blank" class="social">
