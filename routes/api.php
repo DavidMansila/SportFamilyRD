@@ -127,6 +127,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- TRAINER ---
     Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
+    Route::put('/trainer/{id}', [TrainerController::class, 'update']);
     Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus']);
     Route::get('/trainer-requests', [TrainerController::class, 'getAllTrainerRequests']);
 

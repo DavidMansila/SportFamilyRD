@@ -27,19 +27,9 @@
                 </div>
                 <router-link to="/Solicitud" class="cta-button">
                     Aplicar Ahora
-                    <svg
-                        class="arrow-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M5 12H19M19 12L12 5M19 12L12 19"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
+                    <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </router-link>
             </div>
@@ -60,7 +50,7 @@
         <div class="cta-container" v-if="user?.user_type == 'admin'">
             <div class="cta-card">
                 <div class="cta-text">
-                  <h2> <strong>Bienvenido de nuevo: </strong>{{ user.name }}</h2>
+                    <h2> <strong>Bienvenido de nuevo: </strong>{{ user.name }}</h2>
                 </div>
             </div>
         </div>
@@ -68,20 +58,12 @@
         <!-- Filtros y Búsqueda -->
         <div class="controls-section">
             <div class="search-container">
-                <input
-                    type="text"
-                    placeholder="Buscar entrenadores..."
-                    v-model="busqueda"
-                />
+                <input type="text" placeholder="Buscar entrenadores..." v-model="busqueda" />
             </div>
 
             <div class="filter-tabs">
-                <button
-                    v-for="deporte in deportes"
-                    :key="deporte"
-                    @click="filtrarPorDeporte(deporte)"
-                    :class="{ active: deporteActivo === deporte }"
-                >
+                <button v-for="deporte in deportes" :key="deporte" @click="filtrarPorDeporte(deporte)"
+                    :class="{ active: deporteActivo === deporte }">
                     {{ deporte }}
                 </button>
             </div>
@@ -90,23 +72,16 @@
         <!-- Lista de Entrenadores -->
         <div class="entrenadores-container">
             <transition-group name="cards" tag="div" class="entrenadores-grid">
-                <div
-                    v-for="entrenador in paginatedEntrenadores"
-                    :key="entrenador.trainer_id"
-                    class="entrenador-card"
-                    @click="verPerfil(entrenador)"
-                >
+                <div v-for="entrenador in paginatedEntrenadores" :key="entrenador.trainer_id" class="entrenador-card"
+                    @click="verPerfil(entrenador)">
                     <div class="card-image-container">
-                        <img
-                            :src="entrenador.foto"
-                            :alt="`${entrenador.nombre} - ${entrenador.deporte}`"
-                        />
+                        <img :src="entrenador.foto" :alt="`${entrenador.nombre} - ${entrenador.deporte}`" />
                         <div class="deporte-tag">{{ entrenador.deporte }}</div>
                     </div>
 
                     <div class="card-content">
                         <div class="card-header">
-                            <h3>{{ entrenador.nombre }}</h3>
+                            <h3>{{ entrenador.user ? entrenador.user.name : entrenador.nombre }}</h3>
                             <!-- <div class="rating">
                 <span v-for="star in 5" :key="star" :class="{ filled: star <= entrenador.rating }">★</span>
               </div> -->
@@ -118,23 +93,13 @@
                         <!-- <p class="testimonio">"{{ entrenador.testimonio }}"</p> -->
 
                         <div v-if="user" class="card-footer">
-                            <button
-                                class="contact-btn"
-                                @click.stop="contactarEntrenador(entrenador)"
-                            >
-                                <svg
-                                    class="message-icon"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
+                            <button class="contact-btn" @click.stop="contactarEntrenador(entrenador)">
+                                <svg class="message-icon" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                 </svg>
                                 Contactar
                             </button>
@@ -144,51 +109,29 @@
             </transition-group>
         </div>
 
-        <div
-            v-if="entrenadoresFiltrados.length > itemsPerPage"
-            class="pagination-container"
-        >
-            <paginatorComponent
-                v-model="currentPage"
-                :total-items="entrenadoresFiltrados.length"
-                :items-per-page="itemsPerPage"
-                :max-pages-shown="5"
-            />
+        <div v-if="entrenadoresFiltrados.length > itemsPerPage" class="pagination-container">
+            <paginatorComponent v-model="currentPage" :total-items="entrenadoresFiltrados.length"
+                :items-per-page="itemsPerPage" :max-pages-shown="5" />
         </div>
 
         <!-- Modal de Perfil -->
         <transition name="modal">
-            <div
-                v-if="entrenadorSeleccionado"
-                class="profile-modal"
-                @click.self="cerrarPerfil"
-            >
+            <div v-if="entrenadorSeleccionado" class="profile-modal" @click.self="cerrarPerfil">
                 <div class="modal-content">
                     <button class="close-modal" @click="cerrarPerfil">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M18 6L6 18M6 6L18 18"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
                         </svg>
                     </button>
 
                     <div class="modal-header">
                         <div class="profile-image">
-                            <img
-                                :src="entrenadorSeleccionado.foto"
-                                :alt="entrenadorSeleccionado.nombre"
-                            />
+                            <img :src="entrenadorSeleccionado.foto" :alt="entrenadorSeleccionado.nombre" />
                         </div>
                         <div class="profile-info">
-                            <h2>{{ entrenadorSeleccionado.nombre }}</h2>
+                            <h2>{{ entrenadorSeleccionado.user ? entrenadorSeleccionado.user.name :
+                                entrenadorSeleccionado.nombre }}</h2>
                             <div class="deporte-badge">
                                 {{ entrenadorSeleccionado.deporte }}
                             </div>
@@ -213,13 +156,9 @@
                         <div class="section">
                             <h3>Especialidades</h3>
                             <div class="especialidades">
-                                <span
-                                    v-for="(
-                                        esp, i
-                                    ) in entrenadorSeleccionado.especialidades"
-                                    :key="i"
-                                    class="especialidad-tag"
-                                >
+                                <span v-for="(
+esp, i
+                                    ) in entrenadorSeleccionado.especialidades" :key="i" class="especialidad-tag">
                                     {{ esp }}
                                 </span>
                             </div>
@@ -229,62 +168,49 @@
                             <h3>Logros</h3>
                             <div class="logros">
                                 <ul class="logros">
-                                    <li
-                                        v-for="(
-                                            logro, index
-                                        ) in entrenadorSeleccionado.logros"
-                                        :key="index"
-                                    >
+                                    <li v-for="(
+logro, index
+                                        ) in entrenadorSeleccionado.logros" :key="index">
                                         {{ logro }}
                                     </li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div
-                            class="section"
-                            v-if="
-                                entrenadorSeleccionado &&
-                                entrenadorSeleccionado.horario
-                            "
-                        >
+                        <div class="section" v-if="
+                            entrenadorSeleccionado &&
+                            entrenadorSeleccionado.horario
+                        ">
                             <h3 class="horario-titulo">
                                 🗓️ Horario Disponible
                             </h3>
                             <div class="horario-grid">
-                                <div
-                                    v-for="(diaAbrev, index) in [
-                                        'Lun',
-                                        'Mar',
-                                        'Mié',
-                                        'Jue',
-                                        'Vie',
-                                        'Sáb',
-                                        'Dom',
-                                    ]"
-                                    :key="index"
-                                    class="horario-dia"
-                                    :class="{
+                                <div v-for="(diaAbrev, index) in [
+                                    'Lun',
+                                    'Mar',
+                                    'Mié',
+                                    'Jue',
+                                    'Vie',
+                                    'Sáb',
+                                    'Dom',
+                                ]" :key="index" class="horario-dia" :class="{
                                         disponible: isDisponible(diaAbrev),
                                         noDisponible: !isDisponible(diaAbrev),
-                                    }"
-                                >
+                                    }">
                                     <span class="dia-nombre">{{
                                         diaAbrev
-                                    }}</span>
+                                        }}</span>
                                     <span class="estado-icono">
                                         <template v-if="isDisponible(diaAbrev)">
                                             ✅ Disponible
                                             <br />
-                                            <small
-                                                >{{
-                                                    getHorario(diaAbrev).desde
-                                                }}
+                                            <small>{{
+                                                getHorario(diaAbrev).desde
+                                            }}
                                                 -
                                                 {{
                                                     getHorario(diaAbrev).hasta
-                                                }}</small
-                                            >
+                                                }}</small>
                                         </template>
                                         <template v-else>
                                             ❌ No Disponible
@@ -306,10 +232,7 @@
                     </div>
 
                     <div v-if="user" class="modal-footer">
-                        <button
-                            class="primary-btn"
-                            @click="contactarEntrenador(entrenadorSeleccionado)"
-                        >
+                        <button class="primary-btn" @click="contactarEntrenador(entrenadorSeleccionado)">
                             Contactar a
                             {{ entrenadorSeleccionado.nombre.split(" ")[0] }}
                         </button>
@@ -320,46 +243,26 @@
 
         <!-- Modal de Contacto -->
         <transition name="modal">
-            <div
-                v-if="mostrarFormularioContacto"
-                class="contact-modal"
-                @click.self="cerrarFormularioContacto"
-            >
+            <div v-if="mostrarFormularioContacto" class="contact-modal" @click.self="cerrarFormularioContacto">
                 <div class="modal-content">
-                    <button
-                        class="close-modal"
-                        @click="cerrarFormularioContacto"
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M18 6L6 18M6 6L18 18"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
+                    <button class="close-modal" @click="cerrarFormularioContacto">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
                         </svg>
                     </button>
 
                     <h2 class="modal-title">
-                        Contactar a
-                        {{ contactoEntrenador.nombre.split(" ")[0] }}
+                        Contactar a {{ contactoEntrenador.user ? contactoEntrenador.user.name.split(" ")[0] :
+                            contactoEntrenador.nombre.split(" ")[0] }}
                     </h2>
 
                     <div class="profile-info">
                         <div class="user-details">
                             <span class="user-avatar">
-                                <img
-                                    :src="
-                                        user.image ||
-                                        'public/storage/users/Perfil-Icon.png'
-                                    "
-                                    alt="Tu foto de perfil"
-                                />
+                                <img :src="user.image ||
+                                    'public/storage/users/Perfil-Icon.png'
+                                    " alt="Tu foto de perfil" />
                             </span>
                             <div>
                                 <p><strong>Nombre:</strong> {{ user.name }}</p>
@@ -376,30 +279,17 @@
                         </p>
                     </div>
 
-                    <form
-                        @submit.prevent="enviarFormularioContacto"
-                        class="contact-form"
-                    >
+                    <form @submit.prevent="enviarFormularioContacto" class="contact-form">
                         <div class="form-group">
-                            <label for="objetivos"
-                                >¿Qué buscas aprender o lograr?</label
-                            >
-                            <textarea
-                                id="objetivos"
-                                v-model="formularioContacto.objetivos"
-                                rows="4"
+                            <label for="objetivos">¿Qué buscas aprender o lograr?</label>
+                            <textarea id="objetivos" v-model="formularioContacto.objetivos" rows="4"
                                 placeholder="Ej: Mejorar mi técnica de tiro, prepararme para una competencia, perder peso..."
-                                required
-                            ></textarea>
+                                required></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="nivel">Nivel en el deporte</label>
-                            <select
-                                id="nivel"
-                                v-model="formularioContacto.nivel"
-                                required
-                            >
+                            <select id="nivel" v-model="formularioContacto.nivel" required>
                                 <option value="" disabled selected>
                                     Selecciona tu nivel
                                 </option>
@@ -413,20 +303,12 @@
                         </div>
 
                         <p class="data-notice">
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
                             </svg>
                             <template v-if="user?.user_type == 'entrenador'">
                                 Los entrenadores no pueden enviar solicitudes de
@@ -447,19 +329,10 @@
         </transition>
 
         <!-- Burbuja de Mensajes Flotante -->
-        <ChatBubbleComponent
-            v-if="user && !entrenadorSeleccionado && !mostrarFormularioContacto"
-            :user="user"
-        />
+        <ChatBubbleComponent v-if="user && !entrenadorSeleccionado && !mostrarFormularioContacto" :user="user" />
     </div>
 
-    <Alert
-      v-if="openModal"
-      :key="alertKey"
-      :message="alertMessage"
-      :type="alertType"
-      @closed="openModal = null"
-    />
+    <Alert v-if="openModal" :key="alertKey" :message="alertMessage" :type="alertType" @closed="openModal = null" />
 </template>
 
 <script>
@@ -632,24 +505,24 @@ export default {
         },
 
         async enviarFormularioContacto() {
-            
+
             if (!this.user?.id) {
-              this.alertType = "alert";
-              this.alertMessage = "Debes iniciar sesión para contactar a un entrenador";
-              this.alertKey++;
-              this.openModal = true;
-        
-              return;
+                this.alertType = "alert";
+                this.alertMessage = "Debes iniciar sesión para contactar a un entrenador";
+                this.alertKey++;
+                this.openModal = true;
+
+                return;
             }
 
             // Verificar si el usuario es entrenador
             if (this.user.user_type === "entrenador") {
-              this.alertType = "error";
-              this.alertMessage = "Los entrenadores no pueden enviar solicitudes a otros entrenadores.";
-              this.alertKey++;
-              this.openModal = true;
-              
-              return;
+                this.alertType = "error";
+                this.alertMessage = "Los entrenadores no pueden enviar solicitudes a otros entrenadores.";
+                this.alertKey++;
+                this.openModal = true;
+
+                return;
             }
 
             try {
@@ -669,12 +542,12 @@ export default {
                             `/training/${checkResponse.data.id}`
                         );
                     } else {
-                      this.alertType = "error";
-                      this.alertMessage = `Ya tienes una solicitud pendiente con ${this.contactoEntrenador.nombre}`;
-                      this.alertKey++;
-                      this.openModal = true;
-          
-                      return;
+                        this.alertType = "error";
+                        this.alertMessage = `Ya tienes una solicitud pendiente con ${this.contactoEntrenador.nombre}`;
+                        this.alertKey++;
+                        this.openModal = true;
+
+                        return;
                     }
                 }
 
@@ -690,19 +563,19 @@ export default {
                 const response = await axios.post("/training", formData);
 
                 if (response.status === 201) {
-                  this.alertType = "success";
-                  this.alertMessage = `Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`;
-                  this.alertKey++;
-                  this.openModal = true;
-            
-                  this.cerrarFormularioContacto();
+                    this.alertType = "success";
+                    this.alertMessage = `Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`;
+                    this.alertKey++;
+                    this.openModal = true;
+
+                    this.cerrarFormularioContacto();
                 }
             } catch (error) {
                 // Manejo de errores
                 if (error.response?.status === 422) {
                     const errors = error.response.data.errors;
                     let errorMsg = Object.values(errors).flat().join("\n");
-                    
+
                     this.alertType = "error";
                     this.alertMessage = `Error de validación:\n${errorMsg}`;
                     this.alertKey++;
@@ -714,14 +587,14 @@ export default {
                     this.openModal = true;
 
                 } else if (error.response?.data?.message) {
-                   
+
                     this.alertType = "error";
                     this.alertMessage = `Error: ${error.response.data.message}`;
                     this.alertKey++;
                     this.openModal = true;
                 } else {
                     console.error("Error completo:", error);
-                    
+
                     this.alertType = "error";
                     this.alertMessage = `Error al procesar la solicitud: ${error.message}`;
                     this.alertKey++;
@@ -737,7 +610,7 @@ export default {
                     let trainers = response.data.trainer.map((trainer) => ({
                         trainer_id: trainer.id,
                         user_id: trainer.user_id,
-                        nombre: trainer.name,
+                        nombre: trainer.user ? trainer.user.name : trainer.name,
                         deporte: trainer.sport_category,
                         experiencia: trainer.experience,
                         foto: trainer.image,
@@ -747,16 +620,15 @@ export default {
                         horario: this.parseSchedule(trainer.schedule),
                         especialidades: trainer.specialties
                             ? trainer.specialties.map(
-                                  (e) => e.description || e.name
-                              )
+                                (e) => e.description || e.name
+                            )
                             : [],
                         logros: trainer.achievements
                             ? trainer.achievements.map(
-                                  (a) =>
-                                      `${a.title}${
-                                          a.date ? ` (${a.date})` : ""
-                                      }`
-                              )
+                                (a) =>
+                                    `${a.title}${a.date ? ` (${a.date})` : ""
+                                    }`
+                            )
                             : [],
                     }));
 
