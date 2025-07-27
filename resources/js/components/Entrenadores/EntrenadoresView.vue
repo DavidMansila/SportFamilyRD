@@ -17,50 +17,106 @@
 
         <!-- Sección CTA -->
         <div class="cta-container" v-if="user?.user_type == 'user'">
-            <div class="cta-card">
-                <div class="cta-text">
-                    <h2>¿Tienes lo necesario para ser entrenador?</h2>
-                    <p>
-                        Únete a nuestra red de profesionales y comparte tu
-                        conocimiento
-                    </p>
+            <div class="cta-card-nonuser">
+                <div class="cta-content">
+                    <div class="cta-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <div class="cta-text">
+                        <h2>¿Te apasiona entrenar y motivar a otros?</h2>
+                        <p>
+                            Da el siguiente paso y convierte tu pasión en una carrera. Aplica para ser parte de nuestra
+                            comunidad de entrenadores certificados y contribuye al crecimiento del deporte en República
+                            Dominicana.
+                        </p>
+                    </div>
                 </div>
-                <router-link to="/Solicitud" class="cta-button">
-                    Aplicar Ahora
-                    <svg
-                        class="arrow-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M5 12H19M19 12L12 5M19 12L12 19"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                </router-link>
+                <div class="cta-actions">
+                    <router-link to="/solicitud" class="cta-button register-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                        </svg>
+                        Aplicar ahora
+                    </router-link>
+                </div>
             </div>
         </div>
 
         <div class="cta-container" v-if="user?.user_type == 'entrenador'">
-            <div class="cta-card">
-                <div class="cta-text">
-                    <h2><strong>Bienvenido de nuevo: </strong>{{ user.name }}</h2>
-                    <p>
-                        Puedes actualizar tus datos profesionales actualizando
-                        tu perfil
-                    </p>
+            <div class="cta-card-nonuser">
+                <div class="cta-content">
+                    <div class="cta-text">
+                        <h2>Bienvenido denuevo: {{ user.name }}</h2>
+                        <p>
+                            Puedes actualizar tus datos profesionales actualizando
+                            tu perfil
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="cta-container" v-if="user?.user_type == 'admin'">
-            <div class="cta-card">
-                <div class="cta-text">
-                  <h2> <strong>Bienvenido de nuevo: </strong>{{ user.name }}</h2>
+            <div class="cta-card-nonuser">
+                <div class="cta-content">
+                    <div class="cta-text">
+                        <h2>Bienvenido denuevo: {{ user.name }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="cta-container" v-if="!user">
+            <div class="cta-card-nonuser">
+                <div class="cta-content">
+                    <div class="cta-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <div class="cta-text">
+                        <h2>¿Quieres llevar tu entrenamiento al siguiente nivel?</h2>
+                        <p>Inicia sesión para contactar con entrenadores certificados o da el primer paso para
+                            convertirte en uno de ellos. ¡Conéctate con el futuro del deporte en República Dominicana!
+                        </p>
+                    </div>
+                </div>
+                <div class="cta-actions">
+                    <router-link :to="{ path: '/signup', query: { panel: 'login' } }" class="cta-button login-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        Iniciar Sesión
+                    </router-link>
+                    <router-link :to="{ path: '/signup', query: { panel: 'signup' } }" class="cta-button register-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                        </svg>
+                        Registrarse
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -68,20 +124,12 @@
         <!-- Filtros y Búsqueda -->
         <div class="controls-section">
             <div class="search-container">
-                <input
-                    type="text"
-                    placeholder="Buscar entrenadores..."
-                    v-model="busqueda"
-                />
+                <input type="text" placeholder="Buscar entrenadores..." v-model="busqueda" />
             </div>
 
             <div class="filter-tabs">
-                <button
-                    v-for="deporte in deportes"
-                    :key="deporte"
-                    @click="filtrarPorDeporte(deporte)"
-                    :class="{ active: deporteActivo === deporte }"
-                >
+                <button v-for="deporte in deportes" :key="deporte" @click="filtrarPorDeporte(deporte)"
+                    :class="{ active: deporteActivo === deporte }">
                     {{ deporte }}
                 </button>
             </div>
@@ -90,23 +138,16 @@
         <!-- Lista de Entrenadores -->
         <div class="entrenadores-container">
             <transition-group name="cards" tag="div" class="entrenadores-grid">
-                <div
-                    v-for="entrenador in paginatedEntrenadores"
-                    :key="entrenador.trainer_id"
-                    class="entrenador-card"
-                    @click="verPerfil(entrenador)"
-                >
+                <div v-for="entrenador in paginatedEntrenadores" :key="entrenador.trainer_id" class="entrenador-card"
+                    @click="verPerfil(entrenador)">
                     <div class="card-image-container">
-                        <img
-                            :src="entrenador.foto"
-                            :alt="`${entrenador.nombre} - ${entrenador.deporte}`"
-                        />
+                        <img :src="entrenador.foto" :alt="`${entrenador.nombre} - ${entrenador.deporte}`" />
                         <div class="deporte-tag">{{ entrenador.deporte }}</div>
                     </div>
 
                     <div class="card-content">
                         <div class="card-header">
-                            <h3>{{ entrenador.nombre }}</h3>
+                            <h3>{{ entrenador.user ? entrenador.user.name : entrenador.nombre }}</h3>
                             <!-- <div class="rating">
                 <span v-for="star in 5" :key="star" :class="{ filled: star <= entrenador.rating }">★</span>
               </div> -->
@@ -118,23 +159,13 @@
                         <!-- <p class="testimonio">"{{ entrenador.testimonio }}"</p> -->
 
                         <div v-if="user" class="card-footer">
-                            <button
-                                class="contact-btn"
-                                @click.stop="contactarEntrenador(entrenador)"
-                            >
-                                <svg
-                                    class="message-icon"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
+                            <button class="contact-btn" @click.stop="contactarEntrenador(entrenador)">
+                                <svg class="message-icon" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                 </svg>
                                 Contactar
                             </button>
@@ -144,51 +175,29 @@
             </transition-group>
         </div>
 
-        <div
-            v-if="entrenadoresFiltrados.length > itemsPerPage"
-            class="pagination-container"
-        >
-            <paginatorComponent
-                v-model="currentPage"
-                :total-items="entrenadoresFiltrados.length"
-                :items-per-page="itemsPerPage"
-                :max-pages-shown="5"
-            />
+        <div v-if="entrenadoresFiltrados.length > itemsPerPage" class="pagination-container">
+            <paginatorComponent v-model="currentPage" :total-items="entrenadoresFiltrados.length"
+                :items-per-page="itemsPerPage" :max-pages-shown="5" />
         </div>
 
         <!-- Modal de Perfil -->
         <transition name="modal">
-            <div
-                v-if="entrenadorSeleccionado"
-                class="profile-modal"
-                @click.self="cerrarPerfil"
-            >
+            <div v-if="entrenadorSeleccionado" class="profile-modal" @click.self="cerrarPerfil">
                 <div class="modal-content">
                     <button class="close-modal" @click="cerrarPerfil">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M18 6L6 18M6 6L18 18"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
                         </svg>
                     </button>
 
                     <div class="modal-header">
                         <div class="profile-image">
-                            <img
-                                :src="entrenadorSeleccionado.foto"
-                                :alt="entrenadorSeleccionado.nombre"
-                            />
+                            <img :src="entrenadorSeleccionado.foto" :alt="entrenadorSeleccionado.nombre" />
                         </div>
                         <div class="profile-info">
-                            <h2>{{ entrenadorSeleccionado.nombre }}</h2>
+                            <h2>{{ entrenadorSeleccionado.user ? entrenadorSeleccionado.user.name :
+                                entrenadorSeleccionado.nombre }}</h2>
                             <div class="deporte-badge">
                                 {{ entrenadorSeleccionado.deporte }}
                             </div>
@@ -213,13 +222,9 @@
                         <div class="section">
                             <h3>Especialidades</h3>
                             <div class="especialidades">
-                                <span
-                                    v-for="(
-                                        esp, i
-                                    ) in entrenadorSeleccionado.especialidades"
-                                    :key="i"
-                                    class="especialidad-tag"
-                                >
+                                <span v-for="(
+esp, i
+                                    ) in entrenadorSeleccionado.especialidades" :key="i" class="especialidad-tag">
                                     {{ esp }}
                                 </span>
                             </div>
@@ -229,46 +234,35 @@
                             <h3>Logros</h3>
                             <div class="logros">
                                 <ul class="logros">
-                                    <li
-                                        v-for="(
-                                            logro, index
-                                        ) in entrenadorSeleccionado.logros"
-                                        :key="index"
-                                    >
+                                    <li v-for="(
+logro, index
+                                        ) in entrenadorSeleccionado.logros" :key="index">
                                         {{ logro }}
                                     </li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div
-                            class="section"
-                            v-if="
-                                entrenadorSeleccionado &&
-                                entrenadorSeleccionado.horario
-                            "
-                        >
+                        <div class="section" v-if="
+                            entrenadorSeleccionado &&
+                            entrenadorSeleccionado.horario
+                        ">
                             <h3 class="horario-titulo">
                                 🗓️ Horario Disponible
                             </h3>
                             <div class="horario-grid">
-                                <div
-                                    v-for="(diaAbrev, index) in [
-                                        'Lun',
-                                        'Mar',
-                                        'Mié',
-                                        'Jue',
-                                        'Vie',
-                                        'Sáb',
-                                        'Dom',
-                                    ]"
-                                    :key="index"
-                                    class="horario-dia"
-                                    :class="{
-                                        disponible: isDisponible(diaAbrev),
-                                        noDisponible: !isDisponible(diaAbrev),
-                                    }"
-                                >
+                                <div v-for="(diaAbrev, index) in [
+                                    'Lun',
+                                    'Mar',
+                                    'Mié',
+                                    'Jue',
+                                    'Vie',
+                                    'Sáb',
+                                    'Dom',
+                                ]" :key="index" class="horario-dia" :class="{
+                                    disponible: isDisponible(diaAbrev),
+                                    noDisponible: !isDisponible(diaAbrev),
+                                }">
                                     <span class="dia-nombre">{{
                                         diaAbrev
                                     }}</span>
@@ -276,15 +270,13 @@
                                         <template v-if="isDisponible(diaAbrev)">
                                             ✅ Disponible
                                             <br />
-                                            <small
-                                                >{{
-                                                    getHorario(diaAbrev).desde
-                                                }}
+                                            <small>{{
+                                                getHorario(diaAbrev).desde
+                                            }}
                                                 -
                                                 {{
                                                     getHorario(diaAbrev).hasta
-                                                }}</small
-                                            >
+                                                }}</small>
                                         </template>
                                         <template v-else>
                                             ❌ No Disponible
@@ -306,10 +298,7 @@
                     </div>
 
                     <div v-if="user" class="modal-footer">
-                        <button
-                            class="primary-btn"
-                            @click="contactarEntrenador(entrenadorSeleccionado)"
-                        >
+                        <button class="primary-btn" @click="contactarEntrenador(entrenadorSeleccionado)">
                             Contactar a
                             {{ entrenadorSeleccionado.nombre.split(" ")[0] }}
                         </button>
@@ -320,46 +309,26 @@
 
         <!-- Modal de Contacto -->
         <transition name="modal">
-            <div
-                v-if="mostrarFormularioContacto"
-                class="contact-modal"
-                @click.self="cerrarFormularioContacto"
-            >
+            <div v-if="mostrarFormularioContacto" class="contact-modal" @click.self="cerrarFormularioContacto">
                 <div class="modal-content">
-                    <button
-                        class="close-modal"
-                        @click="cerrarFormularioContacto"
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M18 6L6 18M6 6L18 18"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
+                    <button class="close-modal" @click="cerrarFormularioContacto">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
                         </svg>
                     </button>
 
                     <h2 class="modal-title">
-                        Contactar a
-                        {{ contactoEntrenador.nombre.split(" ")[0] }}
+                        Contactar a {{ contactoEntrenador.user ? contactoEntrenador.user.name.split(" ")[0] :
+                            contactoEntrenador.nombre.split(" ")[0] }}
                     </h2>
 
                     <div class="profile-info">
                         <div class="user-details">
                             <span class="user-avatar">
-                                <img
-                                    :src="
-                                        user.image ||
-                                        'public/storage/users/Perfil-Icon.png'
-                                    "
-                                    alt="Tu foto de perfil"
-                                />
+                                <img :src="user.image ||
+                                    'public/storage/users/Perfil-Icon.png'
+                                    " alt="Tu foto de perfil" />
                             </span>
                             <div>
                                 <p><strong>Nombre:</strong> {{ user.name }}</p>
@@ -376,30 +345,17 @@
                         </p>
                     </div>
 
-                    <form
-                        @submit.prevent="enviarFormularioContacto"
-                        class="contact-form"
-                    >
+                    <form @submit.prevent="enviarFormularioContacto" class="contact-form">
                         <div class="form-group">
-                            <label for="objetivos"
-                                >¿Qué buscas aprender o lograr?</label
-                            >
-                            <textarea
-                                id="objetivos"
-                                v-model="formularioContacto.objetivos"
-                                rows="4"
+                            <label for="objetivos">¿Qué buscas aprender o lograr?</label>
+                            <textarea id="objetivos" v-model="formularioContacto.objetivos" rows="4"
                                 placeholder="Ej: Mejorar mi técnica de tiro, prepararme para una competencia, perder peso..."
-                                required
-                            ></textarea>
+                                required></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="nivel">Nivel en el deporte</label>
-                            <select
-                                id="nivel"
-                                v-model="formularioContacto.nivel"
-                                required
-                            >
+                            <select id="nivel" v-model="formularioContacto.nivel" required>
                                 <option value="" disabled selected>
                                     Selecciona tu nivel
                                 </option>
@@ -413,20 +369,12 @@
                         </div>
 
                         <p class="data-notice">
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
                             </svg>
                             <template v-if="user?.user_type == 'entrenador'">
                                 Los entrenadores no pueden enviar solicitudes de
@@ -447,19 +395,10 @@
         </transition>
 
         <!-- Burbuja de Mensajes Flotante -->
-        <ChatBubbleComponent
-            v-if="user && !entrenadorSeleccionado && !mostrarFormularioContacto"
-            :user="user"
-        />
+        <ChatBubbleComponent v-if="user && !entrenadorSeleccionado && !mostrarFormularioContacto" :user="user" />
     </div>
 
-    <Alert
-      v-if="openModal"
-      :key="alertKey"
-      :message="alertMessage"
-      :type="alertType"
-      @closed="openModal = null"
-    />
+    <Alert v-if="openModal" :key="alertKey" :message="alertMessage" :type="alertType" @closed="openModal = null" />
 </template>
 
 <script>
@@ -632,24 +571,24 @@ export default {
         },
 
         async enviarFormularioContacto() {
-            
+
             if (!this.user?.id) {
-              this.alertType = "alert";
-              this.alertMessage = "Debes iniciar sesión para contactar a un entrenador";
-              this.alertKey++;
-              this.openModal = true;
-        
-              return;
+                this.alertType = "alert";
+                this.alertMessage = "Debes iniciar sesión para contactar a un entrenador";
+                this.alertKey++;
+                this.openModal = true;
+
+                return;
             }
 
             // Verificar si el usuario es entrenador
             if (this.user.user_type === "entrenador") {
-              this.alertType = "error";
-              this.alertMessage = "Los entrenadores no pueden enviar solicitudes a otros entrenadores.";
-              this.alertKey++;
-              this.openModal = true;
-              
-              return;
+                this.alertType = "error";
+                this.alertMessage = "Los entrenadores no pueden enviar solicitudes a otros entrenadores.";
+                this.alertKey++;
+                this.openModal = true;
+
+                return;
             }
 
             try {
@@ -669,12 +608,12 @@ export default {
                             `/training/${checkResponse.data.id}`
                         );
                     } else {
-                      this.alertType = "error";
-                      this.alertMessage = `Ya tienes una solicitud pendiente con ${this.contactoEntrenador.nombre}`;
-                      this.alertKey++;
-                      this.openModal = true;
-          
-                      return;
+                        this.alertType = "error";
+                        this.alertMessage = `Ya tienes una solicitud pendiente con ${this.contactoEntrenador.nombre}`;
+                        this.alertKey++;
+                        this.openModal = true;
+
+                        return;
                     }
                 }
 
@@ -690,19 +629,19 @@ export default {
                 const response = await axios.post("/training", formData);
 
                 if (response.status === 201) {
-                  this.alertType = "success";
-                  this.alertMessage = `Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`;
-                  this.alertKey++;
-                  this.openModal = true;
-            
-                  this.cerrarFormularioContacto();
+                    this.alertType = "success";
+                    this.alertMessage = `Solicitud enviada a ${this.contactoEntrenador.nombre} con éxito`;
+                    this.alertKey++;
+                    this.openModal = true;
+
+                    this.cerrarFormularioContacto();
                 }
             } catch (error) {
                 // Manejo de errores
                 if (error.response?.status === 422) {
                     const errors = error.response.data.errors;
                     let errorMsg = Object.values(errors).flat().join("\n");
-                    
+
                     this.alertType = "error";
                     this.alertMessage = `Error de validación:\n${errorMsg}`;
                     this.alertKey++;
@@ -714,14 +653,14 @@ export default {
                     this.openModal = true;
 
                 } else if (error.response?.data?.message) {
-                   
+
                     this.alertType = "error";
                     this.alertMessage = `Error: ${error.response.data.message}`;
                     this.alertKey++;
                     this.openModal = true;
                 } else {
                     console.error("Error completo:", error);
-                    
+
                     this.alertType = "error";
                     this.alertMessage = `Error al procesar la solicitud: ${error.message}`;
                     this.alertKey++;
@@ -737,7 +676,7 @@ export default {
                     let trainers = response.data.trainer.map((trainer) => ({
                         trainer_id: trainer.id,
                         user_id: trainer.user_id,
-                        nombre: trainer.name,
+                        nombre: trainer.user ? trainer.user.name : trainer.name,
                         deporte: trainer.sport_category,
                         experiencia: trainer.experience,
                         foto: trainer.image,
@@ -747,16 +686,15 @@ export default {
                         horario: this.parseSchedule(trainer.schedule),
                         especialidades: trainer.specialties
                             ? trainer.specialties.map(
-                                  (e) => e.description || e.name
-                              )
+                                (e) => e.description || e.name
+                            )
                             : [],
                         logros: trainer.achievements
                             ? trainer.achievements.map(
-                                  (a) =>
-                                      `${a.title}${
-                                          a.date ? ` (${a.date})` : ""
-                                      }`
-                              )
+                                (a) =>
+                                    `${a.title}${a.date ? ` (${a.date})` : ""
+                                    }`
+                            )
                             : [],
                     }));
 
@@ -877,7 +815,15 @@ export default {
         },
     },
     mounted() {
-        this.user = JSON.parse(sessionStorage.getItem("user")) || {};
+
+        const userData = sessionStorage.getItem("user");
+
+        if (userData) {
+            this.user = JSON.parse(userData);
+        } else {
+            this.user = null;
+        }
+
         this.cargarEntrenadores();
     },
 };
@@ -1096,5 +1042,193 @@ export default {
     font-size: 0.9rem;
     color: #6c757d;
     margin-top: 10px;
+}
+
+
+/* Estilos para la sección CTA */
+.cta-container {
+    max-width: 1200px;
+}
+
+.cta-card-nonuser {
+    background: linear-gradient(135deg, #b87800, rgb(37, 23, 0));
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.cta-card-nonuser:hover {
+    transform: translateY(-5px);
+}
+
+.cta-card-nonuser::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070') no-repeat center center/cover;
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.cta-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.cta-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.cta-icon svg {
+    width: 40px;
+    height: 40px;
+    stroke: white;
+}
+
+.cta-text h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cta-text p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 0 2rem 2.5rem;
+    flex-wrap: wrap;
+}
+
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.cta-button svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    stroke-width: 2.5px;
+}
+
+.login-btn {
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    color: #1a2980;
+}
+
+.register-btn {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.register-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Efecto de onda al pasar el ratón */
+.cta-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: -1;
+}
+
+.cta-button:hover::after {
+    transform: translateX(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cta-content {
+        padding: 2rem 1.5rem;
+    }
+
+    .cta-text h2 {
+        font-size: 1.7rem;
+    }
+
+    .cta-text p {
+        font-size: 1rem;
+    }
+
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 1.5rem 2rem;
+    }
+
+    .cta-button {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cta-text h2 {
+        font-size: 1.5rem;
+    }
+
+    .cta-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .cta-icon svg {
+        width: 35px;
+        height: 35px;
+    }
 }
 </style>
