@@ -202,7 +202,7 @@
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
                   </button>
-                  <button v-if="isPostAuthor(postSeleccionado) || user.user_type === 'admin'"
+                  <button v-if="isPostAuthor(postSeleccionado) || (user && user.user_type === 'admin')"
                     @click="confirmarEliminarPost" class="delete-post-btn" title="Eliminar post">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -243,7 +243,7 @@
                       <div class="comment-header">
 
                         <span class="comment-author">{{ comentario.user?.name || `Usuario${comentario.user_id}`
-                        }}</span>
+                          }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.replies && comentario.replies.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -298,7 +298,7 @@
                           class="comment-action edit-btn">
                           Editar
                         </button>
-                        <button v-if="isCommentAuthor(comentario) || user.user_type === 'admin'"
+                        <button v-if="isCommentAuthor(comentario) || (user && user.user_type === 'admin')"
                           @click="eliminarComentario(comentario)" class="comment-action delete-btn">
                           Eliminar
                         </button>
@@ -369,7 +369,7 @@
                                 class="comment-action edit-btn">
                                 Editar
                               </button>
-                              <button v-if="isReplyAuthor(reply) || user.user_type === 'admin'"
+                              <button v-if="isReplyAuthor(reply) || (user && user.user_type === 'admin')"
                                 @click="eliminarReply(reply)" class="comment-action delete-btn">
                                 Eliminar
                               </button>
@@ -414,7 +414,7 @@
                 </div>
 
                 <div v-else class="login-prompt">
-                  <p>Debes <router-link to="/login">iniciar sesión</router-link> para participar en la conversación
+                  <p>Debes <router-link to="/signup">iniciar sesión</router-link> para participar en la conversación
                   </p>
                 </div>
 
@@ -530,14 +530,8 @@
 
   <!-- Burbuja de Mensajes Flotante -->
   <ChatBubbleComponent v-if="user && !mostrarModal && !postSeleccionado" :user="user" />
-  
-  <Alert 
-    v-if="openModal" 
-    :key="alertKey"
-    :type="alertType" 
-    :message="alertMessage" 
-    @close="openModal = false" 
-  />  
+
+  <Alert v-if="openModal" :key="alertKey" :type="alertType" :message="alertMessage" @close="openModal = false" />
 </template>
 
 <script>
@@ -610,7 +604,7 @@ export default {
     // Métodos de UI
     abrirModal() {
       if (!this.user) {
-       
+
         this.alertType = 'alert';
         this.alertMessage = 'Por favor, inicia sesión para crear un nuevo post.';
         this.alertKey++;
@@ -733,7 +727,7 @@ export default {
     async createPost() {
 
       if (!this.user?.id) {
-        
+
         this.alertType = 'alert';
         this.alertMessage = 'Por favor, inicia sesión para crear un nuevo post.';
         this.alertKey++;
@@ -759,7 +753,7 @@ export default {
         this.cerrarModal();
       } catch (error) {
         console.error('Error creando post:', error);
-        
+
         this.alertType = 'error';
         this.alertMessage = 'Error al crear el post. Por favor, inténtalo de nuevo.';
         this.alertKey++;
@@ -818,7 +812,7 @@ export default {
       ];
 
       if (!allowedTypes.includes(file.type)) {
-       
+
         this.alertType = 'error';
         this.alertMessage = `Tipo de archivo no válido: ${file.type}. Usa JPEG, PNG o GIF.`;
         this.alertKey++;
@@ -844,7 +838,7 @@ export default {
 
       try {
         if (!this.user) {
-          
+
           this.alertType = 'alert';
           this.alertMessage = 'Por favor, inicia sesión para comentar.';
           this.alertKey++;
@@ -933,7 +927,7 @@ export default {
     // METODOS PARA LIKES
     async toggleLike(type, id) {
       if (!this.user) {
-        
+
         this.alertType = 'alert';
         this.alertMessage = 'Por favor, inicia sesión para dar like.';
         this.alertKey++;
@@ -1001,15 +995,15 @@ export default {
     // METODOS PARA EDITAR Y ELIMINAR EN POST
 
     isPostAuthor(post) {
-      return post.user_id === this.user.id;
+      return this.user && post.user_id === this.user.id;
     },
 
     isCommentAuthor(comment) {
-      return comment.user_id === this.user.id;
+      return this.user && comment.user_id === this.user.id;
     },
 
     isReplyAuthor(reply) {
-      return reply.user_id === this.user.id;
+      return this.user && reply.user_id === this.user.id;
     },
 
     // En el método editarPost
@@ -1050,7 +1044,7 @@ export default {
 
       } catch (error) {
         console.error('Error:', error.response?.data);
-        
+
         this.alertType = 'error';
         this.alertMessage = error.response?.data?.message || 'Error al editar el post. Por favor, inténtalo de nuevo.';
         this.alertKey++;
@@ -1083,7 +1077,7 @@ export default {
           }
         } catch (error) {
           console.error('Error eliminando post:', error.response?.data || error.message);
-          
+
           this.alertType = 'error';
           this.alertMessage = error.response?.data?.message || 'Error al eliminar el post. Por favor, inténtalo de nuevo.';
           this.alertKey++;
@@ -1122,7 +1116,7 @@ export default {
     guardarEdicionComentario(comentario) {
 
       if (!this.comentarioEditado.trim()) {
-        
+
         this.alertType = 'alert';
         this.alertMessage = 'El comentario no puede estar vacío';
         this.alertKey++;
@@ -1147,7 +1141,7 @@ export default {
         })
         .catch(error => {
           console.error('Error editando comentario:', error);
-          
+
           this.alertType = 'error';
           this.alertMessage = 'Error al guardar cambios: ' + (error.response?.data?.message || error.message);
           this.alertKey++;
@@ -1166,7 +1160,7 @@ export default {
     guardarEdicionReply(reply, comentarioID) {
 
       if (!this.replyEditado.trim()) {
-        
+
         this.alertType = 'alert';
         this.alertMessage = 'La respuesta no puede estar vacía';
         this.alertKey++;
@@ -1192,7 +1186,7 @@ export default {
         })
         .catch(error => {
           console.error('Error editando respuesta:', error);
-          
+
           this.alertType = 'error';
           this.alertMessage = 'Error al guardar cambios: ' + (error.response?.data?.message || error.message);
           this.alertKey++;
@@ -1236,7 +1230,7 @@ export default {
         })
         .catch(error => {
           console.error('Error eliminando comentario:', error);
-          
+
           this.alertType = 'error';
           this.alertMessage = 'Error al eliminar el comentario: ' + (error.response?.data?.message || error.message);
           this.alertKey++;
@@ -1280,7 +1274,7 @@ export default {
         })
         .catch(error => {
           console.error('Error eliminando respuesta:', error);
-          
+
           this.alertType = 'error';
           this.alertMessage = 'Error al eliminar la respuesta: ' + (error.response?.data?.message || error.message);
           this.alertKey++;
