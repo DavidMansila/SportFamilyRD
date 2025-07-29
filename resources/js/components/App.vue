@@ -2,14 +2,27 @@
   <div class="app-container">
     <VerificaCorreo v-if="user && !user.email_verified_at && $route.path !== '/signup'" :user="user" @logout="handleLogout" />
     
-    <router-view v-else-if="!user || (user && user.email_verified_at)" />
-    
-    <div v-else-if="verificationStatus" class="verification-message" :class="verificationStatus.type">
+    <!-- <div v-else-if="verificationStatus" class="verification-message" :class="verificationStatus.type">
       <h2>{{ verificationStatus.title }}</h2>
       <p>{{ verificationStatus.message }}</p>
       <pre v-if="verificationStatus.raw" style="text-align:left; background:#f3f4f6; color:#334155; padding:10px; border-radius:6px; font-size:13px; overflow-x:auto;">{{ verificationStatus.raw }}</pre>
-      <router-link v-if="verificationStatus.type==='success'" to="/signup">Iniciar sesión</router-link>
+      <router-link v-if="verificationStatus.type==='success'" @click="$router.push('/signup')" '>Iniciar sesión</router-link> 
+    </div> -->
+    
+    <div
+      v-else-if="verificationStatus"
+      class="verification-message"
+      :class="verificationStatus.type"
+    >
+      <h2>{{ verificationStatus.type === 'error' ? 'Error de verificación' : 'Email verificado' }}</h2>
+      <p v-if="verificationStatus.type === 'error'">
+        {{ verificationStatus.message || 'No se pudo verificar tu correo electrónico.' }}
+      </p>
+      <p v-else>En breve serás dirigido a la página de inicio...</p>
     </div>
+   
+    <router-view v-else-if="!user || (user && user.email_verified_at) ||  $route.path === '/signup'" />
+    
     <!-- <router-view v-else-if="user || isPublicRoute($route)" /> -->
    
   </div>
@@ -27,15 +40,19 @@ export default {
     VerificaCorreo,
     EmailVerifiedSuccess
   },
+
   name: 'App',
   data() {
     return {
+      alreadyRefreshed: false,
+      showVerificationMessage: false,
       user: null,
       isLoginOrHome: false,
       publicRoutes: ['/', '/signup', '/login', '/email/verified-success'],
       verificationStatus: null
     };
   },
+
   watch: {
     '$route'(to) {
       this.checkRoute(to);
@@ -63,8 +80,24 @@ export default {
       if (this.isVerifyRoute(to)) {
         this.handleEmailVerification(to);
       }
+    },
+
+    verificationStatus(val) {
+      if (val?.type === 'success' && !this.alreadyRefreshed) {
+        this.showVerificationMessage = true;
+
+        this.refreshUser(); // actualiza el user en sesión
+        this.alreadyRefreshed = true;
+
+        setTimeout(() => {
+          this.verificationStatus = null; // opcional: limpiar estado
+          this.showVerificationMessage = false;
+          this.$router.push('/');
+        }, 2500); // tiempo visible del mensaje
+      }
     }
   },
+
   created() {
     this.checkRoute(this.$route);
     // Inicializar user desde sessionStorage inmediatamente
@@ -82,7 +115,26 @@ export default {
       this.handleEmailVerification(this.$route);
     }
   },
+
   methods: {
+    refreshUser() {
+      axios.get('/user-by-id', { params: { user_id: this.user.id } })
+      .then(response => {
+        
+        this.user = response.data.user;
+        console.log('Usuario actualizado:', this.user);
+        console.log('data',response.data.user);
+
+        sessionStorage.setItem('user', JSON.stringify(this.user));
+        this.showToast('Usuario actualizado correctamente');
+
+      }).catch(error => {
+        console.error('Error al actualizar el usuario:', error);
+        this.showToast('Error al actualizar el usuario');
+      });
+        
+    },
+    
     checkRoute(route) {
       const loginPaths = ['/', '/signUp', '/signup'];
       this.isLoginOrHome = loginPaths.includes(route.path);
@@ -102,9 +154,11 @@ export default {
       const match = route.path.match(/^\/email\/verify\/(\d+)\/([^/]+)$/);
       if (!match) return;
       const [ , id, hash ] = match;
+      
       // Extraer query params de la ruta
       const query = route.fullPath.split('?')[1] || '';
       const url = `/api/email/verify/${id}/${hash}` + (query ? `?${query}` : '');
+     
       try {
         const response = await axios.get(url);
         this.verificationStatus = {
@@ -113,15 +167,12 @@ export default {
           message: response.data?.message || 'Tu correo electrónico ha sido verificado correctamente. Ahora puedes iniciar sesión.',
           raw: JSON.stringify(response.data, null, 2)
         };
-        // Obtener usuario actualizado tras verificar
-        const userResp = await axios.get(`/api/user-by-id/${id}`);
-        console.log('Usuario verificado:', userResp.data);
-        this.user = userResp.data;
-        sessionStorage.setItem('user', JSON.stringify(this.user));
-        // Notificar a otras pestañas que el usuario fue verificado
-        localStorage.setItem('email_verified', id);
+
+        this.refreshUser();
+        // localStorage.setItem('email_verified', id);
         // Redirigir a la pantalla de éxito
-        this.$router.replace({ name: 'EmailVerifiedSuccess', query: { id } });
+        // this.$router.replace({ name: 'EmailVerifiedSuccess', query: { id } });
+        
       } catch (error) {
         this.verificationStatus = {
           type: 'error',
@@ -157,11 +208,23 @@ export default {
       }, 3500);
     }
   },
+  // mounted() {
+  //   axios.defaults.withCredentials = true;
+  //   // Eliminar listeners de localStorage y Pusher/Echo
+  //   // Si necesitas refrescar el usuario tras verificación, hazlo solo localmente
+  // }
   mounted() {
-    axios.defaults.withCredentials = true;
-    // Eliminar listeners de localStorage y Pusher/Echo
-    // Si necesitas refrescar el usuario tras verificación, hazlo solo localmente
-  }
+    if (this.routeHasVerifiedEmail) {
+      this.refreshUser().then(() => {
+        this.showVerifiedMessage = true;
+
+        // Redirige después de unos segundos
+        setTimeout(() => {
+          this.$router.push({ name: 'home' }); // o la ruta que necesites
+        }, 3000);
+      });
+    }
+  },
 };
 </script>
 

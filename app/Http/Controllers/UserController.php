@@ -188,17 +188,24 @@ class UserController extends Controller
         }
     }
 
-    // Obtener usuario por ID (para refresco tras verificación de email)
-    public function getUserByID($id)
+   public function getUserByID(Request $request)
     {
-        $user = User::findOrFail($id);
-        $user->image = $user->image
-            ? url('storage/users/' . $user->id . '/' . $user->image)
-            : url('storage/users/Perfil-Icon.png');
-        $arr = $user->toArray();
-        if (!array_key_exists('email_verified_at', $arr)) {
-            $arr['email_verified_at'] = $user->email_verified_at;
+        try {
+            $user = User::findOrFail($request->input('user_id'));
+            $user->image = $user->image
+                ? url('storage/users/' . $user->id . '/' . $user->image)
+                : url('storage/users/Perfil-Icon.png');
+
+            return response()->json([
+                'message' => 'Usuario obtenido con éxito',
+                'user' => $user,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Usuario no encontrado o error',
+                'error' => $e->getMessage()
+            ], 404);
         }
-        return response()->json($arr);
     }
 }
