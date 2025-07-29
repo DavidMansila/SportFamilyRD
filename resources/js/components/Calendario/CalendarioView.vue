@@ -509,8 +509,9 @@ export default {
     async addToCart() {
       if (!this.user) {
         
-        alertType = 'error';
-        alertMessage = 'Debes iniciar sesión para agregar eventos al carrito';
+        this.alertType = 'error';
+        this.alertMessage = 'Debes iniciar sesión para agregar eventos al carrito';
+        this.alertKey++;
         this.openModal = true;
         return;
       }
