@@ -2,13 +2,13 @@
   <div class="verification-message success">
     <h2>¡Correo verificado!</h2>
     <p>Tu correo electrónico ha sido verificado correctamente.<br>
-      Por seguridad, debes iniciar sesión de nuevo para continuar usando la app.
-      <router-link to="/signup" class="inline-login-btn">Iniciar sesión</router-link>
+      En breve, serás redirigido a la página de inicio.
     </p>
+     
   </div>
 </template>
 
-<script>
+<!-- <script>
 import axios from 'axios';
 export default {
   name: 'EmailVerifiedSuccess',
@@ -27,6 +27,47 @@ export default {
       } catch (e) {
         sessionStorage.removeItem('user');
       }
+    }
+  }
+};
+</script> -->
+
+<script>
+import axios from 'axios';
+
+export default {
+  name: 'EmailVerifiedSuccess',
+  data() {
+    return {
+      userId: null,
+    };
+  },
+  mounted() {
+    const params = new URLSearchParams(window.location.search);
+    this.userId = params.get('id');
+    if (this.userId) {
+      this.refreshUserAndNotify();
+    }
+  },
+  methods: {
+    refreshUserAndNotify() {
+      axios.get('/user-by-id', { params: { user_id: this.userId } })
+        .then(response => {
+          const userUpdated = response.data.user;
+          sessionStorage.setItem('user', JSON.stringify(userUpdated));
+          // localStorage.setItem('email_verified', this.userId);
+
+          // Emitir evento con usuario actualizado para el padre
+          this.$emit('user-updated', userUpdated);
+
+          setTimeout(() => {
+            this.$router.push('/');
+          }, 2000);
+        })
+        .catch(error => {
+          sessionStorage.removeItem('user');
+          console.error('Error al refrescar usuario tras verificación:', error);
+        });
     }
   }
 };

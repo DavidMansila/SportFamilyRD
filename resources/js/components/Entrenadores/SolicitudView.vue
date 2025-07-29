@@ -371,7 +371,7 @@
 
           <div class="form-actions">
             <button type="button" class="btn btn-prev" @click="pasoAnterior">Anterior</button>
-            <button type="submit" class="btn btn-submit">Enviar Solicitud</button>
+            <button type="submit" class="btn btn-submit" >Enviar Solicitud</button>
           </div>
         </div>
       </form>
