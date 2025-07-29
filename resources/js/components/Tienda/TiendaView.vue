@@ -657,7 +657,8 @@ export default {
         console.error('Error al agregar al carrito:', error);
         
         this.alertType = 'error';
-        this.alertMessage = 'No se pudo agregar el producto al carrito';
+        // this.alertMessage = 'No se pudo agregar el producto al carrito';
+        this.alertMessage = error.response?.data?.message == "No query results for model [App\\Models\\User]." ? 'Inicia sesión para añadir al carrito' :  'Error al agregar al carrito';
         this.alertKey++;
         this.openModal = true;
       }
