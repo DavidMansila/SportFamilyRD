@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// axios.defaults.baseURL = 'http://18.191.50.161/api';
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+axios.defaults.baseURL = 'http://18.191.50.161/api';
+// axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 // axios.defaults.baseURL = 'http://10.0.0.7:8000//api';
 
 // axios.defaults.baseURL = 'http://10.0.0.6:8000/api';
