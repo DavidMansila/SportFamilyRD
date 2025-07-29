@@ -30,6 +30,7 @@ export default {
     }
   }
 };
+
 </script> -->
 
 <script>
@@ -45,6 +46,7 @@ export default {
   mounted() {
     const params = new URLSearchParams(window.location.search);
     this.userId = params.get('id');
+    console.log('userId en producción:', this.userId);
     if (this.userId) {
       this.refreshUserAndNotify();
     }
@@ -54,15 +56,14 @@ export default {
       axios.get('/user-by-id', { params: { user_id: this.userId } })
         .then(response => {
           const userUpdated = response.data.user;
+          console.log("🚀 ~ refreshUserAndNotify ~ userUpdated:", userUpdated)
           sessionStorage.setItem('user', JSON.stringify(userUpdated));
           // localStorage.setItem('email_verified', this.userId);
 
-          // Emitir evento con usuario actualizado para el padre
-          this.$emit('user-updated', userUpdated);
-
+          
           setTimeout(() => {
             this.$router.push('/');
-          }, 2000);
+          }, 10000);
         })
         .catch(error => {
           sessionStorage.removeItem('user');
