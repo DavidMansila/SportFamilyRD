@@ -243,7 +243,7 @@
                       <div class="comment-header">
 
                         <span class="comment-author">{{ comentario.user?.name || `Usuario${comentario.user_id}`
-                          }}</span>
+                        }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.replies && comentario.replies.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -620,8 +620,12 @@ export default {
       this.nuevoPost = { titulo: '', contenido: '', categoria: '', imagenFile: null };
       this.imagenMiniatura = null;
       this.modoEdicion = false;
-      document.body.style.overflow = 'auto';
+
+      if (!this.postSeleccionado) {
+        document.body.style.overflow = 'auto';
+      }
     },
+
 
     handlePageChange(newPage) {
       this.currentPage = newPage;
@@ -1087,6 +1091,8 @@ export default {
     },
 
     abrirEditarModal(post) {
+      this.cerrarPopout();
+
       this.modoEdicion = true;
       this.mostrarModal = true;
       this.nuevoPost = {
@@ -1097,6 +1103,9 @@ export default {
         imagenFile: null
       };
       this.imagenMiniatura = post.imagen;
+
+      // Agregar clase para deshabilitar scroll
+      document.body.style.overflow = 'hidden';
     },
 
 
@@ -1629,5 +1638,14 @@ export default {
     width: 28px;
     height: 28px;
   }
+}
+
+
+.modal-overlay {
+  z-index: 1001 !important;
+}
+
+.post-popout-overlay {
+  z-index: 1000;
 }
 </style>
