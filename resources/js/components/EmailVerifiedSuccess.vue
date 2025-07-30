@@ -43,6 +43,7 @@ export default {
       userId: null,
     };
   },
+  
   mounted() {
     const params = new URLSearchParams(window.location.search);
     this.userId = params.get('id');
@@ -51,15 +52,16 @@ export default {
       this.refreshUserAndNotify();
     }
   },
+
   methods: {
     refreshUserAndNotify() {
-      axios.get('/user-by-id', { params: { user_id: this.userId } })
-        .then(response => {
+      // axios.get('/user-by-id', { params: { user_id: this.userId } })
+      axios.get(`/user-by-id/${this.userId}`)
+      .then(response => {
           console.log("🚀 ~ refreshUserAndNotify ~ response:", response);
           const userUpdated = response.data.user;
           console.log("🚀 ~ refreshUserAndNotify ~ userUpdated:", userUpdated)
           sessionStorage.setItem('user', JSON.stringify(userUpdated));
-          // localStorage.setItem('email_verified', this.userId);
 
           setTimeout(() => {
             this.$router.push('/');
