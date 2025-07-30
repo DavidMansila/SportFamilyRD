@@ -55,12 +55,12 @@ export default {
     refreshUserAndNotify() {
       axios.get('/user-by-id', { params: { user_id: this.userId } })
         .then(response => {
+          console.log("🚀 ~ refreshUserAndNotify ~ response:", response);
           const userUpdated = response.data.user;
           console.log("🚀 ~ refreshUserAndNotify ~ userUpdated:", userUpdated)
           sessionStorage.setItem('user', JSON.stringify(userUpdated));
           // localStorage.setItem('email_verified', this.userId);
 
-          
           setTimeout(() => {
             this.$router.push('/');
           }, 10000);
