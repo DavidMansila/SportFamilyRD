@@ -1126,7 +1126,7 @@ export default {
 }
 
 .time-slots input[type="time"] {
-    padding: 8px;
+    padding: 3px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 0.9rem;
