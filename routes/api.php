@@ -78,7 +78,8 @@ Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerBy
 
 // --- MISC ---
 Route::get('/prueba-publica', fn() => response()->json(['mensaje' => 'Sin autenticación']));
-Route::get('/user-by-id', [UserController::class, 'getUserByID']);
+// Route::get('/user-by-id', [UserController::class, 'getUserByID']);
+Route::get('/user-by-id/{id}', [UserController::class, 'getUserByID']);
 
 
 

@@ -188,10 +188,17 @@ class UserController extends Controller
         }
     }
 
-   public function getUserByID(Request $request)
+   public function getUserByID($id)
     {
         try {
-            $user = User::findOrFail($request->input('user_id'));
+            $user = User::find($id);
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Usuario no encontrado'
+                ], 404);
+            }
+
             $user->image = $user->image
                 ? url('storage/users/' . $user->id . '/' . $user->image)
                 : url('storage/users/Perfil-Icon.png');
@@ -203,7 +210,7 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Usuario no encontrado o error',
+                'message' => 'Hubo un error',
                 'error' => $e->getMessage()
             ], 404);
         }
