@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Trainer;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Mail\NuevaSolicitudAdminMail;
+use App\Mail\SolicitudAprobadaEntrenador;
+use App\Mail\SolicitudRechazadaaEntrenador;
+
+use Illuminate\Support\Facades\Mail;
 
 class TrainerController extends Controller
 {
@@ -122,6 +127,10 @@ class TrainerController extends Controller
         if (!empty($specialties)) {
             $trainer->specialties()->createMany($specialties);
         }
+        $admin = User::where('user_type', 'admin')->first();
+        if ($admin) {
+            Mail::to($admin->email)->send(new NuevaSolicitudAdminMail($admin, $trainer->user));
+        }
 
         return response()->json([
             'message' => 'solicitud de entrenador creada exitosamente (con achievements y specialties)',
@@ -144,9 +153,11 @@ class TrainerController extends Controller
             $user->user_type = 'entrenador';
             $user->category = $trainer->sport_category;
             $user->save();
+            Mail::to($user->email)->send(new SolicitudAprobadaEntrenador($user));
         } elseif ($trainer->status === 'rejected') {
             $user->user_type = 'user';
             $user->save();
+            Mail::to($user->email)->send(new SolicitudRechazadaaEntrenador($user));
         }
         $trainer->save();
 
