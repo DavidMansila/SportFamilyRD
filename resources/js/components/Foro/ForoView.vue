@@ -243,7 +243,7 @@
                       <div class="comment-header">
 
                         <span class="comment-author">{{ comentario.user?.name || `Usuario${comentario.user_id}`
-                        }}</span>
+                          }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
                         <button v-if="comentario.replies && comentario.replies.length > 0"
                           @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
@@ -390,7 +390,7 @@
                 <!-- Formulario de comentario principal o respuesta -->
                 <div class="add-comment-form" v-if="user">
                   <div v-if="comentarioRespondiendo" class="replying-to">
-                    Respondiendo a <strong>@Usuario{{ findCommentById(comentarioRespondiendo)?.user_id }}</strong>
+                    Respondiendo a <strong> @{{ getUsernameFromCommentId(comentarioRespondiendo) }}</strong>
                     <button @click="cancelarRespuesta" class="cancel-reply-btn">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1368,6 +1368,15 @@ export default {
         return null;
       };
       return searchComments(this.postSeleccionado?.comments || []);
+    },
+
+
+    getUsernameFromCommentId(commentId) {
+      const comment = this.findCommentById(commentId);
+      if (comment) {
+        return comment.user?.name || `Usuario${comment.user_id}`;
+      }
+      return '';
     },
 
     toggleReply(commentId) {
