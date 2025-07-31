@@ -39,6 +39,7 @@
                                         </span>
                                         <div>
                                             <p><strong>Nombre:</strong> {{ solicitud.userName }}</p>
+                                            <p v-if="user.location"><strong>Ubicacion:</strong> {{ solicitud.location }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -238,7 +239,8 @@ export default {
                 mensaje: item.description || 'Sin mensaje',
                 estado: this.mapStatus(item.status || 'pending'),
                 fechaSolicitud: this.validarFecha(item.created_at) || new Date().toISOString(),
-                userImage: user.image || ''
+                userImage: user.image || '',
+                location: user.location || 'Desconocido'
             };
         },
 

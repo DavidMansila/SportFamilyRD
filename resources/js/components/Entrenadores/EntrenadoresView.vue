@@ -202,6 +202,16 @@
                                 {{ entrenadorSeleccionado.deporte }}
                             </div>
 
+                            <div class="ubicacion" v-if="entrenadorSeleccionado.ubicacion">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                {{ entrenadorSeleccionado.ubicacion }}
+                            </div>
+
                             <!-- <div class="modal-rating">
                 <div class="stars">
                   <span v-for="star in 5" :key="star"
@@ -335,6 +345,7 @@ logro, index
                                 <p v-if="user.email">
                                     <strong>Email:</strong> {{ user.email }}
                                 </p>
+                                <p v-if="user.location"><strong>Ubicacion:</strong> {{ user.location }}</p>
                             </div>
                         </div>
                         <p class="mensaje">
@@ -684,6 +695,7 @@ export default {
                         reseñas: trainer.reviews || 0,
                         biografia: trainer.description || "",
                         horario: this.parseSchedule(trainer.schedule),
+                        ubicacion: trainer.city_country || "",
                         especialidades: trainer.specialties
                             ? trainer.specialties.map(
                                 (e) => e.description || e.name
@@ -1230,5 +1242,21 @@ export default {
         width: 35px;
         height: 35px;
     }
+}
+
+
+.ubicacion {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.ubicacion svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 </style>
