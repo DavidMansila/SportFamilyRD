@@ -141,7 +141,7 @@
                 <div v-for="entrenador in paginatedEntrenadores" :key="entrenador.trainer_id" class="entrenador-card"
                     @click="verPerfil(entrenador)">
                     <div class="card-image-container">
-                        <img :src="entrenador.foto" :alt="`${entrenador.nombre} - ${entrenador.deporte}`" />
+                        <img :src="entrenador.foto" :alt="`${entrenador.nombre} - ${entrenador.deporte}`" loading="lazy" />
                         <div class="deporte-tag">{{ entrenador.deporte }}</div>
                     </div>
 

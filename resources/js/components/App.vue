@@ -30,15 +30,11 @@
 
 <script>
 import axios from 'axios';
-import ProductModal from '../components/CarritoComponent.vue';
 import VerificaCorreo from './VerificaCorreo.vue';
-import EmailVerifiedSuccess from './EmailVerifiedSuccess.vue';
 
 export default {
   components: {
-    ProductModal,
-    VerificaCorreo,
-    EmailVerifiedSuccess
+    VerificaCorreo
   },
 
   name: 'App',

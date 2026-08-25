@@ -2,30 +2,29 @@ import "./bootstrap";
 import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
-// Importa todos tus componentes
+// App raíz: se necesita en todas las rutas, se mantiene estática.
 import App from "./components/App.vue";
-import SignUpView from "./components/Login/SignUpView.vue";
-// import HomeView from "./components/Home/HomeView.vue";
-import HomeView from './components/home/HomeVIew.vue'
-
-import DirectorioView from "./components/Directorio/DirectorioView.vue";
-import NoticiasView from "./components/Noticias/NoticiasView.vue";
-import CalendarioView from "./components/Calendario/CalendarioView.vue";
-import TiendaView from "./components/Tienda/TiendaView.vue";
-import EntrenadoresView from "./components/Entrenadores/EntrenadoresView.vue";
-import SolicitudView from "./components/Entrenadores/SolicitudView.vue";
-import SolicitudesUsuarios from "./components/Entrenadores/SolicitudesUsuarios.vue";
-import SolicitudesEntrenadores from "./components/Admin/SolicitudesEntrenadores.vue";
-import ForoView from "./components/Foro/ForoView.vue";
-import AjustesView from "./components/Ajustes/AjustesView.vue";
-import PerfilView from "./components/Perfil/PerfilView.vue";
-import EmailVerifiedSuccess from "./components/EmailVerifiedSuccess.vue";
-import VerificaApiCorreo from "./components/VerificaApiCorreo.vue";
 import store from "./cartStore";
 
-// Paginate
-import VueAwesomePaginate from "vue-awesome-paginate";
-import "vue-awesome-paginate/dist/style.css";
+// El resto de las vistas se cargan bajo demanda (import dinámico): cada ruta
+// se convierte en su propio chunk de JS/CSS, así el navegador solo descarga
+// el código de la página que el usuario realmente visita, en vez de las 16
+// vistas completas en un único bundle en cada carga.
+const HomeView = () => import('./components/home/HomeVIew.vue');
+const SignUpView = () => import("./components/Login/SignUpView.vue");
+const DirectorioView = () => import("./components/Directorio/DirectorioView.vue");
+const NoticiasView = () => import("./components/Noticias/NoticiasView.vue");
+const CalendarioView = () => import("./components/Calendario/CalendarioView.vue");
+const TiendaView = () => import("./components/Tienda/TiendaView.vue");
+const EntrenadoresView = () => import("./components/Entrenadores/EntrenadoresView.vue");
+const SolicitudView = () => import("./components/Entrenadores/SolicitudView.vue");
+const SolicitudesUsuarios = () => import("./components/Entrenadores/SolicitudesUsuarios.vue");
+const SolicitudesEntrenadores = () => import("./components/Admin/SolicitudesEntrenadores.vue");
+const ForoView = () => import("./components/Foro/ForoView.vue");
+const AjustesView = () => import("./components/Ajustes/AjustesView.vue");
+const PerfilView = () => import("./components/Perfil/PerfilView.vue");
+const EmailVerifiedSuccess = () => import("./components/EmailVerifiedSuccess.vue");
+const VerificaApiCorreo = () => import("./components/VerificaApiCorreo.vue");
 
 // Configuración del router
 const router = createRouter({
@@ -52,9 +51,9 @@ const router = createRouter({
     ],
 });
 
-// app.js
-import gsap from 'gsap';
-
+// Paginate
+import VueAwesomePaginate from "vue-awesome-paginate";
+import "vue-awesome-paginate/dist/style.css";
 
 // Crea la aplicación Vue
 const app = createApp(App);
@@ -66,10 +65,7 @@ app.use(store);
 
 app.component("app-component", App);
 
-app.use({
-  install(app) {
-    app.config.globalProperties.$gsap = gsap;
-  }
-});
+// gsap solo lo usa ForoView: se importa ahí mismo bajo demanda en vez de
+// registrarlo globalmente, para no meterlo en el bundle inicial de toda la app.
 
 app.mount("#app");

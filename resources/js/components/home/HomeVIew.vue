@@ -7,11 +7,6 @@
 
     <!-- Hero Section -->
     <section class="hero-banner">
-      <div class="hero-video-overlay"></div>
-      <video autoplay muted loop class="hero-video">
-        <source src="/videos/sports-hero.mp4" type="video/mp4">
-      </video>
-
       <div class="hero-content">
         <div class="hero-text">
           <h1 class="hero-title">
@@ -65,7 +60,7 @@
         <div v-for="(category, index) in categories" :key="category.name" class="category-card">
           <div class="card-inner">
             <div class="card-front">
-              <img :src="category.image" :alt="category.name" class="card-image">
+              <img :src="category.image" :alt="category.name" class="card-image" loading="lazy">
               <div class="card-overlay"></div>
               <div class="card-badge" v-if="category.popular">Popular</div>
               <div class="participation-rate">
@@ -97,7 +92,7 @@
         <!-- Noticia Destacada -->
         <div v-if="recentNews.length > 0" class="featured-news">
           <div class="featured-image">
-            <img :src="recentNews[0].image" :alt="recentNews[0].title">
+            <img :src="recentNews[0].image" :alt="recentNews[0].title" loading="lazy">
             <div class="news-badge">Destacada</div>
             <div class="category-tag">{{ recentNews[0].category || 'General' }}</div>
           </div>
@@ -118,7 +113,7 @@
         <div class="news-list" v-if="recentNews.length > 1">
           <div class="news-card" v-for="(news, index) in recentNews.slice(1, 7)" :key="index">
             <div class="news-card-image">
-              <img :src="news.image" :alt="news.title">
+              <img :src="news.image" :alt="news.title" loading="lazy">
               <div class="category-tag">{{ news.category || 'General' }}</div>
             </div>
             <div class="news-card-content">
@@ -195,7 +190,7 @@
             <div class="badge featured" v-if="product.featured">Destacado</div>
           </div>
           <div class="product-image-container">
-            <img :src="product.image" :alt="product.name" class="product-image">
+            <img :src="product.image" :alt="product.name" class="product-image" loading="lazy">
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>

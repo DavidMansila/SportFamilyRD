@@ -94,7 +94,7 @@
       <div v-for="producto in paginatedProducts" :key="producto.id" class="product-card" @click="abrirPopup(producto)">
         <!-- <div class="product-badge" v-if="producto.oferta">OFERTA</div> -->
         <div class="product-image-container">
-          <img :src="producto.image" :alt="producto.name" class="product-image" />
+          <img :src="producto.image" :alt="producto.name" class="product-image" loading="lazy" />
           <button class="quick-view-btn" @click.stop="abrirPopup(producto)">
             Ver Detalles
           </button>

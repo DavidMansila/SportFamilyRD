@@ -92,7 +92,7 @@
         </div>
 
         <div class="post-imagen">
-          <img :src="post.imagen" alt="Imagen del post" class="post-image" @load="onImageLoad(post.id)"
+          <img :src="post.imagen" alt="Imagen del post" class="post-image" loading="lazy" @load="onImageLoad(post.id)"
             :class="{ loaded: imageLoaded[post.id] }" />
         </div>
 
@@ -237,7 +237,7 @@
 
                   <div v-for="(comentario) in postSeleccionado.comments" :key="comentario.id" class="comment-item">
                     <div class="comment-avatar-wrapper">
-                      <img :src="getUserImage(comentario.user)" class="comment-avatar" alt="Avatar del usuario">
+                      <img :src="getUserImage(comentario.user)" class="comment-avatar" alt="Avatar del usuario" loading="lazy">
                     </div>
                     <div class="comment-content">
                       <div class="comment-header">
@@ -317,7 +317,7 @@
                         class="comment-replies">
                         <div v-for="reply in comentario.replies" :key="reply.id" class="comment-item reply-item">
                           <div class="comment-avatar-wrapper">
-                            <img :src="getUserImage(reply.user)" class="comment-avatar" alt="Avatar del usuario">
+                            <img :src="getUserImage(reply.user)" class="comment-avatar" alt="Avatar del usuario" loading="lazy">
                           </div>
                           <div class="comment-content">
                             <div class="comment-header">
@@ -536,6 +536,7 @@
 
 <script>
 import axios from 'axios';
+import gsap from 'gsap';
 import { supabase } from '../../supabaseClient';
 import Navbar from '../navbarComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
@@ -1427,7 +1428,7 @@ export default {
     },
     enter(el, done) {
       if (!el) return done();
-      this.$gsap.to(el, {
+      gsap.to(el, {
         opacity: 1,
         duration: 0.3,
         onComplete: done
@@ -1435,7 +1436,7 @@ export default {
     },
     leave(el, done) {
       if (!el) return done();
-      this.$gsap.to(el, {
+      gsap.to(el, {
         opacity: 0,
         duration: 0.2,
         onComplete: done
