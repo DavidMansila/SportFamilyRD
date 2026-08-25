@@ -536,6 +536,7 @@
 
 <script>
 import axios from 'axios';
+import { supabase } from '../../supabaseClient';
 import Navbar from '../navbarComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
@@ -798,6 +799,7 @@ export default {
         }));
 
         this.postsFiltrados = [...this.posts];
+        this.$store.dispatch('cacheSection', { key: 'foro', data: this.posts });
       } catch (error) {
         console.error('Post fetch error:', error);
       }
@@ -1440,14 +1442,55 @@ export default {
       });
     },
 
+
+    // --- Realtime (Supabase) ---
+
+    subscribeRealtime() {
+      this.realtimeChannel = supabase
+        .channel('foro-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+          this.refetchPostsDebounced();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, () => {
+          this.refetchPostsDebounced();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, () => {
+          this.refetchPostsDebounced();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'replies' }, () => {
+          this.refetchPostsDebounced();
+        })
+        .subscribe();
+    },
+
+    refetchPostsDebounced() {
+      clearTimeout(this._realtimeDebounceTimer);
+      this._realtimeDebounceTimer = setTimeout(() => {
+        this.getPost();
+      }, 300);
+    },
+
   },
   mounted() {
     this.user = JSON.parse(sessionStorage.getItem('user')) || null;
-    this.getPost();
+
+    const cachedPosts = this.$store.getters.sectionCache('foro');
+    if (cachedPosts) {
+      this.posts = cachedPosts;
+      this.postsFiltrados = [...this.posts];
+    } else {
+      this.getPost();
+    }
+
+    this.subscribeRealtime();
   },
   beforeUnmount() {
     document.body.style.overflow = 'auto';
     this.postSeleccionado = null;
+    clearTimeout(this._realtimeDebounceTimer);
+    if (this.realtimeChannel) {
+      supabase.removeChannel(this.realtimeChannel);
+    }
   }
 }
 </script>

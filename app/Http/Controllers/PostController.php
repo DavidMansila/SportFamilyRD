@@ -484,13 +484,34 @@ class PostController extends Controller
     public function popularPosts()
     {
         try {
-            $posts = Post::withCount(['likes', 'comments'])
+            // Nota: Post::$withCount = ['likes'] ya agrega "likes_count" a toda query,
+            // y llamar a ->withCount(...) explicitamente aqui la reaplica y la duplica
+            // (columna "likes_count" repetida -> error de SQL). Por eso ambos conteos
+            // se arman a mano con subselects (el de comments con el query builder plano
+            // para evitar que el propio $withCount del modelo Comment tambien se cuele).
+            // Postgres tampoco permite usar el alias de una columna del SELECT dentro
+            // de una expresion en ORDER BY, asi que el ORDER BY repite los subselects.
+            $likesSubquery = DB::table('likes')
+                ->selectRaw('count(*)')
+                ->whereColumn('likeable_id', 'posts.id')
+                ->where('likeable_type', Post::class);
+
+            $commentsSubquery = DB::table('comments')
+                ->selectRaw('count(*)')
+                ->whereColumn('post_id', 'posts.id');
+
+            $posts = Post::query()
+                ->addSelect(['likes_count' => $likesSubquery])
+                ->addSelect(['comments_count' => $commentsSubquery])
                 ->with(['user' => function ($query) {
                     // Cargar el avatar_url directamente
                     $query->select('id', 'name', 'image')
                         ->addSelect(DB::raw("CONCAT('" . asset('storage/users') . "/', id, '/', image) as image_url"));
                 }])
-                ->orderByRaw('(likes_count + comments_count) DESC')
+                ->orderByRaw(
+                    '(' . $likesSubquery->toSql() . ') + (' . $commentsSubquery->toSql() . ') DESC',
+                    array_merge($likesSubquery->getBindings(), $commentsSubquery->getBindings())
+                )
                 ->take(5)
                 ->get();
 

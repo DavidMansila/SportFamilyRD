@@ -726,6 +726,7 @@ export default {
                     }
 
                     this.entrenadores = trainers;
+                    this.$store.dispatch("cacheSection", { key: "entrenadores", data: trainers });
                 })
                 .catch((error) => {
                     console.error(
@@ -836,7 +837,12 @@ export default {
             this.user = null;
         }
 
-        this.cargarEntrenadores();
+        const cachedEntrenadores = this.$store.getters.sectionCache("entrenadores");
+        if (cachedEntrenadores) {
+            this.entrenadores = cachedEntrenadores;
+        } else {
+            this.cargarEntrenadores();
+        }
     },
 };
 </script>

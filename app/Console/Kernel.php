@@ -9,11 +9,13 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         \App\Console\Commands\ImportSportsNews::class,
+        \App\Console\Commands\ImportCalendarEvents::class,
     ];
 
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('news:import')->dailyAt('08:00');
+        $schedule->command('calendar:import')->dailyAt('09:00');
         $schedule->command('training:expire')->dailyAt('03:00');
     }
 

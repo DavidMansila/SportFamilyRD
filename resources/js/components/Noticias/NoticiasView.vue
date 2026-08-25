@@ -233,6 +233,7 @@ import paginatorComponent from '@/components/paginatorComponent.vue';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
+import { supabase } from '../../supabaseClient';
 
 export default {
   name: 'NoticiasComponent',
@@ -300,11 +301,13 @@ export default {
       try {
         // Cargar noticias
         const newsResponse = await axios.get('/news');
-        this.noticias = newsResponse.data.map(noticia => ({
+        this.noticias = newsResponse.data
+          .filter(noticia => !!noticia.image)
+          .map(noticia => ({
           id: noticia.id,
           title: noticia.title,
           description: noticia.description,
-          image: noticia.image || '/imagenes/noticia-default.jpg',
+          image: noticia.image,
           author: noticia.author || 'Autor desconocido',
           date: noticia.published_at,
           categoria: noticia.category,
@@ -319,6 +322,7 @@ export default {
 
         this.noticias.sort((a, b) => b.parsedDate - a.parsedDate);
         this.filtrarNoticias();
+        this.$store.dispatch('cacheSection', { key: 'noticias', data: this.noticias });
 
       } catch (error) {
         console.error('Error al cargar noticias:', error);
@@ -611,7 +615,21 @@ export default {
           this.openModal = true;
         }
       }
-    }
+    },
+
+    // --- Realtime (Supabase) ---
+
+    subscribeRealtime() {
+      this.realtimeChannel = supabase
+        .channel('noticias-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'NewsScrapping' }, () => {
+          clearTimeout(this._realtimeDebounceTimer);
+          this._realtimeDebounceTimer = setTimeout(() => {
+            this.cargarNoticias();
+          }, 300);
+        })
+        .subscribe();
+    },
 
   },
 
@@ -620,15 +638,34 @@ export default {
     // Cargar usuario
     this.user = JSON.parse(sessionStorage.getItem('user')) || {};
 
-    // Cargar noticias
-    await this.cargarNoticias();
+    const cachedNoticias = this.$store.getters.sectionCache('noticias');
+    if (cachedNoticias) {
+      // Al guardarse en sessionStorage, parsedDate se serializa a texto: se reconstruye como Date.
+      this.noticias = cachedNoticias.map(n => ({ ...n, parsedDate: new Date(n.parsedDate) }));
+      if (this.user) {
+        await this.cargarNoticiasGuardadas();
+      }
+      this.filtrarNoticias();
+    } else {
+      // Cargar noticias
+      await this.cargarNoticias();
 
-    // Cargar estado de guardado si hay usuario
-    if (this.user) {
-      await this.cargarNoticiasGuardadas();
+      // Cargar estado de guardado si hay usuario
+      if (this.user) {
+        await this.cargarNoticiasGuardadas();
+      }
     }
 
+    this.subscribeRealtime();
+
     document.title = 'Noticias';
+  },
+
+  beforeUnmount() {
+    clearTimeout(this._realtimeDebounceTimer);
+    if (this.realtimeChannel) {
+      supabase.removeChannel(this.realtimeChannel);
+    }
   }
 };
 

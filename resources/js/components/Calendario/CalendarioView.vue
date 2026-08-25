@@ -272,6 +272,7 @@ import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
+import { supabase } from '../../supabaseClient';
 
 export default {
   name: 'Calendario',
@@ -595,6 +596,7 @@ export default {
             links: e.links || []
           }));
           this.updateSelectedDayEvents();
+          this.$store.dispatch('cacheSection', { key: 'calendario', data: this.scrapEvents });
         })
         .catch(error => {
           console.error('Error obteniendo eventos desde la base de datos:', error);
@@ -679,16 +681,44 @@ export default {
       }
     },
 
+
+    // --- Realtime (Supabase) ---
+
+    subscribeRealtime() {
+      this.realtimeChannel = supabase
+        .channel('calendario-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'calendars' }, () => {
+          clearTimeout(this._realtimeDebounceTimer);
+          this._realtimeDebounceTimer = setTimeout(() => {
+            this.getCalendarFromDB();
+          }, 300);
+        })
+        .subscribe();
+    },
+
   },
   mounted() {
     document.title = 'Calendario';
     //this.getCalendarScrap(); // usar para cuando vayas a pasar el scrap a la base de datos
-    this.getCalendarFromDB();
+    const cachedEventos = this.$store.getters.sectionCache('calendario');
+    if (cachedEventos) {
+      this.scrapEvents = cachedEventos;
+      this.updateSelectedDayEvents();
+    } else {
+      this.getCalendarFromDB();
+    }
+    this.subscribeRealtime();
 
     this.user = JSON.parse(sessionStorage.getItem('user'));
     console.log("🚀 ~ mounted ~ this.user:", this.user)
     // No seleccionar ningún día al cargar la vista
     this.selectedDay = null;
+  },
+  beforeUnmount() {
+    clearTimeout(this._realtimeDebounceTimer);
+    if (this.realtimeChannel) {
+      supabase.removeChannel(this.realtimeChannel);
+    }
   },
 };
 </script>

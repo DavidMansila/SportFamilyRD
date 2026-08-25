@@ -383,6 +383,7 @@
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
+import { supabase } from '../../supabaseClient';
 
 function throttle(func, wait) {
   let timeout = null;
@@ -484,7 +485,7 @@ export default {
         console.log("Posts:", posts.data);
 
         this.stats = stats.data || {};
-        this.recentNews = news.data || [];
+        this.recentNews = (news.data || []).filter(n => !!n.image);
         this.recentProducts = products.data.products || [];
 
         // Extraer posts de la respuesta
@@ -688,9 +689,37 @@ export default {
           }
         }
       ];
-    }
+    },
 
+    // --- Realtime (Supabase) ---
 
+    async refreshStats() {
+      try {
+        const { data } = await axios.get('/home-stats');
+        this.stats = data || {};
+      } catch (error) {
+        console.error('Error refrescando stats:', error);
+      }
+    },
+
+    subscribeRealtime() {
+      this.realtimeChannel = supabase
+        .channel('home-stats-realtime')
+        // calendars y posts son tablas publicas: se puede escuchar directo
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'calendars' }, () => {
+          this.refreshStats();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+          this.refreshStats();
+        })
+        // users tiene datos privados (email, telefono): en vez de escuchar la tabla
+        // directo, un trigger en la base de datos manda solo un "aviso" por Broadcast
+        // cuando cambia la cantidad de usuarios, sin exponer ninguna fila.
+        .on('broadcast', { event: 'user_count_changed' }, () => {
+          this.refreshStats();
+        })
+        .subscribe();
+    },
 
   },
 
@@ -699,6 +728,7 @@ export default {
     this.fetchInitialData();
     this.animateElements();
     this.fetchFeaturedEvents(); // Llama a la función para cargar los eventos reales
+    this.subscribeRealtime();
 
     const userData = sessionStorage.getItem('user');
     this.user = userData ? JSON.parse(userData) : null;
@@ -710,6 +740,9 @@ export default {
 
   beforeUnmount() {
     window.removeEventListener('scroll', this.throttledScroll);
+    if (this.realtimeChannel) {
+      supabase.removeChannel(this.realtimeChannel);
+    }
   }
 }
 </script>

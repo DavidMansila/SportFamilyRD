@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class SolicitudRechazadaaEntrenador extends Mailable
+class SolicitudRechazadaEntrenador extends Mailable
 {
     use Queueable, SerializesModels;
 

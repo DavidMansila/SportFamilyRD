@@ -421,6 +421,7 @@ export default {
           // Mezclar los productos aleatoriamente
           this.productos = this.shuffleArray(products);
           this.productosFiltrados = this.productos;
+          this.$store.dispatch('cacheSection', { key: 'productos', data: this.productos });
         })
         .catch(error => {
           console.error('Error:', error);
@@ -683,13 +684,19 @@ export default {
 
   },
   mounted() {
-    this.getProducts();
+    const cachedProductos = this.$store.getters.sectionCache('productos');
+    if (cachedProductos) {
+      this.productos = cachedProductos;
+      this.productosFiltrados = this.productos;
+    } else {
+      this.getProducts();
+    }
     window.addEventListener('keyup', this.handleKeyup);
     this.user = JSON.parse(sessionStorage.getItem('user')) || {};
     this.generarCategoriasFlat()
     document.title = 'Tienda';
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('keyup', this.handleKeyup);
   }
 };

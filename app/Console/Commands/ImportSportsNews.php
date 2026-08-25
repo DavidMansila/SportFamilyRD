@@ -157,12 +157,12 @@ class ImportSportsNews extends Command
                     return Carbon::create($yearVolleyball, $monthVolleyball + 1, $dayVolleyball, 0, 0, 0);
 
                 case 'swimming':
-                    $partsSwimming = explode(' ', $dateString);
-                    if (count($partsSwimming) < 3) return now();
-                    $monthSwimming = $this->getMonthNumber($partsSwimming[0]);
-                    $daySwimming = intval(str_replace(',', '', $partsSwimming[1]));
-                    $yearSwimming = intval($partsSwimming[2]);
-                    return Carbon::create($yearSwimming, $monthSwimming + 1, $daySwimming, 0, 0, 0);
+                    // La fecha viene del meta tag article:published_time (ISO 8601), Carbon la parsea directo.
+                    try {
+                        return Carbon::parse($dateString);
+                    } catch (\Exception $e) {
+                        return now();
+                    }
 
                 default:
                     try {
@@ -497,32 +497,41 @@ class ImportSportsNews extends Command
         $html = (string) $response->getBody();
         $crawler = new Crawler($html);
 
-        // Selector actualizado
-        $links = $crawler->filter('div.row.justify-content-center div.col-md-6.tablet_full_width div.single_post.post__grid__layout__style__2 div.single_post_text h4 a')->each(function (Crawler $node) {
+        // Selector actualizado: el sitio cambio de tema (Elementor) a uno estandar de
+        // WordPress; la clase "single_post" que se usaba antes ya no existe.
+        $links = $crawler->filter('.entry-title a')->each(function (Crawler $node) {
             return $node->attr('href');
         });
 
-        $links = array_filter($links);
+        $links = array_unique(array_filter($links));
 
         foreach ($links as $link) {
             try {
                 $response = $client->get($link);
                 $subCrawler = new Crawler((string)$response->getBody());
 
-                $title = $subCrawler->filter('div.elementor-widget-container h1.elementor-heading-title.elementor-size-default')->text();
-                $image = $subCrawler->filter('div.elementor-element.elementor-element-a663d17.elementor-widget.elementor-widget-theme-post-featured-image.elementor-widget-image div.elementor-widget-container img')->attr('src');
-                $author = $subCrawler->filter('div.elementor-author-box .elementor-author-box__text .elementor-author-box__name')->text();
+                $title = $subCrawler->filter('h1.entry-title')->text();
 
-                $description = $subCrawler->filter('div.elementor-element.elementor-element-0259b0e.elementor-widget.elementor-widget-theme-post-content .elementor-widget-container p')->each(function (Crawler $pNode) {
+                $image = null;
+                $imageNode = $subCrawler->filter('meta[property="og:image"]');
+                if ($imageNode->count()) {
+                    $image = $imageNode->attr('content');
+                }
+
+                $author = null;
+                $authorNode = $subCrawler->filter('a[rel="author"]');
+                if ($authorNode->count()) {
+                    $author = trim($authorNode->first()->text());
+                }
+
+                $date = null;
+                $dateNode = $subCrawler->filter('meta[property="article:published_time"]');
+                if ($dateNode->count()) {
+                    $date = $dateNode->attr('content');
+                }
+
+                $description = $subCrawler->filter('.entry-content p')->each(function (Crawler $pNode) {
                     return trim($pNode->text());
-                });
-
-                $date = '';
-                $subCrawler->filter('div.elementor-widget-container .post-single .page_comments ul.inline li')->each(function (Crawler $node) use (&$date) {
-                    $text = $node->text();
-                    if (strpos($text, ',') !== false) {
-                        $date = $text;
-                    }
                 });
 
                 $articles[] = [

@@ -58,7 +58,8 @@
       </router-link>
 
       <router-link v-if="user" to="/perfil" class="Perfil" title="Perfil">
-        <img src="/imagenes/Perfil-Icon.png" alt="Perfil" class="perfil-icon" />
+        <img :src="user.image || '/imagenes/Perfil-Icon.png'" alt="Perfil" class="perfil-icon"
+          style="border-radius: 50%; object-fit: cover;" />
       </router-link>
 
 
@@ -266,6 +267,7 @@ export default {
       try {
         sessionStorage.removeItem('user');
         sessionStorage.removeItem('token');
+        this.$store.dispatch('clearSectionCache');
         this.user = null;
         this.user_type = '';
         this.showLogoutConfirm = false;

@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Mail\NuevaSolicitudAdminMail;
 use App\Mail\SolicitudAprobadaEntrenador;
-use App\Mail\SolicitudRechazadaaEntrenador;
+use App\Mail\SolicitudRechazadaEntrenador;
 
 use Illuminate\Support\Facades\Mail;
 
@@ -157,7 +157,7 @@ class TrainerController extends Controller
         } elseif ($trainer->status === 'rejected') {
             $user->user_type = 'user';
             $user->save();
-            Mail::to($user->email)->send(new SolicitudRechazadaaEntrenador($user));
+            Mail::to($user->email)->send(new SolicitudRechazadaEntrenador($user));
         }
         $trainer->save();
 

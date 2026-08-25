@@ -29,7 +29,13 @@ export default defineConfig({
     },
     
     server: {
+        host: "127.0.0.1",
+        port: 5173,
+        strictPort: true,
         allowedHosts: true,
+        hmr: {
+            host: "127.0.0.1",
+        },
     },
 
     //  server: {
