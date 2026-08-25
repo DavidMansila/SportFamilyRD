@@ -16,6 +16,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ScrapCalendarController;
 use App\Http\Controllers\ScrapperController;
+use App\Http\Controllers\SportController;
 use App\Http\Controllers\UserStatsController;
 use App\Models\Calendar;
 use Illuminate\Support\Facades\Route;
@@ -75,6 +76,9 @@ Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
 Route::get('/trainer', [TrainerController::class, 'index']);
 Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
 Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
+
+// --- DIRECTORIO DE DEPORTES ---
+Route::get('/sports', [SportController::class, 'index']);
 
 // --- MISC ---
 Route::get('/prueba-publica', fn() => response()->json(['mensaje' => 'Sin autenticación']));
