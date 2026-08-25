@@ -234,9 +234,20 @@ export default {
         this.$router.push('/');
       } catch (error) {
         console.error('Login error:', error);
-        
+
         this.alertType = 'error';
-        this.alertMessage = 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+        if (!error.response) {
+          // La petición no llegó al servidor (red caída, servidor no responde, etc.)
+          this.alertMessage = 'No se pudo conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.';
+        } else if (error.response.status === 429) {
+          this.alertMessage = 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.';
+        } else if (error.response.status === 422) {
+          this.alertMessage = error.response.data?.errors?.email?.[0]
+            || error.response.data?.message
+            || 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+        } else {
+          this.alertMessage = error.response.data?.message || 'Ocurrió un error al iniciar sesión. Inténtalo de nuevo.';
+        }
         this.alertKey++;
         this.openModal = true;
 
