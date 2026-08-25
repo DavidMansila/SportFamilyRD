@@ -226,6 +226,29 @@ class ImportSportsNews extends Command
         return $months[$normalizedMonth] ?? 0;
     }
 
+    /**
+     * Algunos sitios (fedofutbol.do) cargan la imagen destacada con lazy-load:
+     * el <img src> real es un placeholder SVG transparente de 1x1 y la URL
+     * verdadera vive en un atributo data-* que un navegador real reemplaza
+     * al hacer scroll, pero que el scraper (sin JS) nunca dispara.
+     */
+    private function extractLazyImage(Crawler $crawler, string $selector): ?string
+    {
+        $node = $crawler->filter($selector);
+        if (!$node->count()) {
+            return null;
+        }
+
+        foreach (['data-src', 'data-lazy-src', 'data-original', 'src'] as $attr) {
+            $value = $node->attr($attr);
+            if ($value && !str_starts_with($value, 'data:image')) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
     private function getSource($category)
     {
         $sources = [
@@ -342,7 +365,7 @@ class ImportSportsNews extends Command
 
                     // Selectores actualizados
                     $title = $subCrawler->filter('.post_title.entry-title')->text();
-                    $image = $subCrawler->filter('.post_featured img')->attr('src');
+                    $image = $this->extractLazyImage($subCrawler, '.post_featured img');
                     $date = $subCrawler->filter('.post_meta_item.post_date')->text();
                     $author = $subCrawler->filter('.post_meta_item.post_categories')->text();
 
