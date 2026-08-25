@@ -487,6 +487,7 @@ export default {
           // Eliminar de la lista local
           this.noticias = this.noticias.filter(n => n.id !== noticia.id);
           this.filtrarNoticias();
+          this.$store.dispatch('cacheSection', { key: 'noticias', data: this.noticias });
 
           if (this.noticiaSeleccionada && this.noticiaSeleccionada.id === noticia.id) {
             this.cerrarNoticia();
@@ -545,6 +546,7 @@ export default {
         }
 
         this.filtrarNoticias();
+        this.$store.dispatch('cacheSection', { key: 'noticias', data: this.noticias });
         this.cerrarNoticia();
         this.newImage = null;
 
@@ -639,13 +641,24 @@ export default {
     this.user = JSON.parse(sessionStorage.getItem('user')) || {};
 
     const cachedNoticias = this.$store.getters.sectionCache('noticias');
-    if (cachedNoticias) {
-      // Al guardarse en sessionStorage, parsedDate se serializa a texto: se reconstruye como Date.
-      this.noticias = cachedNoticias.map(n => ({ ...n, parsedDate: new Date(n.parsedDate) }));
-      if (this.user) {
-        await this.cargarNoticiasGuardadas();
+    // Un array vacio es "truthy" en JS: sin este chequeo de longitud, un cache
+    // vacio o corrupto se toma como valido y la pagina queda en blanco para
+    // siempre (nunca se vuelve a pedir al backend hasta recargar la pagina).
+    if (Array.isArray(cachedNoticias) && cachedNoticias.length > 0) {
+      try {
+        // Al guardarse en sessionStorage, parsedDate se serializa a texto: se reconstruye como Date.
+        this.noticias = cachedNoticias.map(n => ({ ...n, parsedDate: new Date(n.parsedDate) }));
+        if (this.user) {
+          await this.cargarNoticiasGuardadas();
+        }
+        this.filtrarNoticias();
+      } catch (error) {
+        console.error('Cache de noticias invalido, recargando desde el servidor:', error);
+        await this.cargarNoticias();
+        if (this.user) {
+          await this.cargarNoticiasGuardadas();
+        }
       }
-      this.filtrarNoticias();
     } else {
       // Cargar noticias
       await this.cargarNoticias();
