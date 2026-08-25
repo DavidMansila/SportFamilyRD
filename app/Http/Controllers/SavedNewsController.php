@@ -12,12 +12,7 @@ class SavedNewsController extends Controller
 {
     public function toggleSave($newsId, Request $request)
     {
-
-        $user = User::findOrFail($request['user_id']);
-
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
+        $user = $request->user();
 
         try {
             $news = News::findOrFail($newsId);
@@ -47,12 +42,7 @@ class SavedNewsController extends Controller
 
     public function index(Request $request)
     {
-
-        $user = User::findOrFail($request['user_id']);
-
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
+        $user = $request->user();
 
         $savedNewsIds = SavedNews::where('user_id', $user->id)
             ->pluck('news_id')

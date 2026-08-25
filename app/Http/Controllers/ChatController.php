@@ -17,7 +17,7 @@ class ChatController extends Controller
 
     public function index(Request $request)
     {
-        $userId = $request->user_id;
+        $userId = $request->user()->id;
 
         $chats = Chat::with([
             'user:id,name,image',
@@ -68,7 +68,15 @@ class ChatController extends Controller
     {
         $request->validate(['message' => 'required|string']);
 
-        $user = User::findOrFail($request->user_id);
+        $user = $request->user();
+        $chat = Chat::with('trainer')->findOrFail($chatId);
+
+        // Solo alguno de los dos participantes del chat puede escribir en el.
+        $isParticipant = $chat->user_id == $user->id
+            || optional($chat->trainer)->user_id == $user->id;
+        if (!$isParticipant) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
 
         $message = Message::create([
             'chat_id' => $chatId,
@@ -88,6 +96,13 @@ class ChatController extends Controller
     public function markAsRead($chatId)
     {
         $userId = Auth::id();
+        $chat = Chat::with('trainer')->findOrFail($chatId);
+
+        $isParticipant = $chat->user_id == $userId
+            || optional($chat->trainer)->user_id == $userId;
+        if (!$isParticipant) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
 
         Message::where('chat_id', $chatId)
             ->where('sender_id', '!=', $userId)
@@ -104,12 +119,13 @@ class ChatController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'trainer_id' => 'required|exists:trainer,id',
         ]);
 
+        $userId = $request->user()->id;
+
         // Verificar si ya existe un chat
-        $existingChat = Chat::where('user_id', $request->user_id)
+        $existingChat = Chat::where('user_id', $userId)
             ->where('trainer_id', $request->trainer_id)
             ->first();
 
@@ -121,7 +137,7 @@ class ChatController extends Controller
         }
 
         $chat = Chat::create([
-            'user_id' => $request->user_id,
+            'user_id' => $userId,
             'trainer_id' => $request->trainer_id,
             'status' => 'accepted'
         ]);
@@ -134,12 +150,22 @@ class ChatController extends Controller
 
 
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $chat = Chat::with(['messages' => function ($query) {
             $query->orderBy('created_at', 'asc');
         }, 'user', 'trainer'])
             ->findOrFail($id);
+
+        // Solo alguno de los dos participantes puede leer la conversacion; si no,
+        // cualquiera podria leer los mensajes privados de otros con solo
+        // adivinar/incrementar el id del chat.
+        $userId = $request->user()->id;
+        $isParticipant = $chat->user_id == $userId
+            || optional($chat->trainer)->user_id == $userId;
+        if (!$isParticipant) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
 
         Message::where('chat_id', $id)
             ->where('sender_id', '!=', Auth::id())

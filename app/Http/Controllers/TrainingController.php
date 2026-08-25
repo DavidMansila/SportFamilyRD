@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\NuevaSolicitudEntrenadorMail;
 
 use App\Models\Training;
+use App\Models\Trainer;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -23,6 +24,19 @@ class TrainingController extends Controller
             'trainer_id' => 'nullable|integer',
             'page' => 'sometimes|integer'
         ]);
+
+        // La lista trae nombre/email/telefono de cada solicitante: solo el
+        // propio entrenador (o un admin) puede consultar sus solicitudes.
+        if ($request->has('trainer_id')) {
+            $isOwnerTrainer = Trainer::where('id', $request->trainer_id)
+                ->where('user_id', $request->user()->id)
+                ->exists();
+            if (!$isOwnerTrainer && $request->user()->user_type !== 'admin') {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+        } elseif ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
 
         $query = Training::with('user');
 
@@ -41,14 +55,19 @@ class TrainingController extends Controller
 
     public function store(Request $request)
     {
-        $user = User::findOrFail($request['user_id']);
+        // El solicitante siempre es el usuario autenticado, nunca un user_id que
+        // mande el cliente (si no, cualquiera podria solicitar entrenamiento
+        // suplantando a otro usuario).
+        $user = $request->user();
 
         $validated = $request->validate([
             'trainer_id' => 'required|exists:trainer,id',
             'sport_level' => 'required|in:Principiante,Intermedio,Avanzado,Profesional',
             'description' => 'required|string|max:500',
-            'status' => 'required|in:pending,accepted,rejected'
         ]);
+        // status siempre arranca en 'pending': solo el entrenador (via update())
+        // puede aceptar o rechazar, nunca el propio solicitante.
+        $validated['status'] = 'pending';
 
         // Verificar si ya existe una solicitud pendiente o recientemente expirada
         $existingRequest = Training::where('user_id', $user->id)
@@ -128,11 +147,20 @@ class TrainingController extends Controller
     {
         $training = Training::findOrFail($id);
 
+        // Solo el entrenador dueño de la solicitud (o un admin) puede aceptarla o
+        // rechazarla. Antes no habia ningun chequeo: cualquier usuario autenticado
+        // podia aceptar/rechazar (o reasignar a otro user_id) cualquier solicitud.
+        $isOwnerTrainer = Trainer::where('id', $training->trainer_id)
+            ->where('user_id', $request->user()->id)
+            ->exists();
+        if (!$isOwnerTrainer && $request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $validated = $request->validate([
-            'user_id' => 'sometimes|exists:users,id',
             'sport_level' => 'sometimes',
             'description' => 'nullable|string',
-            'status' => 'sometimes',
+            'status' => 'sometimes|in:pending,accepted,rejected,expired',
         ]);
 
         $training->update($validated);
@@ -156,9 +184,21 @@ class TrainingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $training = Training::findOrFail($id);
+
+        $isOwnerTrainer = Trainer::where('id', $training->trainer_id)
+            ->where('user_id', $request->user()->id)
+            ->exists();
+        if (
+            $training->user_id != $request->user()->id
+            && !$isOwnerTrainer
+            && $request->user()->user_type !== 'admin'
+        ) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $training->delete();
         return response()->json(null, 204);
     }
@@ -174,6 +214,17 @@ class TrainingController extends Controller
         ]);
 
         $trainerId = $request->input('trainer_id');
+
+        // Solo el propio entrenador (o un admin) puede ver quien le ha pedido
+        // entrenamiento: la lista incluye nombre/email/telefono de cada
+        // solicitante. Antes cualquier usuario autenticado podia ver esos datos
+        // de cualquier entrenador con solo cambiar el trainer_id.
+        $isOwnerTrainer = Trainer::where('id', $trainerId)
+            ->where('user_id', $request->user()->id)
+            ->exists();
+        if (!$isOwnerTrainer && $request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
 
         $trainings = Training::with(['user' => function ($query) {
             $query->select('id', 'name', 'email', 'phone', 'image');
@@ -206,13 +257,12 @@ class TrainingController extends Controller
     public function checkExisting(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|integer',
             'trainer_id' => 'required|integer',
         ]);
 
         $lastWeek = now()->subWeek();
 
-        $existingRequests = Training::where('user_id', $request->user_id)
+        $existingRequests = Training::where('user_id', $request->user()->id)
             ->where('trainer_id', $request->trainer_id)
             ->whereIn('status', ['pending', 'accepted'])
             ->where('created_at', '>=', $lastWeek)

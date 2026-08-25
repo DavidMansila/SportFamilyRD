@@ -110,10 +110,27 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            $user->update($request->except('image'));
 
-            if (isset($request['image']) && $request['image']) {
-                $imageName = Post::addImages($request['image'], $user->id, 'users');
+            // Solo el dueño de la cuenta o un admin puede editarla. Antes esta ruta
+            // era publica y sin este chequeo, asi que cualquiera podia editar (o,
+            // via $request->all(), incluso cambiar el password o el user_type de
+            // cualquier cuenta).
+            if ($request->user()->id != $user->id && $request->user()->user_type !== 'admin') {
+                return response()->json([
+                    'message' => 'No autorizado para editar este usuario'
+                ], 403);
+            }
+
+            // Lista blanca explicita: email, password, user_type y email_verified_at
+            // nunca se aceptan por esta via generica (el email/password tienen sus
+            // propios flujos con verificacion; user_type solo lo cambia el sistema
+            // al aprobar una solicitud de entrenador).
+            $user->update($request->only([
+                'name', 'phone', 'location', 'birthdate', 'bio',
+            ]));
+
+            if ($request->hasFile('image')) {
+                $imageName = Post::addImages($request->file('image'), $user->id, 'users');
                 $user->update(['image' => $imageName]);
             }
 
@@ -125,7 +142,7 @@ class UserController extends Controller
                 'message' => 'Usuario actualizado con éxito',
                 'user' => $user,
             ], 200);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error: ' . $e->getMessage()
@@ -172,10 +189,17 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         try {
             $user = User::findOrFail($id);
+
+            if ($request->user()->id != $user->id && $request->user()->user_type !== 'admin') {
+                return response()->json([
+                    'message' => 'No autorizado para eliminar este usuario'
+                ], 403);
+            }
+
             $user->delete();
 
             return response()->json([
@@ -192,20 +216,30 @@ class UserController extends Controller
     {
         try {
             $user = User::find($id);
-            
+
             if (!$user) {
                 return response()->json([
                     'message' => 'Usuario no encontrado'
                 ], 404);
             }
 
-            $user->image = $user->image
+            $image = $user->image
                 ? url('storage/users/' . $user->id . '/' . $user->image)
                 : url('storage/users/Perfil-Icon.png');
 
+            // Endpoint publico (se usa justo despues de verificar el correo, antes
+            // de que exista un token de sesion): solo se devuelven campos no
+            // sensibles. Antes devolvia el registro completo (email, telefono,
+            // fecha de nacimiento, bio) de CUALQUIER usuario sin autenticacion.
             return response()->json([
                 'message' => 'Usuario obtenido con éxito',
-                'user' => $user,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'image' => $image,
+                    'user_type' => $user->user_type,
+                    'email_verified_at' => $user->email_verified_at,
+                ],
             ], 200);
 
         } catch (\Exception $e) {

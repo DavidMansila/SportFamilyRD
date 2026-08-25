@@ -38,6 +38,10 @@ class CalendarController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $calendar = Calendar::create($request->validate([
             'Title'=> 'required|string|max:255',
             'date' => 'required|date',
@@ -93,8 +97,9 @@ class CalendarController extends Controller
      */
     public function update(Request $request, Calendar $calendar)
     {
-        // dump($calendar);
-        // dd($request->all());
+        if ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
 
         $calendar->update($request->validate([
             'Title'=> 'required|string|max:255',
@@ -112,8 +117,12 @@ class CalendarController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Calendar $calendar)
+    public function destroy(Request $request, Calendar $calendar)
     {
+        if ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $calendar->delete();
         return response()->json(null, 204);
     }

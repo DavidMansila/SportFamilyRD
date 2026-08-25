@@ -16,6 +16,13 @@ class TrainerController extends Controller
 
     public function index(Request $request)
     {
+        // Lista completa de solicitudes de entrenador (incluye pendientes/rechazadas,
+        // con telefono/email/ciudad): solo un admin puede verla. Antes esta ruta
+        // era publica y exponia esos datos de TODAS las solicitudes sin autenticacion.
+        if ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $status = $request->query('status', 'all');
 
         $query = Trainer::query()->with(['achievements', 'specialties']);
@@ -96,6 +103,11 @@ class TrainerController extends Controller
             $data['cost'] = null;
         }
 
+        // user_id siempre el del usuario autenticado (nunca uno que mande el
+        // cliente), y status siempre arranca en 'pending': solo updateStatus()
+        // (solo-admin) puede aprobar o rechazar una solicitud.
+        $data['user_id'] = $request->user()->id;
+        $data['status'] = 'pending';
         $trainer = Trainer::create($data);
 
         if (is_string($achievements)) {
@@ -140,8 +152,14 @@ class TrainerController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+        // Aprobar/rechazar una solicitud (y con eso, convertir al usuario en
+        // entrenador) es una accion solo de admin.
+        if ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $request->validate([
-            'status' => 'required|string'
+            'status' => 'required|string|in:pending,approved,rejected'
         ]);
 
         $trainer = Trainer::findOrFail($id);
@@ -187,6 +205,13 @@ class TrainerController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $trainer = Trainer::findOrFail($id);
+
+        // Solo el dueño de la solicitud o un admin puede editarla.
+        if ($trainer->user_id != $request->user()->id && $request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $data = $request->all();
         $achievements = $data['achievements'] ?? [];
         unset($data['achievements']);
@@ -197,7 +222,9 @@ class TrainerController extends Controller
             $data['cost'] = null;
         }
 
-        $trainer = Trainer::findOrFail($id);
+        // status solo lo cambia updateStatus() (solo-admin): nunca por esta via,
+        // o cualquiera podria auto-aprobarse como entrenador.
+        unset($data['user_id'], $data['status']);
         $trainer->update($data);
 
         $trainer->achievements()->delete();
@@ -262,8 +289,12 @@ class TrainerController extends Controller
     }
 
 
-    public function getAllTrainerRequests()
+    public function getAllTrainerRequests(Request $request)
     {
+        if ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $requests = Trainer::all();
         return response()->json([
             'success' => true,

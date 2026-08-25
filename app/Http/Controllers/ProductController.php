@@ -27,6 +27,12 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
+            // Gestionar el catalogo es solo de admin (la UI ya lo oculta a los
+            // demas usuarios, pero eso no impedia llamar el endpoint directo).
+            if ($request->user()->user_type !== 'admin') {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'description' => 'required|string',
@@ -60,6 +66,10 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            if ($request->user()->user_type !== 'admin') {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+
             $product = Product::find($id);
 
             if (!$product) {
@@ -98,9 +108,13 @@ class ProductController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
+            if ($request->user()->user_type !== 'admin') {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+
             $product = Product::find($id);
 
             if (!$product) {

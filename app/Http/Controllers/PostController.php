@@ -17,8 +17,13 @@ class PostController extends Controller
     public function index(Request $request)
     {
         try {
-            // Obtener user_id del request
-            $userId = $request->input('user_id');
+            // Solo para marcar is_liked en la respuesta: el usuario autenticado
+            // (si hay uno), nunca uno que mande el cliente por query string. Esta
+            // ruta es publica (se puede navegar el foro sin iniciar sesion), asi
+            // que no lleva auth:sanctum; si viene un token igual se resuelve aqui
+            // para personalizar is_liked, sin exigirlo.
+            $userId = optional(\Laravel\Sanctum\PersonalAccessToken::findToken((string) $request->bearerToken()))
+                ->tokenable_id;
 
             // Obtener posts con relaciones
             $posts = Post::with([
@@ -94,7 +99,6 @@ class PostController extends Controller
                 'titulo' => 'required|string|max:255',
                 'contenido' => 'required|string',
                 'categoria' => 'required|string',
-                'user_id' => 'required|exists:users,id',
                 'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,jpe,jfif'
             ], [
                 'imagen.image' => 'El archivo debe ser una imagen válida',
@@ -108,7 +112,11 @@ class PostController extends Controller
                 ], 422);
             }
 
-            $postData = $request->only(['titulo', 'contenido', 'categoria', 'user_id']);
+            // El autor siempre es el usuario autenticado, nunca un user_id que
+            // mande el cliente (si no, cualquiera podria publicar suplantando a
+            // otro usuario).
+            $postData = $request->only(['titulo', 'contenido', 'categoria']);
+            $postData['user_id'] = $request->user()->id;
             $post = Post::create($postData);
 
             if ($request->hasFile('imagen')) {
@@ -149,7 +157,6 @@ class PostController extends Controller
                 'contenido' => 'sometimes|string',
                 'categoria' => 'sometimes|string',
                 'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'user_id' => 'required|exists:users,id'
             ]);
 
             if ($validator->fails()) {
@@ -159,8 +166,8 @@ class PostController extends Controller
                 ], 422);
             }
 
-            // Verificar si el usuario es el propietario del post
-            if ($post->user_id != $request->input('user_id')) {
+            // Verificar si el usuario autenticado es el propietario del post
+            if ($post->user_id != $request->user()->id) {
                 return response()->json([
                     'message' => 'No autorizado para editar este post'
                 ], 403);
@@ -204,24 +211,8 @@ class PostController extends Controller
 
             $post = Post::findOrFail($id);
 
-            $input = $request->isMethod('delete')
-                ? $request->json()->all()
-                : $request->all();
-
-            $validator = Validator::make($input, [
-                'user_id' => 'required|exists:users,id',
-                'user_type' => 'required|in:user,entrenador,admin'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Error de validación',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Verificar si el usuario es el propietario o admin
-            if ($post->user_id != $request->input('user_id') && $request->input('user_type') !== 'admin') {
+            // Verificar si el usuario autenticado es el propietario o admin
+            if ($post->user_id != $request->user()->id && $request->user()->user_type !== 'admin') {
                 return response()->json([
                     'message' => 'No autorizado para eliminar este post'
                 ], 403);
@@ -253,7 +244,6 @@ class PostController extends Controller
             $validator = Validator::make($request->all(), [
                 'texto' => 'required|string',
                 'post_id' => 'required|exists:posts,id',
-                'user_id' => 'required|exists:users,id'
             ]);
 
             if ($validator->fails()) {
@@ -266,7 +256,7 @@ class PostController extends Controller
             $comment = Comment::create([
                 'texto' => $request->texto,
                 'post_id' => $request->post_id,
-                'user_id' => $request->input('user_id')
+                'user_id' => $request->user()->id
             ]);
 
             return response()->json([
@@ -292,7 +282,6 @@ class PostController extends Controller
             // Validar campos
             $validator = Validator::make($request->all(), [
                 'texto' => 'required|string',
-                'user_id' => 'required|exists:users,id'
             ]);
 
             if ($validator->fails()) {
@@ -302,8 +291,8 @@ class PostController extends Controller
                 ], 422);
             }
 
-            // Verificar si el usuario es el propietario
-            if ($comment->user_id != $request->input('user_id')) {
+            // Verificar si el usuario autenticado es el propietario
+            if ($comment->user_id != $request->user()->id) {
                 return response()->json([
                     'message' => 'No autorizado para editar este comentario'
                 ], 403);
@@ -330,21 +319,8 @@ class PostController extends Controller
         try {
             $comment = Comment::findOrFail($commentId);
 
-            // Validar campos
-            $validator = Validator::make($request->all(), [
-                'user_id' => 'required|exists:users,id',
-                'user_type' => 'required|in:user,entrenador,admin'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Error de validación',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Verificar si el usuario es el propietario o admin
-            if ($comment->user_id != $request->input('user_id') && $request->input('user_type') !== 'admin') {
+            // Verificar si el usuario autenticado es el propietario o admin
+            if ($comment->user_id != $request->user()->id && $request->user()->user_type !== 'admin') {
                 return response()->json([
                     'message' => 'No autorizado para eliminar este comentario'
                 ], 403);
@@ -369,7 +345,6 @@ class PostController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'texto' => 'required|string',
-                'user_id' => 'required|exists:users,id'
             ]);
 
             if ($validator->fails()) {
@@ -382,7 +357,7 @@ class PostController extends Controller
             $reply = Reply::create([
                 'texto' => $request->texto,
                 'comment_id' => $commentId,
-                'user_id' => $request->input('user_id')
+                'user_id' => $request->user()->id
             ]);
 
             return response()->json([
@@ -408,7 +383,6 @@ class PostController extends Controller
             // Validar campos
             $validator = Validator::make($request->all(), [
                 'texto' => 'required|string',
-                'user_id' => 'required|exists:users,id'
             ]);
 
             if ($validator->fails()) {
@@ -418,8 +392,8 @@ class PostController extends Controller
                 ], 422);
             }
 
-            // Verificar si el usuario es el propietario
-            if ($reply->user_id != $request->input('user_id')) {
+            // Verificar si el usuario autenticado es el propietario
+            if ($reply->user_id != $request->user()->id) {
                 return response()->json([
                     'message' => 'No autorizado para editar esta respuesta'
                 ], 403);
@@ -446,21 +420,8 @@ class PostController extends Controller
         try {
             $reply = Reply::findOrFail($replyId);
 
-            // Validar campos
-            $validator = Validator::make($request->all(), [
-                'user_id' => 'required|exists:users,id',
-                'user_type' => 'required|in:user,entrenador,admin'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Error de validación',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Verificar si el usuario es el propietario o admin
-            if ($reply->user_id != $request->input('user_id') && $request->input('user_type') !== 'admin') {
+            // Verificar si el usuario autenticado es el propietario o admin
+            if ($reply->user_id != $request->user()->id && $request->user()->user_type !== 'admin') {
                 return response()->json([
                     'message' => 'No autorizado para eliminar esta respuesta'
                 ], 403);

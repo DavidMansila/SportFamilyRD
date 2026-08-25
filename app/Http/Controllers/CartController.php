@@ -12,12 +12,7 @@ class CartController extends Controller
 {
     public function getCart(Request $request)
     {
-
-        $user = User::findOrFail($request['user_id']);
-
-        if (!$user) {
-            return response()->json(['items' => []]);
-        }
+        $user = $request->user();
 
         $cart = Cart::with(['items.product', 'items.event'])
             ->where('user_id', $user->id)
@@ -49,12 +44,23 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
+        // El item debe pertenecer al carrito del usuario autenticado; si no,
+        // cualquiera podria modificar la cantidad de items del carrito de otro
+        // usuario con solo adivinar/incrementar el id.
+        if ($item->cart->user_id != $request->user()->id) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $item->update(['quantity' => $request->quantity]);
         return response()->json(['message' => 'Item updated']);
     }
 
-    public function removeItem(CartItem $item)
+    public function removeItem(Request $request, CartItem $item)
     {
+        if ($item->cart->user_id != $request->user()->id) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $item->delete();
         return response()->json(['message' => 'Item removed']);
     }
@@ -69,11 +75,7 @@ class CartController extends Controller
         ]);
 
 
-        $user = User::findOrFail($request['user_id']);
-
-        if (!$user) {
-            return response()->json(['error' => 'Unauthenticated'], 401);
-        }
+        $user = $request->user();
 
         $cart = Cart::firstOrCreate([
             'user_id' => $user->id,
@@ -109,11 +111,7 @@ class CartController extends Controller
 
     public function clearCart(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|integer|exists:users,id'
-        ]);
-
-        $user = User::findOrFail($request->user_id);
+        $user = $request->user();
 
         $cart = Cart::where('user_id', $user->id)
             ->where('status', 'active')

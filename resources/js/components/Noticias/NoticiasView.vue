@@ -405,9 +405,19 @@ export default {
 
 
     formatDescription(desc) {
-      return desc
+      // La descripcion viene de sitios externos (scraper) o de un admin: se
+      // escapa como texto plano primero y recien despues se agregan las
+      // etiquetas propias (<br>, <a>), para no poder inyectar HTML/JS ajeno
+      // via v-html.
+      const escaped = desc
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+      return escaped
         .replace(/\n/g, '<br>')
-        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
     },
 
     formatDateForDisplay(dateObj) {

@@ -35,8 +35,14 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // --- AUTENTICACIÓN ---
 // Route::get('/sanctum/csrf-cookie', [AuthController::class, 'csrfCookie']);
-Route::resource('/user', UserController::class);
-Route::post('/login', [AuthController::class, 'login']);
+// Solo store (registro) es publico; index/show no los usa el frontend y
+// exponian nombre/email/telefono/fecha de nacimiento de TODOS los usuarios sin
+// autenticacion. update/destroy requieren estar autenticado y ser dueño de la
+// cuenta (ver auth:sanctum mas abajo): antes este resource completo era
+// publico, lo que permitia editar o borrar CUALQUIER cuenta (incluyendo
+// password y user_type) sin iniciar sesion.
+Route::resource('/user', UserController::class)->only(['store']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/logout', [AuthController::class, 'logout']);
 
 
@@ -73,7 +79,6 @@ Route::get('/news', fn() => News::orderBy('published_at', 'desc')->get()->map(fn
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/post', [PostController::class, 'index']);
 Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
-Route::get('/trainer', [TrainerController::class, 'index']);
 Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
 Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
 
@@ -92,15 +97,17 @@ Route::get('/user-by-id/{id}', [UserController::class, 'getUserByID']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
+    Route::put('/user/{user}', [UserController::class, 'update']);
+    Route::delete('/user/{user}', [UserController::class, 'destroy']);
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
     Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
 
-    // --- CALENDARIO ---
+    // --- CALENDARIO (solo admin, ver check dentro del controller) ---
     Route::post('/calendar', [CalendarController::class, 'store']);
     Route::put('/calendar/{calendar}', [CalendarController::class, 'update']);
     Route::delete('/calendar/{calendar}', [CalendarController::class, 'destroy']);
 
-    // --- PRODUCTOS ---
+    // --- PRODUCTOS (solo admin, ver check dentro del controller) ---
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
@@ -130,7 +137,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/news/{id}', [NewsController::class, 'update']);
     Route::delete('/news/{id}', [NewsController::class, 'destroy']);
 
-    // --- TRAINER ---
+    // --- TRAINER (index/updateStatus/trainer-requests solo admin, ver checks
+    // dentro del controller) ---
+    Route::get('/trainer', [TrainerController::class, 'index']);
     Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
     Route::put('/trainer/{id}', [TrainerController::class, 'update']);
     Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus']);

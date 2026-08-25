@@ -14,7 +14,7 @@ class ConfigurationController extends Controller
     public function index(Request $request )
     {
         try {
-            $userId = $request->user_id;
+            $userId = $request->user()->id;
             // Obtener todas las configuraciones
             $allConfigs = Configuration::all();
             // Obtener las configuraciones del usuario
@@ -46,8 +46,7 @@ class ConfigurationController extends Controller
     public function updateValue(Request $request)
     {
         try {
-            // dd($request->all());
-            $userId = $request->user_id;
+            $userId = $request->user()->id;
             $configId = $request->configuration_id;
             $status = $request->status;
 
@@ -57,11 +56,9 @@ class ConfigurationController extends Controller
                 ->first();
 
             if ($userConfig) {
-                 dump('llegamos aqui');
                 $userConfig->status = $status;
                 $userConfig->save();
             } else {
-                dump('llegamos aqui abajo');
                 ConfigurationUser::create([
                     'user_id' => $userId,
                     'configuration_id' => $configId,
@@ -84,14 +81,17 @@ class ConfigurationController extends Controller
     public function changePassword(Request $request)
     {
         try {
-            // dd($request->all());
-            $userId = $request->user_id;
+            $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => 'required|string|min:8',
+            ]);
+
             $currentPassword = $request->current_password;
             $newPassword = $request->new_password;
-            
 
-            // Verificar si el usuario existe
-            $user = User::findOrFail($userId);
+            // Siempre la contraseña del usuario autenticado, nunca un user_id que
+            // mande el cliente.
+            $user = $request->user();
 
             // Actualizar la contraseña
             if (Hash::check($currentPassword, $user->password)) {
@@ -121,15 +121,12 @@ class ConfigurationController extends Controller
     
     public function show($id)
     {
-        dd($id);
         $configuration = Configuration::findOrFail($id);
         return response()->json($configuration);
     }
 
     public function store(Request $request)
     {
-        dd($request->all());
-
         $configuration = Configuration::create($request->validate([
             'configuration' => 'nullable|string|max:255',
         ]));
@@ -138,7 +135,6 @@ class ConfigurationController extends Controller
 
     public function update(Request $request, $id)
     {
-        dd($request->all());
         $configuration = Configuration::findOrFail($id);
         $configuration->update($request->validate([
             'configuration' => 'nullable|string|max:255',
@@ -148,8 +144,6 @@ class ConfigurationController extends Controller
 
     public function destroy($id)
     {
-        dd($id);
-
         $configuration = Configuration::findOrFail($id);
         $configuration->delete();
         return response()->json(null, 204);

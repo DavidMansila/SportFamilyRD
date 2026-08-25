@@ -18,10 +18,10 @@ class LikeController extends Controller
             'likeable_id' => 'required|integer',
         ]);
 
-        $user = User::findOrFail($request['user_id']);
-        if (!$user) {
-            return response()->json(['message' => 'Debes iniciar sesión para dar like'], 401);
-        }
+        // El usuario que da like siempre es el autenticado, nunca el user_id que
+        // mande el cliente (si no, cualquiera podria dar/quitar like en nombre de
+        // otro usuario).
+        $user = $request->user();
 
         // Mapear tipo a modelo
         $modelMap = [
@@ -64,7 +64,6 @@ class LikeController extends Controller
             'likeable_owner' => [
                 'id' => $owner?->id,
                 'name' => $owner?->name,
-                'email' => $owner?->email,
             ],
         ]);
     }

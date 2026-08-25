@@ -69,6 +69,10 @@ class NewsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -108,9 +112,13 @@ class NewsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
+            if ($request->user()->user_type !== 'admin') {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+
             $news = News::findOrFail($id);
 
             // Eliminar imagen asociada
