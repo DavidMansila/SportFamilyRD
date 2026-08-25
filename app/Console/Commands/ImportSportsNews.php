@@ -227,6 +227,24 @@ class ImportSportsNews extends Command
     }
 
     /**
+     * fedombal.org sirve sus paginas comprimidas en gzip pero sin declarar
+     * el header Content-Encoding: gzip, asi que Guzzle no las descomprime
+     * solo y el HTML le llega crudo (binario) al parser, que no encuentra
+     * nada. Se detecta por la firma gzip (\x1f\x8b) y se descomprime a mano.
+     */
+    private function decompressIfNeeded(string $body): string
+    {
+        if (substr($body, 0, 2) === "\x1f\x8b") {
+            $decoded = @gzdecode($body);
+            if ($decoded !== false) {
+                return $decoded;
+            }
+        }
+
+        return $body;
+    }
+
+    /**
      * Algunos sitios (fedofutbol.do) cargan la imagen destacada con lazy-load:
      * el <img src> real es un placeholder SVG transparente de 1x1 y la URL
      * verdadera vive en un atributo data-* que un navegador real reemplaza
@@ -402,7 +420,7 @@ class ImportSportsNews extends Command
         $articles = [];
 
         $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
-        $html = (string) $response->getBody();
+        $html = $this->decompressIfNeeded((string) $response->getBody());
         $crawler = new Crawler($html);
 
         // Selector actualizado
@@ -416,7 +434,7 @@ class ImportSportsNews extends Command
         foreach ($links as $link) {
             try {
                 $response = $client->get($link);
-                $subCrawler = new Crawler((string)$response->getBody());
+                $subCrawler = new Crawler($this->decompressIfNeeded((string) $response->getBody()));
 
                 $title = $subCrawler->filter('div.col-md-12.col-xs-12 h1.single-title')->text();
                 $author = $subCrawler->filter('div.single-follow ul.nota-detalles li')->eq(1)->text();
