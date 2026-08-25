@@ -10,8 +10,11 @@
             <div class="profile-header">
                 <div class="avatar-container">
                     <img :src="user.image ? user.image : '/storage/users/Perfil-Icon.png'" alt=""
-                        class="profile-avatar" />
-                    <button class="edit-avatar" @click="handleAvatarChange">
+                        class="profile-avatar" :class="{ 'is-uploading': avatarUploading }" />
+                    <div v-if="avatarUploading" class="avatar-uploading-overlay">
+                        <span class="avatar-spinner"></span>
+                    </div>
+                    <button class="edit-avatar" @click="handleAvatarChange" :disabled="avatarUploading">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"
@@ -377,6 +380,7 @@ export default {
             alertKey: 0, // Para forzar la re-renderización del componente Alert
             
             editMode: false,
+            avatarUploading: false,
             entrenadores: [],
             trainer: null,
             deportes: ['Fútbol', 'Tenis', 'Baloncesto', 'Natación', 'Ciclismo', 'Atletismo', 'Artes Marciales'],
@@ -737,6 +741,7 @@ export default {
         },
 
         async subirAvatarAlServidor(file) {
+            this.avatarUploading = true;
             const formData = new FormData()
             formData.append('_method', 'PUT');
             formData.append('image', file)
@@ -746,24 +751,24 @@ export default {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
 
-                // Actualiza el objeto user con la respuesta del servidor
-                this.user = response.data.user;
-                sessionStorage.setItem('user', JSON.stringify(response.data.user));
+                // Actualiza el objeto user con la respuesta del servidor (ya trae la
+                // URL definitiva de la imagen guardada, no hace falta releerla localmente)
+                this.user = { ...this.user, ...response.data.user };
+                sessionStorage.setItem('user', JSON.stringify(this.user));
+                if (this.originalUserData) {
+                    this.originalUserData.image = this.user.image;
+                }
 
-                // Muestra la imagen actualizada inmediatamente
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.user.image = e.target.result;
-                };
-                reader.readAsDataURL(file);
-
+                this.showToast('Foto de perfil actualizada', 'success');
             } catch (error) {
                 console.error('Error al actualizar la imagen:', error);
-                
+
                 this.alertType = 'error';
                 this.alertMessage = 'Error al actualizar la imagen. Por favor intenta nuevamente.';
                 this.alertKey++;
                 this.openModal = true;
+            } finally {
+                this.avatarUploading = false;
             }
         },
 
@@ -1192,6 +1197,38 @@ export default {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+.profile-avatar.is-uploading {
+    opacity: 0.5;
+}
+
+.avatar-uploading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.avatar-spinner {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid rgba(196, 166, 0, 0.25);
+    border-top-color: #c4a600;
+    animation: avatar-spin 0.8s linear infinite;
+}
+
+@keyframes avatar-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .edit-avatar {
     position: absolute;
     bottom: 10px;
@@ -1211,6 +1248,11 @@ export default {
     svg {
         width: 18px;
         height: 18px;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 }
 

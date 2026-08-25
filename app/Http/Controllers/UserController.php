@@ -110,7 +110,7 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            $user->update($request->all());
+            $user->update($request->except('image'));
 
             if (isset($request['image']) && $request['image']) {
                 $imageName = Post::addImages($request['image'], $user->id, 'users');
