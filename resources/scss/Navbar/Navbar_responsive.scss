@@ -1,3 +1,26 @@
+/* ------------------- BASE ------------------ */
+
+/* La foto de perfil debe llenar su circulo por completo en cualquier tamaño
+   de pantalla. Los breakpoints de abajo fijan un ancho/alto pequeño en el
+   <img> pensado para los iconos genericos (ajustes/carrito/logout, que
+   comparten el selector ".Imagenes a img"); se sobreescribe aqui con
+   !important para que la foto real del usuario nunca se vea diminuta
+   flotando dentro del circulo en vez de cubrirlo entero. */
+.perfil-icon {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  display: block;
+}
+
+/* Tamaño de respaldo para los iconos del navbar en anchos de pantalla que
+   ningun breakpoint de abajo cubre (1600px-1919px, y 1920px+). */
+.Imagenes a {
+  width: 36px;
+  height: 36px;
+}
+
 /* ------------------- RESPONSIVE ------------------ */
 
 /* Pantallas grandes (TVs, monitores 4K) - 1920px+ */

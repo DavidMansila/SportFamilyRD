@@ -187,11 +187,16 @@ export default {
     this.checkAuthStatus();
     window.addEventListener('user-authenticated', this.checkAuthStatus);
     window.addEventListener('user-logged-out', this.checkAuthStatus);
+    // Se dispara desde Perfil (foto, nombre, etc.) para que el icono del
+    // navbar se actualice al instante sin tener que navegar o recargar.
+    window.addEventListener('user-updated', this.checkAuthStatus);
     window.addEventListener('resize', this.handleResize);
   },
-  beforeDestroy() {
+  beforeUnmount() {
+    document.body.style.overflow = '';
     window.removeEventListener('user-authenticated', this.checkAuthStatus);
     window.removeEventListener('user-logged-out', this.checkAuthStatus);
+    window.removeEventListener('user-updated', this.checkAuthStatus);
     window.removeEventListener('resize', this.handleResize);
   },
 
@@ -218,10 +223,6 @@ export default {
         this.closeCart();
       }
     }
-  },
-
-  beforeUnmount() {
-    document.body.style.overflow = '';
   },
 
 

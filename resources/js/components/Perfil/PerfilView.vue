@@ -672,6 +672,7 @@ export default {
                 }
 
                 sessionStorage.setItem('user', JSON.stringify(this.user));
+                window.dispatchEvent(new CustomEvent('user-updated'));
 
                 // Actualizar datos originales
                 this.originalUserData = JSON.parse(JSON.stringify(this.user));
@@ -758,6 +759,7 @@ export default {
                 if (this.originalUserData) {
                     this.originalUserData.image = this.user.image;
                 }
+                window.dispatchEvent(new CustomEvent('user-updated'));
 
                 this.showToast('Foto de perfil actualizada', 'success');
             } catch (error) {
