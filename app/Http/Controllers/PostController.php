@@ -57,7 +57,7 @@ class PostController extends Controller
                 if ($post->imagen) {
                     $post->imagen = public_storage_url('posts/' . $post->id . '/' . $post->imagen);
                 } else {
-                    $post->imagen = public_storage_url('posts/no_image.png');
+                    $post->imagen = asset('defaults/no_image.png');
                 }
 
                 // Verificar si el usuario dio like al post

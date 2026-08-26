@@ -22,7 +22,7 @@ class UserController extends Controller
         $users = User::all()->map(function ($user) {
             $user->image = $user->image
                 ? public_storage_url('users/' . $user->id . '/' . $user->image)
-                : public_storage_url('users/Perfil-Icon.png');
+                : asset('defaults/Perfil-Icon.png');
             return $user;
         });
 
@@ -86,7 +86,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->image = $user->image
             ? public_storage_url('users/' . $user->id . '/' . $user->image)
-            : public_storage_url('users/Perfil-Icon.png');
+            : asset('defaults/Perfil-Icon.png');
         // Forzar que email_verified_at siempre esté presente en la respuesta
         $arr = $user->toArray();
         if (!array_key_exists('email_verified_at', $arr)) {
@@ -171,7 +171,7 @@ class UserController extends Controller
 
             $user->image = $user->image
                 ? public_storage_url('users/' . $user->id . '/' . $user->image)
-                : public_storage_url('users/Perfil-Icon.png');
+                : asset('defaults/Perfil-Icon.png');
 
             return response()->json([
                 'message' => 'Usuario actualizado con éxito',
@@ -260,7 +260,7 @@ class UserController extends Controller
 
             $image = $user->image
                 ? public_storage_url('users/' . $user->id . '/' . $user->image)
-                : public_storage_url('users/Perfil-Icon.png');
+                : asset('defaults/Perfil-Icon.png');
 
             // Endpoint publico (se usa justo despues de verificar el correo, antes
             // de que exista un token de sesion): solo se devuelven campos no

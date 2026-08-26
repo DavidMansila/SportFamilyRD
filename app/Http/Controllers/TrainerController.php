@@ -79,7 +79,7 @@ class TrainerController extends Controller
             $trainer->image = optional($trainer->user)->image;
             $trainer->image = $trainer->image
                 ? public_storage_url('users/' . $trainer->user_id . '/' . $trainer->image)
-                : public_storage_url('users/Perfil-Icon.png');
+                : asset('defaults/Perfil-Icon.png');
             return $trainer;
         });
 
