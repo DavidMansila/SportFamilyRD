@@ -5,7 +5,21 @@
 # y evita configurar nginx/php-fpm aparte.
 
 # Etapa 1: compilar los assets del SPA (Vue + Vite)
+# Las variables VITE_* se compilan DENTRO del bundle de JS en este paso (no
+# se leen en tiempo de ejecucion), asi que hay que pasarlas como build args.
+# Render pasa automaticamente cada Environment Variable configurada en el
+# dashboard como ARG si el Dockerfile declara un ARG con el mismo nombre.
 FROM node:20-alpine AS frontend
+ARG VITE_APP_NAME
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_PUSHER_APP_KEY
+ARG VITE_PUSHER_APP_CLUSTER
+ENV VITE_APP_NAME=$VITE_APP_NAME \
+    VITE_SUPABASE_URL=$VITE_SUPABASE_URL \
+    VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY \
+    VITE_PUSHER_APP_KEY=$VITE_PUSHER_APP_KEY \
+    VITE_PUSHER_APP_CLUSTER=$VITE_PUSHER_APP_CLUSTER
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
