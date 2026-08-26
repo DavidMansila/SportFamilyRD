@@ -36,51 +36,66 @@
 }
 
 /* Contenedor de Imagen con overlay */
+/* Las fotos de perfil que hay son de 128x128 px. Antes se estiraban a todo el
+   ancho de la tarjeta (~320px) con object-fit: cover, o sea una ampliacion de
+   2,5x, y por eso se veian borrosas. Bajar solo la altura no lo arreglaba: con
+   'cover' quien manda es el ANCHO. La solucion es mostrarla como retrato
+   circular a un tamaño cercano al original, sobre una banda de color. */
 .card-image-container {
     position: relative;
-    height: 280px;
+    height: 150px;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
 }
 
-.card-image-container::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40%;
-    background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.7) 0%,
-        transparent 100%
-    );
-}
+/* El degradado oscuro existia para que se leyera el texto sobre la foto a
+   ancho completo. Ya no hace falta: el fondo es una banda de color solida. */
 
 .card-image-container img {
-    width: 100%;
-    height: 100%;
+    /* 112px: por debajo de los 128px del original, asi nunca se amplia y se ve
+       nitida. Si en el futuro se suben fotos mas grandes, se puede subir. */
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
     object-fit: cover;
-    transition: transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
+    border: 4px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    background-color: var(--gray-100);
+    transition: transform 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .entrenador-card:hover .card-image-container img {
-    transform: scale(1.1);
+    /* Antes era scale(1.1). Ampliar una foto de 128px la vuelve a desenfocar,
+       asi que el hover solo la levanta un poco. */
+    transform: translateY(-3px);
 }
 
 /* Etiqueta de Deporte con gradiente */
 .deporte-tag {
     position: absolute;
-    bottom: 1.5rem;
-    left: 1.5rem;
-    background: linear-gradient(135deg, #8a5f1f 0%, #694d0d 100%);
-    color: white;
-    padding: 0.4rem 1.2rem;
+    /* Arriba a la izquierda: abajo se solapaba con el retrato circular, y en la
+       esquina derecha esta el triangulo que aparece al pasar el raton
+       (.entrenador-card::before). */
+    top: 0.75rem;
+    left: 0.75rem;
+    bottom: auto;
+    right: auto;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--accent-strong);
+    padding: 0.35rem 0.9rem;
     border-radius: 50px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    max-width: calc(100% - 1.5rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     z-index: 2;
 }
 
@@ -189,7 +204,7 @@
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    background: linear-gradient(135deg, #8a5f1f 0%, rgb(157, 117, 23) 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -245,7 +260,7 @@
     right: 0;
     width: 50px;
     height: 50px;
-    background: linear-gradient(45deg, #8a5f1f 0%, #aa7803 100%);
+    background: linear-gradient(45deg, var(--accent) 0%, var(--accent-strong) 100%);
     clip-path: polygon(0 0, 100% 0, 100% 100%);
     opacity: 0;
     transition: all 0.4s ease;
@@ -295,7 +310,7 @@
     }
 
     .card-image-container {
-        height: 240px;
+        height: 140px;
     }
 }
 
@@ -333,6 +348,6 @@
     }
 
     .card-image-container {
-        height: 220px;
+        height: 140px;
     }
 }
