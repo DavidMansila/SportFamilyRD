@@ -11,16 +11,16 @@ con **PostgreSQL** como base de datos.
 
 ## Índice
 
-- [Stack tecnológico]
-- [Requisitos previos]
-- [Instalación y configuración]
-- [Restaurar la base de datos]
-- [Variables de entorno]
-- [Arrancar el proyecto]
-- [Estructura del proyecto]
-- [Tareas programadas]
-- [Solución de problemas]
-- [Imagenes del Proyecto]
+- [Stack tecnológico](#stack-tecnológico)
+- [Requisitos previos](#requisitos-previos)
+- [Instalación y configuración](#instalación-y-configuración)
+- [Restaurar la base de datos](#restaurar-la-base-de-datos)
+- [Variables de entorno](#variables-de-entorno)
+- [Arrancar el proyecto](#arrancar-el-proyecto)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Tareas programadas](#tareas-programadas)
+- [Solución de problemas](#solución-de-problemas)
+- [Imágenes del Proyecto](#imágenes-del-proyecto)
 
 
 ---
