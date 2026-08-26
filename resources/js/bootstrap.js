@@ -1,12 +1,13 @@
 import axios from "axios";
 
-// axios.defaults.baseURL = 'http://18.191.50.161/api';
-axios.defaults.baseURL = 'http://127.0.0.1:8080/api';
-    // axios.defaults.baseURL = 'http://10.0.0.7:8000//api';
-
-// axios.defaults.baseURL = 'http://10.0.0.6:8000/api';
-// axios.defaults.baseURL = 'http://10.0.0.7:8000/api';
-// axios.defaults.baseURL = 'http://10.193.2.172:8000/api';
+// Relativa a proposito: Laravel sirve el SPA y la API desde el mismo origen
+// (mismo dominio/puerto), asi que "/api" resuelve solo contra el host que
+// esta sirviendo la pagina en ese momento, sin importar cual sea (artisan
+// serve en :8000, Apache en :8080, una IP de red local, o el dominio real de
+// produccion). Antes esto apuntaba hardcodeado a http://127.0.0.1:8080/api:
+// funcionaba "de casualidad" en la laptop que tenia ese servidor local
+// corriendo, y fallaba para cualquier otro dispositivo o visitante real.
+axios.defaults.baseURL = '/api';
 
 // Tope de peticiones a la API en vuelo al mismo tiempo.
 //
