@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.1",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
+        "league/flysystem-aws-s3-v3": "*",
         "pusher/pusher-php-server": "^7.2",
         "symfony/dom-crawler": "^7.2"
     },
@@ -29,7 +30,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Support/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

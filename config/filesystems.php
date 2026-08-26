@@ -38,11 +38,25 @@ return [
             'report' => false,
         ],
 
+        // Driver configurable por entorno: en local sigue siendo un disco
+        // "local" normal (storage:link + /public/storage). En un host con
+        // filesystem efimero (p. ej. Render free, que borra todo lo que no
+        // este en el repo cada vez que el contenedor se reinicia o duerme)
+        // se pone PUBLIC_DISK_DRIVER=s3 para que las imagenes subidas por
+        // usuarios (avatares, fotos de posts/productos/eventos) persistan en
+        // Supabase Storage (compatible con la API S3) en vez de perderse.
+        // Todo el codigo que ya usa Storage::disk('public') no cambia.
         'public' => [
-            'driver' => 'local',
+            'driver' => env('PUBLIC_DISK_DRIVER', 'local'),
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('PUBLIC_DISK_URL', env('APP_URL').'/storage'),
             'visibility' => 'public',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
             'throw' => false,
             'report' => false,
         ],

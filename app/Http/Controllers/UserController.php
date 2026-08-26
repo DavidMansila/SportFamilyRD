@@ -21,8 +21,8 @@ class UserController extends Controller
     {
         $users = User::all()->map(function ($user) {
             $user->image = $user->image
-                ? url('storage/users/' . $user->id . '/' . $user->image)
-                : url('storage/users/Perfil-Icon.png');
+                ? public_storage_url('users/' . $user->id . '/' . $user->image)
+                : public_storage_url('users/Perfil-Icon.png');
             return $user;
         });
 
@@ -85,8 +85,8 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->image = $user->image
-            ? url('storage/users/' . $user->id . '/' . $user->image)
-            : url('storage/users/Perfil-Icon.png');
+            ? public_storage_url('users/' . $user->id . '/' . $user->image)
+            : public_storage_url('users/Perfil-Icon.png');
         // Forzar que email_verified_at siempre esté presente en la respuesta
         $arr = $user->toArray();
         if (!array_key_exists('email_verified_at', $arr)) {
@@ -101,6 +101,41 @@ class UserController extends Controller
     public function edit(string $id)
     {
         //
+    }
+
+    /**
+     * Reemplaza solo el avatar del usuario (el frontend actual no usa esta
+     * ruta: sube el avatar junto con el resto del perfil via update(), pero
+     * la dejamos funcional por si algun cliente la llega a usar).
+     */
+    public function updateAvatar(Request $request, string $user)
+    {
+        try {
+            $user = User::findOrFail($user);
+
+            if ($request->user()->id != $user->id && $request->user()->user_type !== 'admin') {
+                return response()->json([
+                    'message' => 'No autorizado para editar este usuario'
+                ], 403);
+            }
+
+            $request->validate([
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            $imageName = Post::addImages($request->file('image'), $user->id, 'users');
+            $user->update(['image' => $imageName]);
+            $user->image = public_storage_url('users/' . $user->id . '/' . $user->image);
+
+            return response()->json([
+                'message' => 'Avatar actualizado con éxito',
+                'user' => $user,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -135,8 +170,8 @@ class UserController extends Controller
             }
 
             $user->image = $user->image
-                ? url('storage/users/' . $user->id . '/' . $user->image)
-                : url('storage/users/Perfil-Icon.png');
+                ? public_storage_url('users/' . $user->id . '/' . $user->image)
+                : public_storage_url('users/Perfil-Icon.png');
 
             return response()->json([
                 'message' => 'Usuario actualizado con éxito',
@@ -224,8 +259,8 @@ class UserController extends Controller
             }
 
             $image = $user->image
-                ? url('storage/users/' . $user->id . '/' . $user->image)
-                : url('storage/users/Perfil-Icon.png');
+                ? public_storage_url('users/' . $user->id . '/' . $user->image)
+                : public_storage_url('users/Perfil-Icon.png');
 
             // Endpoint publico (se usa justo despues de verificar el correo, antes
             // de que exista un token de sesion): solo se devuelven campos no

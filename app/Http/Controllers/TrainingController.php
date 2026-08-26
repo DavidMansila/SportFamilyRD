@@ -234,8 +234,8 @@ class TrainingController extends Controller
 
         return $trainings->map(function ($training) {
             $imageUrl = $training->user && $training->user->image
-                ? asset('storage/users/' . $training->user->id . '/' . $training->user->image)
-                : asset('storage/users/Perfil-Icon.png');
+                ? public_storage_url('users/' . $training->user->id . '/' . $training->user->image)
+                : public_storage_url('users/Perfil-Icon.png');
 
             return [
                 'id' => $training->id,

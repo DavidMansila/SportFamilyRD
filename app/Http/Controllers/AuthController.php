@@ -26,8 +26,8 @@ class AuthController extends Controller
         }
 
         $user->image = $user->image
-            ? url('storage/users/' . $user->id . '/' . $user->image)
-            : url('storage/users/Perfil-Icon.png');
+            ? public_storage_url('users/' . $user->id . '/' . $user->image)
+            : public_storage_url('users/Perfil-Icon.png');
 
         return response()->json([
             'user' => $user,

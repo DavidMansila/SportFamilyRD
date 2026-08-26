@@ -55,9 +55,9 @@ class PostController extends Controller
             $posts = $posts->map(function ($post) use ($userId, $userLikes) {
                 // Imagen del post
                 if ($post->imagen) {
-                    $post->imagen = url('storage/posts/' . $post->id . '/' . $post->imagen);
+                    $post->imagen = public_storage_url('posts/' . $post->id . '/' . $post->imagen);
                 } else {
-                    $post->imagen = url('storage/posts/no_image.png');
+                    $post->imagen = public_storage_url('posts/no_image.png');
                 }
 
                 // Verificar si el usuario dio like al post
@@ -467,7 +467,7 @@ class PostController extends Controller
                 ->with(['user' => function ($query) {
                     // Cargar el avatar_url directamente
                     $query->select('id', 'name', 'image')
-                        ->addSelect(DB::raw("CONCAT('" . asset('storage/users') . "/', id, '/', image) as image_url"));
+                        ->addSelect(DB::raw("CONCAT('" . public_storage_url('users') . "/', id, '/', image) as image_url"));
                 }])
                 ->orderByRaw(
                     '(' . $likesSubquery->toSql() . ') + (' . $commentsSubquery->toSql() . ') DESC',

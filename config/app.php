@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    // Token que debe mandar el cron externo (cron-job.org) para poder
+    // disparar /api/internal/schedule-run. Vacio en local: la ruta queda
+    // desactivada por defecto.
+    'cron_secret' => env('CRON_SECRET'),
+
 ];

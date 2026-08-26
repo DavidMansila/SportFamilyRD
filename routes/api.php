@@ -59,10 +59,12 @@ Route::get('/recent-products', [ProductController::class, 'recentProducts']);
 Route::get('/popular-posts', [PostController::class, 'popularPosts']);
 
 // --- CALENDARIO ---
-Route::resource('/calendar', CalendarController::class)->only(['index', 'show']);
-Route::get('/featured-events', [CalendarController::class, 'featuredEvents']);
-Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap']);
-Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store']);
+Route::resource('/calendar', CalendarController::class)->only(['index', 'show'])->middleware('throttle:60,1');
+Route::get('/featured-events', [CalendarController::class, 'featuredEvents'])->middleware('throttle:60,1');
+// Scraping en vivo (golpea un sitio externo): limite bajo para que no se
+// pueda usar esta ruta publica para tumbar el servicio ni al sitio scrapeado.
+Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap'])->middleware('throttle:5,1');
+Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store'])->middleware('throttle:5,1');
 
 // --- NOTICIAS ---
 Route::get('/news', fn() => News::orderBy('published_at', 'desc')->get()->map(fn($n) => [
@@ -73,22 +75,57 @@ Route::get('/news', fn() => News::orderBy('published_at', 'desc')->get()->map(fn
     'author' => $n->author,
     'published_at' => $n->published_at->toIso8601String(),
     'category' => $n->category,
-]));
+]))->middleware('throttle:60,1');
 
 // --- POSTS, TRAINERS, PRODUCTOS ---
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/post', [PostController::class, 'index']);
-Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply']);
-Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers']);
-Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId']);
+Route::get('/products', [ProductController::class, 'index'])->middleware('throttle:60,1');
+Route::get('/post', [PostController::class, 'index'])->middleware('throttle:60,1');
+Route::get('/post/get-reply/{commentId}', [PostController::class, 'getReply'])->middleware('throttle:60,1');
+Route::get('/trainer/approved', [TrainerController::class, 'getAprovedTrainers'])->middleware('throttle:60,1');
+Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerByUserId'])->middleware('throttle:60,1');
 
 // --- DIRECTORIO DE DEPORTES ---
-Route::get('/sports', [SportController::class, 'index']);
+Route::get('/sports', [SportController::class, 'index'])->middleware('throttle:60,1');
 
 // --- MISC ---
 Route::get('/prueba-publica', fn() => response()->json(['mensaje' => 'Sin autenticación']));
 // Route::get('/user-by-id', [UserController::class, 'getUserByID']);
 Route::get('/user-by-id/{id}', [UserController::class, 'getUserByID']);
+
+// --- CRON EXTERNO (Render free no trae cron propio) ---
+// Un servicio externo (p. ej. cron-job.org) llama esta ruta cada minuto con
+// ?token=CRON_SECRET para disparar el scheduler de Laravel (news:import,
+// calendar:import, training:expire). Sin el token correcto, 403. Si
+// CRON_SECRET no esta configurado en .env, la ruta se desactiva sola.
+Route::get('/internal/schedule-run', function (Request $request) {
+    $secret = config('app.cron_secret');
+    if (!$secret || !hash_equals($secret, (string) $request->query('token'))) {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+    \Illuminate\Support\Facades\Artisan::call('schedule:run');
+    return response()->json(['message' => 'Scheduler ejecutado']);
+})->middleware('throttle:10,1');
+
+// Render free no da terminal (Shell requiere plan pago), asi que esta ruta
+// permite correr un puñado de comandos artisan seguros (lista blanca) desde
+// el navegador con el mismo token, para migrar la base de datos tras el
+// primer deploy o limpiar cache sin necesidad de SSH.
+Route::get('/internal/artisan', function (Request $request) {
+    $secret = config('app.cron_secret');
+    if (!$secret || !hash_equals($secret, (string) $request->query('token'))) {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    $allowed = ['migrate', 'migrate:status', 'storage:link', 'config:clear', 'cache:clear', 'route:list'];
+    $cmd = (string) $request->query('cmd');
+    if (!in_array($cmd, $allowed, true)) {
+        return response()->json(['message' => 'Comando no permitido', 'permitidos' => $allowed], 422);
+    }
+
+    $args = $cmd === 'migrate' ? ['--force' => true] : [];
+    \Illuminate\Support\Facades\Artisan::call($cmd, $args);
+    return response()->json(['output' => \Illuminate\Support\Facades\Artisan::output()]);
+})->middleware('throttle:10,1');
 
 
 

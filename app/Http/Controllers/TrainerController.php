@@ -78,8 +78,8 @@ class TrainerController extends Controller
         $approvedTrainer->transform(function ($trainer) {
             $trainer->image = optional($trainer->user)->image;
             $trainer->image = $trainer->image
-                ? url('storage/users/' . $trainer->user_id . '/' . $trainer->image)
-                : url('storage/users/Perfil-Icon.png');
+                ? public_storage_url('users/' . $trainer->user_id . '/' . $trainer->image)
+                : public_storage_url('users/Perfil-Icon.png');
             return $trainer;
         });
 
