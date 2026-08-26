@@ -12,10 +12,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Agrega esto para broadcasting
+        // Autorizacion de canales privados de broadcasting (chat).
+        // Solo auth:sanctum: identifica al usuario por el Bearer token y deja
+        // que Broadcast::channel() de routes/channels.php decida si puede
+        // entrar al canal.
+        //
+        // Antes aqui tambien iba BroadcastAuth, que hacia Auth::login() sobre
+        // un guard sin estado y reventaba con "RequestGuard::login does not
+        // exist" -> /api/broadcasting/auth devolvia 500 SIEMPRE, Echo nunca
+        // lograba suscribirse y el chat en tiempo real no funcionaba nunca.
+        // Era redundante: auth:sanctum ya deja al usuario en el request.
         $middleware->appendToGroup('broadcast', [
-            \App\Http\Middleware\Authenticate::class,
-            \App\Http\Middleware\BroadcastAuth::class,
+            'auth:sanctum',
         ]);
 
         $middleware->prepend([

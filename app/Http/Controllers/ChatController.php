@@ -85,8 +85,12 @@ class ChatController extends Controller
             'message' => $request->message
         ]);
 
-        // Disparar evento después de crear el mensaje
+        // Al canal de la conversacion: lo escucha quien la tenga abierta.
         broadcast(new NewMessage($message))->toOthers();
+
+        // Al canal personal del destinatario: le actualiza la lista de chats y
+        // el contador de no leidos aunque no tenga esa conversacion abierta.
+        broadcast(new NewChat($message));
 
         return response()->json($message);
     }

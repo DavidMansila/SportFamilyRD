@@ -47,6 +47,7 @@
 <script>
 import axios from 'axios';
 import ChatComponent from './ChatComponent.vue';
+import { getEcho } from '../echo';
 
 export default {
   name: 'ChatBubble',
@@ -64,7 +65,8 @@ export default {
       chats: [],
       showMessages: false,
       unreadMessages: 0,
-      activeChat: null
+      activeChat: null,
+      personalChannelName: null
     };
   },
   computed: {
@@ -172,15 +174,41 @@ export default {
         console.error('Error cargando chats', error.response ? error.response.data : error);
       }
     },
+
+    // Escucha el canal personal del usuario para enterarse de mensajes nuevos
+    // en CUALQUIER chat, este abierto o no. Antes la lista solo se refrescaba al
+    // montar el componente o al abrir/cerrar una conversacion, asi que un
+    // mensaje entrante no se veia hasta recargar la pagina.
+    async subscribeToPersonalChannel() {
+      if (!this.user?.id) return;
+
+      const echo = await getEcho();
+      if (!echo) return;
+
+      this.personalChannelName = `user.${this.user.id}`;
+      echo.private(this.personalChannelName)
+        .listen('.chat.updated', () => {
+          this.loadChats();
+        });
+    },
+
+    leavePersonalChannel() {
+      if (this.personalChannelName && window.Echo) {
+        window.Echo.leave(this.personalChannelName);
+        this.personalChannelName = null;
+      }
+    },
   },
   mounted() {
     this.loadChats();
+    this.subscribeToPersonalChannel();
   },
   beforeUnmount() {
     if (this.$refs.chatComponent && this.$refs.chatComponent.leaveChannels) {
       this.$refs.chatComponent.leaveChannels();
     }
-    document.body.classList.remove('chat-open');  
+    this.leavePersonalChannel();
+    document.body.classList.remove('chat-open');
   }
 };
 </script>

@@ -58,6 +58,7 @@
 
 <script>
 import axios from 'axios';
+import { getEcho } from '../echo';
 
 export default {
   props: ['activeChat', 'user'],
@@ -122,35 +123,11 @@ export default {
       this.setupChannels();
     },
 
+    // La inicializacion de Echo vive en resources/js/echo.js, compartida con
+    // ChatBubbleComponent: antes estaba duplicada en ambos, con el riesgo de
+    // que las dos copias se fueran separando.
     async loadEchoLibrary() {
-      if (window.Echo) return;
-
-      try {
-        const token = sessionStorage.getItem('token');
-        if (!token) throw new Error('Token not found');
-
-        // Importación dinámica
-        const { default: Echo } = await import('laravel-echo');
-        const { default: Pusher } = await import('pusher-js');
-
-        window.Pusher = Pusher;
-        window.Echo = new Echo({
-          broadcaster: 'pusher',
-          key: import.meta.env.VITE_PUSHER_APP_KEY,
-          cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-          forceTLS: true,
-          authEndpoint: '/api/broadcasting/auth',
-          auth: {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json'
-            }
-          }
-        });
-
-      } catch (error) {
-        console.error('Error inicializando Echo:', error);
-      }
+      await getEcho();
     },
 
 

@@ -2,46 +2,74 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\PrivateChannel;
+use App\Models\Message;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Chat;
 
-class NewChat implements ShouldBroadcast
+/**
+ * Avisa al DESTINATARIO de un mensaje, en su canal personal, que le llego algo
+ * nuevo. Se usa para que la burbuja de chats actualice la lista y el contador
+ * de no leidos aunque esa conversacion no este abierta.
+ *
+ * Correcciones respecto a la version anterior (que nunca funciono):
+ * - recipientUserId() devolvia $chat->trainer_id, que es el id de la tabla
+ *   'trainer', NO el id del usuario. El aviso se mandaba a un canal de otra
+ *   persona (o de nadie). Ahora resuelve el user_id real del entrenador.
+ * - Emitia a PrivateChannel('online.X'), pero ese canal esta declarado como
+ *   canal de presencia; nombres distintos, nadie escuchaba.
+ * - Usaba ShouldBroadcast (encolado) con QUEUE_CONNECTION=database y sin worker
+ *   corriendo, asi que el evento no se enviaba nunca. Ahora es ShouldBroadcastNow.
+ */
+class NewChat implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $message;
-    public $chat_id;
-    public $sender_id;
-
-    public function __construct($message)
+    public function __construct(public Message $message)
     {
-        $this->message = $message;
-        $this->chat_id = $message->chat_id;
-        $this->sender_id = $message->sender_id;
     }
 
     public function broadcastOn()
     {
-        return [
-            new PrivateChannel('online.' . $this->chat_id),
-            new PrivateChannel('user.' . $this->recipientId())
-        ];
+        $recipientId = $this->recipientUserId();
+
+        return $recipientId
+            ? [new PrivateChannel('user.' . $recipientId)]
+            : [];
     }
 
     public function broadcastAs()
     {
-        return 'NewMessage';
+        return 'chat.updated';
     }
 
-    public function recipientId()
+    public function broadcastWith()
     {
-        $chat = Chat::find($this->chat_id);
-        return $this->sender_id == $chat->user_id
-            ? $chat->trainer_id
+        return [
+            'chat_id'    => $this->message->chat_id,
+            'message'    => $this->message->message,
+            'sender_id'  => $this->message->sender_id,
+            'created_at' => optional($this->message->created_at)->toDateTimeString(),
+        ];
+    }
+
+    /**
+     * user_id del participante que NO envio el mensaje.
+     */
+    private function recipientUserId(): ?int
+    {
+        $chat = $this->message->chat()->with('trainer')->first();
+
+        if (!$chat) {
+            return null;
+        }
+
+        $trainerUserId = optional($chat->trainer)->user_id;
+
+        return (int) $this->message->sender_id === (int) $chat->user_id
+            ? $trainerUserId
             : $chat->user_id;
     }
 }

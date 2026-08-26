@@ -5,6 +5,15 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Chat;
 
 
+// Canal personal de cada usuario. Sirve para avisarle que le llego un mensaje
+// en CUALQUIERA de sus chats, aunque no lo tenga abierto (lo escucha la burbuja
+// de chats para actualizar la lista y el contador de no leidos en vivo).
+// Solo el propio dueño puede suscribirse.
+Broadcast::channel('user.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
+
+
 // Canal privado
 Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
     $chat = Chat::with(['user', 'trainer'])->find($chatId);

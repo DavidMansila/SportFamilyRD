@@ -4,29 +4,41 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\PersonalAccessToken;
 
+/**
+ * Respaldo para la autorizacion de canales privados de broadcasting.
+ *
+ * Normalmente auth:sanctum ya deja al usuario resuelto en el request antes de
+ * llegar aqui; este middleware solo actua si por alguna razon no fue asi.
+ *
+ * Antes hacia Auth::login($token->tokenable), pero el guard activo en una API
+ * es stateless (RequestGuard) y no tiene login(): eso lanzaba
+ * "Method Illuminate\Auth\RequestGuard::login does not exist", el middleware
+ * devolvia 500 y /api/broadcasting/auth fallaba SIEMPRE. Resultado: Echo nunca
+ * conseguia suscribirse al canal privado del chat y el tiempo real no
+ * funcionaba en ningun momento. setUser() es lo correcto aqui: asigna el
+ * usuario a la peticion sin tocar sesion.
+ */
 class BroadcastAuth
 {
     public function handle(Request $request, Closure $next)
     {
-        try {
-            $header = $request->header('Authorization');
-            Log::info('BroadcastAuth header', ['header' => $header]);
-            if ($header && preg_match('/Bearer\\s(.+)/', $header, $matches)) {
-                $token = PersonalAccessToken::findToken($matches[1]);
-                Log::info('BroadcastAuth token', ['token' => $token]);
-                if ($token) {
-                    Auth::login($token->tokenable);
-                    Log::info('BroadcastAuth user logged in', ['user' => Auth::user()]);
-                }
-            }
-        } catch (\Throwable $e) {
-            Log::error('BroadcastAuth error', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Broadcast auth error', 'error' => $e->getMessage()], 500);
+        if ($request->user()) {
+            return $next($request);
         }
+
+        $bearer = $request->bearerToken();
+
+        if ($bearer) {
+            $token = PersonalAccessToken::findToken($bearer);
+
+            if ($token && $token->tokenable) {
+                Auth::setUser($token->tokenable);
+            }
+        }
+
         return $next($request);
     }
 }

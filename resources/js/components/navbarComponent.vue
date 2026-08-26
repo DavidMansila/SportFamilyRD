@@ -164,6 +164,7 @@
 <script>
 import axios from 'axios';
 import CarritoComponent from './CarritoComponent.vue';
+import { teardownEcho } from '../echo';
 
 export default {
   components: {
@@ -269,6 +270,9 @@ export default {
         sessionStorage.removeItem('user');
         sessionStorage.removeItem('token');
         this.$store.dispatch('clearSectionCache');
+        // Cierra la conexion de tiempo real: si no, queda abierta y autenticada
+        // con el token del usuario que acaba de salir.
+        teardownEcho();
         this.user = null;
         this.user_type = '';
         this.showLogoutConfirm = false;
