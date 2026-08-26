@@ -36,4 +36,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'broadcast.auth' => \App\Http\Middleware\BroadcastAuth::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {})->create();
+    ->withExceptions(function (Exceptions $exceptions) {
+        // Todo lo que cuelga de /api debe responder JSON siempre, incluidos los
+        // errores. Sin esto, una peticion sin cabecera Accept que falle la
+        // autenticacion intenta redirigir a una ruta 'login' que no existe en
+        // esta API y termina en un 500 confuso en vez de un 401 limpio.
+        $exceptions->shouldRenderJsonWhen(
+            fn($request) => $request->is('api/*') || $request->expectsJson()
+        );
+    })->create();

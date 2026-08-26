@@ -11,7 +11,13 @@ return [
         env('APP_URL') ? ','.parse_url(env('APP_URL'), PHP_URL_HOST) : ''
     ))),
 
-    'guard' => ['web', 'sanctum'],
+    // NO agregar 'sanctum' a esta lista. Sanctum recorre estos guards para
+    // resolver al usuario; si se incluye a si mismo, se llama en bucle
+    // (sanctum -> sanctum -> ...) hasta desbordar la pila y matar el proceso
+    // de PHP (en Windows: status 3221225725 / 0xC0000409). Era la causa de
+    // que TODA ruta con auth:sanctum tumbara el servidor.
+    // 'web' es el valor por defecto de Laravel y el correcto.
+    'guard' => ['web'],
 
     'expiration' => null,
 

@@ -8,23 +8,18 @@ axios.defaults.baseURL = 'http://127.0.0.1:8080/api';
 // axios.defaults.baseURL = 'http://10.0.0.7:8000/api';
 // axios.defaults.baseURL = 'http://10.193.2.172:8000/api';
 
-// Limita cuantas peticiones a la API viajan al mismo tiempo.
+// Tope de peticiones a la API en vuelo al mismo tiempo.
 //
-// Causa (diagnosticada y aislada, NO es de esta app): en el entorno local de
-// Windows, la libreria libpq.dll que usa PHP para hablar con Postgres corrompe
-// memoria cuando varios hilos de Apache abren conexiones TLS a Supabase de
-// forma simultanea, y se lleva el proceso completo (0xC0000409). Se comprobo
-// que PHP y Apache aguantan 12+ peticiones concurrentes sin problema mientras
-// NO toquen la base de datos, asi que el limite aplica al numero de conexiones
-// TLS simultaneas, no a la carga en general.
+// Ya no es un parche: la causa de los crashes del servidor era una recursion
+// infinita en config/sanctum.php ('guard' se incluia a si mismo), que reventaba
+// la pila en cada peticion autenticada. Con eso corregido, el servidor aguanta
+// 10 peticiones concurrentes sin un solo fallo.
 //
-// Medido empiricamente contra los endpoints reales, en tandas de 10 peticiones
-// repetidas: con 4+ el proceso se cae siempre; con 3 se cayo 3 veces en 8
-// rondas; con 2 no se cayo ninguna vez. Por eso se usa 2.
-//
-// En un servidor Linux (produccion, WSL2 o Docker) este problema no existe y
-// el limite puede subirse o quitarse.
-const MAX_CONCURRENT_REQUESTS = 2;
+// Se mantiene un tope moderado a proposito: la base de datos es remota
+// (Supabase) y los navegadores de todas formas limitan a ~6 conexiones por
+// dominio, asi que 6 no frena nada y evita abrir rafagas innecesarias de
+// conexiones nuevas contra la BD.
+const MAX_CONCURRENT_REQUESTS = 6;
 let activeRequestCount = 0;
 const pendingRequestQueue = [];
 
