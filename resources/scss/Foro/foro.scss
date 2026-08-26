@@ -87,7 +87,7 @@
 
 .hero-btn {
     content: "";
-    background-color: #6a11cb;
+    background-color: var(--accent);
     color: white;
     font-weight: bold;
     padding: 15px;
@@ -104,7 +104,7 @@
 }
 
 .hero-btn:hover {
-    background-color: #6a11cb;
+    background-color: var(--accent-strong);
     transform: translateY(-3px) scale(1.02);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
@@ -311,7 +311,7 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .no-posts-btn {
     content: "";
-    background-color: #000000;
+    background-color: var(--accent);
     color: white;
     font-weight: bold;
     padding: 12px 30px;
@@ -324,7 +324,7 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .no-posts-btn:hover {
-    background-color: #6a11cb;
+    background-color: var(--accent-strong);
     transform: translateY(-3px) scale(1.02);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
@@ -340,7 +340,7 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
 
 /* ================= RESPONSIVE POPOUT PARA MÓVILES ================= */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   
   .comment-content {
     margin-left: 42px; /* Espacio para el avatar */
@@ -447,7 +447,7 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   /* Ocultamos el título en la sección de imagen */
   .post-popout-media .post-popout-body {
     display: none;

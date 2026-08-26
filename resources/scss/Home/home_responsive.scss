@@ -8,14 +8,14 @@
 }
 
 /* Laptops y pantallas medianas - 1440px-1599px */
-@media (max-width: 1599px) and (min-width: 1440px) {
+@media (max-width: 1599.98px) and (min-width: 1440px) {
     .hero-title {
         font-size: 3rem;
     }
 }
 
 /* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
-@media (max-width: 1439px) and (min-width: 1200px) {
+@media (max-width: 1439.98px) and (min-width: 1200px) {
     .nav-links {
         gap: 1.5rem;
     }
@@ -27,7 +27,7 @@
 }
 
 /* Tablets grandes - 1024px-1199px */
-@media (max-width: 1199px) and (min-width: 1024px) {
+@media (max-width: 1199.98px) and (min-width: 1024px) {
     .hero-banner {
         height: 70vh;
     }
@@ -37,12 +37,12 @@
     }
 
     .category-grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     }
 }
 
 /* Tablets en vertical - 768px-1023px */
-@media (max-width: 1023px) and (min-width: 768px) {
+@media (max-width: 1023.98px) and (min-width: 768px) {
     .hero-title {
         font-size: 2.5rem;
     }
@@ -67,7 +67,7 @@
 }
 
 /* Teléfonos grandes - 576px-767px */
-@media (max-width: 767px) and (min-width: 576px) {
+@media (max-width: 767.98px) and (min-width: 576px) {
     .hero-banner {
         height: 60vh;
         min-height: 400px;
@@ -91,7 +91,7 @@
 }
 
 /* Teléfonos medianos - 481px-575px */
-@media (max-width: 575px) and (min-width: 481px) {
+@media (max-width: 575.98px) and (min-width: 481px) {
     .hero-title {
         font-size: 2rem;
     }
@@ -147,7 +147,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .footer-content {
         grid-template-columns: 1fr;
     }

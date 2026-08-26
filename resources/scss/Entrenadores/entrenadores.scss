@@ -6,6 +6,7 @@
     background: var(--bg-light-);
     line-height: 1.6;
     min-height: 100vh;
+    min-height: 100dvh; /* alto real en moviles */
 }
 
 /* Hero Section - Versión mejorada */
@@ -241,7 +242,7 @@
 /* Tarjetas de Entrenadores */
 .trainers-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 2rem;
     padding: 0 2rem;
     max-width: 1280px;
@@ -422,7 +423,7 @@
 
 .schedule-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr));
     gap: 1rem;
 }
 
@@ -537,7 +538,7 @@ input:focus,
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
+@media (max-width: 1023.98px) {
     .hero-section {
         height: 480px;
     }
@@ -552,7 +553,7 @@ input:focus,
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .hero-section {
         height: 400px;
     }

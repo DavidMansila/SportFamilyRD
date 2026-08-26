@@ -6,31 +6,158 @@ $font-family-sans-serif: 'Nunito', sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
 
-//aqui creamos variables a usar, ejemplo color red
-:root,
-::after,
-::before {
-    // Background color variables
-    --bg-view: #F6F5FA;
-    --bg-white: #ffffff; 
-    --bg-secondary-white: #EFF0F6;
-    --bg-black-primary: #000000;
-    --bg-input: #f8f8f8;
-    --bg-shadow: #EEF2FF;
-    --polaris-color: #515def;
 
-    // Text color variables
-    --txt-white: #ffffff;
-    --txt-secondary-white: #d1d1d1;
-    --txt-black-primary: #000000;
-    --txt-black-secondary: #1f1f1f;
-    --txt-polaris-primary: #515def;
-    --txt-polaris-secondary: #64748B;
-    --txt-polaris-subtitle: #333B69;
+// ===========================================================================
+//  BREAKPOINTS
+//  Escala unica para todo el proyecto. Antes habia 35 anchos distintos, con
+//  pares que se pisaban por 1px (768/767, 1024/1023, 576/575, 1200/1199...).
+//  El .98 es a proposito: asi "hasta tablet" y "desde tablet" nunca se aplican
+//  a la vez en un ancho exacto de 768px (que es justo un iPad en vertical).
+// ===========================================================================
+$bp-sm: 576px;   // movil grande
+$bp-md: 768px;   // tablet
+$bp-lg: 992px;   // tablet horizontal / laptop pequeña
+$bp-xl: 1200px;  // escritorio
+$bp-xxl: 1400px; // escritorio grande
 
-    --txt-destructive: #c03a3a;
-    --txt-increase: #00B69B;
-    --txt-decrease: #FE5C73;
-    --txt-title-secundary: #343C6A;
+@mixin hasta($bp) {
+    @media (max-width: #{$bp - 0.02px}) { @content; }
 }
 
+@mixin desde($bp) {
+    @media (min-width: $bp) { @content; }
+}
+
+
+:root {
+    // =======================================================================
+    //  ACENTO POR SECCION
+    //
+    //  Cada seccion tiene su propio color, a proposito, y debe coincidir con
+    //  el degradado de SU navbar. Por eso el acento no es global: se declara
+    //  abajo por seccion y los componentes usan var(--accent), nunca un color
+    //  escrito a mano. Asi, si cambia el navbar de una seccion, basta con
+    //  actualizar su --accent aqui y todo lo demas la sigue.
+    //
+    //  --accent        color principal de la seccion (= el del navbar)
+    //  --accent-strong tono mas oscuro, para :hover
+    //  --accent-soft   version translucida, para sombras y anillos de foco
+    // =======================================================================
+    --accent: #a10013;
+    --accent-strong: #7a000e;
+    --accent-soft: rgba(161, 0, 19, 0.3);
+
+    // Grises (la escala que el proyecto ya venia usando de facto)
+    --gray-900: #1a202c;
+    --gray-800: #2d3748;
+    --gray-700: #4a5568;
+    --gray-500: #718096;
+    --gray-400: #a0aec0;
+    --gray-300: #cbd5e0;
+    --gray-200: #e2e8f0;
+    --gray-100: #f1f5f9;
+    --gray-50:  #f8fafc;
+
+    // Semanticos
+    --success: #2e7d32;
+    --danger:  #c03a3a;
+    --warning: #b7791f;
+    --info:    #2b6cb0;
+
+    // Superficies y texto
+    --surface:      #ffffff;
+    --surface-alt:  var(--gray-50);
+    --text-primary: var(--gray-900);
+    --text-muted:   var(--gray-500);
+    --border:       var(--gray-200);
+
+    // Espaciado (base 4px)
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-8: 3rem;
+
+    // Radios
+    --radius-sm:   8px;
+    --radius-md:   12px;
+    --radius-lg:   16px;
+    --radius-pill: 999px;
+
+    // Sombras
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+    // =======================================================================
+    //  Z-INDEX
+    //  Escala con nombre. Antes habia 18 valores sueltos que llegaban a 9999 y
+    //  10000, señal de que se fueron subiendo para ganar conflictos.
+    // =======================================================================
+    --z-base:     1;
+    --z-dropdown: 100;
+    --z-sticky:   200;
+    --z-navbar:   500;
+    --z-overlay:  1000;
+    --z-modal:    1100;
+    --z-toast:    1200;
+
+    // Foco visible para navegacion por teclado (toma el color de la seccion)
+    --focus-ring: 0 0 0 3px var(--accent-soft);
+}
+
+
+// ===========================================================================
+//  Acento de cada seccion, tomado del degradado de su propio navbar.
+//  Se aplica sobre el contenedor raiz de cada vista, asi que todo lo que hay
+//  dentro hereda el color correcto sin tocar nada mas.
+// ===========================================================================
+.home-container {           // navbar #a10013 rojo vino
+    --accent: #a10013;
+    --accent-strong: #7a000e;
+    --accent-soft: rgba(161, 0, 19, 0.3);
+}
+
+.foro-page {                // navbar #6a11cb violeta
+    --accent: #6a11cb;
+    --accent-strong: #530da0;
+    --accent-soft: rgba(106, 17, 203, 0.3);
+}
+
+.noticias-page {            // navbar #11217a azul profundo
+    --accent: #11217a;
+    --accent-strong: #0b1857;
+    --accent-soft: rgba(17, 33, 122, 0.3);
+}
+
+.app-container {            // Calendario, navbar #4e6b2e verde oscuro
+    --accent: #4e6b2e;
+    --accent-strong: #3a5122;
+    --accent-soft: rgba(78, 107, 46, 0.3);
+}
+
+.entrenadores-page {        // navbar #8a5f1f marron calido
+    --accent: #8a5f1f;
+    --accent-strong: #6b4a18;
+    --accent-soft: rgba(138, 95, 31, 0.3);
+}
+
+.tienda-page {              // navbar #46696f cyan apagado
+    --accent: #46696f;
+    --accent-strong: #345054;
+    --accent-soft: rgba(70, 105, 111, 0.3);
+}
+
+.profile-view {             // navbar #7d7420 mostaza
+    --accent: #7d7420;
+    --accent-strong: #5f5918;
+    --accent-soft: rgba(125, 116, 32, 0.3);
+}
+
+.sports-app {               // Directorio, navbar #a13300 naranja
+    --accent: #a13300;
+    --accent-strong: #7a2700;
+    --accent-soft: rgba(161, 51, 0, 0.3);
+}

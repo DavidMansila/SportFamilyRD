@@ -8,7 +8,7 @@
 /* Grid de Entrenadores con layout dinámico */
 .entrenadores-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
     gap: 2.5rem;
     margin-top: 3rem;
 }
@@ -288,9 +288,9 @@
 }
 
 /* Responsive Design Mejorado */
-@media (max-width: 1024px) {
+@media (max-width: 1023.98px) {
     .entrenadores-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
         gap: 2rem;
     }
 
@@ -299,13 +299,13 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .entrenadores-container {
         padding: 0 1.5rem;
     }
 
     .entrenadores-grid {
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
         gap: 1.8rem;
     }
 

@@ -1,7 +1,7 @@
 /* ------------------- PRODUCT GRID MODERNO ------------------- */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
     gap: 30px;
     max-width: 1400px;
     margin: 0 auto 40px;
@@ -209,7 +209,7 @@
 }
 
 /* ------------------- RESPONSIVE ------------------- */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .products-grid {
         grid-template-columns: 1fr;
         gap: 25px;

@@ -11,6 +11,7 @@
 .no-scroll {
     overflow: hidden;
     height: 100vh;
+    height: 100dvh; /* alto real en moviles */
 }
 .post-popout-overlay {
     position: fixed;
@@ -115,7 +116,7 @@
                 width: 40px;
                 height: 40px;
                 border-radius: 50%;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -673,7 +674,7 @@
 }
 
 /* ==================== DISEÑO RESPONSIVO ==================== */
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
     .post-popout-media {
         max-height: 40vh;
         flex: none;
@@ -703,7 +704,7 @@
     }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1023.98px) {
     .comments-container {
         max-height: 180px;
     }
@@ -951,7 +952,7 @@
 }
 
 /* Ajustes responsive */
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
     .post-comments-section {
         min-height: 50vh;
 
@@ -1201,7 +1202,7 @@
 }
 
 /* ==================== DISEÑO RESPONSIVO UNIFICADO ==================== */
-@media (max-width: 1600px) {
+@media (max-width: 1599.98px) {
     .post-popout-container {
         max-width: 95vw;
         border-radius: 20px;
@@ -1213,7 +1214,7 @@
 }
 
 /* Tablet (768px - 1024px) */
-@media (max-width: 1024px) {
+@media (max-width: 1023.98px) {
     .post-popout-container {
         max-height: 96vh;
         width: 96%;
@@ -1239,6 +1240,7 @@
         border-radius: 12px;
         width: 100%;
         height: 100vh;
+        height: 100dvh; /* alto real en moviles */
         max-height: 100dvh;
     }
 
@@ -1367,7 +1369,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .post-interactions {
         border-top: 1px solid rgba(0, 0, 0, 0.05);
         display: flex;

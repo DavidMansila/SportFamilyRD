@@ -312,7 +312,7 @@
 
 .product-meta {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
     gap: 25px;
     background: rgba(250, 250, 250, 0.8);
     padding: 30px;
@@ -348,14 +348,14 @@
 }
 
 /* ------------------- RESPONSIVE------------------- */
-@media (max-width: 1200px) {
+@media (max-width: 1199.98px) {
     .modal-grid {
         gap: 30px;
         padding: 25px;
     }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 991.98px) {
     .modal-grid {
         grid-template-columns: 1fr;
     }
@@ -369,7 +369,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .modal-content {
         padding: 20px; /* Reducido de 25px */
     }
@@ -384,7 +384,7 @@
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 575.98px) {
     .modal-content {
         width: 95%;
         padding: 20px;
@@ -414,7 +414,7 @@
 }
 
 /* ------------------- BREAKPOINTS MEJORADOS ------------------- */
-@media (max-width: 1600px) {
+@media (max-width: 1599.98px) {
     .modal-content {
         max-width: 750px;
     }
@@ -435,7 +435,7 @@
     }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1199.98px) {
     .modal-content {
         max-width: 90%;
         padding: 25px;
@@ -446,7 +446,7 @@
     }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 991.98px) {
     .modal-content {
         max-height: 90vh;
     }
@@ -481,7 +481,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .modal-content {
         padding: 20px;
         border-radius: 15px;
@@ -546,7 +546,7 @@
 }
 
 
-@media (max-width: 640px) {
+@media (max-width: 639.98px) {
     .product-title {
         font-size: 1.5rem;
     }
@@ -696,7 +696,7 @@
 }
 
 /* ------------------- ORIENTACIÓN HORIZONTAL ------------------- */
-@media (max-width: 992px) and (orientation: landscape) {
+@media (max-width: 991.98px) and (orientation: landscape) {
     .modal-content {
         max-height: 95vh;
     }
@@ -732,10 +732,11 @@
 
 
 /* ------------------- MODAL RESPONSIVE PARA MÓVILES ------------------- */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .modal-content {
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* alto real en moviles */
     max-width: 100%;
     max-height: 100%;
     border-radius: 0;
@@ -876,7 +877,7 @@
 }
 
 /* ------------------- ORIENTACIÓN HORIZONTAL ------------------- */
-@media (max-width: 768px) and (orientation: landscape) {
+@media (max-width: 767.98px) and (orientation: landscape) {
   .modal-grid {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
@@ -884,11 +885,13 @@
   
   .modal-images {
     max-height: 100vh;
+    max-height: 100dvh; /* alto real en moviles */
     min-height: auto;
   }
   
   .modal-details {
     max-height: 100vh;
+    max-height: 100dvh; /* alto real en moviles */
     overflow-y: auto;
   }
 }

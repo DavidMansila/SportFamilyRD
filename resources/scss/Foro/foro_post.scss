@@ -4,108 +4,153 @@
 
 .posts-grid {
     max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
+    margin: 0 auto var(--space-8);
+    padding: 0 var(--space-6);
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 2.5rem;
-    margin-bottom: 4rem;
+    /* auto-fit + min() = las columnas se reparten solas y nunca desbordan,
+       asi que la grilla fluye entre movil, tablet y escritorio sin necesitar
+       un breakpoint por cada tamaño. */
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+    gap: var(--space-6);
+    /* Cada tarjeta mide lo que necesita su contenido. Con 'stretch' (lo que
+       hace la grilla por defecto), una tarjeta con imagen estiraba a todas las
+       de su fila y dejaba un hueco vacio enorme en las que solo tienen texto. */
+    align-items: start;
 
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 0 1.5rem;
+    @media (max-width: 991.98px) {
+        gap: var(--space-5);
+        padding: 0 var(--space-5);
+    }
+
+    @media (max-width: 575.98px) {
+        gap: var(--space-4);
+        padding: 0 var(--space-4);
     }
 }
 
 .post-card {
-    background-color: white;
-    border-radius: 16px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     position: relative;
     display: flex;
     flex-direction: column;
-    height: 100%;
 
     &:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent);
 
         .post-image {
-            transform: scale(1.03);
-        }
-
-        .post-categoria {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .post-stats {
-            color: #4a5568;
+            transform: scale(1.04);
         }
 
         .post-titulo {
-            color: #6a11cb;
+            color: var(--accent-strong);
+        }
+    }
+
+    /* Quien navegue con teclado tiene que ver donde esta parado */
+    &:focus-within {
+        border-color: var(--accent);
+        box-shadow: var(--focus-ring);
+    }
+
+    /* Respeta a quien pidio menos animacion en su sistema */
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+
+        &:hover {
+            transform: none;
         }
     }
 }
 
-.post-categoria {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.4rem 1.2rem;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: white;
-    background-color: hsl(var(--hue), 80%, 60%);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 2;
-    transition: all 0.3s ease;
-}
-
-.post-header {
-    padding: 1.5rem 1.5rem 0.5rem;
-}
-
-.post-titulo {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 0.8rem;
-    color: #1a202c;
-    line-height: 1.4;
-    transition: color 0.3s ease;
-    padding: 10px;
-}
+/* .post-categoria, .post-header y .post-titulo se definen mas abajo, en su
+   version definitiva (con recorte a 2 lineas). Antes estaban tambien aqui,
+   duplicados y sin efecto porque la version de abajo los sobrescribia. */
 
 .post-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 0.85rem;
-    color: #718096;
+    color: var(--text-muted);
     margin-bottom: 1.2rem;
 }
 
 .post-contenido {
-    padding: 10px;
-    color: #4a5568;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
+    padding: 0 var(--space-5);
+    color: var(--gray-700);
+    line-height: 1.65;
+    margin-bottom: var(--space-4);
     font-size: 0.95rem;
+
+    /* Recorte a 3 lineas hecho por CSS: se adapta al ancho de la tarjeta y
+       corta con puntos suspensivos donde toca, sin partir palabras. */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ---- Autor de la publicacion ---- */
+.post-autor {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0 var(--space-5) var(--space-4);
+    /* Sin 'margin-top: auto': ahora la tarjeta mide lo que ocupa su contenido,
+       asi que empujar el autor hacia abajo solo generaria el hueco que
+       queriamos quitar. Va justo despues del texto. */
+}
+
+.post-autor-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    background-color: var(--gray-100);
+}
+
+.post-autor-datos {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* permite que el nombre largo se recorte en vez de desbordar */
+    line-height: 1.3;
+}
+
+.post-author {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.post-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
 }
 
 .post-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.5rem;
-    margin-top: auto;
-    border-top: 1px solid #edf2f7;
-    background-color: #f9fafc;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--border);
+    background-color: var(--surface-alt);
+    /* En pantallas muy estrechas, estadisticas y boton se apilan en vez de
+       apretarse o desbordar. */
+    flex-wrap: wrap;
 }
 
 .post-stats {
@@ -120,6 +165,10 @@
         gap: 5px;
         cursor: pointer;
         transition: all 0.2s ease;
+        /* Los "me gusta" y comentarios son botones de hecho: necesitan un area
+           tactil comoda en movil, no solo el tamaño del texto. */
+        min-height: 40px;
+        padding: 0 var(--space-1);
 
         &:hover {
             opacity: 0.8;
@@ -128,6 +177,11 @@
                 transform: scale(1.1);
             }
         }
+    }
+
+    .liked svg {
+        fill: var(--danger);
+        stroke: var(--danger);
     }
 
     .post-likes:hover svg {
@@ -148,9 +202,15 @@
 
 .post-imagen {
     width: 100%;
-    height: 240px;
+    /* aspect-ratio en vez de alto fijo: la imagen mantiene proporcion en
+       cualquier ancho de tarjeta en vez de recortarse distinto segun pantalla.
+       21/9 (formato banner) en vez de 16/10 para que una tarjeta con foto no
+       sea tanto mas alta que las que solo tienen texto. */
+    aspect-ratio: 21 / 9;
+    height: auto;
     overflow: hidden;
     position: relative;
+    background-color: var(--gray-100);
 
     &::after {
         content: "";
@@ -181,17 +241,21 @@
 
 .btn-leer {
     background-color: transparent;
-    color: #6a11cb;
-    border: 2px solid #6a11cb;
+    color: var(--accent-strong);
+    border: 2px solid var(--accent);
     padding: 0.5rem 1.2rem;
-    border-radius: 50px;
+    border-radius: var(--radius-pill);
     font-weight: 600;
     font-size: 0.9rem;
     text-decoration: none;
-    transition: all 0.3s ease;
+    cursor: pointer;
+    transition: all 0.25s ease;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    /* Area tactil comoda en movil (recomendacion: 44px minimo) */
+    min-height: 40px;
+    white-space: nowrap;
 
     svg {
         width: 16px;
@@ -200,14 +264,19 @@
     }
 
     &:hover {
-        background-color: #6a11cb;
-        color: white;
-        box-shadow: 0 4px 12px rgba(106, 17, 203, 0.3);
+        background-color: var(--accent);
+        color: #fff;
+        box-shadow: 0 4px 12px var(--accent-soft);
 
         svg {
             transform: translateX(3px);
-            stroke: white;
+            stroke: #fff;
         }
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: var(--focus-ring);
     }
 }
 
@@ -307,7 +376,7 @@
 }
 
 /* Para pantallas pequeñas */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .post-header-container {
         padding-right: 90px;
     }

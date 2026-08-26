@@ -493,7 +493,7 @@
 }
 
 /* Tablets en horizontal y pantallas pequeñas (entre 768px y 1024px) */
-@media (max-width: 1024px) {
+@media (max-width: 1023.98px) {
     .modal-container {
         max-width: 90%;
     }
@@ -505,7 +505,7 @@
 }
 
 /* Tablets en vertical y móviles grandes (entre 600px y 768px) */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .modal-header {
         padding: 18px 22px;
     }

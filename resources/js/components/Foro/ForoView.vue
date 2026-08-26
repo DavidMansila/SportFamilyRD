@@ -81,22 +81,27 @@
             {{ post.categoria || 'General' }}
           </div>
           <div class="post-header">
-            <div>
-              <h3 class="post-titulo">{{ post.titulo }}</h3>
-              <div class="post-meta">
-                <span class="post-author">{{ post.user?.name || `Usuario${post.user_id}` }}</span>
-                <span class="post-date">{{ formatDate(post.created_at) }}</span>
-              </div>
-            </div>
+            <h3 class="post-titulo">{{ post.titulo }}</h3>
           </div>
         </div>
 
-        <div class="post-imagen">
-          <img :src="post.imagen" alt="Imagen del post" class="post-image" loading="lazy" @load="onImageLoad(post.id)"
-            :class="{ loaded: imageLoaded[post.id] }" />
+        <div class="post-imagen" v-if="tieneImagen(post)">
+          <img :src="post.imagen" :alt="`Imagen de: ${post.titulo}`" class="post-image" loading="lazy"
+            @load="onImageLoad(post.id)" :class="{ loaded: imageLoaded[post.id] }" />
         </div>
 
-        <p class="post-contenido">{{ post.contenido.substring(0, 150) }}...</p>
+        <!-- El recorte del texto lo hace el CSS (line-clamp), no JavaScript:
+             asi se adapta al ancho real de la tarjeta y no corta a mitad de
+             palabra como hacia el substring(0,150) anterior. -->
+        <p class="post-contenido">{{ post.contenido }}</p>
+
+        <div class="post-autor">
+          <img :src="getUserImage(post.user)" class="post-autor-avatar" alt="" loading="lazy" />
+          <div class="post-autor-datos">
+            <span class="post-author">{{ post.user?.name || `Usuario${post.user_id}` }}</span>
+            <span class="post-date">{{ formatDate(post.created_at) }}</span>
+          </div>
+        </div>
 
         <div class="post-footer">
           <div class="post-stats">
@@ -1391,6 +1396,13 @@ export default {
       this.nuevoComentario = '';
     },
 
+
+    // El backend siempre devuelve una URL de imagen: si el post no tiene una,
+    // manda un "no_image.png" de relleno. Eso dejaba un recuadro gris feo en
+    // las tarjetas sin foto; aqui lo detectamos para no pintar nada.
+    tieneImagen(post) {
+      return !!post.imagen && !String(post.imagen).includes('no_image');
+    },
 
     getUserImage(user) {
       if (!user) {

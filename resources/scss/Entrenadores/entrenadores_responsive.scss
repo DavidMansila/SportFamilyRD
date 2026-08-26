@@ -11,29 +11,29 @@
     }
 
     .entrenadores-grid {
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(350px, 100%), 1fr));
         gap: 2.5rem;
     }
 }
 
 /* Laptops y pantallas medianas - 1440px-1599px */
-@media (max-width: 1599px) and (min-width: 1440px) {
+@media (max-width: 1599.98px) and (min-width: 1440px) {
     .entrenadores-grid {
         gap: 2rem;
     }
 }
 
 /* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
-@media (max-width: 1439px) and (min-width: 1200px) {
+@media (max-width: 1439.98px) and (min-width: 1200px) {
     .filter-tabs {
         gap: 0.75rem;
     }
 }
 
 /* Tablets grandes - 1024px-1199px */
-@media (max-width: 1199px) and (min-width: 1024px) {
+@media (max-width: 1199.98px) and (min-width: 1024px) {
     .entrenadores-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     }
 
     .modal-content {
@@ -42,7 +42,7 @@
 }
 
 /* Tablets en vertical - 768px-1023px */
-@media (max-width: 1023px) and (min-width: 768px) {
+@media (max-width: 1023.98px) and (min-width: 768px) {
     .hero-section {
         height: 350px;
     }
@@ -52,7 +52,7 @@
     }
 
     .entrenadores-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
     }
 
     .filter-tabs {
@@ -73,7 +73,7 @@
 }
 
 /* Corrección del espaciado y desajustes */
-@media (max-width: 992px) {
+@media (max-width: 991.98px) {
     .entrenadores-page {
         overflow-x: hidden; /* Prevenir overflow horizontal */
     }
@@ -98,7 +98,7 @@
 }
 
 /* Corrección del espaciado derecho y etiquetas de deporte */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .entrenadores-page {
         padding-bottom: 20px;
         overflow-x: hidden; /* Asegurar que no hay scroll horizontal */
@@ -334,7 +334,7 @@
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 575.98px) {
     .hero-section {
         height: 220px;
 
@@ -481,7 +481,7 @@ textarea {
   }
 
   /* Ajustes específicos para pantallas pequeñas */
-  @media (max-width: 768px) {
+  @media (max-width: 767.98px) {
     .profile-info {
       .user-details {
         padding: 15px;
@@ -513,7 +513,7 @@ textarea {
 /* ... (otros estilos responsive) ... */
 
 // Media queries para ajustes en pantallas pequeñas
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   // Estilos base para el contenedor de contacto
   .contact-modal {
     position: fixed;
@@ -539,7 +539,7 @@ textarea {
       flex-direction: column;
       max-height: 70vh;
 
-      @media (max-width: 768px) {
+      @media (max-width: 767.98px) {
         min-height: 80vh;
         padding: 20px;
       }

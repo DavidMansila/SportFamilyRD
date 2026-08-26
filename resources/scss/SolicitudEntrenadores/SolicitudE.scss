@@ -1,6 +1,7 @@
 /* ESTILOS GENERALES */
 .page-container {
     min-height: 100vh;
+    min-height: 100dvh; /* alto real en moviles */
     background: #f8f9fa;
     display: flex;
     flex-direction: column;
@@ -75,7 +76,7 @@
 .solicitudes-grid {
     display: grid;
     gap: 2rem;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
 }
 
 /* TARJETAS */
@@ -304,7 +305,7 @@
 }
 
 /* RESPONSIVE */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .page-header {
         flex-direction: column;
         gap: 1.5rem;

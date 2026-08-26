@@ -119,7 +119,7 @@
 
 .sports-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
     gap: 30px;
     margin-bottom: 60px;
     padding: 0 20px;
@@ -269,7 +269,7 @@
 .places-container,
 .events-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     gap: 25px;
     margin-top: 20px;
 }
@@ -377,13 +377,13 @@
     }
 
     .sports-list {
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(350px, 100%), 1fr));
         gap: 40px;
     }
 }
 
 /* Laptops y pantallas medianas - 1440px-1599px */
-@media (max-width: 1599px) and (min-width: 1440px) {
+@media (max-width: 1599.98px) and (min-width: 1440px) {
 
     .header-image {
         height: 450px;
@@ -394,13 +394,13 @@
     }
 
     .sports-list {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
         gap: 35px;
     }
 }
 
 /* Tablets en horizontal y laptops pequeñas - 1200px-1439px */
-@media (max-width: 1439px) and (min-width: 1200px) {
+@media (max-width: 1439.98px) and (min-width: 1200px) {
 
     .header-image {
         height: 400px;
@@ -411,13 +411,13 @@
     }
 
     .sports-list {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
         gap: 30px;
     }
 }
 
 /* Tablets grandes - 1024px-1199px */
-@media (max-width: 1199px) and (min-width: 1024px) {
+@media (max-width: 1199.98px) and (min-width: 1024px) {
 
     .header-image {
         height: 380px;
@@ -428,7 +428,7 @@
     }
 
     .sports-list {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
         gap: 25px;
     }
 
@@ -438,7 +438,7 @@
 }
 
 /* Tablets en vertical - 768px-1023px */
-@media (max-width: 1023px) and (min-width: 768px) {
+@media (max-width: 1023.98px) and (min-width: 768px) {
 
     .logo {
         width: 180px;
@@ -479,7 +479,7 @@
 }
 
 /* Teléfonos grandes - 576px-767px */
-@media (max-width: 767px) and (min-width: 576px) {
+@media (max-width: 767.98px) and (min-width: 576px) {
 
     .header-image {
         height: 300px;
@@ -519,7 +519,7 @@
 }
 
 /* Teléfonos medianos - 481px-575px */
-@media (max-width: 575px) and (min-width: 481px) {
+@media (max-width: 575.98px) and (min-width: 481px) {
 
     .header-image {
         height: 280px;

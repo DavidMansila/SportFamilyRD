@@ -3,38 +3,11 @@
     color: #333;
 }
 
-/* Hero Banner */
-.hero-banner {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)),
-        url("/imagenes/estadio.jpg");
-    background-size: cover;
-    background-position: center;
-    height: 80vh;
-    min-height: 500px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: white;
-    padding: 0 20px;
-}
-
-.hero-content {
-    max-width: 800px;
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.hero-subtitle {
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-}
+/* Hero Banner
+   Antes esto estaba dividido en dos bloques .hero-banner separados en el
+   archivo, con alturas en conflicto (80vh y 100vh). Funcionaba de casualidad:
+   la 2da ganaba la altura pero la imagen de fondo solo existia en la 1ra.
+   Ahora es una sola definicion con el resultado real que se veia. */
 
 .hero-cta {
     display: flex;
@@ -61,8 +34,14 @@
 /* Hero Section */
 .hero-banner {
   position: relative;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)),
+    url("/imagenes/estadio.jpg");
+  background-size: cover;
+  background-position: center;
   height: 100vh;
+  height: 100dvh; /* alto real en moviles */
   min-height: 600px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,6 +80,7 @@
   font-weight: 800;
   margin-bottom: 1rem;
   line-height: 1.2;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .title-line {
@@ -116,6 +96,7 @@
   font-size: 1.5rem;
   margin-bottom: 2rem;
   opacity: 0.9;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 
@@ -249,7 +230,7 @@
 /* Category Cards */
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto;
@@ -618,20 +599,8 @@
   gap: 10px;
 }
 
-.share-button {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  border: none;
-  background: #f1f1f1;
-  color: #555;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.share-button:hover {
-  transform: translateY(-3px);
-}
+/* .share-button y .share-button:hover se definen una sola vez mas abajo
+   (antes estaban duplicados aqui y alli, con colores distintos). */
 
 .share-button:nth-child(1):hover {
   background: #3b5998;
@@ -650,7 +619,7 @@
 
 .news-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 20px;
 }
 
@@ -693,7 +662,7 @@
 
 .secondary-news {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
   gap: 15px;
 }
 
@@ -728,7 +697,7 @@
 }
 
 /* Responsive */
-@media (max-width: 992px) {
+@media (max-width: 991.98px) {
   .featured-news {
     grid-template-columns: 1fr;
   }
@@ -738,7 +707,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .news-tabs {
     justify-content: flex-start;
     overflow-x: auto;
@@ -754,7 +723,7 @@
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 575.98px) {
   .news-meta {
     flex-direction: column;
     gap: 5px;
@@ -978,6 +947,7 @@
 
 .share-button:hover {
   background: #e9ecef;
+  transform: translateY(-3px);
 }
 
 .map-view {
@@ -1107,7 +1077,7 @@
 
 .products-carousel {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
   gap: 30px;
   max-width: 1200px;
   margin: 40px auto 0;
@@ -2019,7 +1989,7 @@
 }
 
 /* Responsive Styles */
-@media (max-width: 1200px) {
+@media (max-width: 1199.98px) {
   .hero-title {
     font-size: 3.5rem;
   }
@@ -2033,7 +2003,7 @@
   }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 991.98px) {
   .events-container {
     grid-template-columns: 1fr;
   }
@@ -2051,7 +2021,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .hero-title {
     font-size: 2.8rem;
   }
@@ -2092,7 +2062,7 @@
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 575.98px) {
   .hero-title {
     font-size: 2.2rem;
   }

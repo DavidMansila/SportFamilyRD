@@ -148,7 +148,7 @@
 /* ------------------- CUADRÍCULA DE NOTICIAS ------------------ */
 .news-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
     gap: 25px;
     margin-bottom: 40px;
 }
@@ -446,7 +446,7 @@
 }
 
 /* ------------------- RESPONSIVE MEJORADO ------------------ */
-@media (max-width: 1024px) {
+@media (max-width: 1023.98px) {
     .header-section {
         padding-top: 15px;
 
@@ -460,7 +460,7 @@
     }
 
     .news-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
         gap: 20px;
     }
 
@@ -482,7 +482,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .container {
         padding: 0 15px;
     }
