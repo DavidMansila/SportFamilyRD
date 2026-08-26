@@ -78,7 +78,10 @@
         overflow: hidden;
         flex: 1;
 
-        .post-popout-image {
+        // El <img> real no lleva la clase "post-popout-image" (ese selector
+        // nunca matcheaba nada), asi que la imagen se estaba mostrando sin
+        // ningun limite de tamaño ni encuadre.
+        img {
             max-width: 100%;
             max-height: 70vh;
             object-fit: contain;
@@ -674,36 +677,6 @@
 }
 
 /* ==================== DISEÑO RESPONSIVO ==================== */
-@media (max-width: 767.98px) {
-    .post-popout-media {
-        max-height: 40vh;
-        flex: none;
-    }
-
-    .post-popout-details {
-        flex: 1;
-        overflow-y: auto;
-    }
-
-    .post-popout-header {
-        padding: 15px;
-        position: static;
-    }
-
-    .comments-container {
-        max-height: 150px;
-    }
-
-    .comment-input {
-        padding: 10px 14px;
-    }
-
-    .interaction-btn {
-        padding: 8px 15px;
-        font-size: 13px;
-    }
-}
-
 @media (min-width: 768px) and (max-width: 1023.98px) {
     .comments-container {
         max-height: 180px;
@@ -713,26 +686,6 @@
 @media (min-width: 1024px) {
     .post-popout-content {
         flex-direction: row;
-    }
-}
-
-@media (max-width: 400px) {
-    .post-popout-header {
-        padding: 12px;
-    }
-
-    .author-avatar-wrapper {
-        width: 32px;
-        height: 32px;
-    }
-
-    .post-popout-title {
-        font-size: 16px;
-    }
-
-    .submit-comment-btn {
-        width: 36px;
-        height: 36px;
     }
 }
 
@@ -1234,74 +1187,6 @@
     }
 }
 
-/* Móviles pequeños (hasta 480px) */
-@media (max-width: 480px) {
-    .post-popout-container {
-        border-radius: 12px;
-        width: 100%;
-        height: 100vh;
-        height: 100dvh; /* alto real en moviles */
-        max-height: 100dvh;
-    }
-
-    .post-popout-media {
-        max-height: 35svh;
-        min-height: 25svh;
-
-        .post-popout-image {
-            max-height: 30svh;
-        }
-    }
-
-    .post-popout-header {
-        padding: 0.75rem;
-
-        .post-author-info {
-            gap: 0.5rem;
-
-            .post-category-badge {
-                font-size: 0.7rem;
-            }
-        }
-    }
-
-    .post-popout-body .post-meta-info {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .comment-item {
-        flex-direction: column;
-        margin-bottom: 0.75rem;
-
-        .comment-replies {
-            margin-left: 1rem;
-            padding-left: 0.5rem;
-        }
-    }
-
-    .add-comment-form {
-        padding: 0.75rem 1rem;
-
-        .comment-input {
-            padding: 0.75rem 1rem;
-            font-size: clamp(0.8rem, 3.5vw, 0.9rem);
-        }
-
-        .submit-comment-btn {
-            width: 36px;
-            height: 36px;
-        }
-    }
-
-    .floating-btn {
-        bottom: 1rem;
-        right: 1rem;
-        width: 48px;
-        height: 48px;
-    }
-}
-
 /* Modo landscape móvil (horizontal) */
 @media (max-width: 850px) and (orientation: landscape) {
     .post-popout-container {
@@ -1369,62 +1254,194 @@
     }
 }
 
+/* ==================== MÓVIL: HOJA A PANTALLA COMPLETA, UN SOLO SCROLL ====================
+   Antes esto estaba repartido en 4 media queries distintas que se pisaban
+   entre si (algunas con !important, otras sin), resultando en dos paneles
+   con scroll propio (el modal Y la caja de comentarios) peleando por el
+   gesto de touch, ademas de un titulo que quedaba enterrado dentro de la
+   columna de la imagen. Con el titulo ya movido a .post-popout-details (ver
+   el template), aqui solo queda: la imagen arriba (si existe), y TODO lo
+   demas fluyendo en un unico scroll dentro de .post-popout-details. */
 @media (max-width: 767.98px) {
-    .post-interactions {
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
-        display: flex;
-        justify-content: center;
-        flex-shrink: 0;
-        position: relative;
-        padding: 12px 15px; /* Reducimos el padding */
-        gap: 15px; /* Reducimos el espacio entre botones */
+    .post-popout-overlay {
+        padding: 0;
+    }
 
-        .interaction-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            color: #333;
-            font-size: 14px;
-            padding: 8px 15px; /* Padding más compacto */
-            font-size: 13px; /* Texto ligeramente más pequeño */
-            flex: 1; /* Los botones ocupan todo el espacio disponible */
-            min-width: 120px; /* Ancho mínimo para mantener la forma */
-            justify-content: center; /* Centramos el contenido */
+    .post-popout-container {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+    }
 
-            .interaction-btn svg {
-                width: 16px;
-                height: 16px;
-            }
+    .post-popout-content {
+        flex-direction: column;
+    }
 
-            &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            }
+    .post-popout-media {
+        flex: none;
+        min-height: 0;
+        max-height: 32svh;
+        padding: 0;
 
-            &.like-btn.liked {
-                color: #ff4757;
-                svg {
-                    fill: #ff4757;
-                }
-            }
+        .image-container {
+            padding: 0;
 
-            &.comment-btn:hover {
-                color: #3498db;
-            }
-
-            svg {
-                width: 18px;
-                height: 18px;
-                transition: all 0.3s ease;
+            img {
+                max-height: 32svh;
+                border-radius: 0;
             }
         }
+    }
+
+    // Unico scroll del modal en movil: el header queda pegado arriba y el
+    // formulario de comentar pegado abajo, todo lo del medio (titulo, texto,
+    // interacciones, comentarios) fluye junto sin cajas de scroll anidadas.
+    // padding-bottom deja espacio para que el ultimo comentario no quede
+    // tapado detras de .add-comment-form, que ahora es position:fixed (ver
+    // mas abajo) y por lo tanto ya no ocupa espacio real en este flujo.
+    .post-popout-details {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .post-popout-header {
+        position: sticky;
+        top: 0;
+        padding: 0.75rem 1rem;
+
+        .post-author-info {
+            gap: 0.5rem;
+            min-width: 0; // deja que .author-name se pueda truncar en vez de empujar todo
+
+            > div {
+                min-width: 0;
+                overflow: hidden;
+            }
+
+            .author-name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .post-category-badge {
+            flex-shrink: 0;
+            padding: 6px 10px;
+            font-size: 0.65rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 34vw;
+        }
+    }
+
+    .post-popout-body {
+        padding: 1rem;
+
+        .post-popout-title {
+            font-size: 1.15rem;
+        }
+
+        .post-meta-info {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+    }
+
+    .post-interactions {
+        padding: 10px 1rem;
+        gap: 10px;
+
+        .interaction-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+    }
+
+    // Ya no tienen su propio scroll/alto minimo: fluyen dentro del scroll
+    // unico de .post-popout-details.
+    .post-comments-section {
+        min-height: 0;
+        overflow: visible;
+        padding-top: 0.5rem;
+    }
+
+    .comments-container {
+        max-height: none !important;
+        min-height: 0;
+        overflow: visible;
+        padding: 0.5rem 1rem;
+    }
+
+    .comment-item {
+        flex-direction: column;
+        margin-bottom: 0.75rem;
+
+        .comment-replies {
+            margin-left: 1rem;
+            padding-left: 0.5rem;
+        }
+    }
+
+    // position:fixed en vez de sticky: sticky depende de que el contenedor
+    // con scroll no tenga nada raro en su cadena de ancestros, y en la
+    // practica (sobre todo con el teclado del telefono abriendo/cerrando)
+    // terminaba sin quedar pegado, obligando a bajar para encontrar donde
+    // escribir. Fixed lo ancla siempre al borde inferior de la pantalla,
+    // como cualquier barra de chat (WhatsApp, Messenger, etc.).
+    .add-comment-form {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.75rem 1rem;
+        padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+        z-index: 5;
+
+        .comment-input {
+            padding: 0.75rem 1rem;
+            font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+        }
+
+        .submit-comment-btn {
+            width: 36px;
+            height: 36px;
+        }
+    }
+
+    .floating-btn {
+        bottom: 1rem;
+        right: 1rem;
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@media (max-width: 400px) {
+    .post-popout-header {
+        padding: 0.6rem 0.85rem;
+    }
+
+    .author-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .post-popout-body .post-popout-title {
+        font-size: 1.05rem;
+    }
+
+    .submit-comment-btn {
+        width: 36px;
+        height: 36px;
     }
 }
 

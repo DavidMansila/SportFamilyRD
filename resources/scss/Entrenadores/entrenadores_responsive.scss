@@ -200,62 +200,16 @@
         box-sizing: border-box;
     }
 
-    .entrenadores-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-
-        .entrenador-card {
-            flex-direction: column;
-            overflow: hidden;
-            box-sizing: border-box;
-
-            .card-image-container {
-                width: 100%;
-                height: 140px;
-                position: relative;
-
-                .deporte-tag {
-                    top: 10px;
-                    left: 10px;
-                    padding: 5px 10px; /* Reducir padding */
-                    font-size: 12px; /* Tamaño más pequeño */
-                    border-radius: 4px; /* Bordes más suaves */
-                    max-height: 13%; /* Limitar ancho */
-                    white-space: nowrap; /* Evitar salto de línea */
-                    overflow: hidden; /* Ocultar texto que exceda el ancho */
-                    text-overflow: ellipsis; /* Mostrar puntos suspensivos */
-                    position: absolute;
-                }
-            }
-
-            .card-content {
-                width: 100%;
-                padding: 12px;
-                box-sizing: border-box;
-
-                .card-header {
-                    flex-direction: column;
-                    align-items: flex-start;
-
-                    h3 {
-                        margin-bottom: 6px;
-                        font-size: 1.2rem;
-                    }
-                }
-
-                .testimonio {
-                    margin: 10px 0;
-                    font-size: 13px;
-                    line-height: 1.4; /* Mejor espaciado */
-                }
-
-                .contact-btn {
-                    width: 100%;
-                    padding: 9px;
-                    font-size: 13px;
-                }
-            }
-        }
+    /* El grid de 2 columnas (con el tamaño de tarjeta compacto para movil)
+       vive en entrenadores_grid.scss, importado antes que este archivo. Aqui
+       antes se revertia a 1 columna con flex-direction:column, que es
+       exactamente lo contrario de lo que hace falta: 10+ entrenadores en 1
+       columna es un scroll interminable en telefonos. Solo el contenedor de
+       la tarjeta necesita overflow:hidden para que el badge de deporte no se
+       salga del borde redondeado. */
+    .entrenador-card {
+        overflow: hidden;
+        box-sizing: border-box;
     }
 
     /* Modales */
@@ -345,12 +299,6 @@
         }
     }
 
-    .entrenador-card {
-        .card-image-container {
-            height: 140px;
-        }
-    }
-
     /* Ajuste adicional para etiquetas de deporte */
     .deporte-tag {
         font-size: 11px !important;
@@ -376,10 +324,6 @@
     }
 
     .entrenador-card {
-        .card-image-container {
-            height: 140px;
-        }
-
         /* Reducir aún más la etiqueta de deporte */
         .deporte-tag {
             font-size: 10px !important;

@@ -319,38 +319,82 @@
 
 @media (max-width: 767.98px) {
     .entrenadores-container {
-        padding: 0 1.5rem;
+        padding: 0 0.75rem;
     }
 
+    /* 2 columnas: el contenido de cada tarjeta es liviano (foto + nombre +
+       años de experiencia + boton), asi que igual que en la Tienda, 1 sola
+       columna dejaba demasiado espacio vacio y un scroll interminable. */
     .entrenadores-grid {
-        grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
-        gap: 1.8rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.85rem;
     }
 
     .card-content {
-        padding: 1.5rem;
+        padding: 0.85rem;
     }
-}
 
-@media (max-width: 480px) {
-    .entrenadores-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
+    .card-image-container {
+        height: 100px;
+    }
+
+    .card-image-container img {
+        width: 76px;
+        height: 76px;
+    }
+
+    .deporte-tag {
+        top: 0.5rem;
+        left: 0.5rem;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.6rem;
+    }
+
+    .card-header {
+        margin-bottom: 0.5rem;
+    }
+
+    .card-header h3 {
+        font-size: 0.95rem;
+        line-height: 1.25;
+    }
+
+    .experiencia {
+        font-size: 0.78rem;
+        line-height: 1.4;
+        margin-bottom: 0.75rem;
+        -webkit-line-clamp: 2;
+    }
+
+    .entrenador-card:hover .experiencia {
+        -webkit-line-clamp: 2; // sin hover real en touch, no expandir
     }
 
     .card-footer {
-        flex-direction: column;
-        gap: 1.2rem;
-        align-items: flex-start;
+        padding-top: 0.75rem;
     }
 
     .contact-btn {
         width: 100%;
         justify-content: center;
-        padding: 0.9rem 1.5rem;
+        padding: 0.6rem 0.5rem;
+        font-size: 0.8rem;
+        gap: 0.4rem;
+    }
+}
+
+/* Telefonos muy angostos: mejor 1 columna que dos tarjetas apretadas */
+@media (max-width: 359.98px) {
+    .entrenadores-grid {
+        grid-template-columns: 1fr;
     }
 
     .card-image-container {
         height: 140px;
+    }
+
+    .card-image-container img {
+        width: 100px;
+        height: 100px;
     }
 }

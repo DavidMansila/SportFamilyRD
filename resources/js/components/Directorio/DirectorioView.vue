@@ -1,5 +1,5 @@
 <template>
-  <div class="sports-app">
+  <div class="sports-app" ref="scrollRoot">
 
 
     <!-- Navbar -->
@@ -66,7 +66,7 @@
 
       <!-- Vista detallada de un deporte -->
       <div class="sport-detail" v-else>
-        <button @click="selectedSport = null" class="back-button">
+        <button @click="volverAlListado" class="back-button">
           <i class="fas fa-arrow-left"></i> Volver al listado
         </button>
 
@@ -200,25 +200,38 @@ const filterByRegion = (region) => {
   activeRegion.value = region;
 };
 
+// Punto del listado donde estaba el usuario antes de entrar a un deporte,
+// para volver ahi (no al tope) al darle "Volver al listado". Quien
+// realmente scrollea aqui es .sports-app (el div raiz: height:100vh +
+// overflow-y:auto, ver <style> mas abajo), no la ventana ni .main-content
+// (appContainer): scrollTo() sobre appContainer no hacia nada visible
+// porque ese elemento no tiene su propio scroll.
+const scrollRoot = ref(null);
+const savedScrollTop = ref(0);
+
 const selectSport = async (sport) => {
+  if (scrollRoot.value) {
+    savedScrollTop.value = scrollRoot.value.scrollTop;
+  }
+
   selectedSport.value = sport;
 
   await nextTick();
+  scrollRoot.value?.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // 2. Desplazar el contenedor principal en lugar de window
-  if (appContainer.value) {
-    appContainer.value.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }
-
-  // 3. Enfocar el título del deporte para accesibilidad
+  // Enfocar el título del deporte para accesibilidad
   const sportTitle = document.querySelector('.detail-header h2');
   if (sportTitle) {
     sportTitle.tabIndex = -1;
     sportTitle.focus();
   }
+};
+
+const volverAlListado = async () => {
+  selectedSport.value = null;
+
+  await nextTick();
+  scrollRoot.value?.scrollTo({ top: savedScrollTop.value, behavior: 'auto' });
 };
 
 

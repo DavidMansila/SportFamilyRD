@@ -208,29 +208,21 @@
     font-size: 0.9rem;
 }
 
-/* ------------------- RESPONSIVE ------------------- */
+/* ------------------- RESPONSIVE -------------------
+   El grid de 2 columnas en movil real vive en tienda_responsive.scss (que se
+   importa despues de este archivo y gana el cascade); ese archivo tambien
+   corrige el breakpoint de 575.98px que lo revertia a 1 columna. */
 @media (max-width: 767.98px) {
-    .products-grid {
-        grid-template-columns: 1fr;
-        gap: 25px;
-        padding: 0 15px;
-    }
-    
     .product-image-container {
         height: 220px;
     }
-    
+
     .product-name {
         font-size: 1.1rem;
     }
-    
+
     .add-to-cart-btn {
         padding: 12px;
         font-size: 0.95rem;
-    }
-    
-    .quick-view-btn {
-        width: 90%;
-        font-size: 0.9rem;
     }
 }

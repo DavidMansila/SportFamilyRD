@@ -137,45 +137,15 @@
           <div class="post-popout-content">
 
 
-            <!-- Sección de imagen -->
-            <div class="post-popout-media">
-
-              <!-- Sección de body -->
-              <div class="post-popout-body">
-                <h2 class="post-popout-title">{{ postSeleccionado.titulo }}</h2>
-              </div>
-
+            <!-- Sección de imagen: solo ocupa espacio si el post tiene una foto real
+                 (no el placeholder "sin imagen"). El titulo/texto/interacciones ya no
+                 viven aqui: antes estaban metidos en la columna de la imagen, asi que
+                 en movil (donde esa columna queda arriba, angosta) el titulo quedaba
+                 enterrado antes de la foto en vez de encabezar el post. -->
+            <div class="post-popout-media" v-if="tieneImagen(postSeleccionado)">
               <div class="image-container">
                 <img :src="postSeleccionado.imagen" @load="onImageLoad('selected')"
                   :class="{ loaded: imageLoaded['selected'] }" />
-              </div>
-
-
-              <div class="post-popout-body">
-                <p class="post-popout-text">{{ postSeleccionado.contenido }}</p>
-                <div class="post-meta-info">
-                  <span class="post-date">{{ formatDate(postSeleccionado.created_at) }}</span>
-                  <span class="post-visibility">Público</span>
-                </div>
-              </div>
-
-
-              <div class="post-interactions">
-                <button @click="toggleLike('post', postSeleccionado.id)" :class="{ liked: postSeleccionado.isLiked }"
-                  class="interaction-btn like-btn">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                    <path fill="currentColor"
-                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                  <span>{{ postSeleccionado.likes_count }}</span>
-                </button>
-                <button @click="focusComentario" class="interaction-btn comment-btn">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                    <path fill="currentColor"
-                      d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z" />
-                  </svg>
-                  <span>{{ postSeleccionado.comments.length }}</span>
-                </button>
               </div>
             </div>
 
@@ -224,7 +194,32 @@
                 </button>
               </div>
 
+              <div class="post-popout-body">
+                <h2 class="post-popout-title">{{ postSeleccionado.titulo }}</h2>
+                <p class="post-popout-text">{{ postSeleccionado.contenido }}</p>
+                <div class="post-meta-info">
+                  <span class="post-date">{{ formatDate(postSeleccionado.created_at) }}</span>
+                  <span class="post-visibility">Público</span>
+                </div>
+              </div>
 
+              <div class="post-interactions">
+                <button @click="toggleLike('post', postSeleccionado.id)" :class="{ liked: postSeleccionado.isLiked }"
+                  class="interaction-btn like-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  <span>{{ postSeleccionado.likes_count }}</span>
+                </button>
+                <button @click="focusComentario" class="interaction-btn comment-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                      d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z" />
+                  </svg>
+                  <span>{{ postSeleccionado.comments.length }}</span>
+                </button>
+              </div>
 
               <!-- Contenido del post -->
               <!-- Sección de comentarios -->
@@ -686,6 +681,13 @@ export default {
         this.postSeleccionado = null;
         this.comentarioRespondiendo = null;
         this.nuevoComentario = '';
+
+        // abrirPopout ya guardaba scrollPosition pero nunca se usaba para
+        // restaurarla: al cerrar el post, la pagina volvia siempre al tope
+        // en vez de quedarse donde estaba el usuario en el listado.
+        this.$nextTick(() => {
+          window.scrollTo({ top: this.scrollPosition, behavior: 'auto' });
+        });
       } catch (error) {
         console.error('Popup close error:', error);
       }
@@ -1710,7 +1712,8 @@ export default {
   z-index: 1001 !important;
 }
 
-.post-popout-overlay {
-  z-index: 1000;
-}
+/* El z-index correcto (2000) ya lo define foro_pop_out_post.scss. Esta
+   redeclaracion lo bajaba a 1000, por debajo del boton de hamburguesa del
+   navbar (z-index 1001): con un post abierto en movil, el navbar se veia
+   encima del modal en vez de quedar tapado por el. */
 </style>

@@ -1,12 +1,15 @@
 <template>
 
-  <!-- Tabs para móvil -->
-  <div class="mobile-tabs">
-    <button :class="['tab-button', { 'active': activeTab === 'signIn' }]" @click="showSignIn">Iniciar Sesión</button>
-    <button :class="['tab-button', { 'active': activeTab === 'signUp' }]" @click="showSignUp">Registrarse</button>
-  </div>
+  <!-- auth-shell centra el bloque tabs+tarjeta verticalmente en cualquier
+       resolucion (ver <style>). -->
+  <div class="auth-shell">
+    <!-- Tabs para móvil -->
+    <div class="mobile-tabs">
+      <button :class="['tab-button', { 'active': activeTab === 'signIn' }]" @click="showSignIn">Iniciar Sesión</button>
+      <button :class="['tab-button', { 'active': activeTab === 'signUp' }]" @click="showSignUp">Registrarse</button>
+    </div>
 
-  <div class="container" ref="container">
+    <div class="container" ref="container">
     
     <!-- Mensaje de cierre de sesión -->
     <div v-if="showLogoutMessage" class="logout-message">
@@ -121,25 +124,26 @@
       <div class="overlay">
         <div class="overlay-panel overlay-left">
           <h1>¡Bienvenido de nuevo!</h1>
+          <p>Para mantenerte conectado con nosotros, inicia sesión con tu información personal</p>
           <router-link to="/" class="margin-pc">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
           </router-link>
-          <p>Para mantenerte conectado con nosotros, inicia sesión con tu información personal</p>
           <button class="ghost" @click="toggleForm('signIn')">Iniciar Sesión</button>
         </div>
         <div class="overlay-panel overlay-right">
           <h1>¡Hola, Amigo!</h1>
+          <p>Ingresa tus detalles y comienza tu viaje con nosotros</p>
           <router-link to="/" class="margin-pc">
             <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo" class="logo-main" />
           </router-link>
-          <p>Ingresa tus detalles y comienza tu viaje con nosotros</p>
           <button class="ghost" @click="toggleForm('signUp')">Registrarse</button>
         </div>
       </div>
     </div>
   </div>
+  </div>
 
-  <Alert 
+  <Alert
     v-if="openModal" 
     :key="alertKey"
     :type="alertType" 
@@ -342,6 +346,20 @@ body {
   margin: auto;
 }
 
+// Centra el bloque tabs+tarjeta verticalmente en toda resolucion (antes solo
+// pasaba en movil). El "body { ... flex-center ... }" de arriba nunca
+// funciono: con <style scoped>, Vue le agrega un atributo data-v-xxx a ese
+// selector que el <body> real jamas tiene, asi que esa regla no aplicaba a
+// nada. .auth-shell es un div que si renderiza el propio componente, asi que
+// aqui el centrado si funciona.
+.auth-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 // Mensaje de logout
 .logout-message {
   position: fixed;
@@ -381,19 +399,21 @@ body {
 
   .tab-button {
     flex: 1;
-    background: transparent;
+    background: rgba(142, 40, 40, 0.8);
     border: none;
-    color: white;
+    color: rgba(46, 4, 4, 0.8);
     padding: 10px;
+    margin: 10px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    border-bottom: 3px solid transparent;
+    border-bottom: 3px solid $secondary-color;
 
     &.active {
       border-bottom: 3px solid $secondary-color;
-      color: $secondary-color;
+      color: white;
+      background-color:rgba(94, 29, 29, 0.1);
     }
   }
 }
@@ -564,7 +584,6 @@ button {
 
   p {
     color: rgba($light-color, 0.8);
-    margin-bottom: 2rem;
     max-width: 80%;
     font-size: 0.875rem;
     line-height: 1.6;
@@ -581,13 +600,13 @@ button {
 }
 
 .logo-main {
-  background-color: #000000;
+  margin: 18px;
   padding: 8px;
-  border-radius: 50px;
-  width: 10rem;
+  background-color: #070707;
+  border-radius: 40px;
+  width: 12rem;
   height: auto;
   transition: transform $transition-speed;
-  margin-bottom: 0;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 
   &:hover {
@@ -682,20 +701,32 @@ button {
     box-shadow: none;
   }
 
+  // El mismo degradado que .overlay (ver @include gradient-bg mas abajo),
+  // en vez de negro solido: antes la barra de tabs y el hero de abajo se
+  // veian como dos piezas de diseño distintas pegadas con una costura dura.
   .mobile-tabs {
     position: relative;
-    background: rgb(0, 0, 0);
+    background: linear-gradient(135deg, $primary-color, $secondary-color);
     padding: 15px 10px;
     margin-top: 0;
     z-index: 10;
     display: flex;
   }
 
+  // min-height:50vh forzaba el formulario a ocupar la mitad de la pantalla
+  // sin importar cuantos campos tuviera, dejando un hueco en blanco debajo
+  // de la tarjeta (el body no tiene mas contenido que lo llene). Ahora se
+  // ajusta al contenido real.
+  // min-height fijo (calculado para el formulario mas alto, el de
+  // Registrarse con 4 campos): sin esto, al cambiar de pestaña el
+  // formulario de Iniciar Sesion (2 campos) era mas bajo y todo el bloque
+  // -incluido el panel rojo de arriba- cambiaba de tamaño/posicion de
+  // golpe al alternar entre pestañas.
   .form-container {
     position: relative;
     width: 100%;
     height: auto;
-    min-height: 50vh;
+    min-height: 29rem;
     padding: 1.5rem;
     display: none;
 
@@ -704,11 +735,16 @@ button {
     }
   }
 
+  // !important: signup.scss (importado arriba) tiene un bloque @media
+  // (max-width: 480px) que fija height:180px !important en esta misma
+  // clase. Sin igualar la importancia, ese valor gana siempre por debajo
+  // de 480px sin importar el orden, y el texto de abajo del logo terminaba
+  // desbordando el recuadro (invisible: texto blanco sobre fondo blanco).
   .overlay-container {
     position: relative;
     left: 0;
     width: 100%;
-    height: 200px;
+    height: 215px !important;
     order: -1;
   }
 
@@ -718,13 +754,26 @@ button {
     height: 200%;
   }
 
+  // flex-start en vez de center: centrado dejaba el titulo pegado arriba y
+  // un hueco raro entre el logo y el texto de abajo (la porcion sobrante de
+  // alto se reparte arriba/abajo del bloque entero, no entre cada elemento).
+  // Alineando arriba, el espaciado real entre titulo/logo/texto lo deciden
+  // los margenes de cada uno, que es lo que se ajusta abajo.
   .overlay-panel {
     width: 100%;
-    padding: 1.5rem;
+    padding: 2rem 1.5rem 1.5rem;
     height: 50%;
+    justify-content: flex-start;
+
+    h1 {
+      margin-top: 0 !important;
+      margin-bottom: 0.75rem !important;
+    }
 
     p {
       max-width: 100%;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
     }
 
     .ghost {
@@ -759,7 +808,7 @@ button {
   .logo-main {
     width: 150px !important;
     height: auto;
-    margin-bottom: 0;
+    margin-bottom: 0.6rem !important;
     display: block;
   }
 
