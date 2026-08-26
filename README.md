@@ -386,7 +386,7 @@ php artisan cache:clear
 ---
 
 
-## Imagenes del Proyecto
+## Imágenes del Proyecto
 
 
 ### REGISTRO Y INICIO DE SECCION 
