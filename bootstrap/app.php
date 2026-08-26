@@ -12,6 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Render pone la app detras de su propio proxy HTTPS -> HTTP interno.
+        // Sin confiar en el (via la cabecera X-Forwarded-Proto), Laravel cree
+        // que toda peticion llega por HTTP plano y genera URLs/assets/cookies
+        // de sesion como inseguros. '*' es lo recomendado para PaaS donde el
+        // unico proxy que le habla al contenedor es el de la propia plataforma.
+        $middleware->trustProxies(at: '*');
+
+
         // Autorizacion de canales privados de broadcasting (chat).
         // Solo auth:sanctum: identifica al usuario por el Bearer token y deja
         // que Broadcast::channel() de routes/channels.php decida si puede
