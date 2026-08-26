@@ -83,7 +83,7 @@ export default {
       return this.activeChat?.other_participant || null;
     },
     otherUserAvatar() {
-      return this.otherUser?.image || '/storage/users/Perfil-Icon.png';
+      return this.otherUser?.image || '/imagenes/Perfil-Icon.png';
     },
     otherUserName() {
       return this.otherUser?.name || 'Usuario';
@@ -105,7 +105,7 @@ export default {
   methods: {
 
     getUserImage(user) {
-      if (!user) return '/storage/users/Perfil-Icon.png';
+      if (!user) return '/imagenes/Perfil-Icon.png';
 
       if (user.user?.image) {
         return `/storage/users/${user.user.id}/${user.user.image}`;
@@ -114,7 +114,7 @@ export default {
         return `/storage/users/${user.id}/${user.image}`;
       }
 
-      return '/storage/users/Perfil-Icon.png';
+      return '/imagenes/Perfil-Icon.png';
     },
 
     async initializeChat() {

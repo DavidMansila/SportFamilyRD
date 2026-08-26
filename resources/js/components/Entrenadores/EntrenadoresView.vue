@@ -337,7 +337,7 @@ logro, index
                         <div class="user-details">
                             <span class="user-avatar">
                                 <img :src="user.image ||
-                                    'public/storage/users/Perfil-Icon.png'
+                                    '/imagenes/Perfil-Icon.png'
                                     " alt="Tu foto de perfil" />
                             </span>
                             <div>

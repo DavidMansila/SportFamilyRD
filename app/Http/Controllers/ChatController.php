@@ -33,6 +33,11 @@ class ChatController extends Controller
             ->where('status', 'accepted')
             ->get()
             ->map(function ($chat) use ($userId) {
+                resolve_user_image($chat->user);
+                if ($chat->trainer) {
+                    resolve_user_image($chat->trainer->user);
+                }
+
                 return [
                     'id' => $chat->id,
                     'user_id' => $chat->user_id,

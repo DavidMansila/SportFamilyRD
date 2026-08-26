@@ -9,7 +9,7 @@
             <!-- Header del Perfil -->
             <div class="profile-header">
                 <div class="avatar-container">
-                    <img :src="user.image ? user.image : '/storage/users/Perfil-Icon.png'" alt=""
+                    <img :src="user.image ? user.image : '/imagenes/Perfil-Icon.png'" alt=""
                         class="profile-avatar" :class="{ 'is-uploading': avatarUploading }" />
                     <div v-if="avatarUploading" class="avatar-uploading-overlay">
                         <span class="avatar-spinner"></span>

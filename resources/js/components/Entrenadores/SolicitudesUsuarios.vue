@@ -357,7 +357,7 @@ export default {
             }
 
             // Imagen por defecto
-            return '/storage/users/Perfil-Icon.png';
+            return '/imagenes/Perfil-Icon.png';
         },
     },
     async mounted() {

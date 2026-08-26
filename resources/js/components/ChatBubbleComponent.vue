@@ -130,9 +130,10 @@ export default {
               other_participant: {
                 id: chat.trainer.user.id,
                 name: chat.trainer.user.name,
-                image: chat.trainer.user.image
-                  ? `/storage/users/${chat.trainer.user.id}/${chat.trainer.user.image}`
-                  : '/storage/users/Perfil-Icon.png',
+                // El backend (ChatController) ya manda una URL completa de
+                // Supabase Storage en chat.trainer.user.image, no un nombre
+                // de archivo suelto: usarla tal cual, sin reconstruirla.
+                image: chat.trainer.user.image || '/imagenes/Perfil-Icon.png',
                 type: 'trainer'
               }
             };
@@ -147,9 +148,7 @@ export default {
               other_participant: {
                 id: chat.user.id,
                 name: chat.user.name,
-                image: chat.user.image
-                  ? `/storage/users/${chat.user.id}/${chat.user.image}`
-                  : '/storage/users/Perfil-Icon.png',
+                image: chat.user.image || '/imagenes/Perfil-Icon.png',
                 type: 'user'
               }
             };
@@ -164,7 +163,7 @@ export default {
             last_message: chat.last_message,
             other_participant: {
               name: 'Usuario desconocido',
-              image: 'public/storage/users/Perfil-Icon.png'
+              image: '/imagenes/Perfil-Icon.png'
             }
           };
         });

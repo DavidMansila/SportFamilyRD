@@ -718,7 +718,7 @@ export default {
 
         getUserImage(user) {
       if (!user) {
-        return '/storage/users/Perfil-Icon.png';
+        return '/imagenes/Perfil-Icon.png';
       }
 
       if (user.image && user.image.startsWith('http')) {
@@ -729,7 +729,7 @@ export default {
         return `/storage/users/${user.id}/${user.image}`;
       }
 
-      return '/storage/users/Perfil-Icon.png';
+      return '/imagenes/Perfil-Icon.png';
     }
 
   },

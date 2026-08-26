@@ -63,13 +63,24 @@ class PostController extends Controller
                 // Verificar si el usuario dio like al post
                 $post->is_liked = isset($userLikes[Post::class][$post->id]);
 
+                // El autor del post/comentario/respuesta viaja con la relacion
+                // 'user' cargada tal cual esta en la BD (solo el nombre del
+                // archivo, ej. "avatar.jpg"): sin esto el frontend arma la URL
+                // el mismo asumiendo un disco local, que ya no existe en
+                // produccion (las imagenes viven en Supabase Storage).
+                resolve_user_image($post->user);
+
                 // Procesar comentarios
                 $post->comments->each(function ($comment) use ($userLikes) {
+                    resolve_user_image($comment->user);
+
                     // Verificar si el usuario dio like al comentario
                     $comment->is_liked = isset($userLikes[Comment::class][$comment->id]);
 
                     // Procesar respuestas
                     $comment->replies->each(function ($reply) use ($userLikes) {
+                        resolve_user_image($reply->user);
+
                         // Verificar si el usuario dio like a la respuesta
                         $reply->is_liked = isset($userLikes[Reply::class][$reply->id]);
                     });

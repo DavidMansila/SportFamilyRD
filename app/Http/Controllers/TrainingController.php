@@ -44,7 +44,10 @@ class TrainingController extends Controller
             $query->where('trainer_id', $request->trainer_id);
         }
 
-        return $query->get();
+        $results = $query->get();
+        $results->each(fn($training) => resolve_user_image($training->user));
+
+        return $results;
     }
 
     public function create()
