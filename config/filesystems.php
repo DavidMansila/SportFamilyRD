@@ -46,9 +46,8 @@ return [
         // usuarios (avatares, fotos de posts/productos/eventos) persistan en
         // Supabase Storage (compatible con la API S3) en vez de perderse.
         // Todo el codigo que ya usa Storage::disk('public') no cambia.
-        'public' => [
+        'public' => array_merge([
             'driver' => env('PUBLIC_DISK_DRIVER', 'local'),
-            'root' => storage_path('app/public'),
             'url' => env('PUBLIC_DISK_URL', env('APP_URL').'/storage'),
             'visibility' => 'public',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -59,7 +58,12 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
             'throw' => false,
             'report' => false,
-        ],
+            // 'root' SOLO va si el driver es "local": Laravel lo reutiliza como
+            // prefijo de las claves cuando el driver es "s3" (via PathPrefixer),
+            // asi que dejarlo puesto con driver s3 pegaba
+            // "app/storage/app/public/" delante de cada ruta -> cada URL/subida
+            // apuntaba a una clave que nunca existia en el bucket (400/404).
+        ], env('PUBLIC_DISK_DRIVER', 'local') === 'local' ? ['root' => storage_path('app/public')] : []),
 
         's3' => [
             'driver' => 's3',
