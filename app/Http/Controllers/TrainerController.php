@@ -68,7 +68,10 @@ class TrainerController extends Controller
 
     public function getAprovedTrainers()
     {
-        $approvedTrainer = Trainer::with(['achievements', 'specialties'])
+        // 'user' va en el eager-load: sin esto, optional($trainer->user) mas abajo
+        // dispara una consulta SEPARADA por cada entrenador (N+1) para leer su
+        // imagen, cada una un viaje de red aparte a Supabase.
+        $approvedTrainer = Trainer::with(['achievements', 'specialties', 'user'])
             ->where('status', 'approved')
             ->get();
 
