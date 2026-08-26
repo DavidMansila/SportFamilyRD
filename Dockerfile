@@ -28,7 +28,8 @@ COPY --from=frontend /app/public/build ./public/build
 # borran antes: son cache de un composer install viejo con dev deps y si
 # quedan pisan el autodescubrimiento de paquetes -> "Class ...PailServiceProvider
 # not found" al arrancar, porque el service provider cacheado ya no esta en vendor/.
-RUN rm -f bootstrap/cache/*.php \
+RUN mkdir -p bootstrap/cache \
+    && rm -f bootstrap/cache/*.php \
     && composer install --no-dev --optimize-autoloader --no-interaction \
     && php artisan storage:link || true
 
