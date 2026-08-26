@@ -224,7 +224,7 @@
 }
 
 .filter-tabs button.active {
-    background: #8a5f1f;
+    background: color-mix(in srgb, var(--accent), transparent 30%);
     color: white;
 }
 
@@ -236,7 +236,7 @@
     transform: translateX(-50%);
     width: 60%;
     height: 2px;
-    background: #8a5f1f;
+    background: color-mix(in srgb, var(--accent), transparent 30%);
 }
 
 /* Tarjetas de Entrenadores */

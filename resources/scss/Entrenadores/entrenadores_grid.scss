@@ -48,8 +48,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+    /* Las variables CSS se leen con var(): escribir "--accent-soft" a secas no
+       es un valor valido y el navegador descarta la linea entera. */
+    background: color-mix(in srgb, var(--accent), transparent 30%);
 }
+
 
 /* El degradado oscuro existia para que se leyera el texto sobre la foto a
    ancho completo. Ya no hace falta: el fondo es una banda de color solida. */
@@ -204,7 +207,7 @@
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+    background: color-mix(in srgb, var(--accent), transparent 20%);
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;

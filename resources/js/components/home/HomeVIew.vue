@@ -226,8 +226,8 @@
 
           <div class="forum-thread" v-for="post in popularPosts" :key="post.id">
             <div class="thread-header">
-              <img :src="post.user?.image_url || '/storage/users/Perfil-Icon.png'" :alt="post.user?.name || 'Usuario'"
-                class="author-avatar">
+              <img :src="getUserImage(post.user)" :alt="post.user?.name || 'Usuario'" class="author-avatar"
+                loading="lazy">
 
               <div class="author-info">
                 <span class="author-name">
@@ -715,6 +715,22 @@ export default {
         })
         .subscribe();
     },
+
+        getUserImage(user) {
+      if (!user) {
+        return '/storage/users/Perfil-Icon.png';
+      }
+
+      if (user.image && user.image.startsWith('http')) {
+        return user.image;
+      }
+
+      if (user.image) {
+        return `/storage/users/${user.id}/${user.image}`;
+      }
+
+      return '/storage/users/Perfil-Icon.png';
+    }
 
   },
 
