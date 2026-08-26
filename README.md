@@ -11,15 +11,17 @@ con **PostgreSQL** como base de datos.
 
 ## Índice
 
-- [Stack tecnológico](#stack-tecnológico)
-- [Requisitos previos](#requisitos-previos)
-- [Instalación y configuración](#instalación-y-configuración)
-- [Restaurar la base de datos](#restaurar-la-base-de-datos)
-- [Variables de entorno](#variables-de-entorno)
-- [Arrancar el proyecto](#arrancar-el-proyecto)
-- [Estructura del proyecto](#estructura-del-proyecto)
-- [Tareas programadas](#tareas-programadas)
-- [Solución de problemas](#solución-de-problemas)
+- [Stack tecnológico]
+- [Requisitos previos]
+- [Instalación y configuración]
+- [Restaurar la base de datos]
+- [Variables de entorno]
+- [Arrancar el proyecto]
+- [Estructura del proyecto]
+- [Tareas programadas]
+- [Solución de problemas]
+- [Imagenes del Proyecto]
+
 
 ---
 
@@ -382,6 +384,125 @@ php artisan cache:clear
 ```
 
 ---
+
+
+## Imagenes del Proyecto
+
+
+### REGISTRO Y INICIO DE SECCION 
+
+<img width="1253" height="757" alt="image" src="https://github.com/user-attachments/assets/8c2b39aa-8053-4f0d-9859-0f61c7859d7a" />
+
+<img width="1247" height="737" alt="image" src="https://github.com/user-attachments/assets/68d97bb3-7cb4-41e1-85a5-9c23f754d066" />
+
+
+### HOME
+
+<img width="1853" height="922" alt="image" src="https://github.com/user-attachments/assets/90fa6171-ce34-4582-906a-6bee2c3b0ae3" />
+
+<img width="1841" height="867" alt="image" src="https://github.com/user-attachments/assets/9089dc1d-7cf8-4623-b5ad-aa9123451f37" />
+
+<img width="1835" height="916" alt="image" src="https://github.com/user-attachments/assets/66a48a97-c854-4da7-a24d-a1b93c8b7d15" />
+
+<img width="1832" height="915" alt="image" src="https://github.com/user-attachments/assets/afbf9655-e7f3-444b-9d14-cee83993392f" />
+
+<img width="1845" height="915" alt="image" src="https://github.com/user-attachments/assets/a8fae0e5-86c7-463c-bac7-268836279285" />
+
+<img width="1841" height="917" alt="image" src="https://github.com/user-attachments/assets/7d7a1261-2f2d-4adb-9d7c-d0ce3e51e72e" />
+
+
+### DEPORTES
+
+<img width="1848" height="917" alt="image" src="https://github.com/user-attachments/assets/f9bb7177-36ba-40c0-8c3d-067464a1108f" />
+
+<img width="1850" height="921" alt="image" src="https://github.com/user-attachments/assets/8ff19da1-2f74-4591-a908-619bc0a7e2ab" />
+
+
+### NOTICIAS
+
+<img width="1841" height="925" alt="image" src="https://github.com/user-attachments/assets/cebf1852-699b-4583-ae78-937c8ba59608" />
+
+<img width="1845" height="917" alt="image" src="https://github.com/user-attachments/assets/9778040f-61b1-41e2-a001-0c05911d7a00" />
+
+
+### CALENDARIO
+
+<img width="1846" height="912" alt="image" src="https://github.com/user-attachments/assets/95ac218a-846a-4bd4-ba3d-199f62795828" />
+
+<img width="1847" height="917" alt="image" src="https://github.com/user-attachments/assets/b6e5ab35-8dfc-49e7-9d17-a5b4e18abcfc" />
+
+<img width="1862" height="927" alt="image" src="https://github.com/user-attachments/assets/b104a19c-928d-4675-b371-4b00a9911fcb" />
+
+
+### TIENDA 
+
+<img width="1847" height="922" alt="image" src="https://github.com/user-attachments/assets/f250ab2e-3d1e-4781-8102-620c2fc53a08" />
+
+<img width="1843" height="918" alt="image" src="https://github.com/user-attachments/assets/0893c12c-873f-4968-bd8d-94f3026f3c67" />
+
+<img width="1837" height="918" alt="image" src="https://github.com/user-attachments/assets/48975a29-8ef9-48e3-9eb0-8a545b71b7fb" />
+
+<img width="1858" height="916" alt="image" src="https://github.com/user-attachments/assets/92e81f51-bede-4bda-8815-b1fa469c5b48" />
+
+
+### ENTRENADORES 
+
+<img width="1847" height="918" alt="image" src="https://github.com/user-attachments/assets/7a610ff8-467f-4beb-8d19-a29403d0c799" />
+
+<img width="1841" height="920" alt="image" src="https://github.com/user-attachments/assets/57ffafec-cb00-41a7-99fd-252656c9db97" />
+
+<img width="1845" height="922" alt="image" src="https://github.com/user-attachments/assets/970940f4-5ad2-4df4-9bca-d0375f2d8f08" />
+
+### ENTRENADORES FORMULARIO
+
+<img width="1295" height="845" alt="image" src="https://github.com/user-attachments/assets/ef793123-00c9-40cb-b218-a6b94a47358b" />
+
+<img width="1202" height="721" alt="image" src="https://github.com/user-attachments/assets/c251d7d4-9e76-45e7-a1e6-cf6408b3e928" />
+
+<img width="1156" height="845" alt="image" src="https://github.com/user-attachments/assets/92b0b1e5-9d12-4901-ae43-be2b450032a9" />
+
+<img width="1017" height="713" alt="image" src="https://github.com/user-attachments/assets/579df4a2-439b-4d6f-8cd4-1b04f6867448" />
+
+<img width="928" height="898" alt="image" src="https://github.com/user-attachments/assets/6d3d037f-efbc-430a-b037-1395aba97e5c" />
+
+<img width="472" height="382" alt="image" src="https://github.com/user-attachments/assets/dd64acfe-e043-49bb-ae46-f0db95166156" />
+
+### FORO
+
+<img width="1843" height="921" alt="image" src="https://github.com/user-attachments/assets/73454250-bbac-4106-95bc-f8afd208a738" />
+
+<img width="1846" height="921" alt="image" src="https://github.com/user-attachments/assets/33541382-a11b-46fd-ac9b-49c72c65259c" />
+
+<img width="1652" height="835" alt="image" src="https://github.com/user-attachments/assets/792bf97b-e022-4f4f-9efa-a439db93f8c9" />
+
+<img width="1653" height="823" alt="image" src="https://github.com/user-attachments/assets/69e5e501-58a5-47fc-afd9-2b25d8766d56" />
+
+
+### CARRITO DE COMPRAS
+
+<img width="1860" height="921" alt="image" src="https://github.com/user-attachments/assets/dc6c83de-15f7-4053-adff-5e0dfa1067b0" />
+
+<img width="938" height="852" alt="image" src="https://github.com/user-attachments/assets/95d616a7-9ffd-46b4-b3ef-57b131418520" />
+
+<img width="717" height="721" alt="image" src="https://github.com/user-attachments/assets/e0fae731-da6f-4efe-b78f-8f2fd86c2d65" />
+
+
+### CONFIGURACION 
+
+<img width="1842" height="922" alt="image" src="https://github.com/user-attachments/assets/e3f4ab61-2991-455a-a290-76a3547d478d" />
+
+<img width="1843" height="922" alt="image" src="https://github.com/user-attachments/assets/14beccef-8635-4d32-8876-f796d89bc8e0" />
+
+
+### PERFIL
+
+<img width="1847" height="920" alt="image" src="https://github.com/user-attachments/assets/1fcee57c-8669-4fb3-a69b-17ffdb3f1317" />
+
+<img width="1616" height="702" alt="image" src="https://github.com/user-attachments/assets/92ca9d33-5ab2-4fb0-95dd-2a39e0f99ce5" />
+
+
+
+
 
 ## Licencia
 
