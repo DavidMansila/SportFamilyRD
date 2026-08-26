@@ -506,4 +506,4 @@ php artisan cache:clear
 
 ## Licencia
 
-Proyecto académico desarrollado por [David Mansilla](https://github.com/DavidMansila).
+Proyecto académico desarrollado por [David Mansilla](https://github.com/DavidMansila) y [Yirbel Gomez](https://github.com/YirbelG).
