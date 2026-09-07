@@ -139,12 +139,22 @@ class CalendarController extends Controller
             ->get()
             ->map(function($event) {
                 return [
+                    // El id real hace falta para que el pop-out del Home pueda
+                    // mandar el evento al carrito con la misma ruta que usa el
+                    // calendario. 'event_id' se mantiene por compatibilidad.
+                    'id' => $event->id,
                     'event_id' => 'EVT-' . $event->id,
                     'Title' => $event->Title ?? 'Evento Deportivo',
                     'date' => date('d/M', strtotime($event->date)),
+                    'date_iso' => $event->date,
                     'time' => $event->time,
                     'location' => $event->place,
-                    'description' => $event->description ?? '',
+                    // La columna en la tabla es "Description" con mayuscula:
+                    // pedirla en minuscula devolvia siempre null y por eso la
+                    // descripcion del evento salia vacia en el Home.
+                    'description' => $event->Description ?? '',
+                    'price' => $event->price,
+                    'quantity' => $event->quantity,
                     'image' => $event->image ?? null,
                 ];
             });

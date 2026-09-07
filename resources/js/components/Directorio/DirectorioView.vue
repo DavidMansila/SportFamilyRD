@@ -66,43 +66,83 @@
 
       <!-- Vista detallada de un deporte -->
       <div class="sport-detail" v-else>
-        <button @click="volverAlListado" class="back-button">
-          <i class="fas fa-arrow-left"></i> Volver al listado
+        <button @click="volverAlListado" class="sd-back">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al listado
         </button>
 
-        <div class="detail-header">
-          <h2>{{ selectedSport.name }}</h2>
-          <img :src="selectedSport.image" :alt="selectedSport.name" class="detail-image">
-        </div>
-
-        <div class="detail-content">
-          <div class="detail-section">
-            <h3><i class="fas fa-info-circle"></i> Descripción</h3>
-            <p>{{ selectedSport.description }}</p>
-          </div>
-
-          <div class="detail-section">
-            <h3><i class="fas fa-tools"></i> Qué necesitas</h3>
-            <ul>
-              <li v-for="(item, index) in selectedSport.requirements" :key="index">
-                {{ item }}
-              </li>
-            </ul>
-          </div>
-
-          <div class="detail-section">
-            <h3><i class="fas fa-map-marked-alt"></i> Lugares para practicar</h3>
-            <div class="places-container">
-              <div class="place-card" v-for="place in selectedSport.places" :key="place.name">
-                <h4>{{ place.name }}</h4>
-                <p><i class="fas fa-location-dot"></i> {{ place.location }}</p>
-                <p v-if="place.cost"><i class="fas fa-money-bill-wave"></i> {{ place.cost }}</p>
-              </div>
+        <!-- Portada: el nombre del deporte va SOBRE la foto. Antes el titulo
+             iba encima y la imagen debajo, asi que en pantallas medianas el
+             nombre quedaba solo en una linea con mucho aire alrededor. -->
+        <header class="sd-hero">
+          <img :src="selectedSport.image" :alt="selectedSport.name" class="sd-hero__img">
+          <div class="sd-hero__veil"></div>
+          <div class="sd-hero__content">
+            <h2 class="sd-hero__title">{{ selectedSport.name }}</h2>
+            <div class="sd-chips">
+              <span class="sd-chip" v-if="selectedSport.region">
+                <i class="fas fa-map-marked-alt" aria-hidden="true"></i> {{ selectedSport.region }}
+              </span>
+              <span class="sd-chip" v-if="selectedSport.type">
+                <i class="fas fa-users" aria-hidden="true"></i> {{ selectedSport.type }}
+              </span>
+              <span class="sd-chip sd-chip--accent" v-if="selectedSport.popularity">
+                <i class="fas fa-fire" aria-hidden="true"></i> {{ selectedSport.popularity }}
+              </span>
             </div>
           </div>
+        </header>
 
+        <!-- En escritorio la descripcion y el equipo necesario van lado a lado:
+             la descripcion es larga y el equipo son items cortos, asi que en
+             una sola columna la lista dejaba media pantalla vacia. -->
+        <div class="sd-grid">
+          <section class="sd-main">
+            <p class="sd-lead" v-if="selectedSport.shortDescription">
+              {{ selectedSport.shortDescription }}
+            </p>
+            <h3 class="sd-title">
+              <i class="fas fa-circle-info" aria-hidden="true"></i> Sobre el deporte
+            </h3>
+            <p class="sd-text">{{ selectedSport.description }}</p>
+          </section>
 
+          <aside class="sd-aside" v-if="selectedSport.requirements?.length">
+            <h3 class="sd-title">
+              <i class="fas fa-clipboard-check" aria-hidden="true"></i> Qué necesitas
+              <span class="sd-count">{{ selectedSport.requirements.length }}</span>
+            </h3>
+            <ul class="sd-gear">
+              <li v-for="(item, index) in selectedSport.requirements" :key="index">
+                <i class="fas fa-check" aria-hidden="true"></i>
+                <span>{{ item }}</span>
+              </li>
+            </ul>
+          </aside>
         </div>
+
+        <section class="sd-section" v-if="selectedSport.places?.length">
+          <h3 class="sd-title">
+            <i class="fas fa-map-marked-alt" aria-hidden="true"></i> Dónde practicarlo
+            <span class="sd-count">{{ selectedSport.places.length }}</span>
+          </h3>
+          <div class="sd-places">
+            <article class="sd-place" v-for="place in selectedSport.places" :key="place.name">
+              <h4 class="sd-place__name">{{ place.name }}</h4>
+              <p class="sd-place__row" v-if="place.location">
+                <i class="fas fa-location-dot" aria-hidden="true"></i> {{ place.location }}
+              </p>
+              <p class="sd-place__cost" v-if="place.cost">{{ place.cost }}</p>
+              <!-- El "website" viene de la base de datos: solo se pinta si es
+                   http(s) real, y con rel="noopener noreferrer" para que la
+                   pestaña destino no pueda tocar la nuestra. Antes este enlace
+                   ni se mostraba, aunque el dato ya estaba guardado. -->
+              <a v-if="safeUrl(place.website)" class="sd-place__link" :href="safeUrl(place.website)" target="_blank"
+                rel="noopener noreferrer">
+                Visitar sitio web <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+              </a>
+            </article>
+          </div>
+        </section>
       </div>
     </main>
 
@@ -200,6 +240,19 @@ const filterByRegion = (region) => {
   activeRegion.value = region;
 };
 
+// Solo se pintan enlaces http(s). Sin este filtro, un "website" guardado como
+// javascript:... en la base de datos se volveria un enlace ejecutable al
+// hacerle click.
+const safeUrl = (url) => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(String(url), window.location.origin);
+    return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : null;
+  } catch (error) {
+    return null;
+  }
+};
+
 // Punto del listado donde estaba el usuario antes de entrar a un deporte,
 // para volver ahi (no al tope) al darle "Volver al listado". Quien
 // realmente scrollea aqui es .sports-app (el div raiz: height:100vh +
@@ -220,7 +273,7 @@ const selectSport = async (sport) => {
   scrollRoot.value?.scrollTo({ top: 0, behavior: 'smooth' });
 
   // Enfocar el título del deporte para accesibilidad
-  const sportTitle = document.querySelector('.detail-header h2');
+  const sportTitle = document.querySelector('.sd-hero__title');
   if (sportTitle) {
     sportTitle.tabIndex = -1;
     sportTitle.focus();
@@ -265,6 +318,8 @@ onMounted(() => {
 
 <style scoped>
 @import '../../../scss/Directorio/directorio.scss';
+
+@import '../../../scss/Directorio/directorio_detalle.scss';
 
 .navbar {
   background: linear-gradient(to right, #000000, #a13300);

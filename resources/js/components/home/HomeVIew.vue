@@ -57,12 +57,15 @@
       </div>
 
       <div class="category-grid">
-        <div v-for="(category, index) in categories" :key="category.name" class="category-card">
+        <div v-for="category in categories" :key="category.name" class="category-card is-interactive" role="button"
+          tabindex="0" :aria-label="`Ver detalles de ${category.name}`" @click="openSport(category)"
+          @keydown.enter.prevent="openSport(category)" @keydown.space.prevent="openSport(category)">
           <div class="card-inner">
             <div class="card-front">
               <img :src="category.image" :alt="category.name" class="card-image" loading="lazy">
               <div class="card-overlay"></div>
               <div class="card-badge" v-if="category.popular">Popular</div>
+              <span class="hover-hint">{{ category.name }} · Ver detalles</span>
               <div class="participation-rate">
                 <div class="rate-bar" :style="{ width: category.participation + '%' }"></div>
                 <span>{{ category.participation }}% popularidad</span>
@@ -90,11 +93,14 @@
 
       <div class="news-grid">
         <!-- Noticia Destacada -->
-        <div v-if="recentNews.length > 0" class="featured-news">
+        <div v-if="recentNews.length > 0" class="featured-news is-interactive" role="button" tabindex="0"
+          :aria-label="`Leer noticia: ${recentNews[0].title}`" @click="openNews(recentNews[0])"
+          @keydown.enter.prevent="openNews(recentNews[0])" @keydown.space.prevent="openNews(recentNews[0])">
           <div class="featured-image">
             <img :src="recentNews[0].image" :alt="recentNews[0].title" loading="lazy">
             <div class="news-badge">Destacada</div>
             <div class="category-tag">{{ recentNews[0].category || 'General' }}</div>
+            <span class="hover-hint">Leer noticia</span>
           </div>
           <div class="featured-content">
             <div class="news-meta">
@@ -103,15 +109,20 @@
               <span class="author"><i class="far fa-user"></i> Por {{ recentNews[0].author }}</span>
             </div>
             <h3 class="news-title">{{ recentNews[0].title }}</h3>
-            <p class="news-excerpt">{{ recentNews[0].description.substring(0, 150) }}...</p>
+            <p class="news-excerpt">{{ truncate(recentNews[0].description, 150) }}</p>
             <div class="news-actions">
+              <button type="button" class="read-more" @click.stop="openNews(recentNews[0])">
+                Leer más <i class="fas fa-arrow-right"></i>
+              </button>
             </div>
           </div>
         </div>
 
         <!-- Listado de Noticias -->
         <div class="news-list" v-if="recentNews.length > 1">
-          <div class="news-card" v-for="(news, index) in recentNews.slice(1, 7)" :key="index">
+          <div class="news-card is-interactive" v-for="news in recentNews.slice(1, 7)" :key="news.id" role="button"
+            tabindex="0" :aria-label="`Leer noticia: ${news.title}`" @click="openNews(news)"
+            @keydown.enter.prevent="openNews(news)" @keydown.space.prevent="openNews(news)">
             <div class="news-card-image">
               <img :src="news.image" :alt="news.title" loading="lazy">
               <div class="category-tag">{{ news.category || 'General' }}</div>
@@ -121,7 +132,7 @@
                 <span class="date"><i class="far fa-calendar-alt"></i> {{ formatNewsDate(news.published_at) }}</span>
               </div>
               <h4 class="news-title">{{ news.title }}</h4>
-              <p class="news-excerpt">{{ news.description.substring(0, 100) }}...</p>
+              <p class="news-excerpt">{{ truncate(news.description, 100) }}</p>
             </div>
           </div>
         </div>
@@ -147,7 +158,10 @@
       <div class="events-container">
 
         <div class="featured-events">
-          <div class="event-card" v-for="event in featuredEvents" :key="event.id">
+          <div class="event-card is-interactive" v-for="event in featuredEvents" :key="event.event_id || event.id"
+            role="button" tabindex="0" :aria-label="`Ver detalles del evento: ${event.Title}`"
+            @click="openEvent(event)" @keydown.enter.prevent="openEvent(event)"
+            @keydown.space.prevent="openEvent(event)">
             <div class="event-date">
               <div class="date-day">{{ event.date.split('/')[0] }}</div>
               <div class="date-month">{{ event.date.split('/')[1] }}</div>
@@ -185,12 +199,15 @@
           <p>No hay productos disponibles en este momento</p>
         </div>
 
-        <div v-else class="product-card" v-for="product in recentProducts" :key="product.id">
+        <div v-else class="product-card is-interactive" v-for="product in recentProducts" :key="product.id"
+          role="button" tabindex="0" :aria-label="`Ver detalles de ${product.name}`" @click="openProduct(product)"
+          @keydown.enter.prevent="openProduct(product)" @keydown.space.prevent="openProduct(product)">
           <div class="product-badges">
             <div class="badge featured" v-if="product.featured">Destacado</div>
           </div>
           <div class="product-image-container">
             <img :src="product.image" :alt="product.name" class="product-image" loading="lazy">
+            <span class="hover-hint">Ver detalles</span>
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
@@ -224,7 +241,9 @@
         <div class="forum-highlights">
           <h3 class="sub-section-title">Discusiones Populares</h3>
 
-          <div class="forum-thread" v-for="post in popularPosts" :key="post.id">
+          <div class="forum-thread is-interactive" v-for="post in popularPosts" :key="post.id" role="button"
+            tabindex="0" :aria-label="`Ver discusión: ${post.titulo}`" @click="openPost(post)"
+            @keydown.enter.prevent="openPost(post)" @keydown.space.prevent="openPost(post)">
             <div class="thread-header">
               <img :src="getUserImage(post.user)" :alt="post.user?.name || 'Usuario'" class="author-avatar"
                 loading="lazy">
@@ -252,7 +271,7 @@
             <h4 class="thread-title">{{ post.titulo }}</h4>
 
             <p class="thread-excerpt">
-              {{ (post.contenido || '').substring(0, 100) }}...
+              {{ truncate(post.contenido, 100) }}
             </p>
           </div>
 
@@ -356,8 +375,241 @@
       </div>
     </footer>
 
-    <!-- Product Modal -->
-    <ProductModal v-if="showModal" :product="selectedProduct" @close="closeModal" />
+    <!-- =====================================================================
+         Pop-outs del Home
+
+         Una sola instancia de HomeModal para todo: 'modal.type' decide que
+         contenido se pinta dentro. Ninguna variante usa v-html; el texto que
+         viene de la base de datos (noticias scrapeadas, posts de usuarios,
+         descripciones de productos) se pinta como texto plano y los saltos de
+         linea los respeta el CSS, asi no hay forma de inyectar HTML/JS por ahi.
+         ===================================================================== -->
+
+    <HomeModal :open="modal.open" :variant="modal.type" @close="closeModal" v-slot="{ titleId }">
+
+      <!-- Noticia -->
+      <template v-if="modal.type === 'news' && modal.data">
+        <div class="hm-media">
+          <img :src="modal.data.image" :alt="modal.data.title">
+          <span class="hm-media__chip">{{ modal.data.category || 'General' }}</span>
+        </div>
+        <div class="hm-body">
+          <h2 class="hm-title" :id="titleId">{{ modal.data.title }}</h2>
+          <div class="hm-meta">
+            <span><i class="far fa-calendar-alt"></i> {{ formatNewsDate(modal.data.published_at) }}</span>
+            <span v-if="modal.data.author"><i class="far fa-user"></i> Por {{ modal.data.author }}</span>
+          </div>
+          <p class="hm-text">{{ modal.data.description }}</p>
+          <hr class="hm-divider">
+          <div class="hm-actions">
+            <button v-if="user" type="button" class="hm-btn"
+              :class="isNewsSaved(modal.data.id) ? 'hm-btn--saved' : 'hm-btn--primary'" :disabled="isSavingNews"
+              @click="toggleSaveNews(modal.data)">
+              <i class="fas fa-bookmark"></i>
+              {{ isNewsSaved(modal.data.id) ? 'Guardada' : 'Guardar noticia' }}
+            </button>
+            <router-link v-else :to="{ path: '/signup', query: { panel: 'login' } }" class="hm-btn hm-btn--primary">
+              Inicia sesión para guardarla
+            </router-link>
+            <router-link to="/noticias" class="hm-btn hm-btn--ghost">
+              Ver todas las noticias <i class="fas fa-arrow-right"></i>
+            </router-link>
+          </div>
+        </div>
+      </template>
+
+      <!-- Producto -->
+      <template v-else-if="modal.type === 'product' && modal.data">
+        <div class="hm-media">
+          <img :src="modal.data.image" :alt="modal.data.name">
+        </div>
+        <div class="hm-body">
+          <span class="hm-eyebrow">{{ modal.data.category || 'Tienda' }}</span>
+          <h2 class="hm-title" :id="titleId">{{ modal.data.name }}</h2>
+          <div class="hm-price">
+            <span class="hm-price__current">RD$ {{ modal.data.price }}</span>
+            <span v-if="modal.data.originalPrice" class="hm-price__old">RD$ {{ modal.data.originalPrice }}</span>
+          </div>
+          <p class="hm-text">{{ modal.data.description || 'Este producto todavía no tiene descripción.' }}</p>
+          <p class="hm-note" v-if="hasStockInfo(modal.data)">
+            {{ maxQuantity > 0 ? `${maxQuantity} unidades disponibles` : 'Agotado por el momento' }}
+          </p>
+          <hr class="hm-divider">
+          <div class="hm-actions" v-if="user">
+            <div class="hm-qty">
+              <button type="button" @click="decrementQuantity" :disabled="quantity <= 1"
+                aria-label="Quitar una unidad">−</button>
+              <span aria-live="polite">{{ quantity }}</span>
+              <button type="button" @click="incrementQuantity" :disabled="quantity >= maxQuantity"
+                aria-label="Agregar una unidad">+</button>
+            </div>
+            <button type="button" class="hm-btn hm-btn--primary" :disabled="isAddingToCart || maxQuantity < 1"
+              @click="addProductToCart(modal.data)">
+              <i class="fas fa-shopping-cart"></i>
+              {{ isAddingToCart ? 'Agregando...' : 'Agregar al carrito' }}
+            </button>
+            <router-link to="/tienda" class="hm-btn hm-btn--ghost">Ver la tienda</router-link>
+          </div>
+          <div class="hm-actions" v-else>
+            <router-link :to="{ path: '/signup', query: { panel: 'login' } }" class="hm-btn hm-btn--primary">
+              Inicia sesión para comprar
+            </router-link>
+            <router-link to="/tienda" class="hm-btn hm-btn--ghost">Ver la tienda</router-link>
+          </div>
+        </div>
+      </template>
+
+      <!-- Evento -->
+      <template v-else-if="modal.type === 'event' && modal.data">
+        <div class="hm-media" v-if="modal.data.image">
+          <img :src="modal.data.image" :alt="modal.data.Title">
+        </div>
+        <div class="hm-body">
+          <div class="hm-event-head">
+            <div class="hm-date-badge">
+              <div class="hm-date-badge__day">{{ eventDay(modal.data) }}</div>
+              <div class="hm-date-badge__month">{{ eventMonth(modal.data) }}</div>
+            </div>
+            <h2 class="hm-title" :id="titleId">{{ modal.data.Title }}</h2>
+          </div>
+          <div class="hm-meta">
+            <span><i class="fas fa-clock"></i> {{ modal.data.time || 'Hora por confirmar' }}</span>
+            <span><i class="fas fa-map-marker-alt"></i> {{ modal.data.location || 'Ubicación por confirmar' }}</span>
+          </div>
+          <p class="hm-text">{{ modal.data.description || 'Este evento todavía no tiene descripción.' }}</p>
+          <hr class="hm-divider">
+          <div class="hm-price" v-if="modal.data.price">
+            <span class="hm-price__current">RD$ {{ modal.data.price }}</span>
+            <span class="hm-note">por boleta</span>
+          </div>
+          <p class="hm-note" v-if="hasStockInfo(modal.data)">
+            {{ maxQuantity > 0 ? `${maxQuantity} boletas disponibles` : 'Boletas agotadas' }}
+          </p>
+          <div class="hm-actions" v-if="user && canBuyEvent(modal.data)">
+            <div class="hm-qty">
+              <button type="button" @click="decrementQuantity" :disabled="quantity <= 1"
+                aria-label="Quitar una boleta">−</button>
+              <span aria-live="polite">{{ quantity }}</span>
+              <button type="button" @click="incrementQuantity" :disabled="quantity >= maxQuantity"
+                aria-label="Agregar una boleta">+</button>
+            </div>
+            <button type="button" class="hm-btn hm-btn--primary" :disabled="isAddingToCart"
+              @click="addEventToCart(modal.data)">
+              <i class="fas fa-ticket-alt"></i>
+              {{ isAddingToCart ? 'Agregando...' : `Añadir al carrito - RD$ ${modal.data.price * quantity}` }}
+            </button>
+            <router-link to="/calendario" class="hm-btn hm-btn--ghost">Ver el calendario</router-link>
+          </div>
+          <div class="hm-actions" v-else>
+            <router-link v-if="!user" :to="{ path: '/signup', query: { panel: 'login' } }"
+              class="hm-btn hm-btn--primary">
+              Inicia sesión para comprar boletas
+            </router-link>
+            <router-link to="/calendario" class="hm-btn hm-btn--ghost">Ver el calendario</router-link>
+          </div>
+        </div>
+      </template>
+
+      <!-- Publicación del foro -->
+      <template v-else-if="modal.type === 'post' && modal.data">
+        <div class="hm-media" v-if="postTieneImagen(modal.data)">
+          <img :src="modal.data.imagen" :alt="`Imagen de: ${modal.data.titulo}`">
+        </div>
+        <div class="hm-body">
+          <span class="hm-eyebrow" v-if="modal.data.categoria">{{ modal.data.categoria }}</span>
+          <div class="hm-author">
+            <img :src="getUserImage(modal.data.user)" alt="">
+            <div>
+              <span class="hm-author__name">{{ modal.data.user?.name || 'Usuario Anónimo' }}</span>
+              <span class="hm-author__date">{{ formatDate(modal.data.created_at) }}</span>
+            </div>
+          </div>
+          <h2 class="hm-title" :id="titleId">{{ modal.data.titulo }}</h2>
+          <p class="hm-text">{{ modal.data.contenido }}</p>
+          <div class="hm-stats">
+            <span><i class="fas fa-heart"></i> {{ modal.data.likes_count || 0 }} likes</span>
+            <span><i class="fas fa-comments"></i> {{ modal.data.comments_count || 0 }} comentarios</span>
+          </div>
+          <hr class="hm-divider">
+          <div class="hm-actions">
+            <router-link to="/foro" class="hm-btn hm-btn--primary">
+              {{ user ? 'Comentar en el foro' : 'Ir al foro' }} <i class="fas fa-arrow-right"></i>
+            </router-link>
+          </div>
+        </div>
+      </template>
+
+      <!-- Deporte del directorio -->
+      <template v-else-if="modal.type === 'sport' && modal.data">
+        <!-- Portada: el titulo va SOBRE la foto (no debajo) para que el
+             deporte se lea de una y la ficha no arranque con un bloque de
+             texto suelto. -->
+        <div class="hm-hero">
+          <img :src="modal.data.image" :alt="modal.data.name">
+          <div class="hm-hero__veil"></div>
+          <div class="hm-hero__content">
+            <h2 class="hm-hero__title" :id="titleId">{{ modal.data.name }}</h2>
+            <div class="hm-hero__tags" v-if="modal.data.region || modal.data.type || modal.data.popularity">
+              <span class="hm-chip" v-if="modal.data.region">
+                <i class="fas fa-map-marked-alt"></i> {{ modal.data.region }}
+              </span>
+              <span class="hm-chip" v-if="modal.data.type">
+                <i class="fas fa-users"></i> {{ modal.data.type }}
+              </span>
+              <span class="hm-chip hm-chip--accent" v-if="modal.data.popularity">
+                <i class="fas fa-fire"></i> {{ modal.data.popularity }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hm-body">
+          <p class="hm-text hm-text--lead">{{ modal.data.description }}</p>
+
+          <section class="hm-section" v-if="modal.data.requirements && modal.data.requirements.length">
+            <h3 class="hm-section__title">
+              <i class="fas fa-clipboard-check"></i> Qué necesitas
+            </h3>
+            <ul class="hm-gear">
+              <li v-for="(item, index) in modal.data.requirements" :key="index">
+                <i class="fas fa-check" aria-hidden="true"></i>
+                <span>{{ item }}</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="hm-section" v-if="modal.data.places && modal.data.places.length">
+            <h3 class="hm-section__title">
+              <i class="fas fa-map-marked-alt"></i> Dónde practicarlo
+              <span class="hm-section__count">{{ modal.data.places.length }}</span>
+            </h3>
+            <div class="hm-places">
+              <article class="hm-place" v-for="place in modal.data.places" :key="place.name">
+                <h5 class="hm-place__name">{{ place.name }}</h5>
+                <p class="hm-place__row" v-if="place.location">
+                  <i class="fas fa-location-dot" aria-hidden="true"></i> {{ place.location }}
+                </p>
+                <p class="hm-place__cost" v-if="place.cost">{{ place.cost }}</p>
+                <!-- Los enlaces vienen de la base de datos: solo se pintan si son
+                     http(s) reales, y siempre con rel="noopener noreferrer" para
+                     que la pestaña destino no pueda tocar la nuestra. -->
+                <a v-if="safeUrl(place.website)" class="hm-place__link" :href="safeUrl(place.website)" target="_blank"
+                  rel="noopener noreferrer">
+                  Visitar sitio web <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                </a>
+              </article>
+            </div>
+          </section>
+
+          <div class="hm-actions">
+            <router-link to="/directorio" class="hm-btn hm-btn--primary">
+              Ver todo el directorio <i class="fas fa-arrow-right"></i>
+            </router-link>
+          </div>
+        </div>
+      </template>
+
+    </HomeModal>
 
 
     <!-- Back to Top Button -->
@@ -366,8 +618,11 @@
     </button>
   </div>
 
-  <!-- Burbuja de Mensajes Flotante -->
-  <ChatBubbleComponent v-if="user" :user="user" />
+  <!-- Burbuja de Mensajes Flotante: se esconde mientras hay un pop-out
+       abierto, para que no quede flotando encima del contenido del modal. -->
+  <ChatBubbleComponent v-if="user && !modal.open" :user="user" />
+
+  <Alert v-if="openAlert" :key="alertKey" :type="alertType" :message="alertMessage" @close="openAlert = false" />
 
 </template>
 
@@ -378,7 +633,20 @@
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
+import HomeModal from './HomeModal.vue';
+import Alert from '../Alert.vue';
 import { supabase } from '../../supabaseClient';
+
+// Quita acentos y pasa a minusculas, para poder cruzar los nombres de las
+// tarjetas del Home ("Béisbol") con los del directorio sin depender de como
+// esten tildados en la base de datos.
+function normalize(text) {
+  return String(text || '')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .trim();
+}
 
 function throttle(func, wait) {
   let timeout = null;
@@ -408,16 +676,37 @@ function throttle(func, wait) {
 export default {
   components: {
     Navbar,
-    ChatBubbleComponent
+    ChatBubbleComponent,
+    HomeModal,
+    Alert
   },
   data() {
     return {
       user: null,
-      showModal: false,
-      selectedProduct: null,
+
+      // Pop-out activo. 'open' controla la animacion del modal, 'type' dice
+      // que plantilla se pinta ('news', 'product', 'event', 'post' o 'sport')
+      // y 'data' es el elemento que se abrio. Un solo modal a la vez.
+      // 'type'/'data' sobreviven un momento al cierre a proposito: si se
+      // borraran de golpe, el modal se vaciaria a mitad de la animacion de
+      // salida y se veria parpadear.
+      modal: { open: false, type: null, data: null },
+      modalCleanupTimer: null,
+      quantity: 1,
+      isAddingToCart: false,
+      isSavingNews: false,
+      savedNewsIds: [],
+
+      // Aviso flotante reutilizado del resto de la app (Alert.vue).
+      openAlert: false,
+      alertType: 'success',
+      alertMessage: '',
+      alertKey: 0,
+
       recentNews: [],
       recentProducts: [],
       popularPosts: [],
+      sports: [],
       stats: {
         users: 0,
         events: 0,
@@ -425,25 +714,29 @@ export default {
       },
       isLoading: false,
       featuredEvents: [], // Ahora se inicializa vacío, se llenará dinámicamente
+
+      // 'sportName' es el nombre tal cual esta en el directorio: sirve para
+      // cruzar la tarjeta con el deporte real y poder abrir su ficha completa
+      // en el pop-out (descripcion, equipo necesario, donde practicarlo).
       categories: [
         {
           name: "Baseball",
+          sportName: "Béisbol",
           image: "/imagenes/DirectorioDeDeportes/baseball.jpg",
-          slug: "futbol",
           popular: true,
           participation: 90,
         },
         {
           name: "Basketball",
+          sportName: "Baloncesto",
           image: "/imagenes/DirectorioDeDeportes/Baloncesto.jpg",
-          slug: "futbol",
           popular: true,
           participation: 50,
         },
         {
           name: "Domino",
+          sportName: "Dominó",
           image: "/imagenes/DirectorioDeDeportes/Domino.jpg",
-          slug: "futbol",
           popular: true,
           participation: 60,
         },
@@ -452,11 +745,18 @@ export default {
   },
 
   computed: {
-    filteredNews() {
-      if (this.activeFilter === 'all') {
-        return this.sportsNews;
-      }
-      return this.sportsNews.filter(news => news.category === this.activeFilter);
+    // Tope del selector de cantidad del pop-out abierto: el stock del
+    // producto o las boletas que quedan del evento. Si el dato no viene,
+    // se usa un tope razonable para no bloquear la compra.
+    maxQuantity() {
+      const item = this.modal.data;
+      if (!item) return 1;
+
+      const available = this.modal.type === 'product' ? item.stock : item.quantity;
+      if (available === null || available === undefined || available === '') return 10;
+
+      const parsed = Number(available);
+      return Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : 10;
     }
   },
 
@@ -512,15 +812,262 @@ export default {
     },
 
 
-    showProductModal(product) {
-      this.selectedProduct = product;
-      this.showModal = true;
-      document.body.style.overflow = 'hidden';
+    // =====================================================================
+    //  POP-OUTS
+    //
+    //  Todas las secciones abren el mismo componente (HomeModal) y solo
+    //  cambian el 'type'. El bloqueo del scroll, el cierre con Escape y el
+    //  manejo del foco los resuelve HomeModal, no esta vista.
+    // =====================================================================
+
+    openModal(type, data) {
+      if (!data) return;
+
+      clearTimeout(this.modalCleanupTimer);
+      // Copia superficial: lo que se edite dentro del pop-out (por ejemplo el
+      // estado "guardada" de una noticia) no debe mutar el listado de atras
+      // hasta que el servidor confirme.
+      this.modal = { open: true, type, data: { ...data } };
+      this.quantity = 1;
     },
+
     closeModal() {
-      this.showModal = false;
-      document.body.style.overflow = '';
+      this.modal.open = false;
+      this.quantity = 1;
+
+      // Se espera a que termine la animacion de salida (0.22s en
+      // HomeModal.vue) antes de soltar el contenido.
+      clearTimeout(this.modalCleanupTimer);
+      this.modalCleanupTimer = setTimeout(() => {
+        if (!this.modal.open) {
+          this.modal.type = null;
+          this.modal.data = null;
+        }
+      }, 260);
     },
+
+    openNews(news) {
+      this.openModal('news', news);
+    },
+
+    openProduct(product) {
+      this.openModal('product', product);
+    },
+
+    openEvent(event) {
+      this.openModal('event', event);
+    },
+
+    openPost(post) {
+      this.openModal('post', post);
+    },
+
+    // La tarjeta del Home es fija (imagen + barra de popularidad), pero la
+    // ficha que se abre sale del directorio real. Si el directorio todavia no
+    // cargo o el deporte no existe, se muestra igual una version basica en vez
+    // de dejar la tarjeta muerta.
+    openSport(category) {
+      const match = this.sports.find(
+        sport => normalize(sport.name) === normalize(category.sportName || category.name)
+      );
+
+      this.openModal('sport', match || {
+        name: category.sportName || category.name,
+        image: category.image,
+        description: 'Todavía estamos preparando la ficha completa de este deporte. Mientras tanto, puedes explorarlo en el directorio.',
+        requirements: [],
+        places: []
+      });
+    },
+
+    incrementQuantity() {
+      if (this.quantity < this.maxQuantity) this.quantity++;
+    },
+
+    decrementQuantity() {
+      if (this.quantity > 1) this.quantity--;
+    },
+
+    hasStockInfo(item) {
+      const value = this.modal.type === 'product' ? item?.stock : item?.quantity;
+      return value !== null && value !== undefined && value !== '';
+    },
+
+    canBuyEvent(event) {
+      return Number(event?.price) > 0 && this.maxQuantity > 0 && Number.isFinite(Number(event?.id));
+    },
+
+    postTieneImagen(post) {
+      return !!post?.imagen && !String(post.imagen).includes('no_image');
+    },
+
+    // Solo se pintan enlaces http(s). Sin este filtro, un "website" guardado
+    // como javascript:... en la base de datos se convertiria en un enlace
+    // ejecutable al hacerle click.
+    safeUrl(url) {
+      if (!url) return null;
+      try {
+        const parsed = new URL(String(url), window.location.origin);
+        return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : null;
+      } catch (error) {
+        return null;
+      }
+    },
+
+    truncate(text, length) {
+      const value = String(text || '');
+      return value.length > length ? `${value.substring(0, length)}...` : value;
+    },
+
+    notify(type, message) {
+      this.alertType = type;
+      this.alertMessage = message;
+      this.alertKey++;
+      this.openAlert = true;
+    },
+
+    eventDay(event) {
+      if (event?.date_iso) return new Date(event.date_iso).getDate();
+      return String(event?.date || '').split('/')[0] || '';
+    },
+
+    eventMonth(event) {
+      if (event?.date_iso) {
+        return new Date(event.date_iso).toLocaleDateString('es-ES', { month: 'short' });
+      }
+      return String(event?.date || '').split('/')[1] || '';
+    },
+
+    // =====================================================================
+    //  ACCIONES DEL USUARIO DENTRO DE LOS POP-OUTS
+    //
+    //  Ninguna manda el user_id: el backend saca al usuario del token
+    //  (auth:sanctum), asi que no se puede comprar ni guardar a nombre de
+    //  otra cuenta cambiando el payload desde el navegador.
+    // =====================================================================
+
+    async addProductToCart(product) {
+      if (!this.user || this.isAddingToCart) return;
+
+      this.isAddingToCart = true;
+      try {
+        await axios.post('/cart/items', {
+          item_type: 'product',
+          item_id: product.id,
+          quantity: this.quantity
+        });
+
+        window.dispatchEvent(new CustomEvent('cart-updated'));
+        this.notify('success', `¡${product.name} agregado al carrito!`);
+        this.closeModal();
+      } catch (error) {
+        console.error('Error al agregar el producto al carrito:', error);
+        this.notify('error', this.cartErrorMessage(error));
+      } finally {
+        this.isAddingToCart = false;
+      }
+    },
+
+    async addEventToCart(event) {
+      if (!this.user || this.isAddingToCart) return;
+
+      this.isAddingToCart = true;
+      try {
+        await axios.post('/cart/items', {
+          item_type: 'event',
+          item_id: event.id,
+          quantity: this.quantity
+        });
+
+        window.dispatchEvent(new CustomEvent('cart-updated'));
+        this.notify('success', `¡Boletas para ${event.Title} agregadas al carrito!`);
+        this.closeModal();
+      } catch (error) {
+        console.error('Error al agregar el evento al carrito:', error);
+        this.notify('error', this.cartErrorMessage(error));
+      } finally {
+        this.isAddingToCart = false;
+      }
+    },
+
+    cartErrorMessage(error) {
+      if (error.response?.status === 401) {
+        return 'Tu sesión expiró. Vuelve a iniciar sesión para comprar.';
+      }
+      return 'No se pudo agregar al carrito. Inténtalo de nuevo.';
+    },
+
+    isNewsSaved(newsId) {
+      return this.savedNewsIds.includes(Number(newsId));
+    },
+
+    async fetchSavedNews() {
+      if (!this.user) return;
+
+      try {
+        const { data } = await axios.get('/saved-news');
+        this.savedNewsIds = (data || []).map(Number);
+      } catch (error) {
+        console.error('Error al cargar las noticias guardadas:', error);
+      }
+    },
+
+    async toggleSaveNews(news) {
+      if (!this.user || this.isSavingNews) return;
+
+      this.isSavingNews = true;
+      try {
+        const { data } = await axios.post(`/news/${news.id}/toggle-save`);
+        const id = Number(news.id);
+
+        if (data.saved) {
+          if (!this.savedNewsIds.includes(id)) this.savedNewsIds.push(id);
+          this.notify('success', 'Noticia guardada en tu perfil');
+        } else {
+          this.savedNewsIds = this.savedNewsIds.filter(saved => saved !== id);
+          this.notify('success', 'Noticia quitada de tus guardadas');
+        }
+      } catch (error) {
+        console.error('Error al guardar la noticia:', error);
+        this.notify('error', 'No se pudo guardar la noticia. Inténtalo de nuevo.');
+      } finally {
+        this.isSavingNews = false;
+      }
+    },
+
+    // El directorio se guarda en el mismo cache de seccion que usa
+    // DirectorioView, asi que navegar Home -> Directorio no vuelve a pedirlo.
+    async fetchSports() {
+      const cached = this.$store.getters.sectionCache('directorio');
+      if (Array.isArray(cached) && cached.length > 0) {
+        this.sports = cached;
+        return;
+      }
+
+      try {
+        const { data } = await axios.get('/sports');
+        this.sports = (data.sports || []).map(sport => ({
+          id: sport.id,
+          name: sport.name,
+          region: sport.region,
+          type: sport.type,
+          popularity: sport.popularity,
+          // En la base de datos las rutas vienen sin "/" inicial: sin
+          // normalizar, el navegador las resolveria relativas a la ruta actual.
+          image: String(sport.image || '').startsWith('http') || String(sport.image || '').startsWith('/')
+            ? sport.image
+            : `/${sport.image}`,
+          shortDescription: sport.short_description ?? sport.shortDescription,
+          description: sport.description,
+          requirements: sport.requirements || [],
+          places: sport.places || [],
+        }));
+        this.$store.dispatch('cacheSection', { key: 'directorio', data: this.sports });
+      } catch (error) {
+        console.error('Error al cargar el directorio de deportes:', error);
+      }
+    },
+
     scrollToTop() {
       window.scrollTo({
         top: 0,
@@ -544,14 +1091,6 @@ export default {
           counter.innerText = target;
         }
       });
-    },
-
-    filterNews(category) {
-      this.activeFilter = category;
-      document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      event.target.classList.add('active');
     },
 
     getCalendarScrap() {
@@ -736,13 +1275,23 @@ export default {
 
   mounted() {
     document.title = 'SportFamilyRD - Comunidad Deportiva Dominicana';
+
+    // El usuario se lee ANTES de disparar las peticiones: fetchSavedNews solo
+    // tiene sentido si hay sesion, y antes esto se leia al final del mounted.
+    try {
+      const userData = sessionStorage.getItem('user');
+      this.user = userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.error('Datos de usuario invalidos en sessionStorage:', error);
+      this.user = null;
+    }
+
     this.fetchInitialData();
     this.animateElements();
     this.fetchFeaturedEvents(); // Llama a la función para cargar los eventos reales
+    this.fetchSports();         // Alimenta las fichas del directorio en el pop-out
+    this.fetchSavedNews();
     this.subscribeRealtime();
-
-    const userData = sessionStorage.getItem('user');
-    this.user = userData ? JSON.parse(userData) : null;
 
     // Optimizar scroll
     this.throttledScroll = throttle(this.handleScroll, 100);
@@ -750,6 +1299,7 @@ export default {
   },
 
   beforeUnmount() {
+    clearTimeout(this.modalCleanupTimer);
     window.removeEventListener('scroll', this.throttledScroll);
     if (this.realtimeChannel) {
       supabase.removeChannel(this.realtimeChannel);
@@ -764,6 +1314,10 @@ export default {
 @import '../../../scss/Home/home.scss';
 
 @import '../../../scss/Home/home_navbar.scss';
+
+/* Pop-outs: se importa despues de home.scss para poder ajustar las tarjetas
+   que ahora son pulsables sin tocar los estilos originales. */
+@import '../../../scss/Home/home_modal.scss';
 
 
 img {

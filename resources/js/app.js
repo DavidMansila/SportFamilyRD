@@ -49,6 +49,21 @@ const router = createRouter({
         { path: "/email/verified-success", component: EmailVerifiedSuccess },
         { path: "/email/verify/:id/:hash", component: VerificaApiCorreo },
     ],
+
+    // Al cambiar de seccion se empieza desde arriba. Sin esto, vue-router deja
+    // la pagina en la misma altura de scroll que traia: si el usuario estaba
+    // abajo en el Home (por ejemplo en "Comunidad") y entraba a Noticias o al
+    // Foro, caia a media pagina en vez del encabezado.
+    //
+    // 'savedPosition' solo tiene valor cuando se navega con las flechas de
+    // atras/adelante del navegador; en ese caso se respeta donde estaba el
+    // usuario, que es lo que uno espera al volver atras.
+    scrollBehavior(to, from, savedPosition) {
+        if (savedPosition) {
+            return savedPosition;
+        }
+        return { top: 0 };
+    },
 });
 
 // Paginate

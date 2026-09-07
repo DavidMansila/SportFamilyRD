@@ -1,0 +1,360 @@
+// ===========================================================================
+//  Directorio - ficha de un deporte
+//
+//  Reemplaza al bloque .sport-detail / .detail-* que estaba en directorio.scss
+//  y que tenia dos problemas: los colores estaban escritos a mano (#0056b3
+//  azul, #00796b verde agua) sin relacion con el naranja del navbar de esta
+//  seccion, y toda la ficha caia en una sola columna centrada, asi que la
+//  lista de equipo necesario dejaba media pantalla vacia en escritorio.
+//
+//  Los colores salen de var(--accent), que .sports-app define en
+//  _variables.scss a partir del degradado del navbar del Directorio.
+//  Comparte lenguaje visual con el pop-out del Home (home_modal.scss) a
+//  proposito: es el mismo contenido en dos sitios distintos.
+// ===========================================================================
+
+.sport-detail {
+    max-width: 1100px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+}
+
+// --- Volver -----------------------------------------------------------------
+.sd-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.sd-back:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: translateX(-3px);
+}
+
+.sd-back:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+// --- Portada ----------------------------------------------------------------
+.sd-hero {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--gray-800);
+    box-shadow: var(--shadow-md);
+    // Relacion fija: el alto no depende de la foto, asi que la pagina no
+    // "salta" cuando la imagen termina de cargar.
+    aspect-ratio: 21 / 9;
+}
+
+.sd-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+// Degradado solo en la mitad de abajo: el titulo se lee sobre cualquier foto
+// sin oscurecer la imagen entera.
+.sd-hero__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.85) 0%,
+            rgba(0, 0, 0, 0.45) 45%,
+            rgba(0, 0, 0, 0.05) 100%);
+}
+
+.sd-hero__content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sd-hero__title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+.sd-hero__title:focus {
+    // El titulo recibe el foco al abrir un deporte (ver selectSport): sin
+    // esto el navegador dibuja un contorno feo sobre la foto.
+    outline: none;
+}
+
+.sd-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.sd-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.sd-chip--accent {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+// --- Cuerpo: descripcion + equipo -------------------------------------------
+.sd-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 40px;
+    margin-top: 40px;
+    align-items: start;
+}
+
+.sd-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 16px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.sd-title i {
+    color: var(--accent);
+    font-size: 1.05rem;
+}
+
+.sd-count {
+    margin-left: auto;
+    min-width: 28px;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-100);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+// Frase de entrada: el resumen corto del deporte, destacado con una barra del
+// color de la seccion para separarlo de la descripcion larga.
+.sd-lead {
+    margin: 0 0 24px;
+    padding-left: 18px;
+    border-left: 3px solid var(--accent);
+    color: var(--gray-800);
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.55;
+}
+
+.sd-text {
+    margin: 0;
+    color: var(--gray-700);
+    font-size: 1.02rem;
+    line-height: 1.8;
+    white-space: pre-line;
+}
+
+.sd-aside {
+    padding: 26px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-alt);
+    // Se queda a la vista mientras se lee la descripcion larga de al lado.
+    position: sticky;
+    top: 24px;
+}
+
+.sd-gear {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sd-gear li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: var(--gray-700);
+    font-size: 0.94rem;
+    line-height: 1.5;
+}
+
+.sd-gear i {
+    flex-shrink: 0;
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.6rem;
+}
+
+// --- Lugares ----------------------------------------------------------------
+.sd-section {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+}
+
+.sd-places {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 20px;
+}
+
+.sd-place {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sd-place:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.sd-place__name {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text-primary);
+}
+
+.sd-place__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.sd-place__row i {
+    margin-top: 3px;
+    color: var(--accent);
+}
+
+.sd-place__cost {
+    align-self: flex-start;
+    margin: 4px 0 0;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-100);
+    color: var(--gray-700);
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.sd-place__link {
+    margin-top: auto;
+    padding-top: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent);
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.sd-place__link:hover {
+    text-decoration: underline;
+}
+
+.sd-place__link:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+}
+
+// --- Responsive -------------------------------------------------------------
+// Debajo de 992px la barra lateral pierde sentido (queda demasiado angosta
+// para nombres de equipo largos), asi que pasa a una sola columna.
+@media (max-width: 991.98px) {
+    .sd-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .sd-aside {
+        position: static;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .sport-detail {
+        padding: 0 16px;
+    }
+
+    .sd-hero {
+        aspect-ratio: 4 / 3;
+    }
+
+    .sd-hero__content {
+        padding: 20px;
+    }
+
+    .sd-grid {
+        margin-top: 28px;
+    }
+
+    .sd-lead {
+        font-size: 1.05rem;
+    }
+
+    .sd-aside {
+        padding: 20px;
+    }
+
+    .sd-section {
+        margin-top: 36px;
+        padding-top: 26px;
+    }
+}

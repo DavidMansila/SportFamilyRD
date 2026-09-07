@@ -1,0 +1,621 @@
+// ===========================================================================
+//  Pop-outs del Home
+//
+//  El caparazon (overlay, sombra, boton de cerrar, animacion) vive en
+//  HomeModal.vue. Aqui esta solo el CONTENIDO de cada variante: noticia,
+//  producto, evento, post del foro y deporte del directorio.
+//
+//  Ningun color va escrito a mano: todo sale de var(--accent), que HomeModal
+//  reasigna segun de que seccion venga el contenido (azul para una noticia,
+//  cyan para un producto, verde para un evento, violeta para el foro y
+//  naranja para el directorio; ver hm-theme--* en HomeModal.vue). Asi este
+//  archivo sirve igual para las cinco variantes.
+// ===========================================================================
+
+// --- Tarjetas del Home que ahora abren un pop-out -------------------------
+// Se marcan con .is-interactive para que se note que son pulsables y para
+// que tengan un anillo de foco visible al navegar con teclado.
+.is-interactive {
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.is-interactive:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+// Elevacion solo para las tarjetas que no tenian ningun :hover propio.
+// Las de noticias, eventos y productos ya traen el suyo en home.scss y se
+// respeta tal cual, para no cambiar como se ve el Home hoy.
+.category-card.is-interactive:hover,
+.category-card.is-interactive:focus-visible,
+.featured-news.is-interactive:hover,
+.featured-news.is-interactive:focus-visible,
+.forum-thread.is-interactive:hover,
+.forum-thread.is-interactive:focus-visible {
+    transform: translateY(-4px);
+}
+
+// El aviso "Ver detalles" que aparece encima de la tarjeta al pasar el mouse.
+.hover-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    transform: translate(-50%, 12px);
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--gray-900);
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.is-interactive:hover .hover-hint,
+.is-interactive:focus-visible .hover-hint {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+// --- Contenido comun de los pop-outs --------------------------------------
+.hm-media {
+    position: relative;
+    width: 100%;
+    // Relacion fija: la imagen nunca decide el alto del modal, asi que el
+    // contenido no "salta" cuando termina de cargar.
+    aspect-ratio: 16 / 7;
+    background: var(--gray-100);
+    overflow: hidden;
+}
+
+.hm-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hm-media__chip {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: capitalize;
+}
+
+.hm-body {
+    padding: var(--space-5) var(--space-6) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.hm-eyebrow {
+    align-self: flex-start;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-100);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.hm-title {
+    margin: 0;
+    font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--text-primary);
+}
+
+.hm-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-5);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.hm-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hm-text {
+    margin: 0;
+    color: var(--gray-700);
+    font-size: 1rem;
+    line-height: 1.75;
+    // Los saltos de linea del texto original se respetan sin necesidad de
+    // inyectar HTML.
+    white-space: pre-line;
+    word-break: break-word;
+}
+
+.hm-text a {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.hm-divider {
+    height: 1px;
+    background: var(--border);
+    border: 0;
+    margin: 0;
+}
+
+// --- Botones ---------------------------------------------------------------
+.hm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.hm-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.hm-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.hm-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.hm-btn--primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+.hm-btn--primary:hover:not(:disabled) {
+    background: var(--accent-strong);
+    transform: translateY(-2px);
+}
+
+.hm-btn--ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+.hm-btn--ghost:hover {
+    background: var(--gray-100);
+}
+
+.hm-btn--saved {
+    background: var(--accent-strong);
+    color: #fff;
+}
+
+// --- Precio y cantidad -----------------------------------------------------
+.hm-price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+}
+
+.hm-price__current {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.hm-price__old {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+}
+
+.hm-qty {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+
+.hm-qty button {
+    width: 42px;
+    height: 42px;
+    border: none;
+    background: var(--gray-100);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.hm-qty button:hover:not(:disabled) {
+    background: var(--gray-200);
+}
+
+.hm-qty button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.hm-qty span {
+    min-width: 48px;
+    text-align: center;
+    font-weight: 700;
+}
+
+// --- Autor (foro) ----------------------------------------------------------
+.hm-author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.hm-author img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+    flex-shrink: 0;
+}
+
+.hm-author__name {
+    display: block;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.hm-author__date {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.hm-stats {
+    display: flex;
+    gap: var(--space-5);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.hm-stats span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+// --- Evento ---------------------------------------------------------------
+.hm-event-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.hm-date-badge {
+    flex-shrink: 0;
+    width: 76px;
+    padding: var(--space-3) 0;
+    border-radius: var(--radius-md);
+    background: var(--accent);
+    color: #fff;
+    text-align: center;
+    line-height: 1.1;
+}
+
+.hm-date-badge__day {
+    font-size: 1.7rem;
+    font-weight: 800;
+}
+
+.hm-date-badge__month {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hm-note {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+// ===========================================================================
+//  Directorio (ficha de un deporte)
+//
+//  Es la variante con mas informacion (descripcion larga + equipo + lugares),
+//  asi que se organiza en tres bloques claros en vez de una sola columna de
+//  texto: portada con el nombre encima, "que necesitas" en rejilla y los
+//  lugares como tarjetas.
+// ===========================================================================
+
+// --- Portada ---------------------------------------------------------------
+.hm-hero {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    background: var(--gray-800);
+    overflow: hidden;
+}
+
+.hm-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+// Degradado oscuro solo en la parte de abajo: el titulo se lee sin importar
+// que tan clara sea la foto, y la mitad de arriba de la imagen queda limpia.
+.hm-hero__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.85) 0%,
+            rgba(0, 0, 0, 0.45) 45%,
+            rgba(0, 0, 0, 0.05) 100%);
+}
+
+.hm-hero__content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: var(--space-5) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.hm-hero__title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.hm-hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.hm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.hm-chip--accent {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+// --- Bloques de la ficha ---------------------------------------------------
+.hm-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+}
+
+.hm-section__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.hm-section__title i {
+    color: var(--accent);
+    font-size: 0.95rem;
+}
+
+.hm-section__count {
+    margin-left: auto;
+    min-width: 26px;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-100);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+// Parrafo de entrada: un pelin mas grande que el texto normal, para que la
+// descripcion del deporte lleve el peso de la ficha.
+.hm-text--lead {
+    font-size: 1.05rem;
+    color: var(--gray-800);
+}
+
+// --- Equipo necesario ------------------------------------------------------
+// Rejilla en vez de <ul>: la lista suele tener 5-6 items cortos y en una sola
+// columna dejaba media ficha vacia a la derecha.
+.hm-gear {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-2);
+}
+
+.hm-gear li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    color: var(--gray-700);
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.hm-gear i {
+    flex-shrink: 0;
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.6rem;
+}
+
+// --- Lugares ---------------------------------------------------------------
+.hm-places {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-3);
+}
+
+.hm-place {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.hm-place:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.hm-place__name {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text-primary);
+}
+
+.hm-place__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.hm-place__row i {
+    margin-top: 3px;
+    color: var(--accent);
+}
+
+.hm-place__cost {
+    align-self: flex-start;
+    margin: 4px 0 0;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-100);
+    color: var(--gray-700);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.hm-place__link {
+    margin-top: auto;
+    padding-top: var(--space-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.hm-place__link:hover {
+    text-decoration: underline;
+}
+
+.hm-place__link:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+}
+
+// --- Movil ----------------------------------------------------------------
+@media (max-width: 767.98px) {
+
+    .hm-media,
+    .hm-hero {
+        aspect-ratio: 4 / 3;
+    }
+
+    .hm-body {
+        padding: var(--space-4) var(--space-4) var(--space-6);
+    }
+
+    .hm-hero__content {
+        padding: var(--space-4);
+    }
+
+    .hm-actions .hm-btn {
+        flex: 1 1 100%;
+    }
+
+    .hm-gear,
+    .hm-places {
+        grid-template-columns: 1fr;
+    }
+}
