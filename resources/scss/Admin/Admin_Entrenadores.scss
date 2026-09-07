@@ -1,0 +1,748 @@
+// ===========================================================================
+//  Panel de admin: solicitudes de entrenadores
+//
+//  Este archivo estaba vacio y todos los estilos de la pagina vivian dentro
+//  del <style scoped> del componente. Ahi habia un bloque :root con su propia
+//  paleta (--primary-color: #4361ee, --danger-color: #f72585, --border-radius,
+//  --box-shadow, --transition...) que NUNCA se aplico: Vue compila los estilos
+//  con ambito anadiendo el atributo del componente al ultimo selector, asi que
+//  ":root" acababa como "[data-v-fbae8f4a]:root", y <html> jamas lleva ese
+//  atributo.
+//
+//  Resultado: los 37 usos de esas variables en la pagina resolvian a nada.
+//  Los botones de aprobar y rechazar salian con fondo transparente, las
+//  tarjetas sin esquinas redondeadas ni sombra, y ninguna transicion
+//  funcionaba. La pagina de administracion era, literalmente, la peor cuidada
+//  de la aplicacion sin que se viera el motivo en el codigo.
+//
+//  Ahora usa las variables reales del proyecto (_variables.scss), que si
+//  estan definidas en :root de verdad.
+// ===========================================================================
+
+.solicitudes-entrenadores-container {
+    // Acento propio del area de administracion, tomado del degradado de su
+    // navbar (#000000 -> #2c3e50).
+    --accent: #2c3e50;
+    --accent-strong: #1c2a36;
+    --accent-soft: rgba(44, 62, 80, 0.3);
+
+    min-height: 100vh;
+    background: var(--surface-alt);
+}
+
+.main-content {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-5) var(--space-8);
+}
+
+// ---------------------------------------------------------------------------
+//  Cabecera
+// ---------------------------------------------------------------------------
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border);
+}
+
+.title-wrapper {
+    flex: 1;
+    min-width: 280px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+}
+
+.page-subtitle {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+// Resumen de cuantas solicitudes hay en cada estado. Antes el admin tenia que
+// contar las tarjetas a ojo o ir cambiando el filtro para saberlo.
+.admin-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.admin-stat {
+    flex: 1 1 150px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    // El estado tambien se puede usar como filtro rapido.
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-stat:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.admin-stat.is-active {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-stat__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.admin-stat__dot--all {
+    background: var(--accent);
+}
+
+.admin-stat__dot--pending {
+    background: var(--warning);
+}
+
+.admin-stat__dot--approved {
+    background: var(--success);
+}
+
+.admin-stat__dot--rejected {
+    background: var(--danger);
+}
+
+.admin-stat__value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text-primary);
+}
+
+.admin-stat__label {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+// ---------------------------------------------------------------------------
+//  Filtro
+// ---------------------------------------------------------------------------
+.filters-section {
+    flex-shrink: 0;
+}
+
+.select-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.estado-filter {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 11px 44px 11px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.92rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.estado-filter:hover {
+    border-color: var(--accent);
+}
+
+.estado-filter:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--focus-ring);
+}
+
+.select-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+}
+
+// ---------------------------------------------------------------------------
+//  Tarjeta de solicitud
+// ---------------------------------------------------------------------------
+.solicitudes-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.solicitud-card {
+    border: 1px solid var(--border);
+    // La franja izquierda de color dice el estado de un vistazo, sin tener que
+    // buscar el distintivo de la esquina.
+    border-left: 4px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.solicitud-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.solicitud-card.pending {
+    border-left-color: var(--warning);
+}
+
+.solicitud-card.approved {
+    border-left-color: var(--success);
+}
+
+.solicitud-card.rejected {
+    border-left-color: var(--danger);
+    // Las rechazadas se apagan un poco: siguen consultables, pero no compiten
+    // por la atencion con las que hay que resolver.
+    opacity: 0.72;
+}
+
+.solicitud-card.rejected:hover {
+    opacity: 1;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    border-bottom: 1px solid var(--border);
+}
+
+.user-avatar {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.entrenador-nombre {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    overflow-wrap: break-word;
+}
+
+.fecha-solicitud {
+    display: block;
+    margin-top: 3px;
+    font-size: 0.84rem;
+    color: var(--text-muted);
+}
+
+// Distintivo de estado. Usa las mismas clases que ya traia la plantilla
+// (.estado-badge.pending, etc.) y comparte apariencia con .admin-badge.
+.estado-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.estado-badge::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.estado-badge.pending {
+    background: rgba(183, 121, 31, 0.12);
+    color: var(--warning);
+}
+
+.estado-badge.approved {
+    background: rgba(46, 125, 50, 0.12);
+    color: var(--success);
+}
+
+.estado-badge.rejected {
+    background: rgba(192, 58, 58, 0.12);
+    color: var(--danger);
+}
+
+// ---------------------------------------------------------------------------
+//  Cuerpo
+// ---------------------------------------------------------------------------
+.card-body {
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--surface-alt);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.info-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.info-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow-wrap: break-word;
+}
+
+.details-section {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+}
+
+.detail-item {
+    min-width: 0;
+}
+
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.detail-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 var(--space-3);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.detail-title .icon {
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.detail-content {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--gray-700);
+    overflow-wrap: break-word;
+}
+
+.detail-content a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.detail-content a:hover {
+    text-decoration: underline;
+}
+
+.no-items {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+// --- Logros -----------------------------------------------------------------
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-3);
+}
+
+.achievement-card {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.achievement-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.achievement-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.achievement-content {
+    min-width: 0;
+}
+
+.achievement-title {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    overflow-wrap: break-word;
+}
+
+.achievement-desc {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--gray-700);
+    overflow-wrap: break-word;
+}
+
+.achievement-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+// --- Especialidades ---------------------------------------------------------
+.specialties-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.specialty-badge {
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+// --- Documentos -------------------------------------------------------------
+.documentos-section {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+}
+
+.doc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    color: var(--accent);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.doc-link:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.doc-link:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+// ---------------------------------------------------------------------------
+//  Acciones (aprobar / rechazar)
+// ---------------------------------------------------------------------------
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border);
+    background: var(--surface-alt);
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-action:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn-action:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+// Aprobar es la accion principal: solida. Rechazar es destructiva pero no
+// deberia competir visualmente, asi que va perfilada y solo se llena al pasar
+// el mouse.
+.btn-approve {
+    background: var(--success);
+    color: #fff;
+}
+
+.btn-approve:hover:not(:disabled) {
+    background: #256428;
+    transform: translateY(-2px);
+}
+
+.btn-reject {
+    background: transparent;
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.btn-reject:hover:not(:disabled) {
+    background: var(--danger);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+// ---------------------------------------------------------------------------
+//  Estado vacio
+// ---------------------------------------------------------------------------
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-8) var(--space-5);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+}
+
+.empty-icon-wrapper {
+    margin-bottom: var(--space-4);
+    color: var(--gray-300);
+}
+
+.empty-state h3 {
+    margin: 0 0 var(--space-2);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.empty-state p {
+    margin: 0 0 var(--space-5);
+    color: var(--text-muted);
+    font-size: 0.94rem;
+}
+
+.btn-clear-filters {
+    padding: 11px 24px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-clear-filters:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.btn-clear-filters:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+// --- Cargando ---------------------------------------------------------------
+.admin-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.admin-skeleton__card {
+    height: 190px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(90deg,
+            rgba(0, 0, 0, 0.05) 25%,
+            rgba(0, 0, 0, 0.09) 37%,
+            rgba(0, 0, 0, 0.05) 63%);
+    background-size: 400% 100%;
+    animation: adminSkeleton 1.4s ease infinite;
+}
+
+@keyframes adminSkeleton {
+    0% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+// ---------------------------------------------------------------------------
+//  Responsive
+// ---------------------------------------------------------------------------
+@media (max-width: 991.98px) {
+    .details-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .main-content {
+        padding: var(--space-5) var(--space-4) var(--space-6);
+    }
+
+    .header-section {
+        align-items: stretch;
+    }
+
+    .filters-section,
+    .select-wrapper,
+    .estado-filter {
+        width: 100%;
+    }
+
+    .card-header {
+        flex-wrap: wrap;
+        padding: var(--space-4);
+    }
+
+    .estado-badge {
+        // Al envolverse, el distintivo pasa a la linea de abajo alineado con
+        // el nombre en vez de quedar colgado a la derecha.
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: var(--space-2);
+    }
+
+    .card-body,
+    .card-actions {
+        padding: var(--space-4);
+    }
+
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+
+    // Los botones a ancho completo: en un telefono, dos botones pequeños
+    // pegados uno al lado del otro se pulsan mal, y aqui uno de ellos rechaza
+    // una solicitud.
+    .card-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn-action {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .solicitud-card,
+    .achievement-card,
+    .btn-action,
+    .admin-stat {
+        transition: none;
+    }
+
+    .admin-skeleton__card {
+        animation: none;
+    }
+}

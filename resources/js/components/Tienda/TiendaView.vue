@@ -110,22 +110,29 @@
             <i class="fas fa-shopping-cart">Agregar</i>
           </button>
 
-          <button v-if="user?.user_type === 'admin'" @click.stop="abrirFormularioProducto(producto)" class="btn-editar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        </div>
+
+        <!-- Acciones de admin agrupadas arriba a la derecha de la tarjeta.
+             Antes iban sueltas dentro de .product-info, cada una posicionada
+             por su cuenta con `right: 50px` / `right: 10px`. -->
+        <div v-if="user?.user_type === 'admin'" class="admin-actions">
+          <button type="button" class="btn-editar" :aria-label="`Editar ${producto.name}`" title="Editar producto"
+            @click.stop="abrirFormularioProducto(producto)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
           </button>
 
-          <button v-if="user?.user_type === 'admin'" @click.stop="eliminarProducto(producto.id)" class="btn-eliminar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="btn-eliminar" :aria-label="`Eliminar ${producto.name}`" title="Eliminar producto"
+            @click.stop="pedirConfirmacionBorrado(producto)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
           </button>
-
         </div>
       </div>
     </div>
@@ -217,50 +224,100 @@
     </transition>
 
     <!-- Botón flotante admin -->
-    <button v-if="user?.user_type === 'admin'" @click="abrirFormularioProducto" class="floating-admin-btn">
-      <i class="fas fa-plus"></i>
+    <button v-if="user?.user_type === 'admin'" @click="abrirFormularioProducto" class="floating-admin-btn"
+      data-admin-label="Nuevo producto" aria-label="Crear un producto nuevo">
+      <i class="fas fa-plus" aria-hidden="true"></i>
     </button>
 
-    <!-- Modal formulario (agregar al final del template) -->
-    <div class="admin-modal" v-if="showAdminForm" @click.self="cerrarAdminForm">
-      <div class="admin-modal-content">
-        <h2>{{ editingProduct ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+    <!-- Modal formulario de producto -->
+    <div class="admin-modal" v-if="showAdminForm" @click.self="cerrarAdminForm" @keydown.esc="cerrarAdminForm">
+      <div class="admin-modal-content" role="dialog" aria-modal="true" aria-labelledby="titulo-form-producto">
+        <div class="admin-modal__header">
+          <div>
+            <h2 class="admin-modal__title" id="titulo-form-producto">
+              {{ editingProduct ? 'Editar producto' : 'Nuevo producto' }}
+            </h2>
+            <p class="admin-modal__subtitle">
+              {{ editingProduct ? 'Los cambios se aplican de inmediato en la tienda.' : 'El producto aparecerá en la tienda al guardarlo.' }}
+            </p>
+          </div>
+          <button type="button" class="admin-modal__close" @click="cerrarAdminForm" aria-label="Cerrar formulario">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path fill="currentColor"
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z" />
+            </svg>
+          </button>
+        </div>
 
         <form @submit.prevent="guardarProducto">
-          <div class="form-group">
-            <input v-model="formProducto.name" placeholder="Nombre del producto" required>
-          </div>
+          <!-- Los campos llevan <label> de verdad: antes solo tenian
+               placeholder, que desaparece al escribir (y los lectores de
+               pantalla no lo anuncian como nombre del campo). -->
+          <div class="admin-form-body">
+            <div class="form-group form-group--full">
+              <label for="prod-nombre">Nombre del producto <span class="required">*</span></label>
+              <input id="prod-nombre" v-model="formProducto.name" placeholder="Ej. Guante de béisbol Wilson A2000"
+                required>
+            </div>
 
-          <div class="form-group">
-            <textarea v-model="formProducto.description" placeholder="Descripción" required></textarea>
-          </div>
+            <div class="form-group form-group--full">
+              <label for="prod-desc">Descripción <span class="required">*</span></label>
+              <textarea id="prod-desc" v-model="formProducto.description"
+                placeholder="Material, tallas, para qué sirve..." required></textarea>
+            </div>
 
-          <div class="form-group">
-            <input type="number" v-model="formProducto.price" placeholder="Precio (RD$)" step="0.01" required>
-          </div>
+            <div class="form-group">
+              <label for="prod-precio">Precio (RD$) <span class="required">*</span></label>
+              <input id="prod-precio" type="number" v-model="formProducto.price" placeholder="0.00" step="0.01" min="0"
+                required>
+            </div>
 
-          <div class="form-group">
-            <select v-model="formProducto.category" required>
-              <option value="">Seleccionar categoría</option>
-              <option v-for="cat in categoriasFlat" :value="cat.valor">{{ cat.texto }}</option>
-            </select>
-          </div>
+            <div class="form-group">
+              <label for="prod-stock">Stock disponible <span class="required">*</span></label>
+              <input id="prod-stock" type="number" v-model="formProducto.stock" placeholder="0" min="0" required>
+            </div>
 
-          <div class="form-group">
-            <input v-model="formProducto.image" placeholder="URL de la imagen" required>
-          </div>
+            <div class="form-group form-group--full">
+              <label for="prod-cat">Categoría <span class="required">*</span></label>
+              <select id="prod-cat" v-model="formProducto.category" required>
+                <option value="">Seleccionar categoría</option>
+                <option v-for="cat in categoriasFlat" :key="cat.valor" :value="cat.valor">{{ cat.texto }}</option>
+              </select>
+            </div>
 
-          <div class="form-group">
-            <input type="number" v-model="formProducto.stock" placeholder="Stock disponible" required>
+            <div class="form-group form-group--full">
+              <label for="prod-img">URL de la imagen <span class="required">*</span></label>
+              <input id="prod-img" v-model="formProducto.image" placeholder="https://..." required>
+              <span class="form-hint">Debe ser un enlace directo a la imagen (termina en .jpg, .png o .webp).</span>
+            </div>
+
+            <!-- Vista previa: evita guardar un producto con la URL mal escrita
+                 y descubrirlo despues en la rejilla de la tienda. -->
+            <div class="form-group form-group--full" v-if="formProducto.image">
+              <label>Vista previa</label>
+              <img :src="formProducto.image" alt="" class="admin-image-preview" @error="imagenPreviewFallo = true"
+                @load="imagenPreviewFallo = false">
+              <span class="form-hint" v-if="imagenPreviewFallo">
+                No se pudo cargar esa imagen. Revisa el enlace antes de guardar.
+              </span>
+            </div>
           </div>
 
           <div class="form-actions">
             <button type="button" @click="cerrarAdminForm" class="btn-cancelar">Cancelar</button>
-            <button type="submit" class="btn-guardar">{{ editingProduct ? 'Actualizar' : 'Crear' }}</button>
+            <button type="submit" class="btn-guardar" :disabled="guardandoProducto">
+              {{ guardandoProducto ? 'Guardando...' : (editingProduct ? 'Guardar cambios' : 'Crear producto') }}
+            </button>
           </div>
         </form>
       </div>
     </div>
+
+    <ConfirmDialog :open="!!productoAEliminar" :busy="eliminandoProducto" title="Eliminar producto"
+      confirm-label="Sí, eliminar" @cancel="productoAEliminar = null" @confirm="eliminarProducto">
+      Se va a eliminar <strong>{{ productoAEliminar?.name }}</strong> de la tienda de forma permanente.
+      Esta acción no se puede deshacer.
+    </ConfirmDialog>
 
   </div>
 
@@ -282,6 +339,7 @@ import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
 import Alert from '../Alert.vue';
+import ConfirmDialog from '../ui/ConfirmDialog.vue';
 
 export default {
   name: 'TiendaComponent',
@@ -289,7 +347,8 @@ export default {
     Navbar,
     ChatBubbleComponent,
     paginatorComponent,
-    Alert
+    Alert,
+    ConfirmDialog
   },
   data() {
     return {
@@ -364,6 +423,12 @@ export default {
       quantity: 1,
       showAdminForm: false,
       editingProduct: null,
+      guardandoProducto: false,
+      imagenPreviewFallo: false,
+      // Producto que el admin pidio borrar; mientras no sea null, el dialogo
+      // de confirmacion esta abierto.
+      productoAEliminar: null,
+      eliminandoProducto: false,
       formProducto: this.resetForm(),
       categoriasFlat: [],
       user: null,
@@ -518,6 +583,7 @@ export default {
     },
 
     abrirFormularioProducto(producto = null) {
+      this.imagenPreviewFallo = false;
       if (producto) {
         this.editingProduct = producto.id
         this.formProducto = { ...producto }
@@ -539,70 +605,75 @@ export default {
         stock: parseInt(this.formProducto.stock)
       };
 
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      };
+      // El token lo pone el interceptor de bootstrap.js; aqui solo hace falta
+      // declarar el tipo de contenido.
+      const config = { headers: { 'Content-Type': 'application/json' } };
 
-      if (this.editingProduct) {
-        axios.put(`/products/${this.editingProduct}`, requestData, config)
-          .then(() => {
-            this.getProducts();
-            this.cerrarAdminForm();
-            
-            this.alertType = 'success';
-            this.alertMessage = 'Producto actualizado correctamente';
-            this.alertKey++;
-            this.openModal = true;
-          })
-          .catch(error => {
-            console.error('Error:', error.response?.data);
-         
-            this.alertType = 'error';
-            this.alertMessage = error.response?.data?.message || 'Error al actualizar';
-            this.alertKey++;
-            this.openModal = true;
-          });
-      } else {
-        axios.post('/products', requestData, config)
-          .then(() => {
-            this.getProducts();
-            this.cerrarAdminForm();
-            
-            this.alertType = 'success';
-            this.alertMessage = 'Producto creado correctamente';
-            this.alertKey++;
-            this.openModal = true;
-          })
-          .catch(error => {
-            console.error('Error:', error.response?.data);
-           
-            this.alertType = 'error';
-            this.alertMessage = error.response?.data?.message || 'Error al crear';
-            this.alertKey++;
-            this.openModal = true;
-          });
-      }
-    },
+      const esEdicion = !!this.editingProduct;
+      const peticion = esEdicion
+        ? axios.put(`/products/${this.editingProduct}`, requestData, config)
+        : axios.post('/products', requestData, config);
 
-    async eliminarProducto(id) {
-      if (confirm('¿Eliminar este producto permanentemente?')) {
-        try {
-          await axios.delete(`/products/${id}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          })
-          this.getProducts()
-        } catch (error) {
-          console.error('Error eliminando producto:', error)
-          this.alertType = 'error';
-          this.alertMessage = 'Error eliminando producto';
+      this.guardandoProducto = true;
+
+      peticion
+        .then(() => {
+          this.getProducts();
+          this.cerrarAdminForm();
+
+          this.alertType = 'success';
+          this.alertMessage = esEdicion
+            ? 'Producto actualizado correctamente'
+            : 'Producto creado correctamente';
           this.alertKey++;
           this.openModal = true;
-        }
+        })
+        .catch(error => {
+          console.error('Error:', error.response?.data);
+
+          this.alertType = 'error';
+          this.alertMessage = error.response?.data?.message
+            || (esEdicion ? 'Error al actualizar el producto' : 'Error al crear el producto');
+          this.alertKey++;
+          this.openModal = true;
+        })
+        .finally(() => {
+          this.guardandoProducto = false;
+        });
+    },
+
+    pedirConfirmacionBorrado(producto) {
+      this.productoAEliminar = producto;
+    },
+
+    async eliminarProducto() {
+      if (!this.productoAEliminar || this.eliminandoProducto) return;
+
+      this.eliminandoProducto = true;
+      const nombre = this.productoAEliminar.name;
+
+      try {
+        // Sin cabecera Authorization a mano: el interceptor de bootstrap.js ya
+        // adjunta el token. La que habia aqui leia de localStorage, donde el
+        // token nunca se guarda (vive en sessionStorage), asi que mandaba
+        // "Bearer null" y solo funcionaba porque el interceptor la pisaba.
+        await axios.delete(`/products/${this.productoAEliminar.id}`);
+
+        this.productoAEliminar = null;
+        this.getProducts();
+
+        this.alertType = 'success';
+        this.alertMessage = `"${nombre}" se eliminó de la tienda`;
+        this.alertKey++;
+        this.openModal = true;
+      } catch (error) {
+        console.error('Error eliminando producto:', error);
+        this.alertType = 'error';
+        this.alertMessage = 'No se pudo eliminar el producto. Inténtalo de nuevo.';
+        this.alertKey++;
+        this.openModal = true;
+      } finally {
+        this.eliminandoProducto = false;
       }
     },
 

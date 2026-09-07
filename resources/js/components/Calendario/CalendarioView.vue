@@ -70,24 +70,24 @@
               <span class="event-price" v-if="event.price">${{ event.price }}</span>
               <span class="event-price free" v-else>Gratis</span>
             </div>
-            <div v-if="user?.user_type === 'admin'" class="event-actions">
-
-              <button class="btn-editar" @click.stop="openEventForm(event)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div v-if="user?.user_type === 'admin'" class="admin-actions">
+              <button type="button" class="btn-editar" :aria-label="`Editar ${event.Title}`" title="Editar evento"
+                @click.stop="openEventForm(event)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
               </button>
 
-              <button class="btn-eliminar" @click.stop="deleteEvent(event.id)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button type="button" class="btn-eliminar" :aria-label="`Eliminar ${event.Title}`" title="Eliminar evento"
+                @click.stop="pedirConfirmacionBorrado(event)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                 </svg>
               </button>
-
             </div>
           </div>
         </div>
@@ -197,61 +197,96 @@
     </div>
 
     <!-- Botón flotante admin -->
-    <button v-if="user?.user_type === 'admin'" @click="openEventForm" class="floating-admin-btn">
-      <i class="fas fa-plus"></i>
+    <button v-if="user?.user_type === 'admin'" @click="openEventForm" class="floating-admin-btn"
+      data-admin-label="Nuevo evento" aria-label="Crear un evento nuevo">
+      <i class="fas fa-plus" aria-hidden="true"></i>
     </button>
 
     <!-- Modal formulario evento -->
     <div class="admin-modal" v-if="showEventForm" @click.self="closeEventForm">
-      <div class="admin-modal-content">
-        <h2>{{ editingEvent ? 'Editar Evento' : 'Nuevo Evento' }}</h2>
+      <div class="admin-modal-content" role="dialog" aria-modal="true" aria-labelledby="titulo-form-evento">
+        <div class="admin-modal__header">
+          <div>
+            <h2 class="admin-modal__title" id="titulo-form-evento">
+              {{ editingEvent ? 'Editar evento' : 'Nuevo evento' }}
+            </h2>
+            <p class="admin-modal__subtitle">
+              {{ editingEvent ? 'Los cambios se ven al instante en el calendario.' : 'Aparecerá en el calendario y en los eventos destacados del inicio.' }}
+            </p>
+          </div>
+          <button type="button" class="admin-modal__close" @click="closeEventForm" aria-label="Cerrar formulario">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path fill="currentColor"
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z" />
+            </svg>
+          </button>
+        </div>
 
         <form @submit.prevent="saveEvent">
-          <div class="form-group">
-            <input v-model="formEvent.Title" placeholder="Nombre del evento" required>
-          </div>
-
-          <div class="form-group">
-            <label>Fecha</label>
-            <input type="date" v-model="formEvent.date" required>
-          </div>
-
-          <div class="form-group time-group">
-            <div>
-              <label>Hora</label>
-              <input type="time" v-model="formEvent.time" required>
+          <!-- Ocho campos: sin cabecera y pie fijos, el boton "Guardar"
+               quedaba fuera de la pantalla y habia que bajar a buscarlo. -->
+          <div class="admin-form-body">
+            <div class="form-group form-group--full">
+              <label for="ev-titulo">Nombre del evento <span class="required">*</span></label>
+              <input id="ev-titulo" v-model="formEvent.Title" placeholder="Ej. Torneo Nacional de Béisbol" required>
             </div>
-          </div>
 
-          <div class="form-group">
-            <textarea v-model="formEvent.Description" placeholder="Descripción"></textarea>
-          </div>
+            <div class="form-group">
+              <label for="ev-fecha">Fecha <span class="required">*</span></label>
+              <input id="ev-fecha" type="date" v-model="formEvent.date" required>
+            </div>
 
-          <div class="form-group">
-            <input type="number" v-model="formEvent.price" placeholder="Precio" step="0.01" required>
-          </div>
+            <div class="form-group">
+              <label for="ev-hora">Hora <span class="required">*</span></label>
+              <input id="ev-hora" type="time" v-model="formEvent.time" required>
+            </div>
 
-          <div class="form-group">
-            <input type="number" v-model="formEvent.quantity" placeholder="Boletos disponibles" required>
-          </div>
+            <div class="form-group form-group--full">
+              <label for="ev-lugar">Ubicación <span class="required">*</span></label>
+              <input id="ev-lugar" v-model="formEvent.place" placeholder="Ej. Estadio Quisqueya, Santo Domingo"
+                required>
+            </div>
 
-          <div class="form-group">
-            <input v-model="formEvent.place" placeholder="Ubicación" required>
-          </div>
+            <div class="form-group">
+              <label for="ev-precio">Precio por boleta (RD$) <span class="required">*</span></label>
+              <input id="ev-precio" type="number" v-model="formEvent.price" placeholder="0.00" step="0.01" min="0"
+                required>
+              <span class="form-hint">Pon 0 si el evento es gratis.</span>
+            </div>
 
-          <div class="form-group">
-            <input v-model="formEvent.image" placeholder="URL de imagen">
+            <div class="form-group">
+              <label for="ev-cantidad">Boletas disponibles <span class="required">*</span></label>
+              <input id="ev-cantidad" type="number" v-model="formEvent.quantity" placeholder="0" min="1" required>
+            </div>
+
+            <div class="form-group form-group--full">
+              <label for="ev-desc">Descripción</label>
+              <textarea id="ev-desc" v-model="formEvent.Description"
+                placeholder="Qué se celebra, quién participa, a qué hora abren puertas..."></textarea>
+              <span class="form-hint">Es lo que se lee al abrir el evento desde el inicio o el calendario.</span>
+            </div>
+
+            <div class="form-group form-group--full">
+              <label for="ev-img">URL de imagen</label>
+              <input id="ev-img" v-model="formEvent.image" placeholder="https://...">
+            </div>
           </div>
 
           <div class="form-actions">
             <button type="button" @click="closeEventForm" class="btn-cancelar">Cancelar</button>
-            <button type="submit" class="btn-guardar">{{ editingEvent ? 'Actualizar' : 'Crear' }}</button>
+            <button type="submit" class="btn-guardar">
+              {{ editingEvent ? 'Guardar cambios' : 'Crear evento' }}
+            </button>
           </div>
         </form>
       </div>
     </div>
 
-
+    <ConfirmDialog :open="!!eventoAEliminar" :busy="eliminandoEvento" title="Eliminar evento"
+      confirm-label="Sí, eliminar" @cancel="eventoAEliminar = null" @confirm="deleteEvent">
+      Se va a eliminar <strong>{{ eventoAEliminar?.Title }}</strong> del calendario de forma permanente.
+      Esta acción no se puede deshacer.
+    </ConfirmDialog>
 
   </div>
 
@@ -272,6 +307,7 @@ import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
+import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import { supabase } from '../../supabaseClient';
 
 export default {
@@ -279,11 +315,16 @@ export default {
   components: {
     Navbar,
     ChatBubbleComponent,
-    Alert
+    Alert,
+    ConfirmDialog
   },
   data() {
 
     return {
+      // Evento que el admin pidio borrar; mientras no sea null, el dialogo de
+      // confirmacion esta abierto.
+      eventoAEliminar: null,
+      eliminandoEvento: false,
       alertType: '',
       alertMessage: '',
       alertKey: 0,
@@ -637,16 +678,13 @@ export default {
 
     async saveEvent() {
       try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        };
-
+        // El token lo adjunta el interceptor de bootstrap.js. La cabecera que
+        // habia aqui leia de localStorage, donde el token nunca se guarda
+        // (vive en sessionStorage), asi que mandaba "Bearer null".
         if (this.editingEvent) {
-          await axios.put(`/calendar/${this.editingEvent}`, this.formEvent, config);
+          await axios.put(`/calendar/${this.editingEvent}`, this.formEvent);
         } else {
-          await axios.post('/calendar', this.formEvent, config);
+          await axios.post('/calendar', this.formEvent);
         }
 
         this.getCalendarFromDB();
@@ -659,25 +697,47 @@ export default {
         }, 3000);
       } catch (error) {
         console.error('Error guardando evento:', error);
-        
-        alertType = 'error';
-        alertMessage = error.response?.data?.message || 'Error al guardar';
+
+        // Faltaba el "this.": eran asignaciones a variables no declaradas, que
+        // en un modulo ES lanzan ReferenceError. Es decir, cuando fallaba el
+        // guardado, el propio manejador de errores reventaba y el admin no
+        // veia ningun aviso.
+        this.alertType = 'error';
+        this.alertMessage = error.response?.data?.message || 'Error al guardar el evento';
+        this.alertKey++;
         this.openModal = true;
       }
     },
 
-    async deleteEvent(eventId) {
-      if (confirm('¿Eliminar este evento permanentemente?')) {
-        try {
-          await axios.delete(`/calendar/${eventId}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          });
-          this.getCalendarFromDB();
-        } catch (error) {
-          console.error('Error eliminando evento:', error);
-        }
+    pedirConfirmacionBorrado(evento) {
+      this.eventoAEliminar = evento;
+    },
+
+    async deleteEvent() {
+      if (!this.eventoAEliminar || this.eliminandoEvento) return;
+
+      this.eliminandoEvento = true;
+      const titulo = this.eventoAEliminar.Title;
+
+      try {
+        await axios.delete(`/calendar/${this.eventoAEliminar.id}`);
+
+        this.eventoAEliminar = null;
+        this.getCalendarFromDB();
+
+        this.successEventMessage = `"${titulo}" se eliminó del calendario`;
+        this.showEventSuccess = true;
+        setTimeout(() => { this.showEventSuccess = false; }, 3000);
+      } catch (error) {
+        // Antes este catch solo hacia console.error: si el borrado fallaba, el
+        // evento seguia ahi y el admin no tenia forma de saber por que.
+        console.error('Error eliminando evento:', error);
+        this.alertType = 'error';
+        this.alertMessage = 'No se pudo eliminar el evento. Inténtalo de nuevo.';
+        this.alertKey++;
+        this.openModal = true;
+      } finally {
+        this.eliminandoEvento = false;
       }
     },
 
@@ -728,6 +788,8 @@ export default {
 <style scoped>
 @import '../../../scss/Calendario/calendario_navbar.scss';
 @import '../../../scss/Calendario/calendario.scss';
+
+@import '../../../scss/Admin/Admin_Calendario.scss';
 
 
 /* Notificación de éxito */
@@ -782,200 +844,11 @@ export default {
 
 
 
-/* Estilos para el botón flotante */
-.floating-admin-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #357e36;
-  color: white;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.floating-admin-btn:hover {
-  background: #0f6110;
-  transform: scale(1.1);
-}
-
-/* Estilos para el modal de admin */
-.admin-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.admin-modal-content {
-  background: white;
-  border-radius: 12px;
-  padding: 30px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.admin-modal-content h2 {
-  margin-top: 0;
-  color: #2a4d69;
-  text-align: center;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #34495e;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.form-group textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.time-group {
-  display: flex;
-  gap: 15px;
-}
-
-.time-group>div {
-  flex: 1;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.btn-cancelar {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn-guardar {
-  background: #2a4d69;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-/* Botones admin en tarjetas de eventos */
-.event-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-
-
-/* Botones de edición en tarjetas */
-.btn-editar,
-.btn-eliminar {
-  bottom: 20px;
-  right: 20px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #46696f;
-  color: rgb(0, 0, 0);
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  font-size: 1.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.btn-editar {
-  right: 50px;
-  background: #aeffb2;
-}
-
-.btn-eliminar {
-  right: 10px;
-  background: #ffaeae;
-}
-
-.btn-editar:hover,
-.btn-eliminar:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.btn-editar i {
-  font-size: 14px;
-}
-
-.btn-eliminar i {
-  font-size: 14px;
-}
-
-.btn-editar i::before {
-  content: "\f304";
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-}
-
-.btn-eliminar i::before {
-  content: "\f2ed";
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-}
-
-.floating-admin-btn i::before {
-  content: "\2b";
-  /* Icono de más */
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-  font-size: 1.4rem;
-  /* Un poco más grande porque es un botón flotante */
-  padding: 4px;
-}
-
+/* Las acciones de administracion (boton flotante, modal, formulario, botones
+   de editar/eliminar) estaban escritas aqui a mano, casi identicas a las de
+   Admin_tienda.scss pero con otros colores: verde #357e36 y tamaño 60px aqui,
+   cyan #46696f y 56px alla. Ahora las dos secciones usan la misma capa
+   compartida, que toma el color de cada seccion de var(--accent). */
 
 .no-scroll {
   overflow: hidden;

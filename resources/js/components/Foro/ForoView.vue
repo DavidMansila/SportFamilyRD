@@ -299,7 +299,7 @@
                           Editar
                         </button>
                         <button v-if="isCommentAuthor(comentario) || (user && user.user_type === 'admin')"
-                          @click="eliminarComentario(comentario)" class="comment-action delete-btn">
+                          @click="confirmarEliminarComentario(comentario)" class="comment-action delete-btn">
                           Eliminar
                         </button>
 
@@ -370,7 +370,7 @@
                                 Editar
                               </button>
                               <button v-if="isReplyAuthor(reply) || (user && user.user_type === 'admin')"
-                                @click="eliminarReply(reply)" class="comment-action delete-btn">
+                                @click="confirmarEliminarReply(reply)" class="comment-action delete-btn">
                                 Eliminar
                               </button>
 
@@ -531,6 +531,9 @@
   <!-- Burbuja de Mensajes Flotante -->
   <ChatBubbleComponent v-if="user && !mostrarModal && !postSeleccionado" :user="user" />
 
+  <ConfirmDialog :open="!!confirmacion" :title="confirmacion?.titulo || ''" :message="confirmacion?.texto || ''"
+    confirm-label="Sí, eliminar" @cancel="confirmacion = null" @confirm="ejecutarConfirmacion" />
+
   <Alert v-if="openModal" :key="alertKey" :type="alertType" :message="alertMessage" @close="openModal = false" />
 </template>
 
@@ -542,6 +545,7 @@ import Navbar from '../navbarComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
+import ConfirmDialog from '../ui/ConfirmDialog.vue';
 
 export default {
   name: 'ForoComponent',
@@ -549,7 +553,8 @@ export default {
     paginatorComponent,
     Navbar,
     ChatBubbleComponent,
-    Alert
+    Alert,
+    ConfirmDialog
   },
   data() {
     return {
@@ -573,6 +578,10 @@ export default {
       },
       imagenMiniatura: null,
       postSeleccionado: null,
+      // Accion destructiva pendiente de confirmar. Guarda el texto del
+      // dialogo y la funcion que hay que ejecutar si el usuario acepta, para
+      // que post, comentario y respuesta compartan un solo dialogo.
+      confirmacion: null,
       scrollPosition: 0,
       inputFocused: false,
       nuevoComentario: '',
@@ -1066,8 +1075,22 @@ export default {
       }
     },
 
-    async confirmarEliminarPost() {
-      if (confirm('¿Estás seguro de eliminar este post?')) {
+    ejecutarConfirmacion() {
+      const accion = this.confirmacion?.accion;
+      this.confirmacion = null;
+      if (accion) accion();
+    },
+
+    confirmarEliminarPost() {
+      this.confirmacion = {
+        titulo: 'Eliminar publicación',
+        texto: `Se va a eliminar "${this.postSeleccionado?.titulo}" junto con todos sus comentarios. Esta acción no se puede deshacer.`,
+        accion: () => this.eliminarPost()
+      };
+    },
+
+    async eliminarPost() {
+      {
         try {
           const postId = this.postSeleccionado.id;
 
@@ -1222,9 +1245,15 @@ export default {
 
 
 
-    eliminarComentario(comentario) {
-      if (!confirm('¿Eliminar este comentario permanentemente?')) return;
+    confirmarEliminarComentario(comentario) {
+      this.confirmacion = {
+        titulo: 'Eliminar comentario',
+        texto: 'El comentario y sus respuestas se eliminarán de forma permanente.',
+        accion: () => this.eliminarComentario(comentario)
+      };
+    },
 
+    eliminarComentario(comentario) {
       const endpoint = comentario.parent_id
         ? `/post/destroy-reply/${comentario.id}`
         : `/post/delete-comment/${comentario.id}`;
@@ -1268,9 +1297,15 @@ export default {
 
     // METODOS PARA EDITAR Y ELIMINAR EN REPLYS
 
-    eliminarReply(reply) {
-      if (!confirm('¿Eliminar esta respuesta permanentemente?')) return;
+    confirmarEliminarReply(reply) {
+      this.confirmacion = {
+        titulo: 'Eliminar respuesta',
+        texto: 'La respuesta se eliminará de forma permanente.',
+        accion: () => this.eliminarReply(reply)
+      };
+    },
 
+    eliminarReply(reply) {
       const endpoint = `/post/destroy-reply/${reply.id}`
 
       axios.delete(endpoint, {

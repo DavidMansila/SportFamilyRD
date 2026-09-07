@@ -1,0 +1,561 @@
+// ===========================================================================
+//  Capa visual compartida del modo administrador
+//
+//  Antes esto estaba escrito tres veces, con resultados distintos cada vez:
+//  Admin_tienda.scss, un bloque calcado dentro de CalendarioView.vue
+//  (lineas 786-975) y Admin_Noticias.scss. Los colores no salian de ningun
+//  sitio (#aeffb2 verde pastel, #ffaeae rosa, #28a745, #d84657, #17a2b8) y no
+//  coincidian entre secciones, asi que el mismo boton "eliminar" se veia de
+//  tres formas segun donde estuvieras.
+//
+//  Ahora hay un solo archivo y todo sale de las variables de _variables.scss:
+//  var(--accent) toma el color de la seccion donde este el admin (cyan en
+//  Tienda, verde en Calendario, azul en Noticias...), asi que las acciones de
+//  administracion se ven integradas en cada seccion en vez de pegadas encima.
+//
+//  Los nombres de clase son los que ya usaban las plantillas
+//  (.floating-admin-btn, .admin-modal, .btn-guardar...) para no tener que
+//  tocar el HTML de todas las vistas de golpe.
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+//  Boton flotante "crear"
+// ---------------------------------------------------------------------------
+.floating-admin-btn {
+    position: fixed;
+    right: 28px;
+    // Por encima de la burbuja de chat, que vive abajo a la derecha.
+    bottom: 104px;
+    z-index: var(--z-sticky);
+
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 6px 18px var(--accent-soft), var(--shadow-md);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floating-admin-btn:hover {
+    background: var(--accent-strong);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 24px var(--accent-soft), var(--shadow-lg);
+}
+
+.floating-admin-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring), var(--shadow-md);
+}
+
+// Etiqueta que sale al pasar el mouse. El texto se pone desde el HTML con
+// data-admin-label, asi el mismo boton dice "Nuevo producto" o "Nuevo evento"
+// segun la seccion, sin necesitar una clase distinta.
+.floating-admin-btn[data-admin-label]::after {
+    content: attr(data-admin-label);
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(8px);
+    padding: 7px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-900);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.floating-admin-btn:hover::after,
+.floating-admin-btn:focus-visible::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+// ---------------------------------------------------------------------------
+//  Acciones sobre una tarjeta (editar / eliminar)
+//
+//  Van agrupadas arriba a la derecha de la tarjeta. Antes cada seccion las
+//  colocaba por su cuenta: en Noticias estaban en `top: 130px; right: 310px`,
+//  medidas a ojo para un tamaño de tarjeta concreto, asi que en cuanto la
+//  rejilla cambiaba de ancho los botones se iban a cualquier sitio.
+// ---------------------------------------------------------------------------
+.admin-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 4;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-editar,
+.btn-eliminar {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-editar {
+    color: var(--accent);
+}
+
+.btn-editar:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.btn-eliminar {
+    color: var(--danger);
+}
+
+.btn-eliminar:hover {
+    background: var(--danger);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.btn-editar:focus-visible,
+.btn-eliminar:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.btn-editar svg,
+.btn-eliminar svg {
+    width: 16px;
+    height: 16px;
+}
+
+// En escritorio los botones aparecen al pasar el mouse por la tarjeta, para
+// no ensuciar la vista mientras el admin solo esta navegando. En tactil no
+// hay hover, asi que ahi se quedan siempre visibles: si no, serian
+// inalcanzables desde el telefono.
+@media (hover: hover) and (pointer: fine) {
+
+    .admin-actions {
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .product-card:hover .admin-actions,
+    .noticia-card:hover .admin-actions,
+    .event-card:hover .admin-actions,
+    .admin-actions:focus-within {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ---------------------------------------------------------------------------
+//  Modal de formulario
+// ---------------------------------------------------------------------------
+.admin-modal {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    background: rgba(15, 18, 24, 0.72);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    overscroll-behavior: contain;
+    animation: adminModalFade 0.2s ease;
+}
+
+@keyframes adminModalFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.admin-modal-content {
+    position: relative;
+    width: min(680px, 100%);
+    max-height: min(88vh, 860px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-lg);
+    animation: adminModalRise 0.22s ease;
+}
+
+@keyframes adminModalRise {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+// Franja del color de la seccion, igual que en los pop-outs del Home.
+.admin-modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--accent);
+    z-index: 2;
+}
+
+.admin-modal__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-6) var(--space-4);
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-modal__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.admin-modal__subtitle {
+    margin: 4px 0 0;
+    font-size: 0.86rem;
+    color: var(--text-muted);
+}
+
+.admin-modal__close {
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.admin-modal__close:hover {
+    background: var(--danger);
+    color: #fff;
+}
+
+.admin-modal__close:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+// El formulario es lo unico que hace scroll: la cabecera y los botones se
+// quedan fijos, asi "Guardar" siempre esta a la vista aunque el formulario
+// sea largo (el de eventos tiene 8 campos).
+.admin-modal-content form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+}
+
+.admin-form-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-5) var(--space-6);
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    align-content: start;
+}
+
+// ---------------------------------------------------------------------------
+//  Campos
+// ---------------------------------------------------------------------------
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+// Campos que ocupan las dos columnas (descripcion, nombre, URLs largas).
+.form-group--full {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--gray-700);
+    letter-spacing: 0.01em;
+}
+
+.form-group label .required {
+    color: var(--danger);
+    margin-left: 2px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.94rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--gray-400);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--focus-ring);
+}
+
+// Aviso de validacion del navegador: solo despues de que el usuario haya
+// tocado el campo, no nada mas abrir el formulario vacio.
+.form-group input:not(:placeholder-shown):invalid,
+.form-group textarea:not(:placeholder-shown):invalid {
+    border-color: var(--danger);
+}
+
+.form-group textarea {
+    min-height: 110px;
+    max-height: 260px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.form-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+// ---------------------------------------------------------------------------
+//  Botones del formulario
+// ---------------------------------------------------------------------------
+.form-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--border);
+    background: var(--surface-alt);
+}
+
+.btn-guardar,
+.btn-cancelar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 26px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    font-size: 0.92rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-guardar {
+    background: var(--accent);
+    color: #fff;
+}
+
+.btn-guardar:hover:not(:disabled) {
+    background: var(--accent-strong);
+    transform: translateY(-2px);
+}
+
+.btn-guardar:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+// Cancelar no es una accion destructiva: antes era un boton rojo solido
+// (#d84657) con el mismo peso visual que Guardar, y se prestaba a confusion.
+.btn-cancelar {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+.btn-cancelar:hover {
+    background: var(--gray-100);
+}
+
+.btn-guardar:focus-visible,
+.btn-cancelar:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+// ---------------------------------------------------------------------------
+//  Distintivos de estado (pendiente / aprobado / rechazado)
+// ---------------------------------------------------------------------------
+.admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 13px;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+// El punto de color da la señal aunque el usuario no distinga bien los tonos:
+// el estado no depende solo del color de fondo.
+.admin-badge::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.admin-badge--pending {
+    background: rgba(183, 121, 31, 0.12);
+    color: var(--warning);
+}
+
+.admin-badge--approved {
+    background: rgba(46, 125, 50, 0.12);
+    color: var(--success);
+}
+
+.admin-badge--rejected {
+    background: rgba(192, 58, 58, 0.12);
+    color: var(--danger);
+}
+
+// ---------------------------------------------------------------------------
+//  Movil
+// ---------------------------------------------------------------------------
+@media (max-width: 767.98px) {
+    .floating-admin-btn {
+        right: 18px;
+        bottom: 88px;
+        width: 50px;
+        height: 50px;
+    }
+
+    .admin-modal {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .admin-modal-content {
+        width: 100%;
+        max-height: 92vh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .admin-modal__header {
+        padding: var(--space-4) var(--space-4) var(--space-3);
+    }
+
+    // Una sola columna: dos campos por fila en un telefono deja las etiquetas
+    // partidas en varias lineas.
+    .admin-form-body {
+        grid-template-columns: 1fr;
+        padding: var(--space-4);
+    }
+
+    .form-actions {
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .btn-guardar,
+    .btn-cancelar {
+        flex: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .admin-modal,
+    .admin-modal-content {
+        animation: none;
+    }
+
+    .floating-admin-btn,
+    .btn-editar,
+    .btn-eliminar,
+    .btn-guardar,
+    .btn-cancelar {
+        transition: none;
+    }
+}
+
+// ---------------------------------------------------------------------------
+//  Utilidad: texto solo para lectores de pantalla
+//
+//  Para etiquetas que el diseño no muestra pero que un lector de pantalla si
+//  necesita anunciar (por ejemplo el <label> del desplegable de filtros, que
+//  visualmente se entiende por su contexto).
+// ---------------------------------------------------------------------------
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

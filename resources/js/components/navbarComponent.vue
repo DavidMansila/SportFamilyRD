@@ -32,8 +32,10 @@
         Solicitudes-U
       </span>
 
-      <span v-if="user?.user_type == 'admin'" class="nav-link" @click="handleNavClick('/solicitudes-entrenadores')">
-        Solicitudes-E
+      <span v-if="user?.user_type == 'admin'" class="nav-link nav-link--admin"
+        @click="handleNavClick('/solicitudes-entrenadores')">
+        Solicitudes
+        <span class="admin-tag">Admin</span>
       </span>
     </div>
 
@@ -154,7 +156,8 @@
       <span v-if="user?.user_type == 'admin'" class="mobile-nav-link"
         @click="handleNavClick('/solicitudes-entrenadores')">
         <i class="fas fa-file-contract"></i>
-        <span>Solicitudes-E</span>
+        <span>Solicitudes</span>
+        <span class="admin-tag">Admin</span>
       </span>
     </div>
 
@@ -361,6 +364,31 @@ export default {
 
 
 <style lang="scss">
+/* Distintivo "Admin" junto a los enlaces que solo ve un administrador. Sirve
+   para que quede claro que ese enlace no lo ve todo el mundo: antes se
+   llamaba "Solicitudes-E" y no se distinguia en nada del resto del menu. */
+.admin-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.nav-link--admin {
+  display: inline-flex;
+  align-items: center;
+}
+
 @import '../../scss/Navbar/Navbar_responsive.scss';
 
 /* Navbar */

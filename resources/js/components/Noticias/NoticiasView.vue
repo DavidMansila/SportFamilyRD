@@ -55,16 +55,21 @@
               <span class="news-category">{{ getCategoryName(noticia.categoria) }}</span>
             </div>
 
-            <button v-if="user?.user_type == 'admin'" class="btn-eliminar" @click.stop="eliminarNoticia(noticia)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M4 7H20" stroke="currentColor" stroke-width="2" />
-                <path d="M10 11V17" stroke="currentColor" />
-                <path d="M14 11V17" stroke="currentColor" />
-                <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7"
-                  stroke="currentColor" />
-                <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" />
-              </svg>
-            </button>
+            <!-- Antes este boton estaba suelto con `position: absolute;
+                 top: 130px; right: 310px`, medidas a ojo para un ancho de
+                 tarjeta concreto: en cuanto la rejilla cambiaba de columnas,
+                 se iba fuera de la tarjeta. Ahora va en el grupo
+                 .admin-actions, anclado a la esquina. -->
+            <div v-if="user?.user_type == 'admin'" class="admin-actions">
+              <button type="button" class="btn-eliminar" :aria-label="`Eliminar ${noticia.title}`"
+                title="Eliminar noticia" @click.stop="pedirConfirmacionBorrado(noticia)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
 
             <div class="noticia-content">
               <div class="content-wrapper">
@@ -225,6 +230,12 @@
     :message="alertMessage" 
     @close="openModal = false" 
   />  
+
+  <ConfirmDialog :open="!!noticiaAEliminar" :busy="eliminandoNoticia" title="Eliminar noticia"
+    confirm-label="Sí, eliminar" @cancel="noticiaAEliminar = null" @confirm="eliminarNoticia">
+    Se va a eliminar <strong>{{ noticiaAEliminar?.title }}</strong> de forma permanente.
+    Esta acción no se puede deshacer.
+  </ConfirmDialog>
 </template>
 
 <script>
@@ -233,6 +244,7 @@ import paginatorComponent from '@/components/paginatorComponent.vue';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
+import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import { supabase } from '../../supabaseClient';
 
 export default {
@@ -241,7 +253,8 @@ export default {
     paginatorComponent,
     Navbar,
     ChatBubbleComponent,
-    Alert
+    Alert,
+    ConfirmDialog
   },
   data() {
     return {
@@ -266,7 +279,11 @@ export default {
         { value: 'swimming', label: 'Natacion' },
       ],
       saved: false,
-      user: null
+      user: null,
+      // Noticia que el admin pidio borrar; mientras no sea null, el dialogo de
+      // confirmacion esta abierto.
+      noticiaAEliminar: null,
+      eliminandoNoticia: false
     };
   },
   computed: {
@@ -483,31 +500,45 @@ export default {
       document.body.style.overflow = 'hidden';
     },
 
-    async eliminarNoticia(noticia) {
-      if (confirm(`¿Estás seguro de eliminar "${noticia.title}"? Esta acción no se puede deshacer.`)) {
-        try {
-          const token = sessionStorage.getItem('token');
+    pedirConfirmacionBorrado(noticia) {
+      this.noticiaAEliminar = noticia;
+    },
 
-          await axios.delete(`/news/${noticia.id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
+    async eliminarNoticia() {
+      if (!this.noticiaAEliminar || this.eliminandoNoticia) return;
 
-          // Eliminar de la lista local
-          this.noticias = this.noticias.filter(n => n.id !== noticia.id);
-          this.filtrarNoticias();
-          this.$store.dispatch('cacheSection', { key: 'noticias', data: this.noticias });
+      this.eliminandoNoticia = true;
+      const noticia = this.noticiaAEliminar;
 
-          if (this.noticiaSeleccionada && this.noticiaSeleccionada.id === noticia.id) {
-            this.cerrarNoticia();
-          }
+      try {
+        await axios.delete(`/news/${noticia.id}`);
 
-          this.showToast('Noticia eliminada correctamente', 'success');
-        } catch (error) {
-          console.error('Error al eliminar noticia:', error);
-          this.showToast('Error al eliminar noticia. Por favor intente nuevamente.', 'error');
+        // Eliminar de la lista local
+        this.noticias = this.noticias.filter(n => n.id !== noticia.id);
+        this.filtrarNoticias();
+        this.$store.dispatch('cacheSection', { key: 'noticias', data: this.noticias });
+
+        if (this.noticiaSeleccionada && this.noticiaSeleccionada.id === noticia.id) {
+          this.cerrarNoticia();
         }
+
+        this.noticiaAEliminar = null;
+
+        // Antes esto llamaba a this.showToast(), un metodo que no existe en
+        // este componente: al borrar una noticia correctamente saltaba un
+        // TypeError y no se veia ningun aviso.
+        this.alertType = 'success';
+        this.alertMessage = 'Noticia eliminada correctamente';
+        this.alertKey++;
+        this.openModal = true;
+      } catch (error) {
+        console.error('Error al eliminar noticia:', error);
+        this.alertType = 'error';
+        this.alertMessage = 'No se pudo eliminar la noticia. Inténtalo de nuevo.';
+        this.alertKey++;
+        this.openModal = true;
+      } finally {
+        this.eliminandoNoticia = false;
       }
     },
 
@@ -560,10 +591,16 @@ export default {
         this.cerrarNoticia();
         this.newImage = null;
 
-        this.showToast('Cambios guardados exitosamente', 'success');
+        this.alertType = 'success';
+        this.alertMessage = 'Cambios guardados exitosamente';
+        this.alertKey++;
+        this.openModal = true;
       } catch (error) {
         console.error('Error al guardar cambios:', error);
-        this.showToast('Error al guardar cambios. Por favor intente nuevamente.', 'error');
+        this.alertType = 'error';
+        this.alertMessage = 'Error al guardar los cambios. Inténtalo de nuevo.';
+        this.alertKey++;
+        this.openModal = true;
       } finally {
         this.isLoading = false;
       }

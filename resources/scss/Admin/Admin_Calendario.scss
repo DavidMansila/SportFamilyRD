@@ -1,0 +1,32 @@
+// Acciones de administracion del Calendario.
+//
+// Este archivo existia pero estaba vacio: los estilos de admin del calendario
+// estaban escritos directamente dentro del <style> de CalendarioView.vue
+// (195 lineas), casi calcados de Admin_tienda.scss pero con otros colores y
+// tamaños. Ahora los dos usan la misma capa compartida.
+@import 'admin_ui';
+
+// --- Especifico del Calendario ---------------------------------------------
+
+// La tarjeta del evento es el contexto de posicionamiento de .admin-actions.
+// Ojo: lleva un border-left en linea (el color de la categoria), asi que las
+// acciones se separan un poco mas de la derecha para no pisar el precio.
+.event-card {
+    position: relative;
+}
+
+.event-card .admin-actions {
+    top: 10px;
+    right: 10px;
+}
+
+// Vista previa de la imagen dentro del formulario de evento.
+.admin-image-preview {
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    padding: 8px;
+}
