@@ -129,9 +129,14 @@ export default {
 .confirm-overlay {
   position: fixed;
   inset: 0;
-  /* Por encima del modal de formulario: se puede pedir confirmacion desde
-     dentro de un formulario abierto. */
-  z-index: calc(var(--z-modal, 1100) + 10);
+  /* Por encima de TODO: la confirmacion puede lanzarse desde dentro de
+     cualquier otra capa (un formulario de admin, o el pop-out de un post del
+     foro, que usa z-index 2000 a pelo). Ver --z-confirm en _variables.scss.
+
+     Antes esto era calc(var(--z-modal) + 10) = 1110, y el pop-out del foro
+     quedaba por delante: al pulsar "eliminar publicacion", el dialogo salia
+     por detras del post. */
+  z-index: var(--z-confirm, 100000);
   display: flex;
   align-items: center;
   justify-content: center;

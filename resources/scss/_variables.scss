@@ -104,6 +104,19 @@ $bp-xxl: 1400px; // escritorio grande
     --z-modal:    1100;
     --z-toast:    1200;
 
+    // Techo: el dialogo de confirmacion (ConfirmDialog.vue) siempre va encima
+    // de TODO, porque puede lanzarse desde dentro de cualquier otra capa (por
+    // ejemplo al pulsar "eliminar" con un post del foro ya abierto).
+    //
+    // El valor es tan alto porque la escala de arriba todavia no se respeta en
+    // toda la aplicacion: quedan z-index escritos a mano que la superan
+    // (foro_pop_out_post.scss y entrenadores.scss usan 2000, tienda_modal.scss
+    // 9999, calendario.scss 10000, y el menu movil del navbar 99999). Mientras
+    // eso siga asi, la confirmacion tiene que quedar por encima del mayor de
+    // todos. Al migrar esos valores a la escala (punto 5.2 de MEJORAS.md),
+    // esto deberia bajar a --z-toast + 100.
+    --z-confirm:  100000;
+
     // Foco visible para navegacion por teclado (toma el color de la seccion)
     --focus-ring: 0 0 0 3px var(--accent-soft);
 }
