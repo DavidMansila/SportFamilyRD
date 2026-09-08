@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -47,11 +48,31 @@ Route::post('/logout', [AuthController::class, 'logout']);
 
 
 // --- HOME STATS ---
-Route::get('/home-stats', fn() => response()->json([
-    'users' => User::count(),
-    'events' => Calendar::count(),
-    'posts' => Post::count(),
-]));
+// Son tres COUNT(*) contra Supabase (base de datos remota): tardaban ~1,4 s en
+// devolver 35 bytes, y se pagaban en CADA carga del Home. Con 60 s de cache el
+// Home deja de esperar por ellos.
+//
+// El realtime pide ?fresh=1 para saltarse el cache a proposito: cuando llega el
+// aviso de que cambio el numero de usuarios, eventos o posts hay que leer el
+// valor de verdad, que es justamente para lo que existe esa suscripcion. Sin
+// esta salida, el contador se quedaria congelado hasta un minuto despues de que
+// alguien publica algo, y la suscripcion no serviria de nada.
+Route::get('/home-stats', function (Request $request) {
+    $calcular = fn() => [
+        'users' => User::count(),
+        'events' => Calendar::count(),
+        'posts' => Post::count(),
+    ];
+
+    if ($request->boolean('fresh')) {
+        $stats = $calcular();
+        Cache::put('home-stats', $stats, 60);
+
+        return response()->json($stats);
+    }
+
+    return response()->json(Cache::remember('home-stats', 60, $calcular));
+})->middleware('throttle:60,1');
 
 // --- CONTENIDO PÚBLICO ---
 Route::get('/recent-news', fn() => News::orderBy('published_at', 'desc')->take(7)->get());

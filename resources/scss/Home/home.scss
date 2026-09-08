@@ -242,7 +242,11 @@
   height: 350px;
   opacity: 0;
   transform: translateY(30px);
-  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  /* Solo las dos propiedades que de verdad cambian al entrar (ver
+     .category-card.animate). Con 'all' el navegador tiene que vigilar cada
+     propiedad animable de la tarjeta por si alguna cambia. */
+  transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+              transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .category-card.animate {
@@ -1721,81 +1725,134 @@
 
 
 
-/* Footer */
+/* =========================================================================
+   Footer
+
+   Paleta: el pie usaba #17a2b8 (turquesa) como color de acento, que no
+   aparece en ninguna otra parte del Home. Ahora usa el rojo de la marca
+   (#c92e40), el mismo del hero, los contadores y el boton de "Unete".
+   ========================================================================= */
 .main-footer {
-  background: #333;
-  color: white;
-  padding: 60px 0 0;
+  position: relative;
+  background: linear-gradient(180deg, #232629 0%, #17191c 100%);
+  color: #fff;
+  padding: 70px 0 0;
+}
+
+/* Linea de acento que separa el pie del ultimo bloque de contenido. */
+.main-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #830d1b, #c92e40, #830d1b);
 }
 
 .footer-content {
   display: grid;
-  grid-template-columns: 300px 1fr 250px;
-  gap: 50px;
+  grid-template-columns: 1.6fr 2fr 1.2fr;
+  gap: 45px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 20px 55px;
 }
 
+/* --- Marca --- */
+
 .footer-brand {
-  margin-bottom: 30px;
+  max-width: 340px;
 }
 
 .brand-logo img {
-  max-width: 180px;
-  margin-bottom: 20px;
+  width: 170px;
+  height: auto;
+  margin-bottom: 18px;
 }
 
 .brand-slogan {
-  font-size: 0.95rem;
-  color: #aaa;
-  margin-bottom: 20px;
-  line-height: 1.6;
+  max-width: 46ch;
+  font-size: 0.92rem;
+  color: #9ba1a6;
+  margin-bottom: 22px;
+  line-height: 1.7;
 }
 
-.social-links {
-  display: flex;
-  gap: 15px;
-}
-
-.social-icon {
-  display: flex;
+.footer-cta {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 35px;
-  height: 35px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  color: white;
-  transition: all 0.3s ease;
+  gap: 10px;
+  padding: 11px 22px;
+  border-radius: 50px;
+  background: #c92e40;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.25s ease;
 }
 
-.social-icon:hover {
-  background: #17a2b8;
-  transform: translateY(-3px);
+.footer-cta:hover {
+  background: #e03b4f;
+  transform: translateY(-2px);
 }
+
+/* Iconos del pie: SVG inline en vez de Font Awesome. El proyecto usa clases
+   "fas fa-..." por todas partes pero nunca carga la hoja de Font Awesome, asi
+   que esos <i> se pintan vacios. Aqui los trazos van en el propio marcado. */
+.main-footer svg {
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.footer-ico {
+  width: 0.95em;
+  height: 0.95em;
+}
+
+.footer-cta .footer-ico {
+  transition: transform 0.25s ease;
+}
+
+.footer-cta:hover .footer-ico {
+  transform: translateX(4px);
+}
+
+/* --- Columnas de enlaces --- */
 
 .footer-links {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 30px;
 }
 
-.link-column h3 {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  position: relative;
+.link-column h3,
+.footer-contact h3 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 22px;
   padding-bottom: 10px;
+  position: relative;
 }
 
-.link-column h3::after {
+.link-column h3::after,
+.footer-contact h3::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 40px;
+  width: 32px;
   height: 2px;
-  background: #17a2b8;
+  background: #c92e40;
 }
 
 .link-column ul {
@@ -1805,56 +1862,65 @@
 }
 
 .link-column li {
-  margin-bottom: 12px;
+  margin-bottom: 13px;
 }
 
 .link-column a {
-  color: #aaa;
+  display: inline-block;
+  color: #9ba1a6;
   text-decoration: none;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  font-size: 0.92rem;
+  transition: color 0.25s ease, transform 0.25s ease;
 }
 
-.link-column a:hover {
-  color: white;
-  padding-left: 5px;
+.link-column a:hover,
+.link-column a:focus-visible {
+  color: #fff;
+  transform: translateX(5px);
 }
 
-.footer-contact h3 {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.footer-contact h3::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: #17a2b8;
-}
+/* --- Contacto --- */
 
 .contact-item {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 15px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
   font-size: 0.9rem;
-  color: #aaa;
   line-height: 1.5;
+  color: #9ba1a6;
+  text-decoration: none;
+  transition: color 0.25s ease;
 }
 
-.contact-item i {
-  color: #17a2b8;
-  margin-top: 3px;
+.contact-item:not(.contact-item--static):hover {
+  color: #fff;
 }
+
+.contact-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(201, 46, 64, 0.15);
+  color: #e8536a;
+  font-size: 1rem;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.contact-item:not(.contact-item--static):hover .contact-icon {
+  background: #c92e40;
+  color: #fff;
+}
+
+/* --- Barra inferior --- */
 
 .footer-bottom {
-  border-top: 1px solid #444;
-  margin-top: 50px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
   padding: 20px 0;
 }
 
@@ -1865,33 +1931,44 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.payment-methods {
-  display: flex;
   gap: 15px;
-  font-size: 1.5rem;
-  color: #aaa;
+  flex-wrap: wrap;
 }
 
-.copyright {
-  font-size: 0.8rem;
-  color: #aaa;
+.copyright,
+.footer-made {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #80868b;
 }
 
-.language-selector {
-  display: flex;
+.footer-top-link {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  color: #aaa;
+  gap: 8px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  padding: 7px 16px;
+  color: #9ba1a6;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
-.language-selector select {
-  background: #444;
-  border: none;
-  color: white;
-  padding: 5px;
-  border-radius: 4px;
+.footer-top-link:hover {
+  color: #fff;
+  border-color: #c92e40;
+  background: rgba(201, 46, 64, 0.15);
+}
+
+.footer-top-link .footer-ico {
+  transition: transform 0.25s ease;
+}
+
+.footer-top-link:hover .footer-ico {
+  transform: translateY(-3px);
 }
 
 /* Floating Action Buttons */
@@ -2012,12 +2089,16 @@
     grid-column: span 1;
   }
 
+  /* La marca pasa a ocupar la fila completa y enlaces + contacto se reparten
+     debajo, en vez de estrujar tres columnas en pantallas de tablet. */
   .footer-content {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 40px 35px;
   }
 
-  .footer-links {
-    grid-template-columns: repeat(2, 1fr);
+  .footer-brand {
+    grid-column: 1 / -1;
+    max-width: 100%;
   }
 }
 
@@ -2059,6 +2140,17 @@
 
   .footer-content {
     grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .footer-links {
+    gap: 25px;
+  }
+
+  .footer-bottom-content {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
   }
 }
 
@@ -2078,6 +2170,7 @@
 
   .footer-links {
     grid-template-columns: 1fr;
+    gap: 30px;
   }
 }
 

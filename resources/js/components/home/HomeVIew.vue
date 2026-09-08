@@ -57,8 +57,12 @@
       </div>
 
       <div class="category-grid">
+        <!-- 'ensureSports' en mouseenter/focus: el directorio ya se esta pidiendo
+             mientras el usuario mueve el raton hacia la tarjeta, asi que al hacer
+             click la ficha normalmente ya esta lista. -->
         <div v-for="category in categories" :key="category.name" class="category-card is-interactive" role="button"
           tabindex="0" :aria-label="`Ver detalles de ${category.name}`" @click="openSport(category)"
+          @mouseenter="ensureSports()" @focus="ensureSports()"
           @keydown.enter.prevent="openSport(category)" @keydown.space.prevent="openSport(category)">
           <div class="card-inner">
             <div class="card-front">
@@ -283,94 +287,81 @@
     </section>
 
 
-    <!-- Footer -->
+    <!-- =====================================================================
+         Footer
+
+         La rejilla era 300px / 1fr / 250px con la columna del medio vacia
+         (todos los bloques de enlaces estaban comentados), asi que el pie
+         quedaba con el logo pegado a la izquierda, un hueco enorme y el
+         contacto perdido a la derecha. Ahora la columna del medio tiene
+         enlaces reales del router y el pie cierra la pagina en vez de
+         cortarla.
+         ===================================================================== -->
     <footer class="main-footer">
       <div class="footer-content">
+
         <div class="footer-brand">
           <div class="brand-logo">
-            <img src="/imagenes/Logo2.png" alt="SportFamilyRD Logo">
+            <img src="/imagenes/Logo2.png" alt="SportFamilyRD" width="170" height="60">
           </div>
-          <p class="brand-slogan">Conectando la comunidad deportiva dominicana</p>
-          <!-- <div class="social-links">
-            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
-          </div> -->
+          <p class="brand-slogan">
+            Conectando la comunidad deportiva dominicana: eventos, entrenadores,
+            noticias y tienda en un solo lugar.
+          </p>
+          <router-link v-if="!user" :to="{ path: '/signup', query: { panel: 'signup' } }" class="footer-cta">
+            Únete a la comunidad <svg class="footer-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+          </router-link>
         </div>
 
-        <div class="footer-links">
-          <!-- <div class="link-column">
-            <h3 class="links-title">Explorar</h3>
+        <nav class="footer-links" aria-label="Enlaces del pie de página">
+          <div class="link-column">
+            <h3>Explorar</h3>
             <ul>
-              <li><a href="#">Deportes</a></li>
-              <li><a href="#">Noticias</a></li>
-              <li><a href="#">Eventos</a></li>
-              <li><a href="#">Tienda</a></li>
-              <li><a href="#">Entrenadores</a></li>
-              <li><a href="#">Foro Deportivo</a></li>
+              <li><router-link to="/directorio">Deportes</router-link></li>
+              <li><router-link to="/noticias">Noticias</router-link></li>
+              <li><router-link to="/calendario">Eventos</router-link></li>
+              <li><router-link to="/tienda">Tienda</router-link></li>
             </ul>
-          </div> -->
-          <!-- <div class="link-column">
-            <h3 class="links-title">Comunidad</h3>
+          </div>
+
+          <div class="link-column">
+            <h3>Comunidad</h3>
             <ul>
-              <li><a href="#">Foro</a></li>
-              <li><a href="#">Grupos</a></li>
-              <li><a href="#">Blog</a></li>
-              <li><a href="#">Testimonios</a></li>
-              <li><a href="#">Patrocinadores</a></li>
+              <li><router-link to="/foro">Foro deportivo</router-link></li>
+              <li><router-link to="/entrenadores">Entrenadores</router-link></li>
+              <li v-if="user"><router-link to="/perfil">Mi perfil</router-link></li>
+              <li v-else>
+                <router-link :to="{ path: '/signup', query: { panel: 'login' } }">Iniciar sesión</router-link>
+              </li>
             </ul>
-          </div> -->
-          <!-- <div class="link-column">
-            <h3 class="links-title">Empresa</h3>
-            <ul>
-              <li><a href="#">Nosotros</a></li>
-              <li><a href="#">Contacto</a></li>
-              <li><a href="#">Trabaja con Nosotros</a></li>
-              <li><a href="#">Prensa</a></li>
-              <li><a href="#">Partners</a></li>
-            </ul>
-          </div> -->
-          <!-- <div class="link-column">
-            <h3 class="links-title">Legal</h3>
-            <ul>
-              <li><a href="#">Términos</a></li>
-              <li><a href="#">Privacidad</a></li>
-              <li><a href="#">Cookies</a></li>
-              <li><a href="#">DMCA</a></li>
-              <li><a href="#">Aviso Legal</a></li>
-            </ul>
-          </div> -->
-        </div>
+          </div>
+        </nav>
 
         <div class="footer-contact">
-          <h3 class="contact-title">Contacto</h3>
-          <div class="contact-item">
-            <i class="fas fa-envelope"></i>
+          <h3>Contacto</h3>
+          <a class="contact-item" href="mailto:info@sportfamilyrd.com">
+            <span class="contact-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
             <span>info@sportfamilyrd.com</span>
-          </div>
-          <div class="contact-item">
-            <i class="fas fa-phone-alt"></i>
+          </a>
+          <a class="contact-item" href="tel:+18498814028">
+            <span class="contact-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 4h-2A1.6 1.6 0 003 5.7C3 13 11 21 18.3 21a1.6 1.6 0 001.7-1.6v-2l-4-1.6-2 2a13 13 0 01-6.8-6.8l2-2L6.6 4z"/></svg></span>
             <span>(849) 881-4028</span>
-          </div>
-          <div class="contact-item">
-            <i class="fas fa-map-marker-alt"></i>
+          </a>
+          <div class="contact-item contact-item--static">
+            <span class="contact-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></span>
             <span>Santo Domingo, República Dominicana</span>
           </div>
         </div>
+
       </div>
 
       <div class="footer-bottom">
-        <!-- <div class="payment-methods">
-          <i class="fab fa-cc-visa"></i>
-          <i class="fab fa-cc-mastercard"></i>
-          <i class="fab fa-cc-amex"></i>
-          <i class="fab fa-cc-paypal"></i>
-          <i class="fab fa-cc-discover"></i>
-        </div> -->
-        <div class="copyright">
-          © 2025 SportFamilyRD. Todos los derechos reservados.
+        <div class="footer-bottom-content">
+          <p class="copyright">© {{ currentYear }} SportFamilyRD. Todos los derechos reservados.</p>
+          <p class="footer-made">Hecho en República Dominicana</p>
+          <button type="button" class="footer-top-link" @click="scrollToTop">
+            Volver arriba <svg class="footer-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+          </button>
         </div>
       </div>
     </footer>
@@ -564,7 +555,12 @@
         </div>
 
         <div class="hm-body">
-          <p class="hm-text hm-text--lead">{{ modal.data.description }}</p>
+          <!-- Mientras el directorio viaja, la ficha ya esta abierta con la foto
+               y el nombre del deporte; aqui solo se avisa que falta el detalle. -->
+          <p class="hm-text hm-text--lead hm-text--loading" v-if="modal.data.isLoading">
+            Cargando la ficha del deporte…
+          </p>
+          <p class="hm-text hm-text--lead" v-else>{{ modal.data.description }}</p>
 
           <section class="hm-section" v-if="modal.data.requirements && modal.data.requirements.length">
             <h3 class="hm-section__title">
@@ -635,7 +631,12 @@ import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import HomeModal from './HomeModal.vue';
 import Alert from '../Alert.vue';
-import { supabase } from '../../supabaseClient';
+
+// Supabase NO se importa aqui a proposito. El cliente pesa ~220 KB (57 KB
+// gzip) y con el import estatico entraba dentro del chunk del Home, asi que
+// el navegador tenia que descargarlo entero antes de poder pintar la pagina,
+// aunque solo se usa para refrescar tres contadores por realtime. Ahora se
+// pide con import() dentro de subscribeRealtime(), despues del primer render.
 
 // Quita acentos y pasa a minusculas, para poder cruzar los nombres de las
 // tarjetas del Home ("Béisbol") con los del directorio sin depender de como
@@ -745,6 +746,12 @@ export default {
   },
 
   computed: {
+    // El año del copyright no se escribe a mano: asi el pie no se queda
+    // desfasado el 1 de enero.
+    currentYear() {
+      return new Date().getFullYear();
+    },
+
     // Tope del selector de cantidad del pop-out abierto: el stock del
     // producto o las boletas que quedan del evento. Si el dato no viene,
     // se usa un tope razonable para no bloquear la compra.
@@ -862,22 +869,68 @@ export default {
       this.openModal('post', post);
     },
 
-    // La tarjeta del Home es fija (imagen + barra de popularidad), pero la
-    // ficha que se abre sale del directorio real. Si el directorio todavia no
-    // cargo o el deporte no existe, se muestra igual una version basica en vez
-    // de dejar la tarjeta muerta.
-    openSport(category) {
-      const match = this.sports.find(
+    buscarDeporte(category) {
+      return this.sports.find(
         sport => normalize(sport.name) === normalize(category.sportName || category.name)
       );
+    },
 
-      this.openModal('sport', match || {
-        name: category.sportName || category.name,
+    // La tarjeta del Home es fija (imagen + barra de popularidad), pero la
+    // ficha que se abre sale del directorio real.
+    //
+    // Antes el directorio se pedia en mounted(): 36 KB y ~2,5 s en CADA carga
+    // del Home solo por si el usuario hacia click en una de las tres tarjetas.
+    // Ahora se pide la primera vez que hace falta. Para que el click nunca se
+    // quede sin respuesta, el pop-out se abre de inmediato con lo que ya tiene
+    // la tarjeta (nombre e imagen) y el resto de la ficha entra en cuanto
+    // responde el servidor.
+    async openSport(category) {
+      const cargado = this.buscarDeporte(category);
+      if (cargado) {
+        this.openModal('sport', cargado);
+        return;
+      }
+
+      const nombre = category.sportName || category.name;
+
+      this.openModal('sport', {
+        name: nombre,
         image: category.image,
-        description: 'Todavía estamos preparando la ficha completa de este deporte. Mientras tanto, puedes explorarlo en el directorio.',
+        description: '',
         requirements: [],
-        places: []
+        places: [],
+        isLoading: true
       });
+
+      await this.ensureSports();
+
+      // Mientras se descargaba, el usuario pudo cerrar el pop-out o abrir otro:
+      // en ese caso no se toca nada.
+      if (!this.modal.open || this.modal.type !== 'sport') return;
+      if (normalize(this.modal.data?.name) !== normalize(nombre)) return;
+
+      const ficha = this.buscarDeporte(category);
+      this.modal.data = ficha
+        ? { ...ficha }
+        : {
+          ...this.modal.data,
+          isLoading: false,
+          description: 'Todavía estamos preparando la ficha completa de este deporte. Mientras tanto, puedes explorarlo en el directorio.'
+        };
+    },
+
+    // Pide el directorio una sola vez aunque la llamen varias tarjetas a la
+    // vez (hover sobre una, click en otra): la promesa en vuelo se comparte.
+    ensureSports() {
+      if (this.sports.length > 0) return Promise.resolve();
+
+      if (!this.sportsPromise) {
+        this.sportsPromise = this.fetchSports().finally(() => {
+          this.sportsPromise = null;
+        });
+      }
+
+      return this.sportsPromise;
     },
 
     incrementQuantity() {
@@ -1227,16 +1280,37 @@ export default {
 
     // --- Realtime (Supabase) ---
 
+    // 'fresh=1' se salta el cache de 60 s del backend. Solo lo usa el realtime:
+    // si acaba de entrar un usuario o publicarse un post, el contador tiene que
+    // reflejarlo al momento, no cuando venza el cache. La carga inicial del Home
+    // si usa el valor cacheado, que es donde estaba el costo.
     async refreshStats() {
       try {
-        const { data } = await axios.get('/home-stats');
+        const { data } = await axios.get('/home-stats', { params: { fresh: 1 } });
         this.stats = data || {};
       } catch (error) {
         console.error('Error refrescando stats:', error);
       }
     },
 
-    subscribeRealtime() {
+    // Se descarga el cliente de Supabase bajo demanda (ver nota del import de
+    // arriba). Si falla la descarga o la conexion, la pagina sigue funcionando
+    // igual: los contadores se quedan con el valor que ya trajo /home-stats,
+    // simplemente no se actualizan solos.
+    async subscribeRealtime() {
+      let supabase;
+      try {
+        ({ supabase } = await import('../../supabaseClient'));
+      } catch (error) {
+        console.error('No se pudo cargar el cliente de Supabase:', error);
+        return;
+      }
+
+      // El usuario pudo haberse ido del Home mientras se descargaba el modulo:
+      // sin esta guarda se abriria un canal que ya nadie va a cerrar.
+      if (this.isUnmounted) return;
+
+      this.supabase = supabase;
       this.realtimeChannel = supabase
         .channel('home-stats-realtime')
         // calendars y posts son tablas publicas: se puede escuchar directo
@@ -1273,6 +1347,17 @@ export default {
 
   },
 
+  // Estas tres referencias van fuera de data() a proposito: son objetos
+  // internos (el cliente de Supabase y su canal) que no se pintan en la
+  // plantilla. Metiendolos en data() Vue los envolveria en un Proxy reactivo
+  // y recorreria el cliente entero, que no hace falta y cuesta.
+  created() {
+    this.supabase = null;
+    this.realtimeChannel = null;
+    this.isUnmounted = false;
+    this.sportsPromise = null;
+  },
+
   mounted() {
     document.title = 'SportFamilyRD - Comunidad Deportiva Dominicana';
 
@@ -1289,8 +1374,10 @@ export default {
     this.fetchInitialData();
     this.animateElements();
     this.fetchFeaturedEvents(); // Llama a la función para cargar los eventos reales
-    this.fetchSports();         // Alimenta las fichas del directorio en el pop-out
     this.fetchSavedNews();
+    // fetchSports() ya no se llama aqui: el directorio se pide cuando el
+    // usuario se acerca a una tarjeta de deporte (ver ensureSports).
+
     this.subscribeRealtime();
 
     // Optimizar scroll
@@ -1299,10 +1386,15 @@ export default {
   },
 
   beforeUnmount() {
+    this.isUnmounted = true;
     clearTimeout(this.modalCleanupTimer);
     window.removeEventListener('scroll', this.throttledScroll);
-    if (this.realtimeChannel) {
-      supabase.removeChannel(this.realtimeChannel);
+
+    // 'this.supabase' puede seguir en null si se sale del Home antes de que
+    // termine de descargarse el cliente; en ese caso no hay canal que cerrar.
+    if (this.realtimeChannel && this.supabase) {
+      this.supabase.removeChannel(this.realtimeChannel);
+      this.realtimeChannel = null;
     }
   }
 }
@@ -1324,11 +1416,14 @@ img {
   content-visibility: auto;
 }
 
-.category-card,
-.event-card,
-.product-card {
-  will-change: transform, opacity;
-}
+/* Aqui habia un 'will-change: transform, opacity' permanente sobre las tres
+   familias de tarjetas. 'will-change' le pide al navegador que promueva el
+   elemento a su propia capa de compositor y la mantenga reservada; dejarlo
+   puesto siempre significa decenas de capas vivas todo el rato (memoria de
+   GPU) para animaciones que duran 0,6 s una sola vez, o que ni siquiera
+   ocurren hasta que se pasa el raton por encima. Los navegadores ya promueven
+   solos al empezar una transicion de transform/opacity, que es exactamente lo
+   que hacen estas tarjetas. */
 
 .loading-message {
   min-height: 300px;

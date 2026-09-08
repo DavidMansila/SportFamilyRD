@@ -619,3 +619,10 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Texto de espera de la ficha de deporte: el directorio se pide al abrir el
+   pop-out, no en cada carga del Home, asi que hay un instante sin descripcion. */
+.hm-text--loading {
+  color: #8a9099;
+  font-style: italic;
+}
