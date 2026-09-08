@@ -330,7 +330,6 @@ export default {
   },
 
   mounted() {
-    document.title = 'Ajustes';
     this.user = JSON.parse(sessionStorage.getItem('user'));
     this.fetchUserConfigs();
 

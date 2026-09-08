@@ -765,7 +765,6 @@ export default {
     window.addEventListener('keyup', this.handleKeyup);
     this.user = JSON.parse(sessionStorage.getItem('user')) || {};
     this.generarCategoriasFlat()
-    document.title = 'Tienda';
   },
   beforeUnmount() {
     window.removeEventListener('keyup', this.handleKeyup);

@@ -718,7 +718,6 @@ export default {
 
     this.subscribeRealtime();
 
-    document.title = 'Noticias';
   },
 
   beforeUnmount() {

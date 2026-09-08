@@ -372,7 +372,6 @@ export default {
         } else {
             this.mostrarNotificacion("Debes iniciar sesión");
         }
-        document.title = 'Solicitudes Usuarios';
     }
 }
 </script>

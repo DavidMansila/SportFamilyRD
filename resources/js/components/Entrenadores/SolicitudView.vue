@@ -861,8 +861,16 @@ export default {
 
   },
   mounted() {
-    this.user = JSON.parse(sessionStorage.getItem('user') || null),
-      this.formulario.user_id = this.user.id;
+    // El 'user_id' se asignaba DOS veces: una aqui suelta y otra dentro del if.
+    // La de fuera reventaba con "Cannot read properties of null (reading 'id')"
+    // cuando alguien entraba a /solicitud sin sesion iniciada, porque
+    // sessionStorage no tiene usuario y this.user queda en null. La de dentro
+    // del if ya hacia lo correcto, asi que la de fuera sobraba.
+    try {
+      this.user = JSON.parse(sessionStorage.getItem('user')) || null;
+    } catch (error) {
+      this.user = null;
+    }
 
     if (this.user) {
       this.formulario.user_id = this.user.id;

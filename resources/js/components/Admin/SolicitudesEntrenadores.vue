@@ -450,7 +450,6 @@ export default {
     },
     mounted() {
         this.getTrainers();
-        document.title = 'Solicitudes Entrenadores';
         document.body.style.backgroundColor = '#f8f9fa';
         document.body.style.paddingBottom = '10px';
     },

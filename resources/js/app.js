@@ -29,25 +29,42 @@ const VerificaApiCorreo = () => import("./components/VerificaApiCorreo.vue");
 // Configuración del router
 const router = createRouter({
     history: createWebHistory(),
+    // 'meta.title' es el nombre que sale en la pestaña del navegador.
+    //
+    // Antes cada vista se lo ponia sola en su mounted(), y las que no lo hacian
+    // (Entrenadores, Foro, Directorio, Solicitud, Signup y las dos pantallas de
+    // verificacion de correo) heredaban el titulo de la seccion anterior: se
+    // entraba a Tienda, se pasaba a Entrenadores, y la pestaña seguia diciendo
+    // "Tienda". Definido aqui es imposible que a una ruta se le olvide, porque
+    // el router es lo unico que siempre se entera del cambio de seccion.
+    //
+    // Puede ser texto o una funcion de la ruta, para los casos que dependen de
+    // un parametro o de la query.
     routes: [
-        { path: "/", component: HomeView },
-        { path: "/signup", component: SignUpView },
-        { path: "/directorio", component: DirectorioView },
-        { path: "/noticias", component: NoticiasView },
-        { path: "/calendario", component: CalendarioView },
-        { path: "/tienda", component: TiendaView },
-        { path: "/entrenadores", component: EntrenadoresView },
-        { path: "/solicitud", component: SolicitudView },
-        { path: "/solicitudes-usuarios", component: SolicitudesUsuarios },
+        { path: "/", component: HomeView, meta: { title: "SportFamilyRD - Comunidad Deportiva Dominicana" } },
+        {
+            path: "/signup",
+            component: SignUpView,
+            // La misma ruta sirve el panel de entrar y el de registrarse.
+            meta: { title: (route) => (route.query.panel === "signup" ? "Crear cuenta" : "Iniciar sesión") },
+        },
+        { path: "/directorio", component: DirectorioView, meta: { title: "Directorio de deportes" } },
+        { path: "/noticias", component: NoticiasView, meta: { title: "Noticias" } },
+        { path: "/calendario", component: CalendarioView, meta: { title: "Calendario" } },
+        { path: "/tienda", component: TiendaView, meta: { title: "Tienda" } },
+        { path: "/entrenadores", component: EntrenadoresView, meta: { title: "Entrenadores" } },
+        { path: "/solicitud", component: SolicitudView, meta: { title: "Solicitud de entrenador" } },
+        { path: "/solicitudes-usuarios", component: SolicitudesUsuarios, meta: { title: "Solicitudes de usuarios" } },
         {
             path: "/solicitudes-entrenadores",
             component: SolicitudesEntrenadores,
+            meta: { title: "Solicitudes de entrenadores" },
         },
-        { path: "/foro", component: ForoView },
-        { path: "/ajustes", component: AjustesView },
-        { path: "/perfil", component: PerfilView },
-        { path: "/email/verified-success", component: EmailVerifiedSuccess },
-        { path: "/email/verify/:id/:hash", component: VerificaApiCorreo },
+        { path: "/foro", component: ForoView, meta: { title: "Foro" } },
+        { path: "/ajustes", component: AjustesView, meta: { title: "Ajustes" } },
+        { path: "/perfil", component: PerfilView, meta: { title: "Perfil" } },
+        { path: "/email/verified-success", component: EmailVerifiedSuccess, meta: { title: "Correo verificado" } },
+        { path: "/email/verify/:id/:hash", component: VerificaApiCorreo, meta: { title: "Verificando correo" } },
     ],
 
     // Al cambiar de seccion se empieza desde arriba. Sin esto, vue-router deja
@@ -64,6 +81,25 @@ const router = createRouter({
         }
         return { top: 0 };
     },
+});
+
+// Pone el titulo de la pestaña en CADA navegacion, incluidas las flechas de
+// atras/adelante del navegador.
+//
+// Va en afterEach (y no en beforeEach) para que solo se aplique cuando la
+// navegacion ya se confirmo: si se cancelara a mitad, la pestaña no se quedaria
+// con el nombre de una seccion a la que nunca se llego.
+//
+// Corre antes del mounted() de la vista a proposito: asi una pantalla que
+// necesite un titulo mas concreto -Perfil, que pone "Perfil de <nombre>" cuando
+// carga el usuario- puede afinarlo despues sobre esta base, y mientras tanto la
+// pestaña ya dice algo correcto en vez del nombre de la seccion anterior.
+const TITULO_POR_DEFECTO = "SportFamilyRD";
+
+router.afterEach((to) => {
+    const titulo = to.meta?.title;
+    document.title =
+        typeof titulo === "function" ? titulo(to) : titulo || TITULO_POR_DEFECTO;
 });
 
 // Paginate

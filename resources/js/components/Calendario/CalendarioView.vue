@@ -758,7 +758,6 @@ export default {
 
   },
   mounted() {
-    document.title = 'Calendario';
     //this.getCalendarScrap(); // usar para cuando vayas a pasar el scrap a la base de datos
     const cachedEventos = this.$store.getters.sectionCache('calendario');
     if (cachedEventos) {

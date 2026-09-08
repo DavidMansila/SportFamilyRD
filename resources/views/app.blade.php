@@ -4,9 +4,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'SportFamily') }}</title>
+    {{-- Titulo que sirve el servidor antes de que Vue arranque. En cuanto monta,
+         el router lo sustituye por el de la seccion (ver el afterEach en app.js).
+         Antes esto decia "Laravel" porque APP_NAME nunca se cambio. --}}
+    <title>{{ config('app.name', 'SportFamilyRD') }}</title>
 
     <!-- Fonts y estilos -->
+    {{-- Favicon: el icono de la pestaña. Antes existia public/favicon.ico pero
+         estaba VACIO (0 bytes, el marcador que deja Laravel al instalar), y por
+         eso el navegador pintaba su circulo gris por defecto.
+
+         Es el bateador del logo recortado, sin el texto "SportFamilyRD": a 16
+         pixeles el texto no se lee y solo ensucia. El .ico lleva 16, 32 y 48
+         para que el navegador coja el tamaño exacto segun donde lo pinte
+         (pestaña, favoritos, barra de tareas) en vez de reescalar uno solo. --}}
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
     <link rel="preconnect" href="https://fonts.bunny.net">
 
     {{-- El hero del Home es el elemento LCP de la pagina, y su imagen se

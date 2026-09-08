@@ -1392,7 +1392,6 @@ export default {
   },
 
   mounted() {
-    document.title = 'SportFamilyRD - Comunidad Deportiva Dominicana';
 
     // El usuario se lee ANTES de disparar las peticiones: fetchSavedNews solo
     // tiene sentido si hay sesion, y antes esto se leia al final del mounted.
