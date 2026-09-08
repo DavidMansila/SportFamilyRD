@@ -188,11 +188,25 @@ export default {
 .home-modal-overlay {
   position: fixed;
   inset: 0;
+  /* Alto REAL de la ventana. En el movil "100vh" (y cualquier vh) mide el
+     viewport grande, el de la barra de URL escondida; mientras la barra esta
+     a la vista, la zona visible es mas baja. Por eso el pop-out parecia
+     moverse: al desplazarte, el navegador muestra u oculta la barra y todo lo
+     medido en vh se descoloca. 'dvh' es el alto que hay AHORA mismo.
+     La linea de vh se queda debajo como respaldo para navegadores viejos. */
+  height: 100vh;
+  height: 100dvh;
   z-index: var(--z-modal, 1100);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-4, 1rem);
+  /* El max() respeta la muesca y la barra de gestos de los telefonos, sin
+     bajar nunca del margen normal. */
+  padding:
+    max(var(--space-4, 1rem), env(safe-area-inset-top))
+    max(var(--space-4, 1rem), env(safe-area-inset-right))
+    max(var(--space-4, 1rem), env(safe-area-inset-bottom))
+    max(var(--space-4, 1rem), env(safe-area-inset-left));
   background: rgba(15, 18, 24, 0.72);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -202,7 +216,14 @@ export default {
 .home-modal {
   position: relative;
   width: min(980px, 100%);
-  max-height: min(88vh, 900px);
+  /* Se mide en % contra el overlay (que ya es del alto exacto de la ventana y
+     lleva el margen aplicado), no en vh: asi nunca puede sobresalir ni quedar
+     por debajo del borde visible.
+     El 88% conserva la proporcion que tenia el diseño original con 88vh, para
+     que en escritorio siga viendose como un dialogo y no como una pantalla
+     completa. En movil se sube al 100% (ver la media query), donde cada pixel
+     de alto cuenta. */
+  max-height: min(88%, 900px);
   background: var(--surface, #fff);
   color: var(--text-primary, #1a202c);
   border-radius: var(--radius-lg, 16px);
@@ -285,7 +306,9 @@ export default {
   position: absolute;
   top: 12px;
   right: 12px;
-  z-index: 2;
+  /* Por encima de la barra de acento (::before, z-index 3), que si no le
+     pisaba los 4px de arriba y la X se veia cortada. */
+  z-index: 4;
   width: 40px;
   height: 40px;
   display: inline-flex;
@@ -332,20 +355,37 @@ export default {
 }
 
 @media (max-width: 767.98px) {
+  /* Antes era una hoja pegada al borde inferior (align-items: flex-end) y de
+     borde a borde. Sumado al 92vh, en el telefono quedaba siempre abajo del
+     todo y se descolocaba al aparecer/ocultarse la barra del navegador.
+     Ahora va centrado, con margen a los cuatro lados, igual que en escritorio:
+     una sola forma de comportarse en todos los tamaños. */
   .home-modal-overlay {
-    padding: 0;
-    align-items: flex-end;
+    padding:
+      max(0.75rem, env(safe-area-inset-top))
+      max(0.75rem, env(safe-area-inset-right))
+      max(0.75rem, env(safe-area-inset-bottom))
+      max(0.75rem, env(safe-area-inset-left));
   }
 
   .home-modal {
     width: 100%;
-    max-height: 92vh;
-    border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
+    /* En pantallas pequeñas se aprovecha todo el alto disponible dentro del
+       margen del overlay, en vez del 88% de escritorio. */
+    max-height: 100%;
+    /* Todas las esquinas: ya no es una hoja apoyada en el borde. */
+    border-radius: var(--radius-lg, 16px);
+  }
+
+  /* 44px es el minimo comodo para tocar con el dedo; 40 se queda justo. */
+  .home-modal__close {
+    width: 44px;
+    height: 44px;
   }
 
   .home-modal-enter-from .home-modal,
   .home-modal-leave-to .home-modal {
-    transform: translateY(40px);
+    transform: translateY(18px) scale(0.98);
   }
 }
 
