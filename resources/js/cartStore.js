@@ -86,6 +86,19 @@ export default createStore({
                 return total + item.price * item.quantity;
             }, 0);
         },
-        sectionCache: (state) => (key) => state.sectionCache[key]?.data ?? null,
+        // El timestamp ya se guardaba (ver SET_SECTION_CACHE) pero nadie lo
+        // miraba: una seccion cacheada se quedaba con los mismos datos hasta
+        // cerrar la pestana. Ahora vence sola.
+        //
+        // 5 minutos por defecto, que es el mismo TTL que usa el cache del
+        // servidor para el contenido publico; quien necesite otro margen lo
+        // pasa como segundo argumento. Devolver null al vencer hace que el
+        // componente vuelva a pedir los datos, que es justo lo que se quiere.
+        sectionCache: (state) => (key, maxAgeMs = 5 * 60 * 1000) => {
+            const entry = state.sectionCache[key];
+            if (!entry) return null;
+            if (maxAgeMs && Date.now() - (entry.timestamp ?? 0) > maxAgeMs) return null;
+            return entry.data ?? null;
+        },
     },
 });

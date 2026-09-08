@@ -1445,3 +1445,104 @@
     }
 }
 
+/* ==================== UN SOLO SCROLL EN EL POP-OUT ====================
+
+   QUE ESTABA ROTO
+   ---------------
+   .post-popout-details es una columna flex de alto fijo (90vh en escritorio,
+   100dvh en movil). Dentro tenia cuatro hijos, y dos se peleaban por el sitio:
+
+     .post-comments-section  ->  flex: 1  +  min-height: 60vh
+     .post-popout-body       ->  encogible (sin flex propio) + overflow-y: auto
+
+   En una pantalla de 900px ese "min-height: 60vh" son 540px reservados a la
+   fuerza para los comentarios. Sumados al header (106px) y a la barra de likes
+   (73px), dentro de una columna util de 808px al cuerpo del post le quedaban
+   89px. Y como .post-popout-body ademas tenia scroll propio, el titulo y la
+   descripcion acababan metidos en una rendija de 89px con su propia barra:
+   se leia el titulo y ya. La descripcion del post no se veia.
+   (Medido: caja de 89px con un scrollHeight de 158px.)
+
+   Habia ademas un "min-height: 300px" en .post-comments-section
+   .comments-container que, por especificidad (0,2,0), le ganaba al
+   "min-height: 0" que el bloque de movil intentaba ponerle: por eso en el
+   telefono el texto tambien salia recortado con su propia barrita.
+
+   COMO SE ARREGLA
+   ---------------
+   UN solo scroll, el de .post-popout-details, en TODAS las resoluciones. Sin
+   cajas de scroll anidadas y sin alturas minimas arbitrarias: el contenido
+   ocupa lo que necesita y, si no cabe, se recorre la columna entera de una
+   pasada. Es el mismo modelo de un post de Instagram: la imagen a un lado y,
+   al otro, autor + texto + conversacion en una sola tira que se desplaza.
+
+   Va sin media query a proposito. El problema no era de una resolucion
+   concreta sino del reparto de espacio del flex, y antes justamente el intento
+   de arreglarlo solo en movil dejo el escritorio roto.                        */
+
+.post-popout-details {
+    overflow-y: auto;
+}
+
+/* Ni el cuerpo ni la barra de interacciones se encogen ya por su cuenta: si
+   entre todos no caben, el que hace scroll es la columna, no cada cajita. */
+.post-popout-body {
+    flex: 0 0 auto;
+    overflow: visible;
+}
+
+.post-interactions {
+    flex: 0 0 auto;
+}
+
+/* 'flex: 1 0 auto' = crece para rellenar el hueco cuando hay pocos comentarios
+   (asi el formulario queda abajo del todo y no flotando a media altura, que era
+   el otro sintoma), pero NUNCA se encoge por debajo de su contenido, que es lo
+   que aplastaba al cuerpo del post. */
+.post-comments-section {
+    flex: 1 0 auto;
+    min-height: 0;
+    overflow: visible;
+}
+
+/* Se repite el selector de dos niveles a proposito: la regla que ponia
+   "min-height: 300px" es '.post-comments-section .comments-container', y con un
+   selector de un solo nivel esta no le ganaria. */
+.post-comments-section .comments-container {
+    flex: 1 0 auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+}
+
+/* El aviso que sustituye al formulario cuando no hay sesion no tenia ni una
+   sola regla de estilo en todo el proyecto: quedaba como un parrafo suelto al
+   final. Se le da el mismo acabado que al formulario para que el pie del
+   pop-out se vea igual con sesion y sin ella. */
+.login-prompt {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+    margin-top: auto;
+    z-index: 10;
+    text-align: center;
+
+    p {
+        margin: 0;
+        font-size: 14px;
+        color: #666;
+    }
+
+    a {
+        color: #6a11cb;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

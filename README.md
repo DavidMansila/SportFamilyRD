@@ -300,6 +300,32 @@ npm run build
 > de compilar vuelves a desarrollar y ves que tus cambios no aparecen en el
 > navegador, reinicia `npm run dev` para regenerarlo.
 
+### Cachés de Laravel (importante al desarrollar)
+
+La configuración y las rutas están **cacheadas** para no reconstruirlas en cada
+petición (mide unos 90 ms por petición). El efecto secundario es que Laravel deja
+de leer `.env` y `routes/` en caliente:
+
+> ⚠️ Si editas **`.env`**, **`config/`** o **`routes/`** y el cambio no surte
+> efecto, no es que no funcione: es que está cacheado. Ejecuta:
+>
+> ```bash
+> php artisan optimize
+> ```
+>
+> Y para desactivar los cachés mientras depuras algo:
+>
+> ```bash
+> php artisan optimize:clear
+> ```
+
+También hace falta **OPcache activo** en PHP para que el servidor vaya rápido: sin
+él, PHP recompila todo Laravel en cada petición y se pierden ~400 ms por petición.
+En XAMPP viene apagado; se activa descomentando `zend_extension=opcache` y
+`opcache.enable=1` en `php.ini` y reiniciando Apache. En desarrollo, deja
+`opcache.validate_timestamps=1` para que tus cambios de código se sigan viendo al
+instante.
+
 ---
 
 ## Estructura del proyecto

@@ -29,6 +29,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Cache;
+use App\Support\CacheDeContenido;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -75,7 +76,15 @@ Route::get('/home-stats', function (Request $request) {
 })->middleware('throttle:60,1');
 
 // --- CONTENIDO PÚBLICO ---
-Route::get('/recent-news', fn() => News::orderBy('published_at', 'desc')->take(7)->get());
+// Cacheado: lo que se ahorra no es tanto la consulta como ABRIR la conexion a
+// Supabase (~500 ms de TLS + autenticacion en cada peticion). Una respuesta
+// servida desde el cache no toca la base de datos, asi que no paga nada de eso.
+// El cache se limpia solo cuando cambia la tabla (ver el booted() de News).
+Route::get('/recent-news', fn() => Cache::remember(
+    'recent-news',
+    CacheDeContenido::MINUTOS_CONTENIDO,
+    fn() => News::orderBy('published_at', 'desc')->take(7)->get()
+));
 Route::get('/recent-products', [ProductController::class, 'recentProducts']);
 Route::get('/popular-posts', [PostController::class, 'popularPosts']);
 
@@ -88,15 +97,21 @@ Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap'])->m
 Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store'])->middleware('throttle:5,1');
 
 // --- NOTICIAS ---
-Route::get('/news', fn() => News::orderBy('published_at', 'desc')->get()->map(fn($n) => [
-    'id' => $n->id,
-    'title' => $n->title,
-    'description' => $n->description,
-    'image' => $n->image,
-    'author' => $n->author,
-    'published_at' => $n->published_at->toIso8601String(),
-    'category' => $n->category,
-]))->middleware('throttle:60,1');
+// 111 noticias = 276 KB en cada carga de la seccion. Cachear no arregla el
+// tamano (eso pide paginar en el servidor), pero si quita la conexion a la BD.
+Route::get('/news', fn() => Cache::remember(
+    'news-index',
+    CacheDeContenido::MINUTOS_CONTENIDO,
+    fn() => News::orderBy('published_at', 'desc')->get()->map(fn($n) => [
+        'id' => $n->id,
+        'title' => $n->title,
+        'description' => $n->description,
+        'image' => $n->image,
+        'author' => $n->author,
+        'published_at' => $n->published_at->toIso8601String(),
+        'category' => $n->category,
+    ])
+))->middleware('throttle:60,1');
 
 // --- POSTS, TRAINERS, PRODUCTOS ---
 Route::get('/products', [ProductController::class, 'index'])->middleware('throttle:60,1');

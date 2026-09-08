@@ -649,6 +649,11 @@ function normalize(text) {
     .trim();
 }
 
+// Cuanto vale el contenido del Home guardado de la visita anterior. Un minuto:
+// lo justo para que ir a Noticias y volver sea instantaneo, sin que los
+// contadores ni las noticias se queden notablemente viejos.
+const CACHE_HOME_MS = 60 * 1000;
+
 function throttle(func, wait) {
   let timeout = null;
   let lastCall = 0;
@@ -771,6 +776,19 @@ export default {
 
 
     async fetchInitialData() {
+      // El Directorio ya usaba el cache de secciones; el Home no, asi que
+      // salir y volver relanzaba las cuatro peticiones cada vez. Ahora se
+      // reusan si tienen menos de un minuto.
+      const guardado = this.$store.getters.sectionCache('home', CACHE_HOME_MS);
+      if (guardado) {
+        this.stats = guardado.stats;
+        this.recentNews = guardado.recentNews;
+        this.recentProducts = guardado.recentProducts;
+        this.popularPosts = guardado.popularPosts;
+        this.featuredEvents = guardado.featuredEvents ?? [];
+        return true;
+      }
+
       this.isLoading = true;
       try {
         const [stats, news, products, posts] = await Promise.all([
@@ -780,19 +798,14 @@ export default {
           axios.get('/popular-posts')
         ]);
 
-        // Debuggear respuestas
-        console.log("Stats:", stats.data);
-        console.log("News:", news.data);
-        console.log("Products:", products.data);
-        console.log("Posts:", posts.data);
-
         this.stats = stats.data || {};
         this.recentNews = (news.data || []).filter(n => !!n.image);
         this.recentProducts = products.data.products || [];
-
-        // Extraer posts de la respuesta
         this.popularPosts = this.extractPopularPosts(posts);
-        console.log("Popular posts:", this.popularPosts);
+
+        // Los eventos destacados los trae fetchFeaturedEvents(), que corre en
+        // paralelo; se guardan desde alli para no encadenar las dos peticiones.
+        this.guardarHomeEnCache();
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -1194,10 +1207,30 @@ export default {
         });
     },
 
+    // Guarda de una vez todo lo que pinta el Home. Se llama desde las dos
+    // funciones que cargan datos: la ultima en terminar deja la foto completa.
+    guardarHomeEnCache() {
+      this.$store.dispatch('cacheSection', {
+        key: 'home',
+        data: {
+          stats: this.stats,
+          recentNews: this.recentNews,
+          recentProducts: this.recentProducts,
+          popularPosts: this.popularPosts,
+          featuredEvents: this.featuredEvents,
+        }
+      });
+    },
+
     async fetchFeaturedEvents() {
+      // Si fetchInitialData ya restauro la seccion desde el cache, los eventos
+      // vinieron con ella y no hay nada que pedir.
+      if (this.featuredEvents.length > 0) return;
+
       try {
         const response = await axios.get('/featured-events');
         this.featuredEvents = response.data.events || [];
+        this.guardarHomeEnCache();
       } catch (error) {
         this.featuredEvents = [
           {
@@ -1371,9 +1404,12 @@ export default {
       this.user = null;
     }
 
-    this.fetchInitialData();
+    // Se encadenan a proposito: fetchInitialData puede restaurar la seccion
+    // entera (eventos incluidos) desde el cache, y en ese caso
+    // fetchFeaturedEvents no tiene nada que pedir. Si no hay cache, la peticion
+    // sale igual, solo un instante despues.
+    this.fetchInitialData().then(() => this.fetchFeaturedEvents());
     this.animateElements();
-    this.fetchFeaturedEvents(); // Llama a la función para cargar los eventos reales
     this.fetchSavedNews();
     // fetchSports() ya no se llama aqui: el directorio se pide cuando el
     // usuario se acerca a una tarjeta de deporte (ver ensureSports).

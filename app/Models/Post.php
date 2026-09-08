@@ -2,12 +2,29 @@
 
 namespace App\Models;
 
+use App\Support\CacheDeContenido;
+
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
+
+    /**
+     * Limpia el cache de los endpoints publicos cuando cambian los posts del foro.
+     *
+     * Va aqui y no en el controlador a proposito: asi se entera cualquier
+     * escritura, venga del panel de admin, de un seeder, del scraper o de
+     * tinker. Si estuviera en los controladores, bastaria con anadir una
+     * ruta nueva y olvidarse para que la pagina mostrara datos viejos.
+     */
+    protected static function booted(): void
+    {
+        static::saved(fn() => CacheDeContenido::olvidar(CacheDeContenido::FORO));
+        static::deleted(fn() => CacheDeContenido::olvidar(CacheDeContenido::FORO));
+    }
+
     use HasFactory;
 
     protected $withCount = ['likes'];

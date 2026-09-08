@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 
+use Illuminate\Support\Facades\Cache;
+use App\Support\CacheDeContenido;
+
 class CalendarController extends Controller
 {
     /**
@@ -14,7 +17,14 @@ class CalendarController extends Controller
      */
     public function index()
     {
-        $calendars = Calendar::all();
+        // Cacheado para no abrir la conexion a Supabase (~500 ms) en cada
+        // visita al calendario. Se limpia al crear/editar/borrar un evento
+        // (ver el booted() de Calendar).
+        $calendars = Cache::remember(
+            'calendar-index',
+            CacheDeContenido::MINUTOS_CONTENIDO,
+            fn() => Calendar::all()
+        );
         
         if ($calendars->isEmpty()) {
             return response()->json(['events' => []]);
@@ -132,7 +142,7 @@ class CalendarController extends Controller
      */
     public function featuredEvents()
     {
-        $events = Calendar::whereDate('date', '>=', now())
+        $events = Cache::remember('featured-events', CacheDeContenido::MINUTOS_CONTENIDO, fn() => Calendar::whereDate('date', '>=', now())
             ->orderBy('date', 'asc')
             ->orderBy('time', 'asc')
             ->take(3)
@@ -157,7 +167,8 @@ class CalendarController extends Controller
                     'quantity' => $event->quantity,
                     'image' => $event->image ?? null,
                 ];
-            });
+            }));
+
         return response()->json(['events' => $events]);
     }
 }

@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Cache;
+use App\Support\CacheDeContenido;
+
 class PostController extends Controller
 {
     public function index(Request $request)
@@ -472,7 +475,12 @@ class PostController extends Controller
                 ->selectRaw('count(*)')
                 ->whereColumn('post_id', 'posts.id');
 
-            $posts = Post::query()
+            // Cacheado corto: el ranking cambia con cada like y cada comentario,
+            // pero es un bloque del Home que no necesita ser exacto al segundo.
+            // Lo importante es que una respuesta cacheada no abre conexion a
+            // Supabase (~500 ms). Ademas se limpia solo al guardar un post, un
+            // like o un comentario (ver el booted() de Post, Like y Comment).
+            $posts = Cache::remember('popular-posts', CacheDeContenido::MINUTOS_RANKING, fn() => Post::query()
                 ->addSelect(['likes_count' => $likesSubquery])
                 ->addSelect(['comments_count' => $commentsSubquery])
                 ->with(['user' => function ($query) {
@@ -485,7 +493,7 @@ class PostController extends Controller
                     array_merge($likesSubquery->getBindings(), $commentsSubquery->getBindings())
                 )
                 ->take(5)
-                ->get();
+                ->get());
 
             return response()->json([
                 'message' => 'Posts populares obtenidos exitosamente',

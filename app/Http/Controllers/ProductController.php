@@ -6,12 +6,23 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Validator;
 
+use Illuminate\Support\Facades\Cache;
+use App\Support\CacheDeContenido;
+
 class ProductController extends Controller
 {
     public function index()
     {
         try {
-            $products = Product::all();
+            // Cacheado: lo caro no es la consulta sino abrir la conexion a
+            // Supabase (~500 ms). Se limpia solo al guardar/borrar un producto
+            // (ver el booted() de Product), asi que el panel de admin ve el
+            // cambio al instante.
+            $products = Cache::remember(
+                'products-index',
+                CacheDeContenido::MINUTOS_CONTENIDO,
+                fn() => Product::all()
+            );
             return response()->json([
                 'message' => 'Productos obtenidos con éxito',
                 'products' => $products
@@ -139,7 +150,15 @@ class ProductController extends Controller
     public function recentProducts()
     {
         try {
-            $products = Product::inRandomOrder()->take(4)->get();
+            // TTL corto a proposito: la seleccion es aleatoria, asi que un
+            // cache largo congelaria los mismos 4 productos demasiado tiempo.
+            // Un minuto basta para que la mayoria de visitas no toquen la BD y
+            // la vitrina siga rotando.
+            $products = Cache::remember(
+                'recent-products',
+                CacheDeContenido::MINUTOS_RANKING,
+                fn() => Product::inRandomOrder()->take(4)->get()
+            );
 
             return response()->json([
                 'message'  => 'Productos aleatorios obtenidos con éxito',

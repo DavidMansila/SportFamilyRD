@@ -95,6 +95,32 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'require'),
+
+            // Prepared statements emulados.
+            //
+            // Laravel trae PDO::ATTR_EMULATE_PREPARES => false por defecto (ver
+            // Illuminate\Database\Connectors\Connector), lo que hace que cada
+            // consulta use el protocolo extendido de Postgres: un viaje de red
+            // para PARSE y otro para EXECUTE. Con la base de datos en Supabase
+            // (us-east-2) cada viaje cuesta ~75 ms, asi que una consulta trivial
+            // tardaba ~200 ms.
+            //
+            // Medido sobre la misma conexion, "select 1":
+            //     prepares reales    -> 193 ms
+            //     prepares emulados  ->  64 ms
+            //
+            // Emulando, el parametro se interpola del lado del cliente y la
+            // consulta se manda en UN solo viaje. Son ~130 ms menos POR CONSULTA,
+            // en toda la aplicacion.
+            //
+            // Sobre seguridad: al emular, es PDO quien escapa los parametros en
+            // vez del servidor. El agujero historico de esto era especifico de
+            // MySQL con charsets multibyte tipo GBK; con Postgres en UTF-8 no
+            // aplica. Las consultas se siguen escribiendo con placeholders
+            // (nunca concatenando), que es lo que de verdad importa.
+            'options' => [
+                PDO::ATTR_EMULATE_PREPARES => true,
+            ],
         ],
 
         'sqlsrv' => [
