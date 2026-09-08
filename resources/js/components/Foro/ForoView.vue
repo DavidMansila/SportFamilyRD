@@ -143,9 +143,23 @@
                  en movil (donde esa columna queda arriba, angosta) el titulo quedaba
                  enterrado antes de la foto en vez de encabezar el post. -->
             <div class="post-popout-media" v-if="tieneImagen(postSeleccionado)">
-              <div class="image-container">
+              <!-- Doble toque para dar like, como Instagram.
+                   Se escuchan las DOS cosas a proposito: 'dblclick' cubre el
+                   raton en escritorio, y 'touchend' con un contador manual
+                   cubre el telefono, donde el dblclick nativo llega tarde o no
+                   llega porque el navegador lo interpreta como zoom. -->
+              <div class="image-container" @dblclick="likePorDobleToque" @touchend="detectarDobleToque">
                 <img :src="postSeleccionado.imagen" @load="onImageLoad('selected')"
                   :class="{ loaded: imageLoaded['selected'] }" />
+
+                <!-- El corazon es solo decorativo: no recibe eventos (ver
+                     pointer-events en el CSS) para no tapar la imagen. -->
+                <transition name="corazon-doble">
+                  <svg v-if="corazonVisible" class="corazon-doble-toque" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                </transition>
               </div>
             </div>
 
@@ -220,6 +234,16 @@
                   <span>{{ postSeleccionado.comments.length }}</span>
                 </button>
               </div>
+
+              <!-- Recuento de "me gusta" en texto, como Instagram. En movil el
+                   numero desaparece de al lado del corazon (ver el CSS) y se
+                   lee aqui; en escritorio esta linea no se muestra, para no
+                   repetir el dato que ya esta en el boton. -->
+              <p class="post-likes-summary" v-if="postSeleccionado.likes_count > 0">
+                {{ postSeleccionado.likes_count === 1
+                  ? 'A 1 persona le gusta esto'
+                  : `A ${postSeleccionado.likes_count} personas les gusta esto` }}
+              </p>
 
               <!-- Contenido del post -->
               <!-- Sección de comentarios -->
@@ -558,6 +582,11 @@ export default {
   },
   data() {
     return {
+      // Corazon que aparece al dar doble toque sobre la imagen del post.
+      corazonVisible: false,
+      // Momento del ultimo toque, para detectar el doble toque en el telefono.
+      ultimoToque: 0,
+
       openModal: false,
       alertType: 'success', // 'success', 'error', 'alert'
       alertMessage: '',
@@ -948,6 +977,64 @@ export default {
     },
 
     // METODOS PARA LIKES
+    // ==================== DOBLE TOQUE PARA DAR LIKE ====================
+
+    // Doble toque sobre la imagen del post.
+    //
+    // Como en Instagram, el doble toque SOLO da like, nunca lo quita: si ya
+    // estaba likeado se limita a repetir la animacion. Quitar el like con el
+    // mismo gesto seria facil de hacer sin querer y no habria forma de saber
+    // que paso, porque el gesto no da ninguna pista de en que estado quedo.
+    likePorDobleToque() {
+      if (!this.postSeleccionado) return;
+
+      // Sin sesion se delega en toggleLike, que ya muestra el aviso de
+      // "inicia sesion" y no toca nada mas. Y no se anima el corazon, para no
+      // dar a entender que el like se registro.
+      if (!this.user) {
+        this.toggleLike('post', this.postSeleccionado.id);
+        return;
+      }
+
+      if (!this.postSeleccionado.isLiked) {
+        this.toggleLike('post', this.postSeleccionado.id);
+      }
+
+      this.animarCorazon();
+    },
+
+    animarCorazon() {
+      // Se reinicia con un tick de por medio para que, si das dos dobles
+      // toques seguidos, la animacion vuelva a empezar en vez de quedarse
+      // congelada a mitad.
+      this.corazonVisible = false;
+      clearTimeout(this.temporizadorCorazon);
+
+      this.$nextTick(() => {
+        this.corazonVisible = true;
+        this.temporizadorCorazon = setTimeout(() => {
+          this.corazonVisible = false;
+        }, 850);
+      });
+    },
+
+    // En el telefono no se puede depender de 'dblclick': el navegador lo
+    // retrasa (~300ms) o directamente lo convierte en zoom. Se mide a mano el
+    // tiempo entre dos 'touchend' seguidos.
+    detectarDobleToque(evento) {
+      const ahora = Date.now();
+
+      if (ahora - this.ultimoToque < 300) {
+        // Evita que el navegador remate el gesto con un zoom o un click.
+        evento.preventDefault();
+        this.likePorDobleToque();
+        this.ultimoToque = 0;
+        return;
+      }
+
+      this.ultimoToque = ahora;
+    },
+
     async toggleLike(type, id) {
       if (!this.user) {
 
@@ -1537,6 +1624,7 @@ export default {
   beforeUnmount() {
     document.body.style.overflow = 'auto';
     this.postSeleccionado = null;
+    clearTimeout(this.temporizadorCorazon);
     clearTimeout(this._realtimeDebounceTimer);
     if (this.realtimeChannel) {
       supabase.removeChannel(this.realtimeChannel);

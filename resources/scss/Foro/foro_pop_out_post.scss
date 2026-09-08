@@ -1575,3 +1575,429 @@
         }
     }
 }
+
+/* ============================================================================
+   MOVIL: LECTURA COMPACTA, ESTILO INSTAGRAM
+
+   El problema no era el tamaño de la ventana sino la DENSIDAD del contenido.
+   Medido en un telefono de 390px con un post de 3 comentarios:
+
+       cabecera             92 px   (nombre cortado en "Patric...", categoria
+                                     cortada en "CONSEJOS Y BIE...")
+       cuerpo              238 px
+       botones like/coment  58 px   (dos pildoras enormes centradas)
+       comentarios         746 px   (cada uno una tarjeta blanca con sombra,
+                                     avatar arriba y texto debajo)
+       ---------------------------
+       total             1.205 px   para leer tres frases
+
+   La referencia es como pinta Instagram un post en el telefono: cabecera de
+   una linea, acciones como iconos pequeños a la izquierda, y los comentarios
+   como texto corrido (avatar chico + nombre en negrita + comentario seguido),
+   sin tarjetas ni sombras. Ahi manda el contenido y el envoltorio desaparece.
+
+   Todo va dentro de esta media query: en escritorio no cambia nada.
+   ============================================================================ */
+@media (max-width: 767.98px) {
+
+    /* --- 1. La hoja deja ver algo de fondo -------------------------------
+       Antes ocupaba el 100% de la pantalla. Dejando asomar el foro por arriba
+       se entiende que es una capa encima y no otra pagina distinta. Sigue
+       anclada abajo a proposito: el formulario de comentar es position:fixed
+       para aguantar la apertura del teclado (ver el punto 6), y eso solo
+       funciona bien con la hoja pegada al borde inferior. */
+    .post-popout-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .post-popout-container {
+        width: 100%;
+        height: 94dvh;
+        max-height: 94dvh;
+        min-height: 0;
+        border-radius: 18px 18px 0 0;
+    }
+
+    /* --- 2. Cabecera de una linea ----------------------------------------
+       Era un flex de tres cosas peleando por 390px, y tanto el nombre como la
+       categoria acababan en puntos suspensivos. Con un grid, el avatar ocupa
+       las dos filas y a su derecha van el nombre arriba y la categoria debajo:
+       cabe todo entero y se lee como el "nombre / subtitulo" de Instagram. */
+    /* Se anida bajo .post-popout-details a proposito: la regla base que pone
+       "display: flex" en este bloque vive como
+       ".post-popout-details .post-popout-header .post-author-info" (tres
+       niveles). Escribiendolo con dos niveles, el grid de abajo NO se aplicaba
+       -lo comprobe midiendo: display seguia siendo flex- y el nombre continuaba
+       partiendose. Hay que igualar la especificidad, no bajarla. */
+    .post-popout-details .post-popout-header {
+        padding: 0.55rem 0.85rem;
+
+        .post-author-info {
+            display: grid;
+            /* minmax(0, 1fr) y no 1fr: con "1fr" la columna nunca baja del
+               min-content de su hijo mas ancho, y la etiqueta de categoria va
+               en una sola linea (~207px). Eso desbordaba la cabecera, el bloque
+               se encogia por el flex del padre y el nombre acababa partido en
+               "Patr / Nun". Con minmax(0, 1fr) la columna si puede encoger: la
+               etiqueta recorta con puntos suspensivos si hace falta y el nombre
+               se queda con la fila entera. */
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: center;
+            column-gap: 0.6rem;
+            row-gap: 0.15rem;
+            min-width: 0;
+            /* Reclama el ancho libre de la cabecera. Sin esto el bloque se
+               quedaba en su tamaño minimo (ahora que puede encoger) y el nombre
+               salia con puntos suspensivos aunque sobrara sitio al lado. */
+            flex: 1;
+
+            .author-avatar {
+                grid-row: 1 / span 2;
+                width: 38px;
+                height: 38px;
+            }
+
+            > div {
+                grid-column: 2;
+                grid-row: 1;
+                min-width: 0;
+            }
+
+            .author-name {
+                margin: 0;
+                font-size: 0.92rem;
+                line-height: 1.2;
+                /* Tiene la fila entera para el, pero si el nombre es larguisimo
+                   se recorta en una linea en vez de partir la cabecera. */
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .post-category-badge {
+                grid-column: 2;
+                grid-row: 2;
+                justify-self: start;
+                max-width: 100%;
+                padding: 3px 9px;
+                font-size: 0.6rem;
+                letter-spacing: 0.03em;
+            }
+        }
+    }
+
+    .close-popout-btn {
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+    }
+
+    /* --- 3. Cuerpo: menos aire, mismo texto ------------------------------ */
+    .post-popout-body {
+        padding: 0.9rem 0.85rem 0.6rem;
+
+        .post-popout-title {
+            font-size: 1.1rem;
+            line-height: 1.3;
+            margin-bottom: 0.6rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .post-popout-text {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            margin-bottom: 0.6rem;
+        }
+
+        .post-meta-info {
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.72rem;
+        }
+    }
+
+    /* --- 4. Acciones como iconos, no como pildoras -----------------------
+       Dos botones blancos con sombra ocupando el ancho entero para mostrar dos
+       numeros. Ahora van a la izquierda, sin fondo, como en cualquier red. */
+    .post-interactions {
+        justify-content: flex-start;
+        gap: 1.1rem;
+        padding: 0.15rem 0.85rem 0.7rem;
+        border-top: none;
+
+        .interaction-btn {
+            flex: 0 0 auto;
+            padding: 0.35rem 0;
+            gap: 0.4rem;
+            background: none;
+            box-shadow: none;
+            border-radius: 0;
+            font-size: 0.85rem;
+            color: #444;
+
+            svg {
+                width: 22px;
+                height: 22px;
+            }
+
+            &.liked {
+                color: #e0245e;
+            }
+        }
+    }
+
+    /* --- 5. Comentarios como texto corrido -------------------------------
+       Aqui estaba el grueso del alto: cada comentario era una tarjeta blanca
+       con sombra, 16px de padding y el avatar EN OTRA LINEA por encima del
+       texto (flex-direction: column). Ahora el avatar va pequeño a la
+       izquierda y el comentario a su derecha, sin tarjeta: entran tres
+       comentarios en el espacio en que antes entraba uno. */
+    .post-comments-section .comments-title {
+        padding-left: 0.85rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .comments-container {
+        padding: 0 0.85rem;
+    }
+
+    .comment-item {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0.6rem;
+        margin-bottom: 0.9rem;
+        padding: 0;
+        background: none;
+        box-shadow: none;
+        border-radius: 0;
+
+        /* Sin tarjeta no hay nada que levantar al tocarlo. */
+        &:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .comment-avatar-wrapper .comment-avatar,
+        .comment-avatar-wrapper .comment-avatar-placeholder {
+            width: 30px;
+            height: 30px;
+        }
+
+        .comment-content {
+            min-width: 0;
+        }
+
+        .comment-header {
+            gap: 0.4rem;
+            margin-bottom: 0.1rem;
+
+            .comment-author {
+                font-size: 0.85rem;
+            }
+
+            .comment-time {
+                font-size: 0.7rem;
+            }
+        }
+
+        .comment-text {
+            margin: 0 0 0.25rem;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        /* Acciones en una linea fina debajo del comentario. */
+        .comment-actions {
+            gap: 0.9rem;
+
+            .comment-action {
+                padding: 0.15rem 0;
+                font-size: 0.72rem;
+            }
+        }
+    }
+
+    /* Las respuestas cuelgan del comentario con una guia fina, en vez de un
+       bloque indentado con fondo propio. */
+    .comment-replies {
+        margin-left: 0.75rem;
+        padding-left: 0.75rem;
+        border-left: 2px solid rgba(0, 0, 0, 0.07);
+    }
+
+    /* --- 6. El pie, con y sin sesion -------------------------------------
+       .add-comment-form es position:fixed a proposito (sticky se despegaba al
+       abrir el teclado del telefono). El aviso que lo sustituye cuando no hay
+       sesion se habia quedado en sticky, y por eso FLOTABA POR ENCIMA del
+       ultimo comentario y lo tapaba. Con fixed ocupa el hueco que ya reserva
+       el padding-bottom de .post-popout-details y no tapa nada. */
+    .login-prompt {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin-top: 0;
+        padding: 0.75rem 1rem;
+        padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+        font-size: 0.82rem;
+        z-index: 5;
+    }
+}
+
+/* ============================================================================
+   CORAZON DEL DOBLE TOQUE
+
+   Va fuera de la media query: el gesto funciona igual con raton (dblclick) que
+   con el dedo (touchend), asi que la animacion hace falta en los dos sitios.
+   ============================================================================ */
+.image-container {
+    /* Ancla del corazon, que se posiciona sobre la foto. */
+    position: relative;
+}
+
+.corazon-doble-toque {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 90px;
+    height: 90px;
+    margin: -45px 0 0 -45px;
+    color: #fff;
+    /* La sombra lo despega de fotos claras, donde un corazon blanco se
+       perderia contra el fondo. */
+    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
+    /* Decorativo: no debe robarle el toque a la imagen. */
+    pointer-events: none;
+    z-index: 4;
+}
+
+/* El golpe: entra de golpe pasandose de tamaño y se va desvaneciendo, que es
+   lo que hace que el gesto se sienta "reconocido". */
+.corazon-doble-enter-active {
+    animation: corazon-golpe 0.85s ease-out forwards;
+}
+
+.corazon-doble-leave-active {
+    transition: opacity 0.15s ease;
+}
+
+.corazon-doble-leave-to {
+    opacity: 0;
+}
+
+@keyframes corazon-golpe {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    15% {
+        opacity: 0.95;
+        transform: scale(1.15);
+    }
+
+    30% {
+        transform: scale(0.95);
+    }
+
+    45% {
+        transform: scale(1);
+    }
+
+    75% {
+        opacity: 0.95;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.15);
+    }
+}
+
+/* Quien pide menos animacion ve el corazon aparecer y desaparecer, sin rebote. */
+@media (prefers-reduced-motion: reduce) {
+    .corazon-doble-enter-active {
+        animation: none;
+    }
+}
+
+/* ============================================================================
+   RECUENTO DE "ME GUSTA" EN TEXTO
+
+   En escritorio no se muestra: el numero ya esta al lado del corazon y
+   repetirlo dos veces en la misma franja sobra. Solo aparece en movil, donde
+   ademas se le quita el numero al boton (ver mas abajo).
+   ============================================================================ */
+.post-likes-summary {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+
+    .post-likes-summary {
+        display: block;
+        flex: 0 0 auto;
+        margin: 0;
+        padding: 0 0.85rem 0.6rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #222;
+    }
+
+    /* El corazon se queda sin numero al lado: el recuento pasa a la linea de
+       arriba, como en Instagram. El icono de comentarios si lo conserva,
+       porque ese dato no se repite en ningun otro sitio. */
+    .post-interactions .interaction-btn.like-btn span {
+        display: none;
+    }
+
+    /* ========================================================================
+       TITULO Y TEXTO COMO UN SOLO "CAPTION"
+
+       Eran dos bloques separados: un <h2> con su rayita rosa debajo y, mas
+       abajo, un <p>. Entre los dos se iban ~35px en separadores y margenes
+       para decir dos frases. Poniendolos en linea fluyen como un solo parrafo
+       -titulo en negrita, texto seguido- igual que el pie de foto de
+       Instagram. Se hace solo con CSS: el HTML sigue teniendo su <h2>, asi que
+       la pagina no pierde su encabezado ni para buscadores ni para lectores de
+       pantalla.
+       ======================================================================== */
+    .post-popout-body {
+        .post-popout-title {
+            display: inline;
+            /* La rayita rosa era el separador entre titulo y texto; ya no hay
+               nada que separar. */
+            padding-bottom: 0;
+            margin-bottom: 0;
+
+            &::after {
+                content: none;
+            }
+
+            /* Espacio entre el final del titulo y el comienzo del texto. */
+            &::before {
+                content: '';
+            }
+        }
+
+        .post-popout-text {
+            display: inline;
+            margin: 0;
+
+            /* Separa el texto del titulo sin depender de un espacio en el HTML
+               (que Vue colapsaria al compilar la plantilla). */
+            &::before {
+                content: ' ';
+                white-space: pre;
+            }
+        }
+
+        .post-meta-info {
+            margin-top: 0.6rem;
+        }
+    }
+}
