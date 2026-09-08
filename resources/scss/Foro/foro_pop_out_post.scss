@@ -8,10 +8,20 @@
 .fade-leave-to {
     opacity: 0;
 }
+/* Esta clase la lleva .foro-page mientras hay un post abierto.
+   Antes traia ademas "height: 100vh/100dvh", y eso era el problema: al fijarle
+   a la pagina la altura de la ventana, el documento entero se encogia (de
+   2151px a 900px, medido), el navegador se quedaba sin recorrido y saltaba a
+   scrollY 0. Resultado: detras del post se veia el INICIO del foro en vez del
+   sitio donde estabas. Al cerrar se quitaba la clase, el documento recuperaba
+   su altura y volvias a tu posicion, por eso solo se notaba con el post abierto.
+
+   No hace falta ninguna altura: el scroll ya lo bloquea abrirPopout() poniendo
+   overflow:hidden en el <body>, que ademas conserva la posicion. Asi queda
+   igual que las otras definiciones de .no-scroll del proyecto (App.vue,
+   CalendarioView, navbar), que son solo overflow:hidden. */
 .no-scroll {
     overflow: hidden;
-    height: 100vh;
-    height: 100dvh; /* alto real en moviles */
 }
 .post-popout-overlay {
     position: fixed;
@@ -28,26 +38,39 @@
 }
 
 /* ==================== CONTENEDOR PRINCIPAL ==================== */
+/* El bloque tenia las propiedades declaradas DOS veces (width, max-width,
+   max-height, display, flex-direction) y ganaban las de abajo, que es donde
+   estaba el problema: "height: 90vh" obligaba al pop-out a ocupar el 90% de la
+   pantalla SIEMPRE, tuviera el post tres lineas o treinta. Por eso cualquier
+   publicacion se veia enorme y medio vacia.
+
+   Ahora el alto lo decide el contenido y solo se pone tope cuando hace falta:
+   un post corto ocupa poco, uno largo crece hasta el limite y a partir de ahi
+   se desplaza por dentro. */
 .post-popout-container {
-    background-color: white;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 900px;
-    max-height: 90vh;
     display: flex;
     flex-direction: column;
+    width: 90%;
+    /* 1200px era demasiado ancho: la conversacion quedaba en lineas larguisimas
+       y costaba seguirla. */
+    max-width: 1000px;
+
+    height: auto;
+    /* Suelo para que un post de una linea no quede como una tira estrecha. */
+    min-height: 380px;
+    /* Tope doble: el 88% de la ventana (en dvh para que en el movil no cuente
+       la barra del navegador) y ademas un limite en pixeles, para que en un
+       monitor alto una conversacion larga no acabe ocupando la pantalla
+       entera: a partir de ahi se desplaza por dentro. */
+    max-height: min(88vh, 760px);
+    max-height: min(88dvh, 760px);
+
+    border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.95);
-
-    display: flex;
-    flex-direction: column;
-    height: 90vh;
-    max-height: 90vh;
-    width: 90%;
-    max-width: 1200px;
 }
 .post-popout-content {
     display: flex;
@@ -334,7 +357,9 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding-top: 30px;
+    /* 30px de separacion antes del titulo "Conversacion" era mucho: sumado al
+       resto estiraba el pop-out sin aportar nada. */
+    padding-top: 16px;
 
     .comments-title {
         padding-left: 20px;
@@ -1131,7 +1156,7 @@
 /* Pantallas muy grandes (más de 2000px) */
 @media (min-width: 2000px) {
     .post-popout-container {
-        max-width: 1600px;
+        max-width: 1150px;
     }
 
     .post-popout-title {
@@ -1157,7 +1182,11 @@
 /* ==================== DISEÑO RESPONSIVO UNIFICADO ==================== */
 @media (max-width: 1599.98px) {
     .post-popout-container {
-        max-width: 95vw;
+        /* El 95vw suelto pisaba el max-width del contenedor y en un portatil de
+           1440px dejaba el pop-out en 1368px de ancho. Con min() se conserva la
+           intencion original (que no toque los bordes en pantallas estrechas)
+           sin renunciar al tope de ancho comodo de lectura. */
+        max-width: min(1000px, 95vw);
         border-radius: 20px;
     }
 

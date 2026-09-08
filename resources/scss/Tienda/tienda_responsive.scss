@@ -66,7 +66,9 @@
   /* Header */
   .store-header {
     height: 280px;
-    border-radius: 0 0 20px 20px;
+    /* Sin redondear las esquinas de abajo: en pantallas pequeñas la cabecera
+       azul se curvaba por el borde inferior y quedaba despegada del resto de
+       la pagina. Ahora corta recta, igual que en escritorio. */
     margin-bottom: 15px;
     
     .header-overlay {

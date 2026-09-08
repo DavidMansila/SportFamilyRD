@@ -225,6 +225,17 @@ export default {
 </script>
 
 <style lang="scss">
+/* Reserva SIEMPRE el hueco de la barra de scroll.
+   Todos los modales de la app bloquean el fondo con overflow:hidden en el
+   <body>. Eso hace desaparecer la barra, y al desaparecer el area util se
+   ensancha de golpe (medido: 375 -> 390 px), el texto se re-ajusta y la pagina
+   de detras da un salto lateral justo al abrir cualquier pop-out.
+   Con scrollbar-gutter el hueco esta reservado tanto si la barra se ve como si
+   no, asi que quitarla ya no mueve nada. */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Base Styles */
 :root {
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
