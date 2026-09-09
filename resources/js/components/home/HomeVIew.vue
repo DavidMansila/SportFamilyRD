@@ -654,31 +654,6 @@ function normalize(text) {
 // contadores ni las noticias se queden notablemente viejos.
 const CACHE_HOME_MS = 60 * 1000;
 
-function throttle(func, wait) {
-  let timeout = null;
-  let lastCall = 0;
-
-  return function executedFunction(...args) {
-    const context = this;
-    const now = Date.now();
-    const timeSinceLastCall = now - lastCall;
-
-    const later = () => {
-      if (func) {
-        func.apply(context, args);
-      }
-      lastCall = Date.now();
-    };
-
-    if (timeSinceLastCall >= wait) {
-      later();
-    } else {
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait - timeSinceLastCall);
-    }
-  };
-}
-
 export default {
   components: {
     Navbar,
@@ -1141,72 +1116,6 @@ export default {
       });
     },
 
-    animateStats() {
-      const counters = document.querySelectorAll('.stat-number');
-      const speed = 200;
-
-      counters.forEach(counter => {
-        const target = +counter.getAttribute('data-count');
-        const count = +counter.innerText;
-        const increment = target / speed;
-
-        if (count < target) {
-          counter.innerText = Math.ceil(count + increment);
-          setTimeout(this.animateStats, 1);
-        } else {
-          counter.innerText = target;
-        }
-      });
-    },
-
-    getCalendarScrap() {
-      axios.get('/scrap-calendar')
-        .then(response => {
-          console.log("Calendar data fetched successfully:", response.data.events);
-        })
-        .catch(error => {
-          console.error("Error fetching calendar data:", error);
-        });
-    },
-
-    fetchRecentNews() {
-      axios.get('/recent-news')
-        .then(response => {
-          // Formatear las fechas para mostrarlas correctamente
-          this.recentNews = response.data.map(news => ({
-            ...news,
-            date: new Date(news.published_at).toLocaleDateString('es-ES', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            })
-          }));
-        })
-        .catch(error => {
-          console.error('Error fetching recent news:', error);
-        });
-    },
-
-    fetchRecentProducts() {
-      axios.get('/recent-products')
-        .then(response => {
-          this.recentProducts = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching recent products:', error);
-        });
-    },
-
-    fetchPopularPosts() {
-      axios.get('/popular-posts')
-        .then(response => {
-          this.popularPosts = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching popular posts:', error);
-        });
-    },
-
     // Guarda de una vez todo lo que pinta el Home. Se llama desde las dos
     // funciones que cargan datos: la ultima en terminar deja la foto completa.
     guardarHomeEnCache() {
@@ -1415,15 +1324,17 @@ export default {
 
     this.subscribeRealtime();
 
-    // Optimizar scroll
-    this.throttledScroll = throttle(this.handleScroll, 100);
-    window.addEventListener('scroll', this.throttledScroll);
+    // Aqui se registraba un listener de scroll:
+    //     this.throttledScroll = throttle(this.handleScroll, 100);
+    //     window.addEventListener('scroll', this.throttledScroll);
+    // 'handleScroll' no existia en este componente, asi que se escuchaba el
+    // scroll de toda la pagina para acabar llamando a undefined. Nunca dio
+    // error porque el propio throttle lo tapaba con un "if (func)".
   },
 
   beforeUnmount() {
     this.isUnmounted = true;
     clearTimeout(this.modalCleanupTimer);
-    window.removeEventListener('scroll', this.throttledScroll);
 
     // 'this.supabase' puede seguir en null si se sale del Home antes de que
     // termine de descargarse el cliente; en ese caso no hay canal que cerrar.

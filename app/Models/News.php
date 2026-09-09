@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\CacheDeContenido;
+use Illuminate\Support\Facades\Cache;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,8 +23,17 @@ class News extends Model
      */
     protected static function booted(): void
     {
-        static::saved(fn() => CacheDeContenido::olvidar(CacheDeContenido::NOTICIAS));
-        static::deleted(fn() => CacheDeContenido::olvidar(CacheDeContenido::NOTICIAS));
+        // Ademas de las claves del listado, hay que soltar la de ESTA noticia
+        // en concreto: el texto completo se cachea por separado, con su id
+        // (ver GET /news/{id}). Sin esto, editar una noticia cambiaria el
+        // listado pero el pop-out seguiria mostrando el texto viejo.
+        $olvidar = function ($noticia) {
+            CacheDeContenido::olvidar(CacheDeContenido::NOTICIAS);
+            Cache::forget('news-item-' . $noticia->id);
+        };
+
+        static::saved($olvidar);
+        static::deleted($olvidar);
     }
 
     use SoftDeletes;

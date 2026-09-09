@@ -29,6 +29,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use App\Support\CacheDeContenido;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
@@ -97,21 +98,55 @@ Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap'])->m
 Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store'])->middleware('throttle:5,1');
 
 // --- NOTICIAS ---
-// 111 noticias = 276 KB en cada carga de la seccion. Cachear no arregla el
-// tamano (eso pide paginar en el servidor), pero si quita la conexion a la BD.
+// LISTADO de noticias: va SIN el texto completo del articulo.
+//
+// Medido con 183 noticias: la respuesta pesaba 420 KB y el 87% de eso era el
+// campo 'description' (1.985 caracteres de media). El listado solo pinta un
+// extracto de 120 caracteres por tarjeta, asi que se estaban descargando ~366
+// KB de texto que nadie llegaba a leer.
+//
+// La primera idea fue paginar en el servidor, pero el front filtra por
+// deporte, busca por texto y ordena poniendo delante las noticias guardadas de
+// cada usuario: paginar en el servidor obligaria a mover toda esa logica y
+// romperia tres cosas para arreglar una. Recortar el campo pesado consigue el
+// mismo ahorro sin tocar nada de eso.
+//
+// El texto completo se pide aparte al abrir la noticia (ver GET /news/{id}).
 Route::get('/news', fn() => Cache::remember(
     'news-index',
     CacheDeContenido::MINUTOS_CONTENIDO,
     fn() => News::orderBy('published_at', 'desc')->get()->map(fn($n) => [
         'id' => $n->id,
         'title' => $n->title,
-        'description' => $n->description,
+        // 300 caracteres: la tarjeta corta en 120, y el margen sobrante evita
+        // que un extracto quede raro si algun dia se alarga ese recorte.
+        'description' => Str::limit((string) $n->description, 300),
         'image' => $n->image,
         'author' => $n->author,
         'published_at' => $n->published_at->toIso8601String(),
         'category' => $n->category,
     ])
 ))->middleware('throttle:60,1');
+
+// UNA noticia con su texto completo. Lo pide el pop-out al abrirse, porque el
+// listado ya no lo trae. Es una sola fila, asi que sale barato.
+Route::get('/news/{id}', fn($id) => Cache::remember(
+    'news-item-' . (int) $id,
+    CacheDeContenido::MINUTOS_CONTENIDO,
+    function () use ($id) {
+        $n = News::findOrFail($id);
+
+        return [
+            'id' => $n->id,
+            'title' => $n->title,
+            'description' => $n->description,
+            'image' => $n->image,
+            'author' => $n->author,
+            'published_at' => $n->published_at->toIso8601String(),
+            'category' => $n->category,
+        ];
+    }
+))->whereNumber('id')->middleware('throttle:60,1');
 
 // --- POSTS, TRAINERS, PRODUCTOS ---
 Route::get('/products', [ProductController::class, 'index'])->middleware('throttle:60,1');

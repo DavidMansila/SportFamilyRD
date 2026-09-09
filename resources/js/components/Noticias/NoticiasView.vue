@@ -392,9 +392,27 @@ export default {
       this.filtrarNoticias();
     },
 
-    abrirNoticia(noticia) {
+    async abrirNoticia(noticia) {
       this.noticiaSeleccionada = noticia;
       document.body.style.overflow = 'hidden';
+
+      // El listado ya no trae el texto completo del articulo: pesaba el 87% de
+      // la respuesta (366 KB de 420) para pintar extractos de 120 caracteres.
+      // Se pide aqui, al abrir, que es cuando de verdad hace falta.
+      //
+      // Mientras llega se ve el extracto que si vino en el listado, asi que el
+      // pop-out nunca aparece vacio. Y se marca la noticia para no volver a
+      // pedirla si se abre otra vez.
+      if (noticia.textoCompleto) return;
+
+      try {
+        const { data } = await axios.get(`/news/${noticia.id}`);
+        noticia.description = data.description;
+        noticia.textoCompleto = true;
+      } catch (error) {
+        // Si falla, se queda el extracto: se lee menos, pero no se rompe nada.
+        console.error('No se pudo cargar el texto completo de la noticia:', error);
+      }
     },
 
     cerrarNoticia() {

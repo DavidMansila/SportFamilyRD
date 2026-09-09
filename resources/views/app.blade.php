@@ -35,6 +35,22 @@
     @endif
 
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+    {{-- Font Awesome.
+         La aplicacion usa 73 iconos con clases "fas"/"far" repartidos por
+         todas las secciones, pero la hoja de estilos no se cargaba en ningun
+         sitio: cada <i class="fas fa-..."> se pintaba como un elemento vacio.
+         Se veia sobre todo en el pie del Home y en los pop-outs, donde los
+         chips de contacto salian como circulos sin nada dentro.
+
+         Se sirve desde cdnjs con integrity + crossorigin para que el navegador
+         rechace el archivo si llegara alterado. El preconnect adelanta el
+         handshake TLS, que si no se paga entero al descubrir el <link>. --}}
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     @vite(['resources/js/bootstrap.js', 'resources/js/app.js', 'resources/css/app.css', 'resources/scss/app.scss'])
 </head>
 

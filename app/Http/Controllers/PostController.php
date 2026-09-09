@@ -29,9 +29,14 @@ class PostController extends Controller
                 ->tokenable_id;
 
             // Obtener posts con relaciones
+            // Ojo con volver a poner 'likes' aqui: cargaba las 108 filas de la
+            // tabla de likes y las mandaba enteras en la respuesta (18,4 KB, el
+            // 25% del total) sin que nadie las mirara. El front usa
+            // 'likes_count' (que viene del withCount de abajo) y 'is_liked'
+            // (que se resuelve con la consulta de $userLikes). El array crudo
+            // no lo lee ni el controlador ni la vista.
             $posts = Post::with([
                 'user',
-                'likes',
                 'comments' => function ($query) {
                     $query->withCount('likes as likes_count');
                     $query->with([
