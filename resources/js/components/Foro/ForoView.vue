@@ -137,36 +137,8 @@
           <div class="post-popout-content">
 
 
-            <!-- Sección de imagen: solo ocupa espacio si el post tiene una foto real
-                 (no el placeholder "sin imagen"). El titulo/texto/interacciones ya no
-                 viven aqui: antes estaban metidos en la columna de la imagen, asi que
-                 en movil (donde esa columna queda arriba, angosta) el titulo quedaba
-                 enterrado antes de la foto en vez de encabezar el post. -->
-            <div class="post-popout-media" v-if="tieneImagen(postSeleccionado)">
-              <!-- Doble toque para dar like, como Instagram.
-                   Se escuchan las DOS cosas a proposito: 'dblclick' cubre el
-                   raton en escritorio, y 'touchend' con un contador manual
-                   cubre el telefono, donde el dblclick nativo llega tarde o no
-                   llega porque el navegador lo interpreta como zoom. -->
-              <div class="image-container" @dblclick="likePorDobleToque" @touchend="detectarDobleToque">
-                <img :src="postSeleccionado.imagen" @load="onImageLoad('selected')"
-                  :class="{ loaded: imageLoaded['selected'] }" />
-
-                <!-- El corazon es solo decorativo: no recibe eventos (ver
-                     pointer-events en el CSS) para no tapar la imagen. -->
-                <transition name="corazon-doble">
-                  <svg v-if="corazonVisible" class="corazon-doble-toque" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="currentColor"
-                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                </transition>
-              </div>
-            </div>
-
-
-
             <!-- Sección de contenido -->
-            <div class="post-popout-details">
+            <div class="post-popout-details" :class="{ 'tiene-media': tieneImagen(postSeleccionado) }">
               <!-- Cabecera -->
               <div class="post-popout-header">
                 <div class="post-author-info">
@@ -206,6 +178,39 @@
                       d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                   </svg>
                 </button>
+              </div>
+
+              <!-- Imagen del post: va DEBAJO de la cabecera (autor y categoria)
+                   y ENCIMA del texto, como en Instagram. Antes estaba fuera de
+                   .post-popout-details y por tanto salia por encima de todo,
+                   incluido el nombre de quien publica.
+
+                   Vive dentro del contenedor que hace scroll a proposito: asi
+                   la foto se desplaza al bajar a leer los comentarios en vez de
+                   comerse un tercio de la pantalla de forma permanente.
+
+                   En escritorio se recoloca a la columna izquierda con grid
+                   (ver el bloque min-width: 1024px de los estilos), asi que
+                   alli se sigue viendo en dos columnas como hasta ahora. -->
+              <div class="post-popout-media" v-if="tieneImagen(postSeleccionado)">
+                <!-- Doble toque para dar like, como Instagram.
+                     Se escuchan las DOS cosas a proposito: 'dblclick' cubre el
+                     raton en escritorio, y 'touchend' con un contador manual
+                     cubre el telefono, donde el dblclick nativo llega tarde o no
+                     llega porque el navegador lo interpreta como zoom. -->
+                <div class="image-container" @dblclick="likePorDobleToque" @touchend="detectarDobleToque">
+                  <img :src="postSeleccionado.imagen" @load="onImageLoad('selected')"
+                    :class="{ loaded: imageLoaded['selected'] }" />
+
+                  <!-- El corazon es solo decorativo: no recibe eventos (ver
+                       pointer-events en el CSS) para no tapar la imagen. -->
+                  <transition name="corazon-doble">
+                    <svg v-if="corazonVisible" class="corazon-doble-toque" viewBox="0 0 24 24" aria-hidden="true">
+                      <path fill="currentColor"
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                  </transition>
+                </div>
               </div>
 
               <div class="post-popout-body">
@@ -1650,8 +1655,17 @@ export default {
 @import '../../../scss/Foro/foro_navbar.scss';
 
 
+/* OJO: esta regla convive con otra .login-prompt en
+   scss/Foro/foro_pop_out_post.scss (la que le da el position sticky/fixed del
+   pie). Como este bloque va DESPUES del @import, es el que manda en todo lo
+   que declare: padding, fondo, bordes. Si hay que tocar el espaciado del pie,
+   es aqui, no alli.
+
+   El aire de abajo es mayor que el de arriba a proposito: la caja quedaba
+   pegada al borde inferior del pop-out. El env() suma el margen de los moviles
+   con barra de gestos; donde no la hay vale 0 y queda el 1.45rem. */
 .login-prompt {
-  padding: 1rem;
+  padding: 1rem 1rem calc(1.45rem + env(safe-area-inset-bottom, 0px));
   text-align: center;
   background: #f8f9fa;
   border-radius: 8px;

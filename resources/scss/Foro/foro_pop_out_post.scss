@@ -922,7 +922,9 @@
     position: sticky;
     bottom: 0;
     background: white;
-    padding: 15px 20px;
+    /* Mas aire por debajo que por encima: la caja de escribir quedaba pegada
+       al borde inferior del pop-out, sin ningun respiro. */
+    padding: 15px 20px 22px;
     border-top: 1px solid #eee;
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
     margin-top: auto; /* Empuja el formulario al fondo */
@@ -1335,7 +1337,9 @@
         min-height: 0;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+        /* Ya no se reserva hueco: el pie es sticky y ocupa su sitio real
+           dentro del flujo, asi que no puede tapar al ultimo comentario. */
+        padding-bottom: 0;
     }
 
     .post-popout-header {
@@ -1426,13 +1430,24 @@
     // terminaba sin quedar pegado, obligando a bajar para encontrar donde
     // escribir. Fixed lo ancla siempre al borde inferior de la pantalla,
     // como cualquier barra de chat (WhatsApp, Messenger, etc.).
+    /* De 'fixed' a 'sticky'.
+       Estaba fijo al borde de la VENTANA, no de la hoja. Con la hoja pegada
+       abajo daba igual, pero ahora que hay margen, un elemento fijo a la
+       ventana quedaria por debajo del pop-out, flotando fuera de la tarjeta.
+       Sticky lo mantiene abajo pero DENTRO de la hoja, que es lo correcto.
+       El motivo original de usar fixed era el teclado del telefono, y eso ya
+       lo cubre el alto en dvh: al abrirse el teclado la hoja se encoge y el
+       pie sigue pegado a su borde inferior. */
     .add-comment-form {
-        position: fixed;
+        position: sticky;
         bottom: 0;
-        left: 0;
-        right: 0;
         padding: 0.75rem 1rem;
-        padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+        /* En el telefono la barra toca el borde de la pantalla. El
+           env(safe-area-inset-bottom) solo aporta algo en moviles con barra de
+           gestos; en el resto vale 0 y la caja quedaba pegada al canto. Con
+           1.25rem de base hay respiro siempre, y donde ademas haya barra de
+           gestos se le suma. */
+        padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
         z-index: 5;
 
         .comment-input {
@@ -1552,7 +1567,9 @@
     position: sticky;
     bottom: 0;
     background: white;
-    padding: 15px 20px;
+    /* Mismo aire que .add-comment-form, para que el pie se vea igual con
+       sesion y sin ella. */
+    padding: 15px 20px 22px;
     border-top: 1px solid #eee;
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
     margin-top: auto;
@@ -1606,17 +1623,24 @@
        anclada abajo a proposito: el formulario de comentar es position:fixed
        para aguantar la apertura del teclado (ver el punto 6), y eso solo
        funciona bien con la hoja pegada al borde inferior. */
+    /* La hoja ya no va pegada al borde inferior de la pantalla.
+       Antes: align-items flex-end + padding 0, o sea que el canto de abajo del
+       pop-out era literalmente el canto de la pantalla y quedaba cortado.
+       Ahora se le deja margen abajo y a los lados, y se redondean las CUATRO
+       esquinas, para que se lea como una tarjeta encima del foro. */
     .post-popout-overlay {
         align-items: flex-end;
-        padding: 0;
+        padding: 0 0.5rem max(0.75rem, env(safe-area-inset-bottom, 0px));
     }
 
     .post-popout-container {
         width: 100%;
-        height: 94dvh;
-        max-height: 94dvh;
+        height: 92dvh;
+        /* Contra el overlay, que ya lleva el margen aplicado: asi el alto nunca
+           se come el hueco de abajo. */
+        max-height: 100%;
         min-height: 0;
-        border-radius: 18px 18px 0 0;
+        border-radius: 18px;
     }
 
     /* --- 2. Cabecera de una linea ----------------------------------------
@@ -1835,13 +1859,11 @@
        ultimo comentario y lo tapaba. Con fixed ocupa el hueco que ya reserva
        el padding-bottom de .post-popout-details y no tapa nada. */
     .login-prompt {
-        position: fixed;
+        position: sticky;
         bottom: 0;
-        left: 0;
-        right: 0;
         margin-top: 0;
         padding: 0.75rem 1rem;
-        padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+        padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
         font-size: 0.82rem;
         z-index: 5;
     }
@@ -1955,49 +1977,79 @@
         display: none;
     }
 
-    /* ========================================================================
-       TITULO Y TEXTO COMO UN SOLO "CAPTION"
-
-       Eran dos bloques separados: un <h2> con su rayita rosa debajo y, mas
-       abajo, un <p>. Entre los dos se iban ~35px en separadores y margenes
-       para decir dos frases. Poniendolos en linea fluyen como un solo parrafo
-       -titulo en negrita, texto seguido- igual que el pie de foto de
-       Instagram. Se hace solo con CSS: el HTML sigue teniendo su <h2>, asi que
-       la pagina no pierde su encabezado ni para buscadores ni para lectores de
-       pantalla.
-       ======================================================================== */
+    /* El titulo va en su linea y la descripcion DEBAJO, no seguida.
+       Lo habia fusionado en un solo parrafo imitando el pie de foto de
+       Instagram, pero en un foro el titulo es lo que identifica la publicacion
+       y necesita destacar por si solo. Se queda la separacion justa, sin el
+       aire de mas que tenia al principio. */
     .post-popout-body {
         .post-popout-title {
-            display: inline;
-            /* La rayita rosa era el separador entre titulo y texto; ya no hay
-               nada que separar. */
-            padding-bottom: 0;
-            margin-bottom: 0;
-
-            &::after {
-                content: none;
-            }
-
-            /* Espacio entre el final del titulo y el comienzo del texto. */
-            &::before {
-                content: '';
-            }
+            display: block;
+            margin-bottom: 0.5rem;
         }
 
         .post-popout-text {
-            display: inline;
-            margin: 0;
-
-            /* Separa el texto del titulo sin depender de un espacio en el HTML
-               (que Vue colapsaria al compilar la plantilla). */
-            &::before {
-                content: ' ';
-                white-space: pre;
-            }
+            display: block;
+            margin: 0 0 0.6rem;
         }
 
         .post-meta-info {
             margin-top: 0.6rem;
         }
+    }
+}
+
+/* ============================================================================
+   ESCRITORIO: RECUPERAR LAS DOS COLUMNAS
+
+   La imagen se movio dentro de .post-popout-details (justo debajo de la
+   cabecera) para que en movil salga en el orden de Instagram: autor, foto y
+   despues el texto. Ese cambio de sitio en el HTML dejaria el escritorio
+   apilado, que no es lo que habia.
+
+   Aqui se vuelve a montar la vista de dos columnas -foto a la izquierda,
+   conversacion a la derecha- pero con grid en vez de con el flex de antes.
+   El resultado visual es el mismo; lo que cambia es que ahora la posicion la
+   decide el CSS y no el orden del HTML, que es justo lo que permite que movil
+   y escritorio se vean distintos sin duplicar marcado.
+
+   Solo aplica cuando el post TIENE imagen (clase .tiene-media, que pone Vue).
+   Sin foto, .post-popout-details sigue siendo el flex de una columna de
+   siempre y no se toca nada.
+   ============================================================================ */
+@media (min-width: 1024px) {
+
+    /* Primero lo intente con grid y la foto abarcando todas las filas
+       (grid-row: 1 / -1). No sirve: cuando un elemento ocupa varias filas, el
+       grid le reparte su altura ENTRE esas filas, asi que la fila de la
+       cabecera se estiraba y el nombre quedaba flotando en medio de un hueco
+       enorme. Se veia peor que antes.
+
+       La solucion es sacar la foto del flujo: se reserva su hueco con un
+       padding a la izquierda y la imagen se posiciona encima de ese hueco. Asi
+       no participa en el calculo de alturas de nada y el resto de bloques se
+       apilan a la derecha con su tamaño natural, exactamente como antes. */
+    .post-popout-details.tiene-media {
+        position: relative;
+        /* El hueco de la columna izquierda. */
+        padding-left: 50%;
+    }
+
+    .post-popout-details.tiene-media > .post-popout-media {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 50%;
+        max-height: none;
+    }
+
+    /* Como .post-popout-details es lo que hace scroll, el bloque de arriba
+       abarca TODO el alto desplazable. El sticky va aqui dentro para que la
+       foto siga a la vista mientras se recorre la conversacion, igual que
+       cuando era una columna aparte. */
+    .post-popout-details.tiene-media > .post-popout-media .image-container {
+        position: sticky;
+        top: 0;
     }
 }
