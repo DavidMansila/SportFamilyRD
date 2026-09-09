@@ -34,8 +34,7 @@
 
       <span v-if="user?.user_type == 'admin'" class="nav-link nav-link--admin"
         @click="handleNavClick('/solicitudes-entrenadores')">
-        Solicitudes
-        <span class="admin-tag">Admin</span>
+        Solicitudes-E
       </span>
     </div>
 
@@ -122,7 +121,7 @@
         <span>Inicio</span>
       </span>
       <span class="mobile-nav-link" @click="handleNavClick('/directorio')">
-        <i class="fas fa-home"></i>
+        <i class="fas fa-futbol"></i>
         <span>Deportes</span>
       </span>
       <span class="mobile-nav-link" @click="handleNavClick('/noticias')">
@@ -853,12 +852,14 @@ export default {
   .mobile-nav-link {
     color: white;
     text-decoration: none;
-    padding: 12px 0px;
+    padding: 12px 16px;
     border-radius: 15px;
     background: rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
-    text-align: center;
+    /* Separa el icono del texto. Antes iban pegados: la pastilla no tenia
+       padding lateral y el <i> no dejaba hueco a su derecha. */
+    gap: 12px;
     transition: all 0.3s ease;
 
     &:hover {
@@ -869,7 +870,12 @@ export default {
     i {
       color: #ffcc00;
       font-size: 1.2rem;
+      /* Ancho fijo + centrado para que todos los iconos ocupen la misma
+         columna y los textos arranquen alineados, aunque el glifo sea
+         mas ancho (fa-users) o mas estrecho (fa-home). */
       width: 25px;
+      text-align: center;
+      flex-shrink: 0;
     }
 
     span {

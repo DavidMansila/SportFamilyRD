@@ -165,8 +165,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Separa el carrito del texto. Antes no hacia nada porque "Agregar" iba
+       dentro del propio <i>: el boton tenia un unico hijo. */
     gap: 10px;
     font-weight: 600;
+    line-height: 1.2;
+}
+
+.add-to-cart-btn i {
+    font-size: 0.95em;
+    flex-shrink: 0;
 }
 
 .add-to-cart-btn:hover {

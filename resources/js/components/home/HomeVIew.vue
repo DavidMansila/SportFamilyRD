@@ -264,10 +264,14 @@
 
               <div class="thread-stats">
                 <span class="stat">
-                  <i class="fas fa-comments"> Comentarios </i> {{ post.comments_count || 0 }}
+                  <i class="fas fa-comments" aria-hidden="true"></i>
+                  <span class="stat-label">Comentarios</span>
+                  <span class="stat-value">{{ post.comments_count || 0 }}</span>
                 </span>
                 <span class="stat">
-                  <i class="fas fa-heart"> Likes </i> {{ post.likes_count || 0 }}
+                  <i class="fas fa-heart" aria-hidden="true"></i>
+                  <span class="stat-label">Likes</span>
+                  <span class="stat-value">{{ post.likes_count || 0 }}</span>
                 </span>
               </div>
             </div>

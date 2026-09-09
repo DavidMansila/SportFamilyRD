@@ -256,8 +256,9 @@
         }
         
         .add-to-cart-btn {
-          padding: 7px 10px;
-          font-size: 12px;
+          padding: 9px 12px;
+          font-size: 0.78rem;
+          gap: 8px;
         }
         
         .btn-editar, .btn-eliminar {
@@ -376,18 +377,13 @@
         .product-actions {
           gap: 12px;
           
-          .quantity-selector {
-            max-width: 140px;
-            
-            button {
-              width: 36px;
-              height: 36px;
-              font-size: 16px;
-            }
-            
-            span {
-              font-size: 16px;
-            }
+          .qty-stepper__btn {
+            width: 40px;
+            height: 40px;
+          }
+
+          .qty-stepper__value {
+            font-size: 1rem;
           }
           
           .add-to-cart {
@@ -491,8 +487,9 @@
         }
 
         .add-to-cart-btn {
-          padding: 6px 8px;
-          font-size: 11px;
+          padding: 8px 10px;
+          font-size: 0.72rem;
+          gap: 6px;
         }
       }
     }

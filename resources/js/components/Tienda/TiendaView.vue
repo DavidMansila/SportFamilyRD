@@ -107,7 +107,8 @@
             <!-- <span class="product-old-price" v-if="producto.oldPrice">{{ producto.oldPrice }} RD$</span> -->
           </div>
           <button v-if="user" class="add-to-cart-btn" @click.stop="agregarAlCarrito(producto)">
-            <i class="fas fa-shopping-cart">Agregar</i>
+            <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+            <span>Agregar</span>
           </button>
 
         </div>
@@ -198,14 +199,23 @@
             <p class="product-description">{{ productoSeleccionado.description }}</p>
 
             <div v-if="user" class="product-actions">
-              <div class="quantity-selector">
-                <button @click="decrementQuantity">-</button>
-                <span>{{ quantity }}</span>
-                <button @click="incrementQuantity">+</button>
+              <div class="qty-stepper">
+                <span class="qty-stepper__label">Cantidad</span>
+                <div class="qty-stepper__control">
+                  <button type="button" class="qty-stepper__btn" :disabled="quantity <= 1"
+                    aria-label="Quitar una unidad" @click="decrementQuantity">
+                    <i class="fas fa-minus" aria-hidden="true"></i>
+                  </button>
+                  <span class="qty-stepper__value" aria-live="polite">{{ quantity }}</span>
+                  <button type="button" class="qty-stepper__btn" aria-label="Anadir una unidad"
+                    @click="incrementQuantity">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
 
               <button v-if="user" class="add-to-cart" @click="addToCartFromModal">
-                <i class="fas fa-shopping-cart"></i> Agregar al carrito
+                <i class="fas fa-shopping-cart"></i> Agregar
               </button>
 
             </div>
@@ -1155,10 +1165,6 @@ export default {
     font-size: 0.95rem;
   }
 
-  .quantity-selector {
-    margin-bottom: 15px;
-  }
-
   .add-to-cart {
     width: 100%;
   }
@@ -1187,8 +1193,9 @@ export default {
   }
 
   .add-to-cart-btn {
-    padding: 8px 12px;
-    font-size: 0.9rem;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    gap: 6px;
   }
 
   .modal-content {
@@ -1198,17 +1205,6 @@ export default {
 
   .main-image {
     height: 200px;
-  }
-
-  .quantity-selector button {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
-  }
-
-  .quantity-selector span {
-    font-size: 16px;
-    padding: 0 12px;
   }
 }
 
