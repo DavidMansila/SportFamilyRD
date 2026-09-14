@@ -58,10 +58,17 @@ export default {
       // axios.get('/user-by-id', { params: { user_id: this.userId } })
       axios.get(`/user-by-id/${this.userId}`)
       .then(response => {
-          console.log("🚀 ~ refreshUserAndNotify ~ response:", response);
           const userUpdated = response.data.user;
-          console.log("🚀 ~ refreshUserAndNotify ~ userUpdated:", userUpdated)
-          sessionStorage.setItem('user', JSON.stringify(userUpdated));
+
+          // Solo se refresca la sesion local si YA existe una: el enlace del
+          // correo se abre muchas veces en un navegador sin sesion iniciada
+          // (otro dispositivo, otra ventana). Guardar ahi un "user" sin token
+          // dejaba a la aplicacion creyendo que habia sesion, con la burbuja de
+          // chat, el carrito y las noticias guardadas pidiendo datos que el
+          // servidor rechaza con 401 una y otra vez.
+          if (sessionStorage.getItem('token')) {
+            sessionStorage.setItem('user', JSON.stringify(userUpdated));
+          }
 
           setTimeout(() => {
             this.$router.push('/');

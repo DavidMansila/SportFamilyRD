@@ -128,4 +128,10 @@ return [
     // desactivada por defecto.
     'cron_secret' => env('CRON_SECRET'),
 
+    // Content-Security-Policy: false (por defecto) la emite en modo
+    // Report-Only, que reporta violaciones sin bloquear nada. Poner a true
+    // solo despues de recorrer el SPA entero sin violaciones reportadas
+    // (ver App\Http\Middleware\SecurityHeaders).
+    'csp_enforce' => (bool) env('CSP_ENFORCE', false),
+
 ];

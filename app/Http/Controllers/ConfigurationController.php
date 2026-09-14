@@ -26,7 +26,10 @@ class ConfigurationController extends Controller
                 return [
                     'id' => $config->id,
                     'configuration' => $config->configuration,
-                    'value' => $userConfig ? $userConfig->status : 'inactivo',
+                    // 'disabled' y no 'inactivo': el frontend compara contra
+                    // 'enabled' para pintar el interruptor, asi que el valor por
+                    // defecto tiene que estar en ese mismo vocabulario.
+                    'value' => $userConfig ? $userConfig->status : 'disabled',
                 ];
             });
 
@@ -36,19 +39,25 @@ class ConfigurationController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al obtener las configuraciones',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al obtener las configuraciones', 500);
         }
     }
 
     public function updateValue(Request $request)
     {
         try {
+            // Antes no se validaba nada: 'configuration_id' podia apuntar a una
+            // fila inexistente y 'status' aceptaba cualquier cadena.
+            $datos = $request->validate([
+                // Tabla 'configuration' en singular (ver $table del modelo).
+                // Los valores son los que manda AjustesView.vue en el toggle.
+                'configuration_id' => 'required|integer|exists:configuration,id',
+                'status' => 'required|in:enabled,disabled',
+            ]);
+
             $userId = $request->user()->id;
-            $configId = $request->configuration_id;
-            $status = $request->status;
+            $configId = $datos['configuration_id'];
+            $status = $datos['status'];
 
             // Verificar si la configuración ya existe para el usuario
             $userConfig = ConfigurationUser::where('user_id', $userId)
@@ -71,10 +80,7 @@ class ConfigurationController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al actualizar la configuración',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al actualizar la configuración', 500);
         }
     }
 
@@ -93,59 +99,103 @@ class ConfigurationController extends Controller
             // mande el cliente.
             $user = $request->user();
 
-            // Actualizar la contraseña
-            if (Hash::check($currentPassword, $user->password)) {
-                
-                $user->password = Hash::make($newPassword);
-                $user->save();
-            }else{
-            
+            if (! Hash::check($currentPassword, $user->password)) {
                 return response()->json([
                     'message' => 'La contraseña actual es incorrecta',
                 ], 400);
             }
 
+            $user->password = Hash::make($newPassword);
+            $user->save();
+
+            // REVOCAR TODAS LAS SESIONES y emitir una nueva para este cliente.
+            //
+            // Cambiar la contraseña es justo lo que hace alguien que sospecha
+            // que le entraron en la cuenta, y era lo unico que no funcionaba:
+            // los tokens ya emitidos seguian siendo validos despues del cambio
+            // (y hasta hace poco no caducaban nunca), asi que quien tuviera uno
+            // robado conservaba el acceso y la victima creia haber recuperado
+            // la cuenta.
+            $user->tokens()->delete();
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()->json([
                 'message' => 'Contraseña actualizada exitosamente',
+                // El cliente tiene que guardar este token: el suyo acaba de ser
+                // revocado junto con los demas.
+                'token' => $token,
             ], 200);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al actualizar la contraseña',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al actualizar la contraseña', 500);
         }
      
     }
 
     
-    public function show($id)
+    /**
+     * El catalogo de configuraciones es GLOBAL: una fila de esta tabla gobierna
+     * una preferencia para TODOS los usuarios de la plataforma. Crearlas,
+     * renombrarlas o borrarlas es una accion de admin.
+     *
+     * Antes store/update/destroy no comprobaban nada mas alla de estar
+     * autenticado: cualquier cuenta recien registrada podia borrar el catalogo
+     * entero. index() y updateValue() si son de cada usuario (tocan su propia
+     * fila en configuration_user) y no llevan este chequeo.
+     */
+    private function soloAdmin(Request $request): ?\Illuminate\Http\JsonResponse
     {
-        $configuration = Configuration::findOrFail($id);
-        return response()->json($configuration);
+        if ($request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        return null;
+    }
+
+    public function show(Request $request, $id)
+    {
+        if ($resp = $this->soloAdmin($request)) {
+            return $resp;
+        }
+
+        return response()->json(Configuration::findOrFail($id));
     }
 
     public function store(Request $request)
     {
+        if ($resp = $this->soloAdmin($request)) {
+            return $resp;
+        }
+
         $configuration = Configuration::create($request->validate([
-            'configuration' => 'nullable|string|max:255',
+            'configuration' => 'required|string|max:255',
         ]));
+
         return response()->json($configuration, 201);
     }
 
     public function update(Request $request, $id)
     {
+        if ($resp = $this->soloAdmin($request)) {
+            return $resp;
+        }
+
         $configuration = Configuration::findOrFail($id);
         $configuration->update($request->validate([
-            'configuration' => 'nullable|string|max:255',
+            'configuration' => 'required|string|max:255',
         ]));
+
         return response()->json($configuration);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $configuration = Configuration::findOrFail($id);
-        $configuration->delete();
+        if ($resp = $this->soloAdmin($request)) {
+            return $resp;
+        }
+
+        Configuration::findOrFail($id)->delete();
+
         return response()->json(null, 204);
     }
 }

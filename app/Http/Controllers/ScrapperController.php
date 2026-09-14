@@ -16,7 +16,7 @@ class ScrapperController extends Controller
         // Usar Cache::remember para almacenar los resultados en caché durante 30 días
         $articles = Cache::remember('baseball_news', now()->addDays(30), function () {
             $client = new Client([
-                'verify' => false,
+                'verify' => true,
             ]);
 
             // Primer scraping: Obtener solo los enlaces
@@ -102,7 +102,7 @@ class ScrapperController extends Controller
         // Usar Cache::remember para almacenar los resultados en caché durante 30 días
         $articles = Cache::remember('futbol_news', now()->addDays(30), function () {
             $client = new Client([
-                'verify' => false,
+                'verify' => true,
             ]);
 
             // Primer scraping: Obtener solo los enlaces
@@ -179,7 +179,7 @@ class ScrapperController extends Controller
         // Usar Cache::remember para almacenar los resultados en caché durante 30 días
         $articles = Cache::remember('basketball_news', now()->addDays(30), function () {
             $client = new Client([
-                'verify' => false,
+                'verify' => true,
             ]);
 
             // Primer scraping: Obtener solo los enlaces
@@ -257,7 +257,7 @@ class ScrapperController extends Controller
         // Usar Cache::remember para almacenar los resultados en caché durante 30 días
         $articles = Cache::remember('volleyball_news', now()->addDays(30), function () {
             $client = new Client([
-                'verify' => false,
+                'verify' => true,
             ]);
 
             $baseUrl = 'https://voleiboldominicano.com/author/admin/';
@@ -412,7 +412,7 @@ class ScrapperController extends Controller
     {
         $articles = \Cache::remember('swimming_news', now()->addDays(30), function () {
             $client = new \GuzzleHttp\Client([
-                'verify' => false,
+                'verify' => true,
             ]);
 
             $response = $client->request('GET', 'https://cdndeportes.com.do/tag/natacion/');
@@ -556,7 +556,7 @@ class ScrapperController extends Controller
 
     public function sdcTicketsScrap()
     {
-        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $client = new \GuzzleHttp\Client(['verify' => true]);
         $response = $client->request('GET', 'https://www.sdctickets.do/');
         $html = (string) $response->getBody();
         $crawler = new \Symfony\Component\DomCrawler\Crawler($html);

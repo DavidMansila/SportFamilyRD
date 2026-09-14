@@ -36,7 +36,7 @@
             'has-events': day && hasEvents(day),
             'selected-day': day && selectedDay === day,
             'current-day': day && isCurrentDay(day)
-          }]" @click="day && selectDay(day)">
+          }]" @click="day && selectDay(day)" role="button" tabindex="0" @keydown.enter.prevent="day && selectDay(day)" @keydown.space.prevent="day && selectDay(day)">
             <span class="day-number" v-if="day">{{ day }}</span>
             <div v-if="day && hasEvents(day)" class="event-dots">
               <span v-for="(event, index) in getEventsForDay(day)" :key="index"
@@ -54,7 +54,7 @@
         <h2 v-else>Selecciona un día</h2>
 
         <div v-if="selectedDayEvents.length > 0" class="events-list">
-          <div v-for="event in selectedDayEvents" :key="event.id" class="event-card" @click="openEventDetail(event)"
+          <div v-for="event in selectedDayEvents" :key="event.id" class="event-card" @click="openEventDetail(event)" role="button" tabindex="0" @keydown.enter.prevent="openEventDetail(event)" @keydown.space.prevent="openEventDetail(event)"
             :style="{ borderLeft: `4px solid ${event.categoryColor || '#3498db'}` }">
             <div class="event-time">{{ formatTime(event.time) }}</div>
             <h3 class="event-title">{{ event.Title }}</h3>

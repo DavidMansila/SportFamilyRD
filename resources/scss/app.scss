@@ -9,3 +9,36 @@
 
 // Estilos Globales
 @import '../scss/global.scss';
+// ---------------------------------------------------------------------------
+// Accesibilidad: foco visible por teclado
+// ---------------------------------------------------------------------------
+//
+// Varios controles de la interfaz son <span> o <div> con @click (tarjetas de
+// evento, enlaces del navbar, el ojo de mostrar/ocultar contraseña...). Se les
+// agrego role="button" y tabindex="0" para que se puedan alcanzar con Tab y
+// activar con Enter/Espacio, pero sin un indicador de foco esa navegacion es
+// invisible: la persona tabula a ciegas sin saber donde esta.
+//
+// :focus-visible y no :focus, para que el anillo salga al navegar con teclado
+// y no en cada clic del raton.
+:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+// Los elementos con role="button" deben comportarse como tales al apuntarlos.
+[role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

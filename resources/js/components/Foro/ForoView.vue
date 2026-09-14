@@ -105,14 +105,14 @@
 
         <div class="post-footer">
           <div class="post-stats">
-            <span class="post-likes" @click.stop="toggleLike('post', post.id)" :class="{ liked: post.isLiked }">
+            <span class="post-likes" @click.stop="toggleLike('post', post.id)" role="button" tabindex="0" @keydown.enter.stop.prevent="toggleLike('post', post.id)" @keydown.space.stop.prevent="toggleLike('post', post.id)" :class="{ liked: post.isLiked }">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                 <path
                   d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
               {{ post.likes_count || 0 }}
             </span>
-            <span class="post-comments" @click.stop="abrirPopoutYFocalizarComentario(post)">
+            <span class="post-comments" @click.stop="abrirPopoutYFocalizarComentario(post)" role="button" tabindex="0" @keydown.enter.stop.prevent="abrirPopoutYFocalizarComentario(post)" @keydown.space.stop.prevent="abrirPopoutYFocalizarComentario(post)">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -200,6 +200,7 @@
                      llega porque el navegador lo interpreta como zoom. -->
                 <div class="image-container" @dblclick="likePorDobleToque" @touchend="detectarDobleToque">
                   <img :src="postSeleccionado.imagen" @load="onImageLoad('selected')"
+                    :alt="`Imagen de la publicación: ${postSeleccionado.titulo}`"
                     :class="{ loaded: imageLoaded['selected'] }" />
 
                   <!-- El corazon es solo decorativo: no recibe eventos (ver

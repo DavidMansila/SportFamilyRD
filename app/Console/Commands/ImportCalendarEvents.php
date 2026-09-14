@@ -89,7 +89,7 @@ class ImportCalendarEvents extends Command
         $events = [];
 
         try {
-            $client = new Client(['verify' => false, 'timeout' => 20]);
+            $client = new Client(['verify' => true, 'timeout' => 20]);
             $response = $client->get('https://www.sdctickets.do/');
             $html = (string) $response->getBody();
             $crawler = new Crawler($html);

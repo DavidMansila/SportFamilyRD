@@ -67,6 +67,38 @@ function shouldRetry(error) {
     return !error.response || error.response.status >= 500;
 }
 
+// Sesion caducada o revocada.
+//
+// Los tokens de Sanctum ahora CADUCAN (config/sanctum.php: 7 dias) y se revocan
+// al cambiar la contraseña. Antes no caducaban nunca, asi que este caso casi no
+// se daba y el manejador de 401 estaba comentado.
+//
+// Sin el, el usuario queda en un estado roto a medias: sessionStorage todavia
+// tiene el objeto "user", asi que la interfaz lo trata como identificado y
+// pinta la burbuja de chat, el carrito y el resto, pero cada peticion contra la
+// API devuelve 401 y no se entera de nada. Hay que limpiar la sesion local en
+// cuanto el servidor diga que ya no vale.
+//
+// Se excluye /login: un 401 ahi es "credenciales incorrectas", no una sesion
+// caducada, y no debe disparar una recarga.
+function esSesionCaducada(error) {
+    if (!error.response || error.response.status !== 401) return false;
+
+    const url = (error.config && error.config.url) || '';
+    if (url.includes('/login')) return false;
+
+    // Solo si creiamos tener sesion. Se mira el token Y el usuario: el estado
+    // "user sin token" existe de verdad (al abrir el enlace de verificacion en
+    // un navegador sin sesion) y es justo el que hay que limpiar, porque la
+    // interfaz se comporta como identificada y ninguna peticion funciona.
+    //
+    // Si no hay ni token ni user, no habia sesion que caducar: un 401 ahi es lo
+    // esperado y no debe provocar ninguna redireccion.
+    return !!(sessionStorage.getItem('token') || sessionStorage.getItem('user'));
+}
+
+let cerrandoSesion = false;
+
 axios.interceptors.response.use(
     (response) => {
         onRequestSettled();
@@ -81,19 +113,19 @@ axios.interceptors.response.use(
                 .then(() => axios(error.config));
         }
 
+        if (esSesionCaducada(error) && !cerrandoSesion) {
+            // El guard evita que varias peticiones en vuelo disparen varias
+            // recargas a la vez.
+            cerrandoSesion = true;
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+            sessionStorage.setItem(
+                'logoutMessage',
+                'Tu sesión expiró. Vuelve a iniciar sesión.'
+            );
+            window.location.assign('/signup');
+        }
+
         return Promise.reject(error);
     }
 );
-
-// Manejar errores 401 (No autorizado)
-// axios.interceptors.response.use(
-//     (response) => response,
-//     (error) => {
-//         if (error.response && error.response.status === 401) {
-//             sessionStorage.removeItem("token");
-//             sessionStorage.removeItem("user");
-//             window.location.href = "";
-//         }
-//         return Promise.reject(error);
-//     }
-// );

@@ -139,7 +139,7 @@
         <div class="entrenadores-container">
             <transition-group name="cards" tag="div" class="entrenadores-grid">
                 <div v-for="entrenador in paginatedEntrenadores" :key="entrenador.trainer_id" class="entrenador-card"
-                    @click="verPerfil(entrenador)">
+                    @click="verPerfil(entrenador)" role="button" tabindex="0" @keydown.enter.prevent="verPerfil(entrenador)" @keydown.space.prevent="verPerfil(entrenador)">
                     <div class="card-image-container">
                         <img :src="entrenador.foto" :alt="`${entrenador.nombre} - ${entrenador.deporte}`" loading="lazy" />
                         <div class="deporte-tag">{{ entrenador.deporte }}</div>

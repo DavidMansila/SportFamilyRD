@@ -26,7 +26,7 @@
               <div class="password-input">
                 <input :type="showCurrentPassword ? 'text' : 'password'" v-model="security.currentPassword"
                   placeholder="••••••••">
-                <span class="toggle-password" @click="showCurrentPassword = !showCurrentPassword">
+                <span class="toggle-password" @click="showCurrentPassword = !showCurrentPassword" role="button" tabindex="0" @keydown.enter.prevent="showCurrentPassword = !showCurrentPassword" @keydown.space.prevent="showCurrentPassword = !showCurrentPassword">
                   <i :class="showCurrentPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                 </span>
               </div>
@@ -36,7 +36,7 @@
               <div class="password-input">
                 <input :type="showNewPassword ? 'text' : 'password'" v-model="security.newPassword"
                   placeholder="••••••••">
-                <span class="toggle-password" @click="showNewPassword = !showNewPassword">
+                <span class="toggle-password" @click="showNewPassword = !showNewPassword" role="button" tabindex="0" @keydown.enter.prevent="showNewPassword = !showNewPassword" @keydown.space.prevent="showNewPassword = !showNewPassword">
                   <i :class="showNewPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                 </span>
               </div>
@@ -46,7 +46,7 @@
               <div class="password-input">
                 <input :type="showConfirmPassword ? 'text' : 'password'" v-model="security.confirmPassword"
                   placeholder="••••••••">
-                <span class="toggle-password" @click="showConfirmPassword = !showConfirmPassword">
+                <span class="toggle-password" @click="showConfirmPassword = !showConfirmPassword" role="button" tabindex="0" @keydown.enter.prevent="showConfirmPassword = !showConfirmPassword" @keydown.space.prevent="showConfirmPassword = !showConfirmPassword">
                   <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                 </span>
               </div>
@@ -274,13 +274,22 @@ export default {
       }
 
       try {
-        await axios.post('/change-password', {
-          user_id: this.user.id,
+        // Sin user_id: el backend cambia la contraseña del usuario autenticado
+        // y solo la de ese.
+        const { data } = await axios.post('/change-password', {
           current_password: this.security.currentPassword,
           new_password: this.security.newPassword
         });
 
-        this.showToast('¡Contraseña cambiada con éxito!', 'success');
+        // Al cambiar la contraseña el servidor revoca TODAS las sesiones -para
+        // que un token robado deje de servir- y devuelve uno nuevo para este
+        // navegador. Sin guardarlo, la siguiente peticion saldria con el token
+        // viejo y el usuario se veria expulsado justo despues de acertar.
+        if (data && data.token) {
+          sessionStorage.setItem('token', data.token);
+        }
+
+        this.showToast('¡Contraseña cambiada con éxito! Se cerraron las demás sesiones.', 'success');
 
         this.security = {
           currentPassword: '',

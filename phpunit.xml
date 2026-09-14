@@ -22,8 +22,16 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
-        <!-- <env name="DB_CONNECTION" value="sqlite"/> -->
-        <!-- <env name="DB_DATABASE" value=":memory:"/> -->
+        <!-- SQLite en memoria: las pruebas NUNCA deben tocar la base real de
+             Supabase. Estaba comentado, asi que cualquier test corria contra
+             produccion. -->
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <!-- Sin esto, los eventos de broadcasting salian contra la cuenta REAL
+             de Pusher durante las pruebas (las credenciales del .env se heredan
+             en el entorno de test). Ademas de ensuciar la cuenta y gastar
+             cuota, ataba la suite a que hubiera red. -->
+        <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

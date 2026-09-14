@@ -109,7 +109,7 @@
 
           <!-- <div class="form-group">
             <label class="custom-label">Sube tus certificados (PDF, JPG, PNG)</label>
-            <div class="file-upload-area" @click="triggerFileInput('certificados')" @dragover.prevent
+            <div class="file-upload-area" @click="triggerFileInput('certificados')" role="button" tabindex="0" @keydown.enter.prevent="triggerFileInput('certificados')" @keydown.space.prevent="triggerFileInput('certificados')" @dragover.prevent
               @drop="handleDrop($event, 'certificados')">
               <input type="file" id="certificados" ref="certificadosInput"
                 @change="subirArchivos('certificados', $event)" multiple accept=".pdf,.jpg,.jpeg,.png" hidden />

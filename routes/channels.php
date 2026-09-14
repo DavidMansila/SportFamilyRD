@@ -21,13 +21,11 @@ Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
     if (!$chat) return false;
 
     // Verificar si el usuario es participante del chat
-    $isParticipant = $user->id == $chat->user_id ||
+    // Sin Log::info por autorizacion: se escribia una linea con el id de
+    // usuario y de chat en CADA suscripcion a un canal. Si hace falta depurar
+    // esto, es un caso puntual y se sube el nivel de log a proposito.
+    return $user->id == $chat->user_id ||
         ($chat->trainer && $user->id == $chat->trainer->user_id);
-
-    Log::info("Autenticando usuario {$user->id} para chat {$chatId}: " .
-        ($isParticipant ? 'APROBADO' : 'RECHAZADO'));
-
-    return $isParticipant;
 });
 
 

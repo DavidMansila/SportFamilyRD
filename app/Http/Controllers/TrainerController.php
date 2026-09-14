@@ -49,7 +49,10 @@ class TrainerController extends Controller
                     return [
                         'title' => $achievement->title,
                         'description' => $achievement->description,
-                        'date' => $achievement->date
+                        // La columna es 'achievement_date' (ver la migracion de
+                        // achievements): pedir '->date' devolvia siempre null y
+                        // el panel de admin mostraba la fecha del logro vacia.
+                        'date' => $achievement->achievement_date,
                     ];
                 })->toArray(),
                 'specialties' => $trainer->specialties->map(function ($specialty) {
@@ -71,7 +74,23 @@ class TrainerController extends Controller
         // 'user' va en el eager-load: sin esto, optional($trainer->user) mas abajo
         // dispara una consulta SEPARADA por cada entrenador (N+1) para leer su
         // imagen, cada una un viaje de red aparte a Supabase.
-        $approvedTrainer = Trainer::with(['achievements', 'specialties', 'user'])
+        //
+        // COLUMNAS EXPLICITAS, por lo mismo que en PostController::index(): esta
+        // ruta es PUBLICA y cargar la relacion entera serializaba el registro
+        // completo de la cuenta del entrenador -correo personal, telefono,
+        // fecha de nacimiento, ubicacion y biografia- a cualquiera que pidiera
+        // /api/trainer/approved sin identificarse.
+        //
+        // Ojo con la distincion: los campos 'email' y 'phone' del propio
+        // Trainer son los datos de contacto PROFESIONALES que la persona puso
+        // en su solicitud para aparecer en el directorio, y esos si son
+        // publicos a proposito. Lo que no debia salir es la cuenta de usuario
+        // detras. El frontend solo lee user.name.
+        $approvedTrainer = Trainer::with([
+            'achievements',
+            'specialties',
+            'user:id,name,image',
+        ])
             ->where('status', 'approved')
             ->get();
 
@@ -94,17 +113,114 @@ class TrainerController extends Controller
         //
     }
 
+    /**
+     * Reglas de una solicitud de entrenador.
+     *
+     * store() y update() metian $request->all() directo en create()/update()
+     * SIN UNA SOLA REGLA de validacion: campos de longitud ilimitada, tipos
+     * arbitrarios y correo sin formato, que despues se muestran en el
+     * directorio publico de entrenadores.
+     *
+     * Los enum replican los de la migracion de 'trainer': con un valor fuera de
+     * la lista, Postgres rechazaba el INSERT con un error de tipo que llegaba al
+     * cliente como un 500.
+     *
+     * user_id y status NO estan aqui a proposito: los fija el controlador
+     * (user_id = usuario autenticado, status = 'pending'), nunca el cliente.
+     *
+     * @param  bool  $parcial  update() permite mandar solo algunos campos.
+     */
+    private function reglas(bool $parcial = false): array
+    {
+        $req = $parcial ? 'sometimes' : 'required';
+
+        return [
+            'name' => "$req|string|max:255",
+            'email' => "$req|email|max:255",
+            'phone' => "$req|string|max:30",
+            'city_country' => "$req|string|max:255",
+            'sport_category' => "$req|in:Fútbol,Baloncesto,Tenis,Natación,Ciclismo,Atletismo,Artes Marciales",
+            'experience' => "$req|string|max:255",
+            'level_of_certification' => "$req|in:ninguna,basica,intermedia,avanzada,nacional,internacional",
+            'certificates_linked' => 'nullable|string|max:2048',
+            'description' => 'nullable|string|max:2000',
+            'schedule' => 'nullable|string|max:1000',
+            'cost' => 'nullable|numeric|min:0|max:1000000',
+        ];
+    }
+
+    /**
+     * achievements y specialties llegan como array o como JSON en una cadena
+     * (segun como los serialice el frontend), y a veces con cada elemento a su
+     * vez como cadena JSON. Esta normalizacion ya estaba duplicada literalmente
+     * cuatro veces entre store() y update().
+     */
+    private function normalizarLista($valor): array
+    {
+        if (is_string($valor)) {
+            $valor = json_decode($valor, true) ?? [];
+        }
+
+        if (! is_array($valor)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(function ($item) {
+            if (is_string($item)) {
+                $decoded = json_decode($item, true);
+                return is_array($decoded) ? $decoded : null;
+            }
+
+            return is_array($item) ? $item : null;
+        }, $valor)));
+    }
+
+    /** Solo las claves que el modelo acepta, con longitud acotada. */
+    private function saneaAchievements(array $items): array
+    {
+        return array_map(fn($a) => [
+            'title' => mb_substr((string) ($a['title'] ?? ''), 0, 255),
+            'description' => mb_substr((string) ($a['description'] ?? ''), 0, 1000),
+            'achievement_date' => $a['achievement_date'] ?? ($a['date'] ?? null),
+        ], array_slice($items, 0, 50));
+    }
+
+    private function saneaSpecialties(array $items): array
+    {
+        return array_map(fn($s) => [
+            'description' => mb_substr((string) ($s['description'] ?? ''), 0, 500),
+        ], array_slice($items, 0, 50));
+    }
+
+    /**
+     * El formulario manda la tarifa como FormData y, cuando el campo esta vacio,
+     * JS serializa null/undefined como la CADENA "null". Hay que normalizarlo
+     * ANTES de validar: la regla 'numeric' rechazaria "null" con un 422 y el
+     * formulario de solicitud dejaria de funcionar para quien no ponga tarifa.
+     *
+     * Antes esta conversion se hacia despues, justo antes del create(), porque
+     * no habia validacion ninguna.
+     */
+    private function normalizarCost(Request $request): void
+    {
+        if ($request->has('cost')) {
+            $cost = $request->input('cost');
+            if ($cost === 'null' || $cost === 'undefined' || $cost === '' || $cost === null) {
+                $request->merge(['cost' => null]);
+            }
+        }
+    }
+
     public function store(Request $request)
     {
+        $this->normalizarCost($request);
+        $request->validate($this->reglas());
+
         $data = $request->all();
         $achievements = $data['achievements'] ?? [];
         unset($data['achievements']);
         $specialties = $data['specialties'] ?? [];
         unset($data['specialties']);
-
-        if (isset($data['cost']) && ($data['cost'] === 'null' || $data['cost'] === '')) {
-            $data['cost'] = null;
-        }
 
         // user_id siempre el del usuario autenticado (nunca uno que mande el
         // cliente), y status siempre arranca en 'pending': solo updateStatus()
@@ -113,32 +229,12 @@ class TrainerController extends Controller
         $data['status'] = 'pending';
         $trainer = Trainer::create($data);
 
-        if (is_string($achievements)) {
-            $achievements = json_decode($achievements, true) ?? [];
-        }
-
-        $achievements = array_map(function ($item) {
-            if (is_string($item)) {
-                $decoded = json_decode($item, true);
-                return is_array($decoded) ? $decoded : [];
-            }
-            return $item;
-        }, $achievements);
+        $achievements = $this->saneaAchievements($this->normalizarLista($achievements));
         if (!empty($achievements)) {
             $trainer->achievements()->createMany($achievements);
         }
 
-
-        if (is_string($specialties)) {
-            $specialties = json_decode($specialties, true) ?? [];
-        }
-        $specialties = array_map(function ($item) {
-            if (is_string($item)) {
-                $decoded = json_decode($item, true);
-                return is_array($decoded) ? $decoded : [];
-            }
-            return $item;
-        }, $specialties);
+        $specialties = $this->saneaSpecialties($this->normalizarLista($specialties));
         if (!empty($specialties)) {
             $trainer->specialties()->createMany($specialties);
         }
@@ -215,15 +311,14 @@ class TrainerController extends Controller
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
+        $this->normalizarCost($request);
+        $request->validate($this->reglas(parcial: true));
+
         $data = $request->all();
         $achievements = $data['achievements'] ?? [];
         unset($data['achievements']);
         $specialties = $data['specialties'] ?? [];
         unset($data['specialties']);
-
-        if (isset($data['cost']) && ($data['cost'] === 'null' || $data['cost'] === '')) {
-            $data['cost'] = null;
-        }
 
         // status solo lo cambia updateStatus() (solo-admin): nunca por esta via,
         // o cualquiera podria auto-aprobarse como entrenador.
@@ -231,31 +326,13 @@ class TrainerController extends Controller
         $trainer->update($data);
 
         $trainer->achievements()->delete();
-        if (is_string($achievements)) {
-            $achievements = json_decode($achievements, true) ?? [];
-        }
-        $achievements = array_map(function ($item) {
-            if (is_string($item)) {
-                $decoded = json_decode($item, true);
-                return is_array($decoded) ? $decoded : [];
-            }
-            return $item;
-        }, $achievements);
+        $achievements = $this->saneaAchievements($this->normalizarLista($achievements));
         if (!empty($achievements)) {
             $trainer->achievements()->createMany($achievements);
         }
 
         $trainer->specialties()->delete();
-        if (is_string($specialties)) {
-            $specialties = json_decode($specialties, true) ?? [];
-        }
-        $specialties = array_map(function ($item) {
-            if (is_string($item)) {
-                $decoded = json_decode($item, true);
-                return is_array($decoded) ? $decoded : [];
-            }
-            return $item;
-        }, $specialties);
+        $specialties = $this->saneaSpecialties($this->normalizarLista($specialties));
         if (!empty($specialties)) {
             $trainer->specialties()->createMany($specialties);
         }
@@ -285,9 +362,13 @@ class TrainerController extends Controller
             return response()->json(['message' => 'Trainer not found'], 404);
         }
 
+        // optional(): la relacion 'user' puede no resolver si la cuenta se
+        // borro y quedo la fila de entrenador. Sin esta guarda, una ruta
+        // PUBLICA respondia 500 (y con APP_DEBUG a true, un volcado del
+        // entorno completo).
         return response()->json([
             'id' => $trainer->id,
-            'name' => $trainer->user->name,
+            'name' => optional($trainer->user)->name,
         ]);
     }
 

@@ -38,6 +38,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
 
+        // Cabeceras de seguridad en TODAS las respuestas (SPA y API). La app no
+        // emitia ninguna: ni CSP, ni HSTS, ni X-Frame-Options, ni nosniff.
+        // La CSP sale en modo Report-Only hasta que CSP_ENFORCE=true.
+        $middleware->append([
+            \App\Http\Middleware\SecurityHeaders::class,
+        ]);
+
         $middleware->web(append: [
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
@@ -46,13 +53,54 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
 
+        // Limite de peticiones para TODO /api. En Laravel 11 el grupo 'api' no
+        // lo trae puesto: hay que pedirlo explicitamente. Sin esta linea, las
+        // 60 rutas con auth:sanctum no tenian ningun limite de tasa (los
+        // throttle:60,1 sueltos cubrian solo algunas rutas publicas).
+        // El limitador 'api' se define en App\Providers\RouteServiceProvider.
+        $middleware->throttleApi();
+
+        // 'token.auth' (App\Http\Middleware\VerifyToken) se elimino: leia el
+        // Bearer con base64_decode("id|expiracion") y confiaba en el id que
+        // venia dentro, sin firma ni consulta a la tabla de tokens. Cualquiera
+        // que mandara base64("1|9999999999") quedaba autenticado como el
+        // usuario 1. No estaba enganchado a ninguna ruta, pero bastaba una
+        // palabra en routes/api.php para activarlo. La autenticacion de esta
+        // API es auth:sanctum y no hay motivo para tener una segunda via.
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
-            'token.auth' => \App\Http\Middleware\VerifyToken::class,
             'broadcast.auth' => \App\Http\Middleware\BroadcastAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // Firma invalida en un enlace de verificacion de correo.
+        //
+        // La causa casi siempre es la misma y el 403 pelado no lo dice: APP_URL
+        // no coincide con el host por el que se sirve la app. La firma se
+        // calcula sobre la URL COMPLETA (host incluido), asi que si el correo se
+        // genera con APP_URL=http://localhost:8000 y la persona entra por otro
+        // host o puerto, la firma no cuadra y el enlace legitimo se rechaza.
+        //
+        // Antes esto no se notaba porque la ruta no validaba la firma -que es
+        // justamente lo que la hacia vulnerable-. Ahora que si la valida,
+        // APP_URL tiene que estar bien o NADIE puede verificar su correo.
+        $exceptions->render(function (\Illuminate\Routing\Exceptions\InvalidSignatureException $e, $request) {
+            if (! $request->is('api/email/verify/*')) {
+                return null;
+            }
+
+            \Illuminate\Support\Facades\Log::warning('Enlace de verificacion con firma invalida', [
+                'url_recibida' => $request->fullUrl(),
+                'app_url_configurado' => config('app.url'),
+                'pista' => 'Si ambos difieren en host o puerto, el problema es APP_URL, no el enlace.',
+            ]);
+
+            return response()->json([
+                'message' => 'Este enlace de verificación no es válido o ya expiró. '
+                    . 'Solicita uno nuevo desde la aplicación.',
+            ], 403);
+        });
+
         // Todo lo que cuelga de /api debe responder JSON siempre, incluidos los
         // errores. Sin esto, una peticion sin cabecera Accept que falle la
         // autenticacion intenta redirigir a una ruta 'login' que no existe en

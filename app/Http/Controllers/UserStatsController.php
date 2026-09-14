@@ -31,8 +31,17 @@ class UserStatsController extends Controller
 
             if ($user) {
                 if ($user->user_type === 'entrenador') {
-                    // Solicitudes de usuarios para este entrenador
-                    $trainingRequests = Training::where('trainer_id', $userId)->count();
+                    // trainer_id es la clave de la tabla 'trainer', NO el id del
+                    // usuario: son dos espacios de identificadores distintos.
+                    // Comparar directamente contra $userId contaba las
+                    // solicitudes de OTRO entrenador -el que por casualidad
+                    // tuviera ese mismo numero de id-, asi que el contador del
+                    // perfil siempre mostraba una cifra ajena.
+                    $trainerId = Trainer::where('user_id', $userId)->value('id');
+
+                    $trainingRequests = $trainerId
+                        ? Training::where('trainer_id', $trainerId)->count()
+                        : 0;
                 } else if ($user->user_type === 'admin') {
                     // TOTAL de solicitudes de entrenador
                     $trainerRequests = Trainer::count();
@@ -49,12 +58,7 @@ class UserStatsController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            Log::error('Error en getStats: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al obtener estadísticas',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al obtener estadísticas', 500);
         }
     }
 

@@ -44,7 +44,11 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 // cuenta (ver auth:sanctum mas abajo): antes este resource completo era
 // publico, lo que permitia editar o borrar CUALQUIER cuenta (incluyendo
 // password y user_type) sin iniciar sesion.
-Route::resource('/user', UserController::class)->only(['store']);
+// throttle:registro (5/hora por IP): el registro es publico y cada alta exitosa
+// dispara un correo de verificacion. Sin limite se podia crear cuentas en masa
+// y, con ellas, mandar correo a direcciones de terceros a voluntad.
+Route::resource('/user', UserController::class)->only(['store'])
+    ->middleware('throttle:registro');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -95,7 +99,8 @@ Route::get('/featured-events', [CalendarController::class, 'featuredEvents'])->m
 // Scraping en vivo (golpea un sitio externo): limite bajo para que no se
 // pueda usar esta ruta publica para tumbar el servicio ni al sitio scrapeado.
 Route::get('/scrap-calendar', [ScrapperController::class, 'sdcTicketsScrap'])->middleware('throttle:5,1');
-Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store'])->middleware('throttle:5,1');
+// POST /scrap-calendar se movio al grupo auth:sanctum (solo admin): escribia en
+// la tabla del calendario sin autenticacion ni validacion de ningun tipo.
 
 // --- NOTICIAS ---
 // LISTADO de noticias: va SIN el texto completo del articulo.
@@ -159,9 +164,9 @@ Route::get('/trainer/by-user/{userId}', [TrainerController::class, 'getTrainerBy
 Route::get('/sports', [SportController::class, 'index'])->middleware('throttle:60,1');
 
 // --- MISC ---
-Route::get('/prueba-publica', fn() => response()->json(['mensaje' => 'Sin autenticación']));
-// Route::get('/user-by-id', [UserController::class, 'getUserByID']);
-Route::get('/user-by-id/{id}', [UserController::class, 'getUserByID']);
+Route::get('/user-by-id/{id}', [UserController::class, 'getUserByID'])
+    ->whereNumber('id')
+    ->middleware('throttle:60,1');
 
 // --- CRON EXTERNO (Render free no trae cron propio) ---
 // Un servicio externo (p. ej. cron-job.org) llama esta ruta cada minuto con
@@ -177,26 +182,18 @@ Route::get('/internal/schedule-run', function (Request $request) {
     return response()->json(['message' => 'Scheduler ejecutado']);
 })->middleware('throttle:10,1');
 
-// Render free no da terminal (Shell requiere plan pago), asi que esta ruta
-// permite correr un puñado de comandos artisan seguros (lista blanca) desde
-// el navegador con el mismo token, para migrar la base de datos tras el
-// primer deploy o limpiar cache sin necesidad de SSH.
-Route::get('/internal/artisan', function (Request $request) {
-    $secret = config('app.cron_secret');
-    if (!$secret || !hash_equals($secret, (string) $request->query('token'))) {
-        return response()->json(['message' => 'No autorizado'], 403);
-    }
-
-    $allowed = ['migrate', 'migrate:status', 'storage:link', 'config:clear', 'cache:clear', 'route:list'];
-    $cmd = (string) $request->query('cmd');
-    if (!in_array($cmd, $allowed, true)) {
-        return response()->json(['message' => 'Comando no permitido', 'permitidos' => $allowed], 422);
-    }
-
-    $args = $cmd === 'migrate' ? ['--force' => true] : [];
-    \Illuminate\Support\Facades\Artisan::call($cmd, $args);
-    return response()->json(['output' => \Illuminate\Support\Facades\Artisan::output()]);
-})->middleware('throttle:10,1');
+// ELIMINADA: GET /internal/artisan.
+//
+// Ejecutaba comandos artisan de una lista blanca (migrate --force incluido) y
+// devolvia su salida, con el secreto viajando EN LA URL: queda escrito en los
+// logs de acceso de Render, en cualquier proxy intermedio, en el historial del
+// navegador y se filtra por la cabecera Referer a cualquier recurso externo
+// que cargue la pagina. Era una consola de administracion remota sin
+// autenticacion de usuario.
+//
+// Lo que resolvia (no hay shell en el plan gratuito de Render) ahora lo hace
+// el arranque del contenedor: el Dockerfile corre "migrate --force" antes de
+// levantar el servidor, que es donde corresponde.
 
 
 
@@ -211,6 +208,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
 
     // --- CALENDARIO (solo admin, ver check dentro del controller) ---
+    Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store'])->middleware('throttle:5,1');
     Route::post('/calendar', [CalendarController::class, 'store']);
     Route::put('/calendar/{calendar}', [CalendarController::class, 'update']);
     Route::delete('/calendar/{calendar}', [CalendarController::class, 'destroy']);
@@ -248,9 +246,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- TRAINER (index/updateStatus/trainer-requests solo admin, ver checks
     // dentro del controller) ---
     Route::get('/trainer', [TrainerController::class, 'index']);
-    Route::post('/solicitud-entrenador', [TrainerController::class, 'store']);
+    // Manda correo al admin en cada peticion -> throttle:correo (5/hora).
+    Route::post('/solicitud-entrenador', [TrainerController::class, 'store'])
+        ->middleware('throttle:correo');
     Route::put('/trainer/{id}', [TrainerController::class, 'update']);
-    Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus']);
+    // Aprobar/rechazar manda correo al solicitante -> throttle:correo.
+    Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus'])
+        ->middleware('throttle:correo');
     Route::get('/trainer-requests', [TrainerController::class, 'getAllTrainerRequests']);
 
     // --- CONFIGURACIÓN ---
@@ -259,9 +261,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('/config', ConfigurationController::class);
 
     // --- ENTRENAMIENTOS ---
-    Route::resource('/training', TrainingController::class);
-    Route::get('/training/{id}', [TrainingController::class, 'show']);
+    // check-existing va ANTES del resource: si no, "/training/{training}" del
+    // resource captura "check-existing" como si fuera un id.
     Route::post('/training/check-existing', [TrainingController::class, 'checkExisting']);
+    // El resource ya publica GET /training/{training} -> show(). La linea
+    // "Route::get('/training/{id}', ...)" que habia aqui era la misma ruta
+    // declarada dos veces: ganaba la primera y la otra quedaba inalcanzable.
+    // store() manda correo al entrenador y update() al solicitante -> throttle:correo.
+    Route::resource('/training', TrainingController::class)
+        ->only(['index', 'show', 'destroy']);
+    Route::post('/training', [TrainingController::class, 'store'])
+        ->middleware('throttle:correo');
+    Route::match(['put', 'patch'], '/training/{training}', [TrainingController::class, 'update'])
+        ->middleware('throttle:correo');
 
     // --- CHATS ---
     Route::get('/chats', [ChatController::class, 'index']);
@@ -269,41 +281,71 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/chats/{id}', [ChatController::class, 'show']);
     Route::post('/chats/{id}/messages', [ChatController::class, 'storeMessage']);
     Route::post('/chats/{id}/read', [ChatController::class, 'markAsRead']);
-    Route::post('/messages/send', [ChatController::class, 'sendMessage']);
+    // ELIMINADA: POST /messages/send -> ChatController@sendMessage. Ese metodo
+    // no existe en el controlador, asi que la ruta solo podia devolver un 500.
+    // El envio de mensajes va por POST /chats/{id}/messages.
 
-    // --- PRUEBA AUTENTICADA ---
-    Route::get('/test-auth', fn(Request $request) => response()->json(['user' => $request->user()]));
+    // ELIMINADA: GET /test-auth. Devolvia el objeto User completo del
+    // solicitante; servia para confirmar de un vistazo si un token robado
+    // seguia siendo valido.
 });
 
 
 
 // RUTAS DE VERIFICACIÓN DE CORREO ELECTRÓNICO
 
+// Reenviar el correo de verificacion. Solo para el usuario autenticado: antes
+// aceptaba un 'user_id' del cliente sin comprobar nada, asi que servia para
+// mandarle correos de verificacion a la cuenta de cualquier otra persona.
 Route::post('/email/verification-notification', function (Request $request) {
-    $user = $request->has('user_id') ? User::find($request->input('user_id')) : $request->user();
-    if (!$user) return response()->json(['message' => 'No autenticado.'], 401);
-    if ($user->hasVerifiedEmail()) return response()->json(['message' => 'El correo ya está verificado.'], 200);
+    $user = $request->user();
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'El correo ya está verificado.'], 200);
+    }
     $user->sendEmailVerificationNotification();
     return response()->json(['message' => '¡Correo de verificación enviado!']);
-})->middleware(['throttle:6,1'])->name('api.verification.send');
+})->middleware(['auth:sanctum', 'throttle:correo'])->name('api.verification.send');
 
+// Confirmar la verificacion desde el enlace del correo.
+//
+// El middleware 'signed' es lo que hace que este endpoint sea seguro: comprueba
+// la firma HMAC y la caducidad del enlace que genero App\Notifications\VerifyEmail.
+// Sin el, bastaba con conocer el correo de alguien para calcular su sha1 y
+// verificarle la cuenta:
+//
+//   GET /api/email/verify/1/<sha1(correo)>?user_id=<id victima>
+//
+// Dos cosas mas cambian respecto a la version anterior:
+//   - el usuario se resuelve por el {id} de la RUTA (que va dentro de la firma),
+//     nunca por un ?user_id= que manda el cliente;
+//   - el hash se compara con hash_equals contra el sha1 del correo, que ya no
+//     es el unico control porque la firma lo respalda.
 Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
-    $user = User::find($request->input('user_id'));
-    if (!$user) return response()->json(['message' => 'No autenticado.'], 401);
-    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification())))
+    $user = User::find($id);
+    if (!$user) {
         return response()->json(['message' => 'Enlace inválido.'], 403);
-    if ($user->hasVerifiedEmail())
-        return response()->json(['message' => 'Correo ya verificado.', 'id' => $user->id], 200);
+    }
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        return response()->json(['message' => 'Enlace inválido.'], 403);
+    }
 
-    $user->email_verified_at = now();
-    $user->save();
-    event(new \App\Events\EmailVerified($user->id));
-    $query = http_build_query(['id' => $user->id]);
-    return redirect("/email/verified-success?{$query}");
-})->name('api.verification.verify');
+    if (! $user->hasVerifiedEmail()) {
+        $user->email_verified_at = now();
+        $user->save();
+        event(new \App\Events\EmailVerified($user->id));
+    }
 
+    return redirect('/email/verified-success?' . http_build_query(['id' => $user->id]));
+})->whereNumber('id')
+  ->middleware(['signed', 'throttle:10,1'])
+  ->name('api.verification.verify');
+
+// Aviso de "verifica tu correo" para el usuario autenticado. Antes aceptaba un
+// 'user_id' del cliente y devolvia el registro COMPLETO de cualquier usuario
+// (correo, telefono, fecha de nacimiento, bio) sin autenticacion.
 Route::get('/email/verify', function (Request $request) {
-    $user = $request->has('user_id') ? User::find($request->input('user_id')) : $request->user();
-    if (!$user) return response()->json(['message' => 'No autenticado.'], 401);
-    return response()->json(['message' => 'Por favor verifica tu correo.', 'user' => $user]);
-})->name('api.verification.notice');
+    return response()->json([
+        'message' => 'Por favor verifica tu correo.',
+        'user' => $request->user()->only(['id', 'name', 'email', 'email_verified_at']),
+    ]);
+})->middleware(['auth:sanctum', 'throttle:60,1'])->name('api.verification.notice');

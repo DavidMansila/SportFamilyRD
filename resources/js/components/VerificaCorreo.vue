@@ -44,9 +44,9 @@ async function reenviarCorreo() {
   reenviando.value = true;
   reenviado.value = false;
   try {
-    // Enviar user_id en el body si existe
-    const data = props.user && props.user.id ? { user_id: props.user.id } : {};
-    await axios.post('/email/verification-notification', data);
+    // Sin user_id: el backend reenvia al usuario autenticado y solo a ese. El
+    // token lo agrega el interceptor de resources/js/bootstrap.js.
+    await axios.post('/email/verification-notification');
     reenviado.value = true;
   } catch (e) {
     alertType.value = 'error';

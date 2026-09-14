@@ -48,7 +48,7 @@
       <!-- Lista de noticias -->
       <div v-else>
         <div v-if="paginatedNews.length > 0" class="news-grid">
-          <div v-for="noticia in paginatedNews" :key="noticia.id" class="noticia-card" @click="abrirNoticia(noticia)"
+          <div v-for="noticia in paginatedNews" :key="noticia.id" class="noticia-card" @click="abrirNoticia(noticia)" role="button" tabindex="0" @keydown.enter.prevent="abrirNoticia(noticia)" @keydown.space.prevent="abrirNoticia(noticia)"
             :class="noticia.categoria">
             <div class="noticia-image">
               <img :src="noticia.image" alt="Imagen de noticia" class="image" />

@@ -19,7 +19,18 @@ return [
     // 'web' es el valor por defecto de Laravel y el correcto.
     'guard' => ['web'],
 
-    'expiration' => null,
+    // Minutos de vida de un token de acceso. 'null' (el valor anterior)
+    // significaba que NO CADUCAN NUNCA: un token filtrado -por un volcado de
+    // debug, por un dispositivo compartido, por XSS- daba acceso permanente a
+    // la cuenta, sin rotacion ni forma de expirarlo salvo un logout explicito.
+    //
+    // 7 dias es el equilibrio para este sitio: el token vive en sessionStorage
+    // y ya se pierde al cerrar la pestaña, asi que subir de aqui no aporta
+    // comodidad real y solo alarga la ventana de un token robado.
+    //
+    // Ojo: Sanctum solo comprueba la caducidad, no borra las filas vencidas.
+    // Conviene programar 'sanctum:prune-expired' (ver routes/console.php).
+    'expiration' => 60 * 24 * 7,
 
     'middleware' => [
         // 'verify_csrf_token' => App\Http\Middleware\VerifyCsrfToken::class,

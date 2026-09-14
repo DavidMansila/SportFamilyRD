@@ -20,20 +20,20 @@
     <div class="nav-links desktop-only">
 
       <!-- Secciones para usuarios -->
-      <span class="nav-link" @click="handleNavClick('/directorio')">Deportes</span>
-      <span class="nav-link" @click="handleNavClick('/noticias')">Noticias</span>
-      <span class="nav-link" @click="handleNavClick('/calendario')">Calendario</span>
-      <span class="nav-link" @click="handleNavClick('/tienda')">Tienda</span>
-      <span class="nav-link" @click="handleNavClick('/entrenadores')">Entrenadores</span>
-      <span class="nav-link" @click="handleNavClick('/foro')">Foro</span>
+      <span class="nav-link" @click="handleNavClick('/directorio')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/directorio')" @keydown.space.prevent="handleNavClick('/directorio')">Deportes</span>
+      <span class="nav-link" @click="handleNavClick('/noticias')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/noticias')" @keydown.space.prevent="handleNavClick('/noticias')">Noticias</span>
+      <span class="nav-link" @click="handleNavClick('/calendario')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/calendario')" @keydown.space.prevent="handleNavClick('/calendario')">Calendario</span>
+      <span class="nav-link" @click="handleNavClick('/tienda')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/tienda')" @keydown.space.prevent="handleNavClick('/tienda')">Tienda</span>
+      <span class="nav-link" @click="handleNavClick('/entrenadores')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/entrenadores')" @keydown.space.prevent="handleNavClick('/entrenadores')">Entrenadores</span>
+      <span class="nav-link" @click="handleNavClick('/foro')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/foro')" @keydown.space.prevent="handleNavClick('/foro')">Foro</span>
 
       <!-- Secciones condicionales -->
-      <span v-if="user?.user_type == 'entrenador'" class="nav-link" @click="handleNavClick('/solicitudes-usuarios')">
+      <span v-if="user?.user_type == 'entrenador'" class="nav-link" @click="handleNavClick('/solicitudes-usuarios')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/solicitudes-usuarios')" @keydown.space.prevent="handleNavClick('/solicitudes-usuarios')">
         Solicitudes-U
       </span>
 
       <span v-if="user?.user_type == 'admin'" class="nav-link nav-link--admin"
-        @click="handleNavClick('/solicitudes-entrenadores')">
+        @click="handleNavClick('/solicitudes-entrenadores')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/solicitudes-entrenadores')" @keydown.space.prevent="handleNavClick('/solicitudes-entrenadores')">
         Solicitudes-E
       </span>
     </div>
@@ -116,44 +116,44 @@
 
     <!-- Menú móvil desplegable -->
     <div class="mobile-nav" :class="{ active: isMobileMenuOpen }">
-      <span class="mobile-nav-link" @click="handleNavClick('/')">
+      <span class="mobile-nav-link" @click="handleNavClick('/')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/')" @keydown.space.prevent="handleNavClick('/')">
         <i class="fas fa-home"></i>
         <span>Inicio</span>
       </span>
-      <span class="mobile-nav-link" @click="handleNavClick('/directorio')">
+      <span class="mobile-nav-link" @click="handleNavClick('/directorio')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/directorio')" @keydown.space.prevent="handleNavClick('/directorio')">
         <i class="fas fa-futbol"></i>
         <span>Deportes</span>
       </span>
-      <span class="mobile-nav-link" @click="handleNavClick('/noticias')">
+      <span class="mobile-nav-link" @click="handleNavClick('/noticias')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/noticias')" @keydown.space.prevent="handleNavClick('/noticias')">
         <i class="fas fa-newspaper"></i>
         <span>Noticias</span>
       </span>
-      <span class="mobile-nav-link" @click="handleNavClick('/calendario')">
+      <span class="mobile-nav-link" @click="handleNavClick('/calendario')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/calendario')" @keydown.space.prevent="handleNavClick('/calendario')">
         <i class="fas fa-calendar-alt"></i>
         <span>Calendario</span>
       </span>
-      <span class="mobile-nav-link" @click="handleNavClick('/tienda')">
+      <span class="mobile-nav-link" @click="handleNavClick('/tienda')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/tienda')" @keydown.space.prevent="handleNavClick('/tienda')">
         <i class="fas fa-shopping-cart"></i>
         <span>Tienda</span>
       </span>
-      <span class="mobile-nav-link" @click="handleNavClick('/entrenadores')">
+      <span class="mobile-nav-link" @click="handleNavClick('/entrenadores')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/entrenadores')" @keydown.space.prevent="handleNavClick('/entrenadores')">
         <i class="fas fa-users"></i>
         <span>Entrenadores</span>
       </span>
-      <span class="mobile-nav-link" @click="handleNavClick('/foro')">
+      <span class="mobile-nav-link" @click="handleNavClick('/foro')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/foro')" @keydown.space.prevent="handleNavClick('/foro')">
         <i class="fas fa-comments"></i>
         <span>Foro</span>
       </span>
 
       <!-- Enlaces condicionales -->
       <span v-if="user?.user_type == 'entrenador'" class="mobile-nav-link"
-        @click="handleNavClick('/solicitudes-usuarios')">
+        @click="handleNavClick('/solicitudes-usuarios')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/solicitudes-usuarios')" @keydown.space.prevent="handleNavClick('/solicitudes-usuarios')">
         <i class="fas fa-file-signature"></i>
         <span>Solicitudes-U</span>
       </span>
 
       <span v-if="user?.user_type == 'admin'" class="mobile-nav-link"
-        @click="handleNavClick('/solicitudes-entrenadores')">
+        @click="handleNavClick('/solicitudes-entrenadores')" role="button" tabindex="0" @keydown.enter.prevent="handleNavClick('/solicitudes-entrenadores')" @keydown.space.prevent="handleNavClick('/solicitudes-entrenadores')">
         <i class="fas fa-file-contract"></i>
         <span>Solicitudes</span>
         <span class="admin-tag">Admin</span>

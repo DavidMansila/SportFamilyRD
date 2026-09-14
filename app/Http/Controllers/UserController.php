@@ -33,14 +33,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request)
-    {
-        dd($request->all());
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -48,7 +40,10 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:4|confirmed',
+            // min:8 - antes era min:4, que admite '1234'. El cambio de
+            // contraseña (ConfigurationController) ya exigia 8: eran dos
+            // politicas distintas para la misma contraseña.
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         try {
@@ -72,9 +67,7 @@ class UserController extends Controller
                 'token' => $token,
             ], 201);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Contraseña debe contener al menos 4 caracteres: ' . $e->getMessage()
-            ], 500);
+            return error_json($e, 'No se pudo crear el usuario', 500);
         }
     }
 
@@ -132,9 +125,7 @@ class UserController extends Controller
                 'user' => $user,
             ], 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error: ' . $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al procesar la solicitud', 500);
         }
     }
 
@@ -179,29 +170,9 @@ class UserController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error: ' . $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al procesar la solicitud', 500);
         }
     }
-
-    // public function showUserRequests(Request $request)
-    // {
-    //     try{
-    //         $user = Auth::user();
-    //         $requests = Training::where('status', 'pending')->get();
-
-    //         return response()->json([
-    //             'message' => 'Solicitudes obtenidas con éxito',
-    //             'requests' => $requests,
-    //         ], 200);
-
-    //     }catch(\Exception $e){
-    //         return response()->json([
-    //             'message' => 'Error: '.$e->getMessage()
-    //         ], 500);
-    //     }
-    // }
 
     public function showUserRequests(Request $request)
     {
@@ -215,9 +186,7 @@ class UserController extends Controller
             ], 200);
 
         }catch(\Exception $e){
-            return response()->json([
-                'message' => 'Error: '.$e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al procesar la solicitud', 500);
         }
     }
 
@@ -241,9 +210,7 @@ class UserController extends Controller
                 'message' => 'Usuario eliminado con éxito',
             ], 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error: ' . $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al procesar la solicitud', 500);
         }
     }
 
@@ -278,10 +245,7 @@ class UserController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Hubo un error',
-                'error' => $e->getMessage()
-            ], 404);
+            return error_json($e, 'Hubo un error', 404);
         }
     }
 }

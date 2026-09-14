@@ -124,12 +124,29 @@ class TrainingController extends Controller
 
 
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $training = Training::find($id);
 
         if (!$training) {
             return response()->json(['message' => 'Training not found'], 404);
+        }
+
+        // Solo el solicitante, el entrenador destinatario o un admin. Este
+        // metodo era el unico del controlador SIN comprobacion de propiedad
+        // (index, update y destroy si la tenian), asi que cualquier usuario
+        // autenticado leia la solicitud de cualquier otro -descripcion libre,
+        // nivel deportivo, estado- incrementando el id.
+        $esEntrenadorDestinatario = Trainer::where('id', $training->trainer_id)
+            ->where('user_id', $request->user()->id)
+            ->exists();
+
+        if (
+            $training->user_id != $request->user()->id
+            && !$esEntrenadorDestinatario
+            && $request->user()->user_type !== 'admin'
+        ) {
+            return response()->json(['message' => 'No autorizado'], 403);
         }
 
         return response()->json($training);

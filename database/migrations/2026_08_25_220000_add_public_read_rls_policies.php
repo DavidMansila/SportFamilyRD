@@ -20,6 +20,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // RLS y CREATE POLICY son exclusivos de PostgreSQL. La suite de pruebas
+        // corre sobre SQLite en memoria (ver phpunit.xml) para no tocar la base
+        // real de Supabase, y ahi estas sentencias son un error de sintaxis que
+        // aborta TODAS las migraciones y con ellas la suite entera.
+        if (DB::getDriverName() !== 'pgsql') {
+            return;
+        }
+
         // Tablas de contenido publico que ademas usan Supabase Realtime
         // (postgres_changes) en el frontend: Foro, Calendario, Noticias.
         $publicReadTables = ['posts', 'likes', 'comments', 'replies', 'calendars', '"NewsScrapping"'];
@@ -52,6 +60,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() !== 'pgsql') {
+            return;
+        }
+
         $tables = ['posts', 'likes', 'comments', 'replies', 'calendars', '"NewsScrapping"', 'products', 'sports'];
         foreach ($tables as $table) {
             DB::statement("DROP POLICY IF EXISTS \"Public read access\" ON public.{$table}");

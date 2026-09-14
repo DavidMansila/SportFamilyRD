@@ -48,7 +48,7 @@
 
       <!-- Listado de deportes -->
       <div class="sports-list" v-else-if="!selectedSport">
-        <div v-for="sport in filteredSports" :key="sport.id" class="sport-card" @click="selectSport(sport)">
+        <div v-for="sport in filteredSports" :key="sport.id" class="sport-card" @click="selectSport(sport)" role="button" tabindex="0" @keydown.enter.prevent="selectSport(sport)" @keydown.space.prevent="selectSport(sport)">
           <div class="sport-image">
             <img :src="sport.image" :alt="sport.name" loading="lazy">
           </div>

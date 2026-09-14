@@ -8,7 +8,7 @@
           </svg>
         </button>
         <div class="user-info">
-          <img :src="otherUserAvatar" class="avatar">
+          <img :src="otherUserAvatar" class="avatar" alt="Foto de la otra persona">
           <div class="user-details">
             <h4>{{ otherUserName }}</h4>
             <div class="status-indicator">

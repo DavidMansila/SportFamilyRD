@@ -28,7 +28,10 @@ class Post extends Model
     use HasFactory;
 
     protected $withCount = ['likes'];
-    protected $fillable = ['id', 'titulo', 'contenido', 'user_id', 'likes_quantity',  'imagen', 'video', 'categoria'];
+    // Sin 'id': dejar la clave primaria en $fillable permite fijarla desde
+    // fuera en cuanto alguien escriba create($request->all()). Hoy todas las
+    // llamadas pasan arrays explicitos, asi que quitarlo no cambia nada.
+    protected $fillable = ['titulo', 'contenido', 'user_id', 'likes_quantity', 'imagen', 'video', 'categoria'];
 
     public static function addImages($image, $id, $model)
     {

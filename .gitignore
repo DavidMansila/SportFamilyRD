@@ -26,3 +26,7 @@ yarn-error.log
 
 /.playwright-mcp
 database/.vs
+
+# Herramientas locales, no forman parte de la aplicacion
+ngrok.exe
+composer-setup.php

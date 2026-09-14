@@ -1,6 +1,6 @@
 <template>
   <div v-if="user && chats.length > 0" class="message-bubble" :class="{ 'expanded': showMessages }">
-    <div class="message-icon-container" @click="toggleMessages">
+    <div class="message-icon-container" @click="toggleMessages" role="button" tabindex="0" @keydown.enter.prevent="toggleMessages" @keydown.space.prevent="toggleMessages">
       <svg class="message-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
@@ -16,8 +16,9 @@
       </div>
 
       <div v-if="!activeChat" class="contact-list">
-        <div v-for="chat in approvedChats" :key="chat.id" class="contact-item" @click="openChat(chat)">
-          <img :src="chat.other_participant.image" class="message-avatar" />
+        <div v-for="chat in approvedChats" :key="chat.id" class="contact-item" @click="openChat(chat)" role="button" tabindex="0" @keydown.enter.prevent="openChat(chat)" @keydown.space.prevent="openChat(chat)">
+          <img :src="chat.other_participant.image" class="message-avatar"
+            :alt="`Foto de ${chat.other_participant.name}`" />
           <div class="message-content">
             <div class="message-header">
               <span class="sender-name">{{ chat.other_participant.name }}</span>
@@ -112,7 +113,11 @@ export default {
     },
 
     async loadChats() {
-      if (!this.user) return;
+      // Se comprueba el id y no solo que 'user' exista: varias vistas padre
+      // inicializaban this.user a {} (truthy) con la sesion cerrada, y esta
+      // guarda no las frenaba. /api/chats exige token, asi que sin id la
+      // peticion solo puede devolver 401.
+      if (!this.user || !this.user.id) return;
       try {
         const response = await axios.get('/chats', { params: { user_id: this.user.id } });
 

@@ -54,16 +54,21 @@ class ChatController extends Controller
                         'created_at' => $chat->lastMessage->created_at
                     ] : null,
                     'user' => $chat->user,
-                    'trainer' => [
+                    // Guarda de nulo: tres lineas mas arriba ya se comprueba
+                    // if ($chat->trainer) para resolver la imagen, pero aqui se
+                    // accedia a ->id y ->user sin ella. Un chat huerfano (con el
+                    // registro de entrenador borrado) tumbaba con un 500 el
+                    // listado ENTERO de conversaciones del usuario.
+                    'trainer' => $chat->trainer ? [
                         'id' => $chat->trainer->id,
-                        'user' => $chat->trainer->user
-                    ]
+                        'user' => $chat->trainer->user,
+                    ] : null,
                 ];
             });
 
-        Log::info('Chats encontrados: ' . count($chats));
-        Log::info('User ID: ' . $userId);
-
+        // Se quitaron dos Log::info que escribian el id de usuario y el numero
+        // de conversaciones en CADA carga de la bandeja: ruido constante en el
+        // log y datos de usuario sin motivo.
         return response()->json($chats);
     }
 
@@ -71,7 +76,9 @@ class ChatController extends Controller
 
     public function storeMessage(Request $request, $chatId)
     {
-        $request->validate(['message' => 'required|string']);
+        // max:1000 - sin tope, un solo mensaje podia ocupar megabytes en la
+        // base remota Y difundirse por Pusher a los demas participantes.
+        $request->validate(['message' => 'required|string|max:1000']);
 
         $user = $request->user();
         $chat = Chat::with('trainer')->findOrFail($chatId);

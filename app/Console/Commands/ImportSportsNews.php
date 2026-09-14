@@ -287,7 +287,7 @@ class ImportSportsNews extends Command
     private function scrapeBaseballNews()
     {
         $client = new Client([
-            'verify' => false,
+            'verify' => true,
             'timeout' => 15,
             'headers' => [
                 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -354,7 +354,7 @@ class ImportSportsNews extends Command
     private function scrapeFutbolNews()
     {
         $client = new Client([
-            'verify' => false,
+            'verify' => true,
             'timeout' => 20,
             'headers' => [
                 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -416,7 +416,7 @@ class ImportSportsNews extends Command
 
     private function scrapeBasketballNews()
     {
-        $client = new Client(['verify' => false]);
+        $client = new Client(['verify' => true]);
         $articles = [];
 
         $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
@@ -465,7 +465,7 @@ class ImportSportsNews extends Command
 
     private function scrapeVolleyballNews()
     {
-        $client = new Client(['verify' => false]);
+        $client = new Client(['verify' => true]);
         $baseUrl = 'https://voleiboldominicano.com/author/admin/';
         $currentPage = $baseUrl;
         $articles = [];
@@ -531,7 +531,7 @@ class ImportSportsNews extends Command
 
     private function scrapeSwimmingNews()
     {
-        $client = new Client(['verify' => false]);
+        $client = new Client(['verify' => true]);
         $articles = [];
 
         $response = $client->request('GET', 'https://cdndeportes.com.do/tag/natacion/');

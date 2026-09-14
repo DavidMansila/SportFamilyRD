@@ -39,7 +39,7 @@
         <div class="password-wrapper">
           <input :type="showRegisterPassword ? 'text' : 'password'" v-model="registerForm.password"
             placeholder="Contraseña" required />
-          <span class="toggle-password" @click="showRegisterPassword = !showRegisterPassword">
+          <span class="toggle-password" @click="showRegisterPassword = !showRegisterPassword" role="button" tabindex="0" @keydown.enter.prevent="showRegisterPassword = !showRegisterPassword" @keydown.space.prevent="showRegisterPassword = !showRegisterPassword">
             <svg v-if="showRegisterPassword" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
@@ -59,7 +59,7 @@
         <div class="password-wrapper">
           <input :type="showRegisterConfirm ? 'text' : 'password'" v-model="registerForm.password_confirmation"
             placeholder="Confirmar contraseña" required />
-          <span class="toggle-password" @click="showRegisterConfirm = !showRegisterConfirm">
+          <span class="toggle-password" @click="showRegisterConfirm = !showRegisterConfirm" role="button" tabindex="0" @keydown.enter.prevent="showRegisterConfirm = !showRegisterConfirm" @keydown.space.prevent="showRegisterConfirm = !showRegisterConfirm">
             <svg v-if="showRegisterConfirm" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
@@ -100,7 +100,7 @@
         <div class="password-wrapper">
           <input :type="showLoginPassword ? 'text' : 'password'" v-model="loginForm.password" placeholder="Contraseña"
             required />
-          <span class="toggle-password" @click="showLoginPassword = !showLoginPassword">
+          <span class="toggle-password" @click="showLoginPassword = !showLoginPassword" role="button" tabindex="0" @keydown.enter.prevent="showLoginPassword = !showLoginPassword" @keydown.space.prevent="showLoginPassword = !showLoginPassword">
             <svg v-if="showLoginPassword" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path

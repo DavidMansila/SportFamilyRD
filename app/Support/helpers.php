@@ -1,6 +1,39 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+if (! function_exists('error_json')) {
+    /**
+     * Respuesta de error para el cliente, con el detalle SOLO en el log.
+     *
+     * Los catch de los controladores devolvian 'error' => $e->getMessage() en el
+     * JSON. Un fallo de base de datos publicaba asi nombres de tablas y columnas,
+     * fragmentos de SQL y rutas absolutas del contenedor -reconocimiento gratis
+     * para un atacante-, y lo hacia SIEMPRE, con APP_DEBUG a false incluido.
+     *
+     * A cambio se devuelve un identificador corto que tambien queda escrito en el
+     * log: quien reporta el fallo puede pasar ese codigo y se encuentra la traza
+     * completa sin haber expuesto nada.
+     */
+    function error_json(\Throwable $e, string $mensaje, int $status = 500)
+    {
+        $incidencia = (string) Str::uuid();
+
+        Log::error($mensaje, [
+            'incidencia' => $incidencia,
+            'excepcion' => $e::class,
+            'mensaje' => $e->getMessage(),
+            'archivo' => $e->getFile() . ':' . $e->getLine(),
+        ]);
+
+        return response()->json([
+            'message' => $mensaje,
+            'incidencia' => $incidencia,
+        ], $status);
+    }
+}
 
 if (! function_exists('public_storage_url')) {
     // Construye la URL publica de un archivo del disco "public" sin importar

@@ -132,8 +132,16 @@
 .store-header {
   position: relative;
   height: 400px;
+  // '/imagenes/...' y NO '/public/imagenes/...': public/ ES la raiz del
+  // servidor web, asi que el prefijo sobra. Con el, el navegador pedia
+  // /public/imagenes/tienda.jpg, que no existe, caia en la ruta catch-all del
+  // SPA y recibia HTML en vez de una imagen -> el fondo de la cabecera de la
+  // Tienda quedaba en blanco EN PRODUCCION.
+  //
+  // En desarrollo no se notaba: Vite sirve desde la raiz del proyecto, donde
+  // /public/imagenes/tienda.jpg si resuelve. Solo se ve al desplegar.
   background: linear-gradient(135deg, rgba(#1a237e, 0.9), rgba(#0d47a1, 0.9)),
-              url('/public/imagenes/tienda.jpg');
+              url('/imagenes/tienda.jpg');
   background-size: cover;
   background-position: center;
   overflow: hidden;

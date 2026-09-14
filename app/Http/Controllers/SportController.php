@@ -28,10 +28,7 @@ class SportController extends Controller
                 'sports' => $sports
             ], 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al obtener los deportes',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al obtener los deportes', 500);
         }
     }
 }

@@ -1,2 +1,9 @@
 User-agent: *
-Disallow:
+
+# La API no es contenido indexable: son respuestas JSON, y varias rutas
+# publicas (/api/post, /api/news) devuelven datos que no tiene sentido que
+# acaben en un buscador.
+Disallow: /api/
+
+# Pantallas de sesion/verificacion: no aportan nada en un indice.
+Disallow: /email/

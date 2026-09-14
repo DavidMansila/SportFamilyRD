@@ -73,7 +73,7 @@
         </button>
 
         <div v-for="(categoria, index) in categorias" :key="index" class="mobile-category">
-          <div class="mobile-category-header" @click="toggleMobileCategory(index)">
+          <div class="mobile-category-header" @click="toggleMobileCategory(index)" role="button" tabindex="0" @keydown.enter.prevent="toggleMobileCategory(index)" @keydown.space.prevent="toggleMobileCategory(index)">
             {{ categoria.nombre }}
             <i class="fas fa-chevron-down" :class="{ 'fa-rotate-180': mobileCategoryOpen === index }"></i>
           </div>
@@ -91,7 +91,7 @@
 
     <!-- Productos -->
     <div class="products-grid">
-      <div v-for="producto in paginatedProducts" :key="producto.id" class="product-card" @click="abrirPopup(producto)">
+      <div v-for="producto in paginatedProducts" :key="producto.id" class="product-card" @click="abrirPopup(producto)" role="button" tabindex="0" @keydown.enter.prevent="abrirPopup(producto)" @keydown.space.prevent="abrirPopup(producto)">
         <!-- <div class="product-badge" v-if="producto.oferta">OFERTA</div> -->
         <div class="product-image-container">
           <img :src="producto.image" :alt="producto.name" class="product-image" loading="lazy" />
@@ -441,9 +441,10 @@ export default {
       eliminandoProducto: false,
       formProducto: this.resetForm(),
       categoriasFlat: [],
+      // 'user' estaba declarada DOS veces en este data(): la segunda pisaba a
+      // la primera silenciosamente.
       user: null,
       isLoading: true,
-      user: null,
       showSuccess: false,
       successMessage: '',
       successTimer: null,
@@ -773,7 +774,11 @@ export default {
       this.getProducts();
     }
     window.addEventListener('keyup', this.handleKeyup);
-    this.user = JSON.parse(sessionStorage.getItem('user')) || {};
+    // '|| null' y no '|| {}': un objeto vacio es TRUTHY, asi que con la sesion
+    // cerrada el v-if="user" del ChatBubbleComponent se cumplia igual, se
+    // montaba la burbuja de chat y pedia /api/chats sin token -> 401 en consola
+    // en cada visita a la Tienda sin haber iniciado sesion.
+    this.user = JSON.parse(sessionStorage.getItem('user')) || null;
     this.generarCategoriasFlat()
   },
   beforeUnmount() {

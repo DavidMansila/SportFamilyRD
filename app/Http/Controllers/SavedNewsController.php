@@ -32,11 +32,7 @@ class SavedNewsController extends Controller
                 return response()->json(['saved' => true]);
             }
         } catch (\Exception $e) {
-            Log::error('Error en toggleSave: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Server Error',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Server Error', 500);
         }
     }
 

@@ -134,7 +134,7 @@
                 <h4>Método de pago simulado</h4>
                 <div class="method-cards">
                   <div v-for="method in paymentMethods" :key="method.id" class="method-card"
-                    :class="{ selected: selectedMethod === method.id }" @click="selectedMethod = method.id">
+                    :class="{ selected: selectedMethod === method.id }" @click="selectedMethod = method.id" role="button" tabindex="0" @keydown.enter.prevent="selectedMethod = method.id" @keydown.space.prevent="selectedMethod = method.id">
                     <div class="method-icon">{{ method.icon }}</div>
                     <div class="method-name">{{ method.name }}</div>
                   </div>
@@ -213,7 +213,9 @@ const isLoading = ref(true);
 // Obtener carrito
 const fetchCart = async () => {
   try {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    // 'null' y no '{}': un objeto vacio es truthy y hace que el codigo de
+    // abajo trate como identificado a quien no lo esta.
+    const user = JSON.parse(sessionStorage.getItem('user') || 'null');
     const response = await axios.get('/cart', {
       params: { user_id: user.id }
     });
@@ -340,7 +342,9 @@ const transactionId = ref('');
 // Función para vaciar el carrito en la base de datos
 const clearCartFromDatabase = async () => {
   try {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    // 'null' y no '{}': un objeto vacio es truthy y hace que el codigo de
+    // abajo trate como identificado a quien no lo esta.
+    const user = JSON.parse(sessionStorage.getItem('user') || 'null');
     await axios.delete('/cart/clear', {
       params: { user_id: user.id }
     });

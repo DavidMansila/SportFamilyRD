@@ -20,9 +20,9 @@ const yaVerificado = ref(false);
 
 async function reenviarCorreo() {
   try {
-    const user = JSON.parse(sessionStorage.getItem('user'));
-
-    await axios.post('/email/verification-notification', {user_id: user.id} );
+    // Sin user_id: el backend reenvia al usuario autenticado y solo a ese. El
+    // token lo agrega el interceptor de resources/js/bootstrap.js.
+    await axios.post('/email/verification-notification');
     mensaje.value = 'Correo de verificación reenviado.';
   } catch (e) {
     mensaje.value = e.response?.data?.message || 'Error al reenviar el correo.';
@@ -46,20 +46,15 @@ onMounted(async () => {
     redirectTo.value = route.query.redirect;
   }
   try {
-    // Si no hay user en sessionStorage, intenta obtener user_id de la query
-    let user = null;
-    let userId = null;
-    try {
-      user = JSON.parse(sessionStorage.getItem('user'));
-      if (user && user.id) userId = user.id;
-    } catch {}
-    if (!userId && route.query.user_id) {
-      userId = route.query.user_id;
-    }
-    let url = `/api/email/verify/${id}/${hash}`;
-    if (userId) {
-      url += `?user_id=${userId}`;
-    }
+    // La URL se arma relativa a la baseURL de axios ("/api"): antes empezaba
+    // por "/api/..." y axios la concatenaba, saliendo "/api/api/email/verify/..."
+    // -un 404 seguro-, asi que esta pantalla nunca llego a verificar nada.
+    //
+    // Se reenvia la query string ORIGINAL intacta (expires + signature) y no se
+    // le agrega nada: el endpoint valida la firma sobre la URL completa, asi que
+    // cualquier parametro de mas la invalida. El user_id que se anadia aqui
+    // sobraba -el usuario sale del {id} de la ruta, que va dentro de la firma-.
+    const url = `/email/verify/${id}/${hash}${window.location.search}`;
     const res = await axios.get(url);
     mensaje.value = res.data.message || 'Correo verificado con éxito.';
     verificado.value = true;

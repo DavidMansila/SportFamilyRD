@@ -50,6 +50,27 @@ RUN mkdir -p bootstrap/cache \
 ENV PORT=10000
 EXPOSE 10000
 
+# Las MIGRACIONES corren al arrancar el contenedor.
+#
+# Antes esto se hacia a mano llamando a GET /api/internal/artisan?cmd=migrate
+# con un token en la URL: una consola de administracion remota expuesta a
+# internet, con el secreto quedando escrito en los logs de acceso de Render y
+# filtrandose por la cabecera Referer. Esa ruta se elimino; el arranque del
+# contenedor es donde corresponde hacerlo.
+#
+# --force es obligatorio en produccion (si no, migrate pide confirmacion
+# interactiva y aqui no hay terminal). --isolated evita que dos instancias
+# arrancando a la vez ejecuten la misma migracion en paralelo.
+#
 # config:cache solo lee variables de entorno (no rutas): route:cache NO se usa
 # porque routes/api.php tiene rutas con closures y Laravel no puede cachearlas.
-CMD php artisan config:cache && php artisan serve --host=0.0.0.0 --port=$PORT
+#
+# PENDIENTE (hallazgo B-6, severidad baja): "artisan serve" envuelve el servidor
+# embebido de PHP -un solo proceso, sin concurrencia real ni reinicio ante
+# fallo- y la documentacion de Laravel lo desaconseja explicitamente en
+# produccion. Lo correcto es FrankenPHP o PHP-FPM + nginx. No se cambio aqui
+# porque es un cambio de runtime que hay que VERIFICAR construyendo la imagen,
+# y romper el arranque del contenedor bloquearia el despliegue entero.
+CMD php artisan config:cache \
+ && php artisan migrate --force --isolated \
+ && php artisan serve --host=0.0.0.0 --port=$PORT

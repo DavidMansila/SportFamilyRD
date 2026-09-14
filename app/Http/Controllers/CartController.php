@@ -41,7 +41,7 @@ class CartController extends Controller
     public function updateItem(Request $request, CartItem $item)
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1|max:' . self::MAX_CANTIDAD,
         ]);
 
         // El item debe pertenecer al carrito del usuario autenticado; si no,
@@ -66,14 +66,27 @@ class CartController extends Controller
     }
 
 
+    /** Tope por linea del carrito. */
+    private const MAX_CANTIDAD = 99;
+
     public function addItem(Request $request)
     {
-        $request->validate([
+        $datos = $request->validate([
             'item_type' => 'required|in:product,event',
             'item_id' => 'required|integer',
-            'quantity' => 'nullable|integer|min:1'
+            'quantity' => 'nullable|integer|min:1|max:' . self::MAX_CANTIDAD,
         ]);
 
+        // El articulo tiene que EXISTIR. Antes 'item_id' solo se validaba como
+        // entero, asi que se podian meter en el carrito referencias a productos
+        // o eventos inexistentes: getCart() los devolvia como null y la vista
+        // del carrito quedaba con huecos.
+        //
+        // La tabla depende del tipo, asi que no sirve una regla exists: fija.
+        $modelo = $datos['item_type'] === 'product' ? \App\Models\Product::class : \App\Models\Calendar::class;
+        if (! $modelo::whereKey($datos['item_id'])->exists()) {
+            return response()->json(['message' => 'El artículo no existe'], 422);
+        }
 
         $user = $request->user();
 
@@ -88,14 +101,20 @@ class CartController extends Controller
             ->first();
 
         if ($existingItem) {
+            // La SUMA tambien se acota: la validacion de arriba solo mira la
+            // cantidad de ESTA peticion, asi que sin este min() se podia llegar
+            // a cualquier numero repitiendo la llamada.
             $existingItem->update([
-                'quantity' => $existingItem->quantity + ($request->quantity ?? 1)
+                'quantity' => min(
+                    $existingItem->quantity + ($datos['quantity'] ?? 1),
+                    self::MAX_CANTIDAD
+                ),
             ]);
         } else {
             $cart->items()->create([
-                'item_type' => $request->item_type,
-                'item_id' => $request->item_id,
-                'quantity' => $request->quantity ?? 1
+                'item_type' => $datos['item_type'],
+                'item_id' => $datos['item_id'],
+                'quantity' => $datos['quantity'] ?? 1,
             ]);
         }
 

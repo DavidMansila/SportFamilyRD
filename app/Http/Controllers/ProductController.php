@@ -28,10 +28,7 @@ class ProductController extends Controller
                 'products' => $products
             ], 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al obtener los productos',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al obtener los productos', 500);
         }
     }
 
@@ -67,10 +64,7 @@ class ProductController extends Controller
                 'product' => $product
             ], 201);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al crear el producto',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al crear el producto', 500);
         }
     }
 
@@ -112,10 +106,7 @@ class ProductController extends Controller
                 'product' => $product
             ], 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al actualizar el producto',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al actualizar el producto', 500);
         }
     }
 
@@ -140,10 +131,7 @@ class ProductController extends Controller
                 'message' => 'Producto eliminado exitosamente'
             ], 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al eliminar el producto',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al eliminar el producto', 500);
         }
     }
 
@@ -165,10 +153,7 @@ class ProductController extends Controller
                 'products' => $products
             ], 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al obtener productos aleatorios',
-                'error'   => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al obtener productos aleatorios', 500);
         }
     }
 }

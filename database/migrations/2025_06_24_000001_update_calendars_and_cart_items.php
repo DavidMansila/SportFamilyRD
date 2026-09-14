@@ -24,7 +24,14 @@ return new class extends Migration {
             $table->string('item_type', 20)->default('product')->change();
         });
 
-        DB::statement("ALTER TABLE cart_items ADD CONSTRAINT cart_items_item_type_check CHECK (item_type IN ('product', 'event'))");
+        // SQLite no admite ADD CONSTRAINT sobre una tabla ya creada, y la suite
+        // de pruebas corre sobre SQLite en memoria (ver phpunit.xml). El CHECK
+        // es defensa en profundidad a nivel de base: la validacion equivalente
+        // ('item_type' => 'required|in:product,event') vive en CartController y
+        // si se ejerce en las pruebas.
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE cart_items ADD CONSTRAINT cart_items_item_type_check CHECK (item_type IN ('product', 'event'))");
+        }
     }
 
     /**
@@ -38,7 +45,9 @@ return new class extends Migration {
         });
 
         // Volver item_type a string (asumiendo era string antes)
-        DB::statement('ALTER TABLE cart_items DROP CONSTRAINT IF EXISTS cart_items_item_type_check');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE cart_items DROP CONSTRAINT IF EXISTS cart_items_item_type_check');
+        }
 
         Schema::table('cart_items', function (Blueprint $table) {
             $table->string('item_type')->default(null)->change();

@@ -28,13 +28,13 @@ class Comment extends Model
 
     protected $withCount = ['likes'];
 
+    // Sin 'id' ni timestamps: Eloquent gestiona created_at/updated_at solo, y
+    // tenerlos aqui permitiria falsear la fecha de un comentario desde el
+    // cliente en cuanto alguien use create($request->all()).
     protected $fillable = [
-        'id',
         'post_id',
         'user_id',
         'texto',
-        'created_at',
-        'updated_at',
     ];
 
     public function post()

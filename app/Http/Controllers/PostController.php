@@ -35,20 +35,39 @@ class PostController extends Controller
             // 'likes_count' (que viene del withCount de abajo) y 'is_liked'
             // (que se resuelve con la consulta de $userLikes). El array crudo
             // no lo lee ni el controlador ni la vista.
+            // COLUMNAS EXPLICITAS en las tres relaciones 'user'. Esta ruta es
+            // PUBLICA, y cargar la relacion sin seleccionar columnas devolvia el
+            // registro completo de cada autor: $hidden solo tapa 'password' y
+            // 'remember_token', asi que el correo, el telefono, la fecha de
+            // nacimiento, la ubicacion y la bio de toda persona que hubiera
+            // publicado, comentado o respondido en el foro viajaban a cualquiera
+            // que pidiera /api/post sin iniciar sesion.
+            //
+            // El frontend (ForoView.vue) solo lee id, name, image y user_type.
+            // 'image' hace falta porque resolve_user_image() la reescribe mas
+            // abajo para armar la URL publica.
+            $columnasAutor = 'user:id,name,image,user_type';
+
+            // El limite es la contencion barata del coste de esta ruta mientras
+            // no exista paginacion real: sin el, /api/post crecia sin techo con
+            // el contenido del foro (todos los posts, con todos sus comentarios
+            // y todas sus respuestas, en una sola respuesta).
             $posts = Post::with([
-                'user',
-                'comments' => function ($query) {
+                $columnasAutor,
+                'comments' => function ($query) use ($columnasAutor) {
                     $query->withCount('likes as likes_count');
                     $query->with([
-                        'user',
-                        'replies' => function ($replyQuery) {
+                        $columnasAutor,
+                        'replies' => function ($replyQuery) use ($columnasAutor) {
                             $replyQuery->withCount('likes as likes_count');
-                            $replyQuery->with('user');
+                            $replyQuery->with($columnasAutor);
                         }
                     ]);
                 }
             ])
                 ->withCount('likes as likes_count')
+                ->latest('id')
+                ->limit(200)
                 ->get();
 
             // Pre-cargar likes del usuario actual si se proporcionó user_id
@@ -102,11 +121,7 @@ class PostController extends Controller
                 'posts' => $posts,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error fetching posts: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al obtener los posts',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al obtener los posts', 500);
         }
     }
 
@@ -116,9 +131,11 @@ class PostController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'titulo' => 'required|string|max:255',
-                'contenido' => 'required|string',
-                'categoria' => 'required|string',
-                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,jpe,jfif'
+                'contenido' => 'required|string|max:5000',
+                'categoria' => 'required|string|max:50',
+                // max:2048 (KB): update() ya lo tenia y store() no, asi que el
+                // tope real al crear era el upload_max_filesize de PHP.
+                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,jpe,jfif|max:2048'
             ], [
                 'imagen.image' => 'El archivo debe ser una imagen válida',
                 'imagen.mimes' => 'Formatos permitidos: jpeg, png, jpg, gif, webp, jpe, jfif'
@@ -157,11 +174,7 @@ class PostController extends Controller
                 'post' => $post,
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating post: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al crear el post',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al crear el post', 500);
         }
     }
 
@@ -173,8 +186,8 @@ class PostController extends Controller
             // Validar campos
             $validator = Validator::make($request->all(), [
                 'titulo' => 'sometimes|string|max:255',
-                'contenido' => 'sometimes|string',
-                'categoria' => 'sometimes|string',
+                'contenido' => 'sometimes|string|max:5000',
+                'categoria' => 'sometimes|string|max:50',
                 'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
@@ -216,11 +229,7 @@ class PostController extends Controller
                 'post' => $post,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error updating post: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al actualizar el post',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al actualizar el post', 500);
         }
     }
 
@@ -249,11 +258,7 @@ class PostController extends Controller
                 'message' => 'Post eliminado exitosamente',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting post: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al eliminar el post',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al eliminar el post', 500);
         }
     }
 
@@ -261,7 +266,7 @@ class PostController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'texto' => 'required|string',
+                'texto' => 'required|string|max:2000',
                 'post_id' => 'required|exists:posts,id',
             ]);
 
@@ -284,12 +289,7 @@ class PostController extends Controller
                 'comment' => $comment
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating comment: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al crear comentario',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al crear comentario', 500);
         }
     }
 
@@ -300,7 +300,7 @@ class PostController extends Controller
 
             // Validar campos
             $validator = Validator::make($request->all(), [
-                'texto' => 'required|string',
+                'texto' => 'required|string|max:2000',
             ]);
 
             if ($validator->fails()) {
@@ -325,11 +325,7 @@ class PostController extends Controller
                 'comment' => $comment,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error updating comment: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al actualizar el comentario',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al actualizar el comentario', 500);
         }
     }
 
@@ -351,11 +347,7 @@ class PostController extends Controller
                 'message' => 'Comentario eliminado exitosamente',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting comment: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al eliminar el comentario',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al eliminar el comentario', 500);
         }
     }
 
@@ -363,7 +355,7 @@ class PostController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'texto' => 'required|string',
+                'texto' => 'required|string|max:2000',
             ]);
 
             if ($validator->fails()) {
@@ -385,12 +377,7 @@ class PostController extends Controller
                 'reply' => $reply
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating reply: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al crear respuesta',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al crear respuesta', 500);
         }
     }
 
@@ -401,7 +388,7 @@ class PostController extends Controller
 
             // Validar campos
             $validator = Validator::make($request->all(), [
-                'texto' => 'required|string',
+                'texto' => 'required|string|max:2000',
             ]);
 
             if ($validator->fails()) {
@@ -426,11 +413,7 @@ class PostController extends Controller
                 'reply' => $reply,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error updating reply: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al actualizar la respuesta',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al actualizar la respuesta', 500);
         }
     }
 
@@ -452,11 +435,7 @@ class PostController extends Controller
                 'message' => 'Respuesta eliminada exitosamente',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting reply: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al eliminar la respuesta',
-                'error' => $e->getMessage(),
-            ], 500);
+            return error_json($e, 'Error al eliminar la respuesta', 500);
         }
     }
 
@@ -505,11 +484,7 @@ class PostController extends Controller
                 'posts' => $posts
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error fetching popular posts: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Error al obtener posts populares',
-                'error' => $e->getMessage()
-            ], 500);
+            return error_json($e, 'Error al obtener posts populares', 500);
         }
     }
 }
