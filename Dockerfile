@@ -71,6 +71,16 @@ EXPOSE 10000
 # produccion. Lo correcto es FrankenPHP o PHP-FPM + nginx. No se cambio aqui
 # porque es un cambio de runtime que hay que VERIFICAR construyendo la imagen,
 # y romper el arranque del contenedor bloquearia el despliegue entero.
-CMD php artisan config:cache \
- && php artisan migrate --force --isolated \
+# EL ORDEN IMPORTA: primero migrar, despues cachear la configuracion.
+#
+# CACHE_STORE=file va forzado solo para la migracion, porque --isolated toma un
+# bloqueo atomico a traves del cache: si CACHE_STORE fuera "database", ese
+# bloqueo necesitaria la tabla 'cache'... que todavia no existe en el primer
+# despliegue, porque la crea justamente esta migracion. El driver de fichero no
+# toca la base de datos y rompe ese circulo.
+#
+# Y tiene que ir ANTES de config:cache: una vez cacheada la configuracion,
+# env() deja de leerse y la variable en linea no tendria ningun efecto.
+CMD CACHE_STORE=file php artisan migrate --force --isolated \
+ && php artisan config:cache \
  && php artisan serve --host=0.0.0.0 --port=$PORT
