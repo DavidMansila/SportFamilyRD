@@ -1,10 +1,8 @@
 <template>
-  <div class="sports-app" ref="scrollRoot">
-
+  <div class="sports-app">
 
     <!-- Navbar -->
     <Navbar />
-
 
     <!-- Header -->
     <header class="app-header">
@@ -15,22 +13,54 @@
       </div>
     </header>
 
-    <!-- Barra de búsqueda y filtros -->
-    <!-- <div class="controls">
+    <!-- Buscador y filtro por categoría. Se ocultan al abrir la ficha de un
+         deporte: ahi no hay nada que filtrar y solo quitarian sitio. -->
+    <div class="controls" v-if="!selectedSport">
       <div class="search-container">
-        <input type="text" v-model="searchTerm" placeholder="Buscar deporte..." class="search-input">
-        <button class="search-button">
+        <label for="buscador-deporte" class="visually-hidden">Buscar deporte</label>
+        <input
+          id="buscador-deporte"
+          type="search"
+          v-model="searchTerm"
+          placeholder="Buscar deporte, lugar o disciplina..."
+          class="search-input"
+          autocomplete="off">
+        <button
+          v-if="searchTerm"
+          class="search-clear"
+          type="button"
+          @click="searchTerm = ''"
+          aria-label="Borrar búsqueda">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <span class="search-button" aria-hidden="true">
           <i class="fas fa-search"></i>
+        </span>
+      </div>
+
+      <div class="filter-buttons" role="group" aria-label="Filtrar por categoría">
+        <button
+          v-for="cat in categoriasConTodas"
+          :key="cat.valor"
+          type="button"
+          @click="filtrarPorCategoria(cat.valor)"
+          :class="{ active: activeCategory === cat.valor }"
+          :aria-pressed="activeCategory === cat.valor">
+          <i :class="cat.icono" aria-hidden="true"></i>
+          <span>{{ cat.etiqueta }}</span>
+          <span class="filter-count">{{ cat.total }}</span>
         </button>
       </div>
 
-      <div class="filter-buttons">
-        <button v-for="region in regions" :key="region" @click="filterByRegion(region)"
-          :class="{ active: activeRegion === region }">
-          {{ region }}
-        </button>
-      </div>
-    </div> -->
+      <p class="results-summary" aria-live="polite">
+        <template v-if="filteredSports.length">
+          {{ filteredSports.length }}
+          {{ filteredSports.length === 1 ? 'deporte' : 'deportes' }}
+          <template v-if="activeCategory !== 'Todas'"> en {{ activeCategory }}</template>
+          <template v-if="searchTerm"> para “{{ searchTerm }}”</template>
+        </template>
+      </p>
+    </div>
 
     <!-- Contenido principal -->
     <main class="main-content" ref="appContainer">
@@ -44,6 +74,18 @@
             <div class="skeleton-line" style="width: 90%;"></div>
           </div>
         </div>
+      </div>
+
+      <!-- Nada coincide con la busqueda o el filtro -->
+      <div class="sin-resultados" v-else-if="!selectedSport && !filteredSports.length">
+        <i class="fas fa-search" aria-hidden="true"></i>
+        <h3>No encontramos ese deporte</h3>
+        <p>
+          Prueba con otra palabra o mira todas las categorías.
+        </p>
+        <button type="button" class="sin-resultados__btn" @click="limpiarFiltros">
+          Ver todos los deportes
+        </button>
       </div>
 
       <!-- Listado de deportes -->
@@ -146,13 +188,11 @@
       </div>
     </main>
 
-
     <!-- Burbuja de Mensajes Flotante -->
     <ChatBubbleComponent v-if="user" :user="user" />
 
   </div>
 </template>
-
 
 <script setup>
 import { ref, computed, nextTick, onMounted } from 'vue';
@@ -164,25 +204,10 @@ import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 const store = useStore();
 const appContainer = ref(null);
 const searchTerm = ref('')
-const activeRegion = ref('Todas')
 const selectedSport = ref(null);
 const loading = ref(true);
 
-const regions = ref([
-  'Todas',
-  'Santo Domingo',
-  'Santiago',
-  'La Romana',
-  'Puerto Plata',
-  'Punta Cana',
-  'Samaná',
-  'Barahona',
-  'San Cristóbal',
-  'Jarabacoa',
-  'Constanza',
-  'Higüey',
-  'San Juan de la Maguana'
-]);
+;
 
 const sports = ref([]);
 
@@ -192,6 +217,7 @@ const mapSport = (s) => ({
   region: s.region,
   type: s.type,
   popularity: s.popularity,
+  category: s.category ?? null,
   image: s.image,
   shortDescription: s.short_description ?? s.shortDescription,
   description: s.description,
@@ -215,29 +241,83 @@ const getSports = () => {
     });
 };
 
+// Las siete categorias del directorio, en el mismo orden que el seeder
+// (DeportesNuevosSeeder::CATEGORIAS). El icono es de Font Awesome, que ya
+// carga la aplicacion.
+const CATEGORIAS = [
+  { valor: 'Pelota', etiqueta: 'Pelota', icono: 'fas fa-baseball-ball' },
+  { valor: 'Contacto', etiqueta: 'Contacto', icono: 'fas fa-hand-rock' },
+  { valor: 'Agua', etiqueta: 'Agua', icono: 'fas fa-water' },
+  { valor: 'Resistencia', etiqueta: 'Resistencia', icono: 'fas fa-running' },
+  { valor: 'Precisión', etiqueta: 'Precisión', icono: 'fas fa-bullseye' },
+  { valor: 'Aventura', etiqueta: 'Aventura', icono: 'fas fa-mountain' },
+  { valor: 'Bienestar', etiqueta: 'Bienestar', icono: 'fas fa-heartbeat' },
+];
+
+const activeCategory = ref('Todas');
+
+// Quita tildes y pasa a minusculas: sin esto, buscar "natacion" no encontraria
+// "Natación", que es justo lo que teclea la mayoria de la gente.
+const normalizar = (texto) =>
+  String(texto ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+
+// Deportes que pasan SOLO el filtro de categoria. Se usa para dos cosas: como
+// base del filtro de texto y para contar cuantos hay en cada boton.
+const porCategoria = (categoria) =>
+  categoria === 'Todas'
+    ? sports.value
+    : sports.value.filter((s) => s.category === categoria);
+
+// Cada boton lleva su conteo. Se calcula sobre el catalogo completo y no sobre
+// el resultado de la busqueda: el numero indica cuantos hay en esa categoria,
+// no cuantos quedan tras teclear, que seria confuso.
+const categoriasConTodas = computed(() => [
+  { valor: 'Todas', etiqueta: 'Todas', icono: 'fas fa-th-large', total: sports.value.length },
+  ...CATEGORIAS
+    .map((c) => ({ ...c, total: porCategoria(c.valor).length }))
+    // Una categoria sin deportes no pinta nada en la barra.
+    .filter((c) => c.total > 0),
+]);
+
 const filteredSports = computed(() => {
-  let result = sports.value;
+  let result = porCategoria(activeCategory.value);
 
-  if (activeRegion.value !== 'Todas') {
-    result = result.filter(sport =>
-      sport.region.includes(activeRegion.value)
-    );
-  }
+  const term = normalizar(searchTerm.value).trim();
 
-  if (searchTerm.value) {
-    const term = searchTerm.value.toLowerCase();
-    result = result.filter(sport =>
-      sport.name.toLowerCase().includes(term) ||
-      sport.description.toLowerCase().includes(term) ||
-      sport.region.toLowerCase().includes(term)
-    );
+  if (term) {
+    // Se busca tambien en la descripcion, la categoria y el NOMBRE DE LOS
+    // LUGARES: asi "Jarabacoa" o "Centro Olimpico" encuentran los deportes que
+    // se practican ahi, que es una forma muy natural de buscar.
+    result = result.filter((sport) => {
+      const lugares = (sport.places || [])
+        .map((p) => `${p.name ?? ''} ${p.location ?? ''}`)
+        .join(' ');
+
+      return [
+        sport.name,
+        sport.shortDescription,
+        sport.description,
+        sport.region,
+        sport.category,
+        sport.type,
+        lugares,
+      ].some((campo) => normalizar(campo).includes(term));
+    });
   }
 
   return result;
 });
 
-const filterByRegion = (region) => {
-  activeRegion.value = region;
+const filtrarPorCategoria = (categoria) => {
+  activeCategory.value = categoria;
+};
+
+const limpiarFiltros = () => {
+  activeCategory.value = 'Todas';
+  searchTerm.value = '';
 };
 
 // Solo se pintan enlaces http(s). Sin este filtro, un "website" guardado como
@@ -254,29 +334,25 @@ const safeUrl = (url) => {
 };
 
 // Punto del listado donde estaba el usuario antes de entrar a un deporte,
-// para volver ahi (no al tope) al darle "Volver al listado". Quien
-// realmente scrollea aqui es .sports-app (el div raiz: height:100vh +
-// overflow-y:auto, ver <style> mas abajo), no la ventana ni .main-content
-// (appContainer): scrollTo() sobre appContainer no hacia nada visible
-// porque ese elemento no tiene su propio scroll.
-const scrollRoot = ref(null);
+// para volver ahi (no al tope) al darle "Volver al listado". Quien scrollea
+// es la ventana, igual que en el resto de secciones.
 const savedScrollTop = ref(0);
 
 const selectSport = async (sport) => {
-  if (scrollRoot.value) {
-    savedScrollTop.value = scrollRoot.value.scrollTop;
-  }
+  savedScrollTop.value = window.scrollY;
 
   selectedSport.value = sport;
 
   await nextTick();
-  scrollRoot.value?.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Enfocar el título del deporte para accesibilidad
+  // Enfocar el título del deporte para accesibilidad. Con preventScroll
+  // porque enfocar arrastra el scroll hasta el elemento, y eso deshacia el
+  // scrollTo de arriba: la ficha abria a media altura, con el navbar fuera.
   const sportTitle = document.querySelector('.sd-hero__title');
   if (sportTitle) {
     sportTitle.tabIndex = -1;
-    sportTitle.focus();
+    sportTitle.focus({ preventScroll: true });
   }
 };
 
@@ -284,10 +360,8 @@ const volverAlListado = async () => {
   selectedSport.value = null;
 
   await nextTick();
-  scrollRoot.value?.scrollTo({ top: savedScrollTop.value, behavior: 'auto' });
+  window.scrollTo({ top: savedScrollTop.value, behavior: 'auto' });
 };
-
-
 
 const user = ref(null);
 
@@ -310,11 +384,7 @@ onMounted(() => {
   }
 });
 
-
 </script>
-
-
-
 
 <style scoped>
 @import '../../../scss/Directorio/directorio.scss';
@@ -325,12 +395,10 @@ onMounted(() => {
   background: linear-gradient(to right, #000000, #a13300);
 }
 
-.sports-app {
-  height: 100vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  /* Scroll suave en iOS */
-}
+/* Sin height:100vh ni overflow-y:auto. Los tenia, y eso convertia el div raiz
+   en su propio contenedor de scroll dentro del scroll de la pagina: salian dos
+   barras a la derecha, una encima de otra. Esta seccion scrollea con la
+   ventana, como el foro y el resto. */
 
 .sport-card-skeleton {
   cursor: default;

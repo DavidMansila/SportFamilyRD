@@ -13,6 +13,7 @@ class Sport extends Model
         'name',
         'region',
         'type',
+        'category',
         'popularity',
         'image',
         'short_description',

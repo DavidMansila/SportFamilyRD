@@ -1,3 +1,22 @@
+/* ===================================================================
+   Color de acento del directorio
+   ===================================================================
+   El navbar de esta sección va en degradado #000000 → #a13300. De ese
+   naranja salen los tres tonos de abajo, pero PLANOS y aclarados: el
+   degradado y el tono original resultaban pesados repetidos en ocho
+   botones de categoría, y esa barra está para acompañar al listado, no
+   para competir con él.
+   =================================================================== */
+
+.sports-app {
+    /* Naranja de la sección, aclarado. Plano, sin degradado. */
+    --dir-acento: #b86640;
+    /* Un paso más oscuro, solo para hover y foco. */
+    --dir-acento-fuerte: #ac4b1f;
+    /* Fondo tenue para el contador de cada categoría. */
+    --dir-acento-suave: rgba(184, 102, 64, 0.12);
+}
+
 /* Cabezera */
 
 .app-header {
@@ -68,21 +87,16 @@
 
 .search-input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+    box-shadow: 0 0 0 2px rgba(184, 102, 64, 0.25);
 }
 
 .search-button {
     padding: 0 25px;
-    background: linear-gradient(to right, #0056b3, #0077e6);
-    color: white;
+    background: none;
     border: none;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.3s;
-}
-
-.search-button:hover {
-    background: linear-gradient(to right, #004494, #0066cc);
 }
 
 .filter-buttons {
@@ -109,10 +123,10 @@
 }
 
 .filter-buttons button.active {
-    background: linear-gradient(to right, #0056b3, #0077e6);
+    background: var(--dir-acento);
     color: white;
     border-color: transparent;
-    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.3);
+    box-shadow: 0 3px 8px rgba(184, 102, 64, 0.28);
 }
 
 /* Lista de deportes*/
@@ -483,5 +497,238 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* ===================================================================
+   Buscador y filtro por categoría
+   ===================================================================
+   Se apoyan en los estilos de .controls / .search-container /
+   .filter-buttons que ya existían más arriba en este archivo (estaban
+   escritos pero el bloque del template estaba comentado, así que nunca
+   llegaron a verse). Aquí solo se añade lo nuevo: el icono de búsqueda,
+   el botón de limpiar, el contador de cada categoría y el estado vacío.
+
+   El color sale de las variables --dir-acento del principio del archivo.
+   =================================================================== */
+
+.controls {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+}
+
+/* El buscador es el elemento principal: se centra y se le da aire. */
+.search-container {
+    position: relative;
+    align-items: center;
+}
+
+.search-input {
+    /* Sitio a la derecha para la lupa y la X, que van superpuestas. */
+    padding-right: 84px;
+}
+
+/* La lupa es un ICONO, no un botón.
+   El filtrado ocurre mientras escribes, así que no hay nada que pulsar.
+   Pintarla como el bloque azul que definía el estilo original prometía
+   una interacción inexistente: quien la pulsara no vería pasar nada.
+   Se deja en el azul de la sección pero sin fondo ni sombra, para que
+   lea como adorno del campo y no como control. */
+.search-button {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    padding: 0;
+    color: var(--dir-acento);
+    font-size: 1.05rem;
+    pointer-events: none;
+}
+
+.search-clear {
+    position: absolute;
+    right: 46px;
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 50%;
+    line-height: 1;
+    transition: background 0.2s, color 0.2s;
+}
+
+.search-clear:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--dir-acento);
+}
+
+.search-clear:focus-visible {
+    outline: 2px solid var(--dir-acento);
+    outline-offset: 2px;
+}
+
+/* Botones de categoría */
+.filter-buttons button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+}
+
+.filter-buttons button:hover:not(.active) {
+    border-color: var(--dir-acento);
+    color: var(--dir-acento-fuerte);
+}
+
+.filter-buttons button i {
+    font-size: 0.95em;
+    color: var(--dir-acento);
+    transition: color 0.3s;
+}
+
+.filter-buttons button.active i {
+    color: #fff;
+}
+
+/* Cuántos deportes hay en esa categoría. */
+.filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    background: var(--dir-acento-suave);
+    color: var(--dir-acento-fuerte);
+    font-size: 0.78rem;
+    font-weight: 700;
+    transition: background 0.3s, color 0.3s;
+}
+
+.filter-buttons button.active .filter-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+.results-summary {
+    text-align: center;
+    margin: 0;
+    color: #666;
+    font-size: 0.92rem;
+    min-height: 1.2em;
+}
+
+/* Búsqueda sin resultados */
+.sin-resultados {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.sin-resultados i {
+    font-size: 2.5rem;
+    color: #e3cabc;
+    margin-bottom: 16px;
+}
+
+.sin-resultados h3 {
+    margin: 0 0 8px;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.sin-resultados p {
+    margin: 0 0 20px;
+}
+
+.sin-resultados__btn {
+    padding: 12px 26px;
+    border: none;
+    border-radius: 25px;
+    background: var(--dir-acento);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.sin-resultados__btn:hover {
+    background: var(--dir-acento-fuerte);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(184, 102, 64, 0.3);
+}
+
+/* Etiqueta solo para lectores de pantalla. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---------- Responsive ----------
+   Los breakpoints siguen los que ya usa este archivo. En pantallas
+   estrechas la barra de categorías pasa a scroll horizontal en vez de
+   apilarse en cuatro filas, que dejaba el listado muy abajo. */
+
+@media (max-width: 1023.98px) {
+    .controls {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .filter-buttons {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding: 4px 16px 14px;
+        margin: 0 -16px;
+        /* Oculta la barra de scroll sin perder el gesto de arrastrar. */
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-buttons::-webkit-scrollbar {
+        display: none;
+    }
+
+    .filter-buttons button {
+        flex: 0 0 auto;
+        padding: 9px 16px;
+        font-size: 0.9rem;
+    }
+
+    .search-input {
+        padding: 13px 78px 13px 16px;
+        font-size: 0.95rem;
+    }
+
+    .results-summary {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-buttons button span:not(.filter-count) {
+        /* En pantallas muy estrechas el icono + el número bastan para
+           reconocer la categoría, y así caben todas sin scroll infinito. */
+        font-size: 0.85rem;
+    }
+
+    .sin-resultados {
+        padding: 40px 16px;
     }
 }

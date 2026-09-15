@@ -239,14 +239,53 @@ class ComunidadSeeder extends Seeder
             . 'Planifico cada sesión según el objetivo y la condición de la persona, y doy seguimiento semanal.';
     }
 
+    /**
+     * Horario semanal del entrenador.
+     *
+     * EL FORMATO IMPORTA y no es libre: lo consume parseSchedule() en
+     * EntrenadoresView.vue, que espera exactamente esto:
+     *
+     *   { "Lunes": { "available": true, "hours": { "desde": "06:00", "hasta": "09:00" } } }
+     *
+     * Dos detalles que hay que respetar al pie de la letra:
+     *
+     *   - La clave del dia va CAPITALIZADA Y CON TILDE ("Miércoles", "Sábado").
+     *     La vista construye su tabla con esos nombres exactos y busca por
+     *     ellos; con "miercoles" en minuscula no encuentra nada.
+     *   - 'hours' es un OBJETO con 'desde' y 'hasta', no un array de dos
+     *     posiciones. La vista lee hours.desde / hours.hasta.
+     *
+     * Con el formato anterior (claves en minuscula y hours como array) la ficha
+     * del entrenador mostraba los siete dias como "No Disponible", porque
+     * parseSchedule caia siempre en su valor por defecto de cadenas vacias.
+     *
+     * Los dias NO disponibles se omiten: parseSchedule ya rellena el resto con
+     * vacios, que es como la vista marca "No Disponible".
+     */
     private function horario(int $i): array
     {
-        $dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-        $horas = [['06:00', '09:00'], ['16:00', '20:00'], ['08:00', '12:00']];
-        $schedule = [];
+        // Tres turnos tipicos y tres combinaciones de dias, para que no todos
+        // los entrenadores tengan la misma disponibilidad.
+        $turnos = [
+            ['desde' => '06:00', 'hasta' => '09:00'],   // manana temprano
+            ['desde' => '16:00', 'hasta' => '20:00'],   // tarde
+            ['desde' => '08:00', 'hasta' => '12:00'],   // manana
+        ];
 
-        foreach (array_slice($dias, $i % 3, 3 + ($i % 3)) as $d) {
-            $schedule[$d] = ['available' => true, 'hours' => $horas[$i % 3]];
+        $combinaciones = [
+            ['Lunes', 'Miércoles', 'Viernes'],
+            ['Martes', 'Jueves', 'Sábado'],
+            ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+            ['Lunes', 'Miércoles', 'Viernes', 'Sábado'],
+            ['Martes', 'Miércoles', 'Jueves', 'Viernes'],
+        ];
+
+        $turno = $turnos[$i % count($turnos)];
+        $dias = $combinaciones[$i % count($combinaciones)];
+
+        $schedule = [];
+        foreach ($dias as $dia) {
+            $schedule[$dia] = ['available' => true, 'hours' => $turno];
         }
 
         return $schedule;

@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            SportSeeder::class,     // catalogo del directorio de deportes
+            SportSeeder::class,          // catalogo base del directorio
+            DeportesNuevosSeeder::class, // 20 deportes mas y la categoria de todos
             ComunidadSeeder::class, // usuarios, entrenadores y configuraciones
             TiendaSeeder::class,    // 270 productos en 27 categorias
             ForoSeeder::class,      // hilos con comentarios, respuestas y likes
