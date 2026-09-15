@@ -464,20 +464,31 @@ class PostController extends Controller
             // Lo importante es que una respuesta cacheada no abre conexion a
             // Supabase (~500 ms). Ademas se limpia solo al guardar un post, un
             // like o un comentario (ver el booted() de Post, Like y Comment).
-            $posts = Cache::remember('popular-posts', CacheDeContenido::MINUTOS_RANKING, fn() => Post::query()
-                ->addSelect(['likes_count' => $likesSubquery])
-                ->addSelect(['comments_count' => $commentsSubquery])
-                ->with(['user' => function ($query) {
-                    // Cargar el avatar_url directamente
-                    $query->select('id', 'name', 'image')
-                        ->addSelect(DB::raw("CONCAT('" . public_storage_url('users') . "/', id, '/', image) as image_url"));
-                }])
-                ->orderByRaw(
-                    '(' . $likesSubquery->toSql() . ') + (' . $commentsSubquery->toSql() . ') DESC',
-                    array_merge($likesSubquery->getBindings(), $commentsSubquery->getBindings())
-                )
-                ->take(5)
-                ->get());
+            $posts = Cache::remember('popular-posts', CacheDeContenido::MINUTOS_RANKING, function () use ($likesSubquery, $commentsSubquery) {
+                $resultado = Post::query()
+                    ->addSelect(['likes_count' => $likesSubquery])
+                    ->addSelect(['comments_count' => $commentsSubquery])
+                    ->with(['user:id,name,image'])
+                    ->orderByRaw(
+                        '(' . $likesSubquery->toSql() . ') + (' . $commentsSubquery->toSql() . ') DESC',
+                        array_merge($likesSubquery->getBindings(), $commentsSubquery->getBindings())
+                    )
+                    ->take(5)
+                    ->get();
+
+                // 'image' se resuelve con el mismo helper que el resto de la
+                // aplicacion, en vez de con un CONCAT dentro del SQL.
+                //
+                // El CONCAT anterior tenia dos problemas: dejaba 'image' con el
+                // nombre de archivo crudo (el front recibia "avatar.jpg" suelto)
+                // y ponia la URL en un campo aparte, 'image_url', que ningun
+                // componente lee. Ademas, en SQL un CONCAT con NULL da NULL, asi
+                // que quien no tuviera foto se quedaba sin valor y sin el icono
+                // por defecto.
+                $resultado->each(fn($post) => resolve_user_image($post->user));
+
+                return $resultado;
+            });
 
             return response()->json([
                 'message' => 'Posts populares obtenidos exitosamente',

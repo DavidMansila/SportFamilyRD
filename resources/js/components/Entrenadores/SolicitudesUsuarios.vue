@@ -348,7 +348,10 @@ export default {
         },
 
         getUserImage(solicitud) {
-            if (solicitud.userImage && solicitud.userImage.startsWith('http')) {
+            // Absoluta o relativa a /storage: en ambos casos ya viene
+            // resuelta por el backend y no hay que anteponerle nada.
+            if (solicitud.userImage
+                && (solicitud.userImage.startsWith('http') || solicitud.userImage.startsWith('/'))) {
                 return solicitud.userImage;
             }
 

@@ -95,9 +95,20 @@ class TrainerController extends Controller
             ->get();
 
         $approvedTrainer->transform(function ($trainer) {
-            $trainer->image = optional($trainer->user)->image;
-            $trainer->image = $trainer->image
-                ? public_storage_url('users/' . $trainer->user_id . '/' . $trainer->image)
+            // El nombre de archivo crudo se lee ANTES de resolver la relacion,
+            // porque resolve_user_image() reescribe $trainer->user->image en el
+            // sitio y despues ya no serviria para armar esta ruta.
+            $archivo = optional($trainer->user)->image;
+
+            // La relacion 'user' tambien se resuelve: el modal de detalle del
+            // entrenador pinta user.image directamente, y sin esto recibia el
+            // nombre de archivo suelto ("avatar.jpg"), que el navegador resuelve
+            // contra la URL actual y da una imagen rota. La tarjeta del listado
+            // no lo notaba porque usa $trainer->image, que si estaba resuelta.
+            resolve_user_image($trainer->user);
+
+            $trainer->image = $archivo
+                ? public_storage_url('users/' . $trainer->user_id . '/' . $archivo)
                 : asset('defaults/Perfil-Icon.png');
             return $trainer;
         });

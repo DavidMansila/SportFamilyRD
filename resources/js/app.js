@@ -1,6 +1,12 @@
 import "./bootstrap";
 import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
+import { activarReintentoDeImagenes } from "./reintentarImagenes";
+
+// Una imagen que falla por un parpadeo de red se queda en blanco para siempre:
+// el navegador no reintenta solo. Esto la recupera. Se activa antes de montar
+// la app para no perderse los fallos de la primera pantalla.
+activarReintentoDeImagenes();
 
 // App raíz: se necesita en todas las rutas, se mantiene estática.
 import App from "./components/App.vue";

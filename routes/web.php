@@ -25,6 +25,19 @@ Route::get('/email/verified-success', function () {
 });
 
 // --- RUTA CATCH-ALL PARA EL SPA ---
+//
+// Excluye las rutas de ARCHIVOS. Antes capturaba absolutamente todo, asi que
+// una imagen que no existiera en disco no daba 404: caia aqui y devolvia el
+// HTML del SPA con estado 200. El navegador recibe una pagina donde espera un
+// JPEG, no se queja en consola, y el fallo pasa inadvertido.
+//
+// Asi se escondio el fondo roto de la Tienda (pedia /public/imagenes/... en
+// lugar de /imagenes/...): en produccion no se veia la imagen y no habia ningun
+// error que lo delatara. Con esta exclusion, un asset que falte responde 404 y
+// se ve al instante en la pestaña de red.
+//
+// Los archivos que SI existen los sirve Apache antes de llegar a Laravel (ver
+// las RewriteCond de public/.htaccess), asi que esto solo afecta a los que no.
 Route::get('/{any}', function () {
     return view('app');
-})->where('any', '.*');
+})->where('any', '^(?!storage/|imagenes/|build/|defaults/|public/).*');

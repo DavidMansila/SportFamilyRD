@@ -107,11 +107,19 @@ export default {
     getUserImage(user) {
       if (!user) return '/imagenes/Perfil-Icon.png';
 
+      // El backend puede mandar la URL ya resuelta (absoluta o relativa a
+      // /storage). Anteponer la ruta encima la duplicaba y daba 403.
+      const yaResuelta = (v) => v.startsWith('http') || v.startsWith('/');
+
       if (user.user?.image) {
-        return `/storage/users/${user.user.id}/${user.user.image}`;
+        return yaResuelta(user.user.image)
+          ? user.user.image
+          : `/storage/users/${user.user.id}/${user.user.image}`;
       }
       if (user.image) {
-        return `/storage/users/${user.id}/${user.image}`;
+        return yaResuelta(user.image)
+          ? user.image
+          : `/storage/users/${user.id}/${user.image}`;
       }
 
       return '/imagenes/Perfil-Icon.png';

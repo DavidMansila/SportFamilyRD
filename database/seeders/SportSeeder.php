@@ -514,8 +514,16 @@ class SportSeeder extends Seeder
             ],
         ];
 
+        // updateOrCreate y no create: con create, cada ejecucion volvia a
+        // insertar el catalogo entero y duplicaba los 25 deportes. Ahora se
+        // puede reejecutar el seeder (o 'php artisan db:seed' completo) sin
+        // ensuciar la tabla, y ademas sirve para actualizar descripciones sin
+        // borrar nada.
         foreach ($sports as $index => $sport) {
-            Sport::create(array_merge($sport, ['sort_order' => $index]));
+            Sport::updateOrCreate(
+                ['name' => $sport['name']],
+                array_merge($sport, ['sort_order' => $index])
+            );
         }
     }
 }

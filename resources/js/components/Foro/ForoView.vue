@@ -1539,10 +1539,15 @@ export default {
         return '/imagenes/Perfil-Icon.png';
       }
 
-      if (user.image && user.image.startsWith('http')) {
+      // Ya resuelta por el backend: puede venir absoluta ("https://...") o
+      // RELATIVA ("/storage/users/7/avatar.jpg"), segun PUBLIC_DISK_URL.
+      // Comprobar solo "http" dejaba pasar la relativa y se volvia a anteponer
+      // la ruta encima -> "/storage/users/7//storage/users/7/avatar.jpg" (403).
+      if (user.image && (user.image.startsWith('http') || user.image.startsWith('/'))) {
         return user.image;
       }
 
+      // Nombre de archivo suelto: hay que armar la ruta.
       if (user.image) {
         return `/storage/users/${user.id}/${user.image}`;
       }
