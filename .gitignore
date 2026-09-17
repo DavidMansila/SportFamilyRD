@@ -30,3 +30,7 @@ database/.vs
 # Herramientas locales, no forman parte de la aplicacion
 ngrok.exe
 composer-setup.php
+
+# graphify: grafo local (se regenera con los hooks de git)
+graphify-out/
+.claude/settings.local.json
