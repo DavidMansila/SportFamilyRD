@@ -93,10 +93,15 @@
         .search-input {
           padding: 12px 15px;
           font-size: 14px;
+          min-width: 0;
         }
-        
+
+        /* Ancho fijo y sin padding: el padding se sumaba al ancho del boton y
+           lo dejaba mas grande de la cuenta (ver tienda.scss, donde la lupa
+           va centrada dentro del boton). */
         .search-btn {
-          padding: 12px 18px;
+          width: 52px;
+          padding: 0;
         }
       }
     }

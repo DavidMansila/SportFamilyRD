@@ -48,7 +48,7 @@
           :aria-pressed="activeCategory === cat.valor">
           <i :class="cat.icono" aria-hidden="true"></i>
           <span>{{ cat.etiqueta }}</span>
-          <span class="filter-count">{{ cat.total }}</span>
+          <span v-if="sports.length" class="filter-count">{{ cat.total }}</span>
         </button>
       </div>
 
@@ -200,6 +200,7 @@ import { useStore } from 'vuex';
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
+import { mapSport, cacheDeportesValido } from '../../utils/sports';
 
 const store = useStore();
 const appContainer = ref(null);
@@ -210,20 +211,6 @@ const loading = ref(true);
 ;
 
 const sports = ref([]);
-
-const mapSport = (s) => ({
-  id: s.id,
-  name: s.name,
-  region: s.region,
-  type: s.type,
-  popularity: s.popularity,
-  category: s.category ?? null,
-  image: s.image,
-  shortDescription: s.short_description ?? s.shortDescription,
-  description: s.description,
-  requirements: s.requirements || [],
-  places: s.places || [],
-});
 
 const getSports = () => {
   loading.value = true;
@@ -278,8 +265,11 @@ const categoriasConTodas = computed(() => [
   { valor: 'Todas', etiqueta: 'Todas', icono: 'fas fa-th-large', total: sports.value.length },
   ...CATEGORIAS
     .map((c) => ({ ...c, total: porCategoria(c.valor).length }))
-    // Una categoria sin deportes no pinta nada en la barra.
-    .filter((c) => c.total > 0),
+    // Una categoria sin deportes no pinta nada en la barra. Mientras la lista
+    // esta vacia (cargando o si fallo la peticion) se muestran todas: antes
+    // quedaba solo "Todas" y parecia que las demas no existian. La activa
+    // nunca se oculta.
+    .filter((c) => c.total > 0 || sports.value.length === 0 || c.valor === activeCategory.value),
 ]);
 
 const filteredSports = computed(() => {
@@ -376,7 +366,7 @@ onMounted(() => {
   }
 
   const cachedSports = store.getters.sectionCache('directorio');
-  if (cachedSports) {
+  if (cacheDeportesValido(cachedSports)) {
     sports.value = cachedSports;
     loading.value = false;
   } else {

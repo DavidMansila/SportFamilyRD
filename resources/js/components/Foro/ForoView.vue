@@ -47,7 +47,7 @@
           :aria-pressed="categoriaSeleccionada === cat.valor">
           <i :class="cat.icono" aria-hidden="true"></i>
           <span>{{ cat.etiqueta }}</span>
-          <span class="filter-count">{{ cat.total }}</span>
+          <span v-if="posts.length" class="filter-count">{{ cat.total }}</span>
         </button>
         <button type="button" class="ver-mas-categorias" @click="categoriasExpandidas = !categoriasExpandidas"
           :aria-expanded="categoriasExpandidas">
@@ -1673,7 +1673,7 @@ export default {
     this.user = JSON.parse(sessionStorage.getItem('user')) || null;
 
     const cachedPosts = this.$store.getters.sectionCache('foro');
-    if (cachedPosts) {
+    if (Array.isArray(cachedPosts) && cachedPosts.length > 0) {
       this.posts = cachedPosts;
       this.postsFiltrados = [...this.posts];
     } else {

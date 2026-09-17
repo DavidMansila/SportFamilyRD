@@ -53,38 +53,66 @@
     </div>
 
 
-    <!-- Botón de filtros para móviles -->
-    <button class="mobile-filter-btn" @click="showMobileFilters = true">
-      <i class="fas fa-filter"></i> Filtros
+    <!-- Botón de filtros para móviles. Muestra el filtro activo, para saber
+         que hay uno puesto sin tener que abrir el menu. -->
+    <button class="mobile-filter-btn" @click="abrirFiltrosMoviles" :aria-expanded="showMobileFilters">
+      <span class="mobile-filter-btn__icon"><i class="fas fa-sliders-h"></i></span>
+      <span class="mobile-filter-btn__text">Filtros</span>
+      <span class="mobile-filter-btn__badge">{{ textoFiltroActivo }}</span>
     </button>
 
     <!-- Menú de filtros móviles -->
-    <div class="mobile-filters-menu" :class="{ active: showMobileFilters }">
+    <transition name="filtros-fade">
+      <div v-if="showMobileFilters" class="mobile-filters-overlay" @click="cerrarFiltrosMoviles"></div>
+    </transition>
+
+    <div class="mobile-filters-menu" :class="{ active: showMobileFilters }" role="dialog" aria-modal="true"
+      aria-label="Filtrar productos">
       <div class="mobile-filters-header">
-        <h3>Filtrar Productos</h3>
-        <button class="close-mobile-filters" @click="showMobileFilters = false">
-          <i class="fas fa-times"></i>X
+        <div>
+          <h3>Filtrar productos</h3>
+          <p class="mobile-filters-sub">{{ productosFiltrados.length }}
+            {{ productosFiltrados.length === 1 ? 'producto' : 'productos' }}</p>
+        </div>
+        <button class="close-mobile-filters" @click="cerrarFiltrosMoviles" aria-label="Cerrar filtros">
+          <i class="fas fa-times" aria-hidden="true"></i>
         </button>
       </div>
 
       <div class="mobile-filters-content">
-        <button class="mobile-filter-option" @click="seleccionarSubcategoria(''); showMobileFilters = false;">
+        <button class="mobile-filter-option" :class="{ active: subcategoriaSeleccionada === '' }"
+          @click="seleccionarSubcategoriaMovil('')">
+          <i class="fas fa-table-cells-large" aria-hidden="true"></i>
           Todos los productos
         </button>
 
-        <div v-for="(categoria, index) in categorias" :key="index" class="mobile-category">
-          <div class="mobile-category-header" @click="toggleMobileCategory(index)" role="button" tabindex="0" @keydown.enter.prevent="toggleMobileCategory(index)" @keydown.space.prevent="toggleMobileCategory(index)">
-            {{ categoria.nombre }}
-            <i class="fas fa-chevron-down" :class="{ 'fa-rotate-180': mobileCategoryOpen === index }"></i>
-          </div>
+        <div v-for="(categoria, index) in categorias" :key="index" class="mobile-category"
+          :class="{ abierta: mobileCategoryOpen === index }">
+          <button type="button" class="mobile-category-header" @click="toggleMobileCategory(index)"
+            :aria-expanded="mobileCategoryOpen === index">
+            <span class="mobile-category-nombre">{{ categoria.nombre }}</span>
+            <span v-if="categoriaDelFiltroActivo === index" class="mobile-category-punto" aria-hidden="true"></span>
+            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+          </button>
 
           <div class="mobile-subcategories" v-show="mobileCategoryOpen === index">
             <button v-for="(opcion, i) in categoria.opciones" :key="i"
-              @click="seleccionarSubcategoria(opcion.valor); showMobileFilters = false;">
+              :class="{ active: subcategoriaSeleccionada === opcion.valor }"
+              @click="seleccionarSubcategoriaMovil(opcion.valor)">
               {{ opcion.texto }}
             </button>
           </div>
         </div>
+      </div>
+
+      <div class="mobile-filters-footer">
+        <button v-if="subcategoriaSeleccionada" class="mobile-filters-limpiar" @click="seleccionarSubcategoria('')">
+          Quitar filtro
+        </button>
+        <button class="mobile-filters-ver" @click="cerrarFiltrosMoviles">
+          Ver {{ productosFiltrados.length }}
+          {{ productosFiltrados.length === 1 ? 'producto' : 'productos' }}
+        </button>
       </div>
     </div>
 
@@ -461,6 +489,26 @@ export default {
 
   computed: {
 
+    // Texto del filtro puesto ahora mismo, para la pastilla del boton de
+    // filtros en movil.
+    textoFiltroActivo() {
+      if (!this.subcategoriaSeleccionada) return 'Todos';
+      for (const categoria of this.categorias) {
+        const opcion = categoria.opciones.find(o => o.valor === this.subcategoriaSeleccionada);
+        if (opcion) return opcion.texto;
+      }
+      return this.subcategoriaSeleccionada;
+    },
+
+    // Indice de la categoria que contiene el filtro activo: marca con un punto
+    // que categoria esta filtrando aunque este plegada.
+    categoriaDelFiltroActivo() {
+      if (!this.subcategoriaSeleccionada) return null;
+      const i = this.categorias.findIndex(c =>
+        c.opciones.some(o => o.valor === this.subcategoriaSeleccionada));
+      return i === -1 ? null : i;
+    },
+
     paginatedProducts() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
@@ -471,6 +519,26 @@ export default {
 
     toggleMobileCategory(index) {
       this.mobileCategoryOpen = this.mobileCategoryOpen === index ? null : index;
+    },
+
+    abrirFiltrosMoviles() {
+      this.showMobileFilters = true;
+      // Abre de una vez la categoria del filtro puesto, para ver donde esta.
+      if (this.categoriaDelFiltroActivo !== null) {
+        this.mobileCategoryOpen = this.categoriaDelFiltroActivo;
+      }
+      document.body.style.overflow = 'hidden';
+    },
+
+    cerrarFiltrosMoviles() {
+      this.showMobileFilters = false;
+      document.body.style.overflow = '';
+    },
+
+    // Elegir una categoria filtra y cierra el menu.
+    seleccionarSubcategoriaMovil(subcategoria) {
+      this.seleccionarSubcategoria(subcategoria);
+      this.cerrarFiltrosMoviles();
     },
 
     // Mantenemos el método existente para seleccionar subcategoría
@@ -880,187 +948,334 @@ export default {
 
 
 
-/* ==================== FILTROS MÓVILES ==================== */
+/* ==================== FILTROS MÓVILES ====================
+   Rediseño: los colores salen de --accent (el cyan de la tienda, ver
+   _variables.scss) en vez del azul marino #2a4d69 que estaba escrito a mano y
+   no pegaba con el resto de la seccion. El panel se abre sobre un fondo
+   translucido, las subcategorias son pastillas y el pie tiene el boton de
+   "ver resultados", asi que ya no hace falta cerrar a ciegas. */
 .mobile-filter-btn {
   display: none;
-  background: #2a4d69;
-  color: white;
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  margin: 15px auto;
-  width: 90%;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-  font-size: 1.1rem;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 32px);
+  margin: 18px auto;
+  padding: 13px 18px;
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--accent), white 12%) 0%,
+      var(--accent) 100%);
+  color: #fff;
   border: none;
-  transition: all 0.3s ease;
+  border-radius: var(--radius-pill);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent), transparent 65%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.mobile-filter-btn:hover {
-  background: #3a6d99;
-  transform: translateY(-2px);
+.mobile-filter-btn:active {
+  transform: scale(0.99);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--accent), transparent 70%);
 }
 
-.mobile-filter-btn i {
-  margin-right: 10px;
-  font-size: 1.2rem;
+.mobile-filter-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 0.95rem;
 }
 
+.mobile-filter-btn__text {
+  flex: 1;
+  text-align: left;
+}
+
+/* Pastilla con el filtro puesto ahora mismo. */
+.mobile-filter-btn__badge {
+  max-width: 55%;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* z-index por encima del boton de hamburguesa del navbar, que tiene 1001:
+   con un valor menor las tres rayas se quedaban pintadas ENCIMA del panel. */
+.mobile-filters-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 27, 0.5);
+  z-index: 1100;
+}
+
+.filtros-fade-enter-active,
+.filtros-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.filtros-fade-enter-from,
+.filtros-fade-leave-to {
+  opacity: 0;
+}
+
+/* Ventana centrada en la pantalla, no pegada al borde derecho. El ancho deja
+   16px de aire a cada lado y el alto nunca pasa del 82% de la pantalla, asi
+   que el panel no choca con los bordes ni con el navbar. */
 .mobile-filters-menu {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: white;
-  z-index: 1000;
-  padding: 25px 20px;
-  overflow-y: auto;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-  transform: translateX(100%);
-  transition: transform 0.4s ease;
+  top: 50%;
+  left: 50%;
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(82vh, calc(100dvh - 40px));
+  background: var(--surface);
+  z-index: 1101;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  flex-direction: column;
 }
 
 .mobile-filters-menu.active {
-  display: block;
-  transform: translateX(0);
+  display: flex;
+  animation: filtrosIn 0.26s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes filtrosIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .mobile-filters-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #f0f0f0;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--accent), transparent 92%) 0%,
+      transparent 100%);
 }
 
 .mobile-filters-header h3 {
-  font-size: 1.6rem;
-  color: #2a4d69;
+  margin: 0;
+  font-size: 1.25rem;
   font-weight: 700;
+  color: var(--text-primary);
 }
 
+.mobile-filters-sub {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Boton de cerrar discreto: antes era un circulo rojo de "peligro" y encima
+   pintaba el icono X y la letra X, asi que se veia la equis dos veces. */
 .close-mobile-filters {
-  background: #e74c3c;
-  color: white;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
   border: none;
-  width: 40px;
-  height: 40px;
   border-radius: 50%;
+  background: var(--gray-100);
+  color: var(--text-muted);
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.close-mobile-filters:hover {
-  background: #c0392b;
-  transform: scale(1.1);
-}
-
-.close-mobile-filters i {
-  font-size: 1.3rem;
+.close-mobile-filters:hover,
+.close-mobile-filters:focus-visible {
+  background: color-mix(in srgb, var(--accent), transparent 85%);
+  color: var(--accent-strong);
 }
 
 .mobile-filters-content {
-  padding: 10px 5px;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
 }
 
 .mobile-filter-option {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   text-align: left;
-  background: #f8f9fa;
-  border: none;
-  border-radius: 8px;
-  padding: 14px 20px;
-  margin-bottom: 12px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #2a4d69;
+  background: var(--gray-50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 13px 16px;
+  margin-bottom: 14px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.mobile-filter-option:hover {
-  background: #e3f2fd;
-  transform: translateX(5px);
+.mobile-filter-option i {
+  color: var(--accent);
+}
+
+.mobile-filter-option.active {
+  background: var(--accent);
+  border-color: transparent;
+  color: #fff;
+}
+
+.mobile-filter-option.active i {
+  color: #fff;
 }
 
 .mobile-category {
-  margin-bottom: 15px;
-  border-radius: 8px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+}
+
+.mobile-category.abierta {
+  border-color: color-mix(in srgb, var(--accent), transparent 60%);
 }
 
 .mobile-category-header {
-  padding: 16px 20px;
-  font-weight: 600;
-  background: #2a4d69;
-  color: white;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 0.98rem;
+  font-weight: 600;
+  text-align: left;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.mobile-category-header:hover {
-  background: #3a6d99;
+.mobile-category.abierta .mobile-category-header {
+  background: color-mix(in srgb, var(--accent), transparent 92%);
+  color: var(--accent-strong);
+}
+
+.mobile-category-nombre {
+  flex: 1;
+}
+
+/* Punto que marca la categoria del filtro puesto, aunque este plegada. */
+.mobile-category-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .mobile-category-header i {
+  color: var(--accent);
+  font-size: 0.85rem;
   transition: transform 0.3s ease;
 }
 
+.mobile-category.abierta .mobile-category-header i {
+  transform: rotate(180deg);
+}
+
+/* Subcategorias como pastillas: se ven mejor y caben varias por fila. */
 .mobile-subcategories {
-  background: white;
-  padding: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 14px 16px;
+  background: var(--surface);
 }
 
 .mobile-subcategories button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 14px 25px;
-  border: none;
-  background: none;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--gray-50);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 1rem;
-  color: #333;
-  transition: all 0.2s ease;
-  position: relative;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .mobile-subcategories button:hover {
-  background: #f0f7ff;
-  color: #2a4d69;
+  border-color: var(--accent);
+  color: var(--accent-strong);
 }
 
-.mobile-subcategories button:before {
-  content: "";
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
-  background: #2a4d69;
-  border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+.mobile-subcategories button.active {
+  background: var(--accent);
+  border-color: transparent;
+  color: #fff;
 }
 
-.mobile-subcategories button:hover:before {
-  opacity: 1;
+.mobile-filters-footer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.mobile-filters-limpiar {
+  flex: 0 0 auto;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mobile-filters-limpiar:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.mobile-filters-ver {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--accent), white 12%) 0%,
+      var(--accent) 100%);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* Animación para el icono de flecha */
@@ -1075,41 +1290,14 @@ export default {
   }
 
   .mobile-filter-btn {
+    display: flex;
+  }
+
+  .mobile-filters-overlay {
     display: block;
   }
 }
 
-/* Ajustes para diferentes resoluciones */
-@media (max-width: 480px) {
-  .mobile-filters-menu {
-    padding: 20px 15px;
-  }
-
-  .mobile-filters-header h3 {
-    font-size: 1.4rem;
-  }
-
-  .mobile-filter-option {
-    padding: 12px 15px;
-    font-size: 1rem;
-  }
-
-  .mobile-category-header {
-    padding: 14px 15px;
-    font-size: 1.1rem;
-  }
-
-  .mobile-subcategories button {
-    padding: 12px 20px;
-    font-size: 0.95rem;
-  }
-}
-
-@media (min-width: 481px) and (max-width: 720px) {
-  .mobile-filters-menu {
-    padding: 25px;
-  }
-}
 
 
 @media (max-width: 768px) {
@@ -1118,7 +1306,7 @@ export default {
   }
 
   .mobile-filter-btn {
-    display: block;
+    display: flex;
   }
 }
 

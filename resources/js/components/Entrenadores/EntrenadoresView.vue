@@ -145,7 +145,7 @@
                     :aria-pressed="deporteActivo === dep.valor">
                     <i :class="dep.icono" aria-hidden="true"></i>
                     <span>{{ dep.valor }}</span>
-                    <span class="filter-count">{{ dep.total }}</span>
+                    <span v-if="entrenadores.length" class="filter-count">{{ dep.total }}</span>
                 </button>
             </div>
 
@@ -498,7 +498,10 @@ export default {
                     ...d,
                     total: d.valor === "Todos" ? this.entrenadores.length : totales[d.valor] || 0,
                 }))
-                .filter((d) => d.valor === "Todos" || d.total > 0 || d.valor === this.deporteActivo);
+                // Mientras la lista esta vacia (cargando o si fallo la
+                // peticion) se muestran todos, para que no quede solo "Todos".
+                .filter((d) => d.valor === "Todos" || d.total > 0 || d.valor === this.deporteActivo
+                    || this.entrenadores.length === 0);
         },
 
         entrenadoresFiltrados() {
@@ -867,7 +870,7 @@ export default {
         }
 
         const cachedEntrenadores = this.$store.getters.sectionCache("entrenadores");
-        if (cachedEntrenadores) {
+        if (Array.isArray(cachedEntrenadores) && cachedEntrenadores.length > 0) {
             this.entrenadores = cachedEntrenadores;
         } else {
             this.cargarEntrenadores();

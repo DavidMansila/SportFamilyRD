@@ -631,6 +631,7 @@ import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import HomeModal from './HomeModal.vue';
 import Alert from '../Alert.vue';
+import { mapSport, cacheDeportesValido } from '../../utils/sports';
 
 // Supabase NO se importa aqui a proposito. El cliente pesa ~220 KB (57 KB
 // gzip) y con el import estatico entraba dentro del chunk del Home, asi que
@@ -1080,29 +1081,14 @@ export default {
     // DirectorioView, asi que navegar Home -> Directorio no vuelve a pedirlo.
     async fetchSports() {
       const cached = this.$store.getters.sectionCache('directorio');
-      if (Array.isArray(cached) && cached.length > 0) {
+      if (cacheDeportesValido(cached)) {
         this.sports = cached;
         return;
       }
 
       try {
         const { data } = await axios.get('/sports');
-        this.sports = (data.sports || []).map(sport => ({
-          id: sport.id,
-          name: sport.name,
-          region: sport.region,
-          type: sport.type,
-          popularity: sport.popularity,
-          // En la base de datos las rutas vienen sin "/" inicial: sin
-          // normalizar, el navegador las resolveria relativas a la ruta actual.
-          image: String(sport.image || '').startsWith('http') || String(sport.image || '').startsWith('/')
-            ? sport.image
-            : `/${sport.image}`,
-          shortDescription: sport.short_description ?? sport.shortDescription,
-          description: sport.description,
-          requirements: sport.requirements || [],
-          places: sport.places || [],
-        }));
+        this.sports = (data.sports || []).map(mapSport);
         this.$store.dispatch('cacheSection', { key: 'directorio', data: this.sports });
       } catch (error) {
         console.error('Error al cargar el directorio de deportes:', error);
