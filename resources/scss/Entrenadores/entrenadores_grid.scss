@@ -13,16 +13,18 @@
     margin-top: 3rem;
 }
 
-/* Tarjeta de Entrenador - Diseño Glassmorphism */
+/* Tarjeta de Entrenador */
+/* Sin backdrop-filter: detras de las tarjetas solo hay el fondo liso de la
+   pagina, asi que el blur no cambiaba nada visualmente, pero creaba una capa
+   de composicion con blur por tarjeta y hacia pesada la primera pintura. */
 .entrenador-card {
     background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05),
         inset 0 0 0 1px rgba(255, 255, 255, 0.3);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1),
+        box-shadow 0.4s ease, background-color 0.4s ease;
     cursor: pointer;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.2);

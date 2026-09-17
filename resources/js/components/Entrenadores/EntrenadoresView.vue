@@ -122,17 +122,44 @@
         </div>
 
         <!-- Filtros y Búsqueda -->
+        <!-- Misma estructura que el buscador de Deportes (DirectorioView), con el
+             color de la seccion de entrenadores (--accent). -->
         <div class="controls-section">
             <div class="search-container">
-                <input type="text" placeholder="Buscar entrenadores..." v-model="busqueda" />
+                <label for="buscador-entrenador" class="visually-hidden">Buscar entrenador</label>
+                <input id="buscador-entrenador" type="search" v-model="busqueda"
+                    placeholder="Buscar entrenador, deporte o especialidad..." class="search-input"
+                    autocomplete="off" />
+                <button v-if="busqueda" class="search-clear" type="button" @click="busqueda = ''"
+                    aria-label="Borrar búsqueda">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <span class="search-icon" aria-hidden="true">
+                    <i class="fas fa-search"></i>
+                </span>
             </div>
 
-            <div class="filter-tabs">
-                <button v-for="deporte in deportes" :key="deporte" @click="filtrarPorDeporte(deporte)"
-                    :class="{ active: deporteActivo === deporte }">
-                    {{ deporte }}
+            <div class="filter-tabs" role="group" aria-label="Filtrar por deporte">
+                <button v-for="dep in deportesConTotal" :key="dep.valor" type="button"
+                    @click="filtrarPorDeporte(dep.valor)" :class="{ active: deporteActivo === dep.valor }"
+                    :aria-pressed="deporteActivo === dep.valor">
+                    <i :class="dep.icono" aria-hidden="true"></i>
+                    <span>{{ dep.valor }}</span>
+                    <span class="filter-count">{{ dep.total }}</span>
                 </button>
             </div>
+
+            <p class="results-summary" aria-live="polite">
+                <template v-if="entrenadoresFiltrados.length">
+                    {{ entrenadoresFiltrados.length }}
+                    {{ entrenadoresFiltrados.length === 1 ? 'entrenador' : 'entrenadores' }}
+                    <template v-if="deporteActivo !== 'Todos'"> en {{ deporteActivo }}</template>
+                    <template v-if="busqueda"> para “{{ busqueda }}”</template>
+                </template>
+                <template v-else-if="entrenadores.length">
+                    No hay entrenadores que coincidan con tu búsqueda.
+                </template>
+            </p>
         </div>
 
         <!-- Lista de Entrenadores -->
@@ -193,7 +220,7 @@
 
                     <div class="modal-header">
                         <div class="profile-image">
-                            <img :src="entrenadorSeleccionado.foto" :alt="entrenadorSeleccionado.nombre" />
+                            <img :src="entrenadorSeleccionado.foto" :alt="entrenadorSeleccionado.nombre" decoding="async" />
                         </div>
                         <div class="profile-info">
                             <h2>{{ entrenadorSeleccionado.user ? entrenadorSeleccionado.user.name :
@@ -261,32 +288,16 @@ logro, index
                                 🗓️ Horario Disponible
                             </h3>
                             <div class="horario-grid">
-                                <div v-for="(diaAbrev, index) in [
-                                    'Lun',
-                                    'Mar',
-                                    'Mié',
-                                    'Jue',
-                                    'Vie',
-                                    'Sáb',
-                                    'Dom',
-                                ]" :key="index" class="horario-dia" :class="{
-                                    disponible: isDisponible(diaAbrev),
-                                    noDisponible: !isDisponible(diaAbrev),
+                                <div v-for="dia in horarioSemana" :key="dia.abrev" class="horario-dia" :class="{
+                                    disponible: dia.disponible,
+                                    noDisponible: !dia.disponible,
                                 }">
-                                    <span class="dia-nombre">{{
-                                        diaAbrev
-                                    }}</span>
+                                    <span class="dia-nombre">{{ dia.abrev }}</span>
                                     <span class="estado-icono">
-                                        <template v-if="isDisponible(diaAbrev)">
+                                        <template v-if="dia.disponible">
                                             ✅ Disponible
                                             <br />
-                                            <small>{{
-                                                getHorario(diaAbrev).desde
-                                            }}
-                                                -
-                                                {{
-                                                    getHorario(diaAbrev).hasta
-                                                }}</small>
+                                            <small>{{ dia.desde }} - {{ dia.hasta }}</small>
                                         </template>
                                         <template v-else>
                                             ❌ No Disponible
@@ -406,7 +417,12 @@ logro, index
         </transition>
 
         <!-- Burbuja de Mensajes Flotante -->
-        <ChatBubbleComponent v-if="user && !entrenadorSeleccionado && !mostrarFormularioContacto" :user="user" />
+        <!-- v-show y no v-if: con v-if el componente se destruia y se volvia a
+             crear cada vez que se abria o cerraba un modal, repitiendo el
+             GET /chats y la (des)suscripcion al canal de Echo en cada clic. -->
+        <div v-if="user" v-show="!hayModalAbierto">
+            <ChatBubbleComponent :user="user" />
+        </div>
     </div>
 
     <Alert v-if="openModal" :key="alertKey" :message="alertMessage" :type="alertType" @closed="openModal = null" />
@@ -434,7 +450,6 @@ export default {
             alertType: "", // 'error', 'success', 'alert'.
             alertKey: 0,
             user: null,
-            scrollPosition: 0,
             busqueda: "",
             deporteActivo: "Todos",
             dias: [
@@ -446,15 +461,17 @@ export default {
                 "Sábado",
                 "Domingo",
             ],
+            // Mismos valores que el enum sport_category de la tabla trainer.
+            // Iconos de Font Awesome 6 (ya cargado en app.blade.php).
             deportes: [
-                "Todos",
-                "Fútbol",
-                "Tenis",
-                "Baloncesto",
-                "Natación",
-                "Ciclismo",
-                "Atletismo",
-                "Artes Marciales",
+                { valor: "Todos", icono: "fas fa-table-cells-large" },
+                { valor: "Fútbol", icono: "fas fa-futbol" },
+                { valor: "Tenis", icono: "fas fa-table-tennis-paddle-ball" },
+                { valor: "Baloncesto", icono: "fas fa-basketball" },
+                { valor: "Natación", icono: "fas fa-person-swimming" },
+                { valor: "Ciclismo", icono: "fas fa-person-biking" },
+                { valor: "Atletismo", icono: "fas fa-person-running" },
+                { valor: "Artes Marciales", icono: "fas fa-hand-fist" },
             ],
             entrenadorSeleccionado: null,
             mostrarFormularioContacto: false,
@@ -469,6 +486,21 @@ export default {
         };
     },
     computed: {
+        // Cuantos entrenadores hay por deporte. Como en Deportes, un deporte
+        // sin entrenadores no se pinta (salvo que sea el filtro activo).
+        deportesConTotal() {
+            const totales = {};
+            for (const e of this.entrenadores) {
+                totales[e.deporte] = (totales[e.deporte] || 0) + 1;
+            }
+            return this.deportes
+                .map((d) => ({
+                    ...d,
+                    total: d.valor === "Todos" ? this.entrenadores.length : totales[d.valor] || 0,
+                }))
+                .filter((d) => d.valor === "Todos" || d.total > 0 || d.valor === this.deporteActivo);
+        },
+
         entrenadoresFiltrados() {
             let filtrados = this.entrenadores;
 
@@ -496,6 +528,19 @@ export default {
             const end = start + this.itemsPerPage;
             return this.entrenadoresFiltrados.slice(start, end);
         },
+
+        // Se calcula una vez por entrenador abierto. Antes el template llamaba
+        // isDisponible()/getHorario() hasta 4 veces por dia en cada render.
+        horarioSemana() {
+            return ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((abrev) => {
+                const { desde, hasta } = this.getHorario(abrev);
+                return { abrev, disponible: this.isDisponible(abrev), desde, hasta };
+            });
+        },
+
+        hayModalAbierto() {
+            return !!this.entrenadorSeleccionado || this.mostrarFormularioContacto;
+        },
     },
 
     methods: {
@@ -512,34 +557,29 @@ export default {
             this.currentPage = 1;
         },
 
+        // Bloqueo de scroll mientras hay un modal abierto. Antes se hacia con
+        // body { position: fixed; top: -Npx } + window.scrollTo al cerrar, lo
+        // que obligaba a recalcular el layout de toda la pagina al abrir y al
+        // cerrar. overflow:hidden deja el scroll donde esta; el padding-right
+        // compensa el ancho de la barra de scroll para que el grid no salte.
+        bloquearScroll(bloquear) {
+            const body = document.body;
+            if (bloquear) {
+                const anchoBarra = window.innerWidth - document.documentElement.clientWidth;
+                body.style.overflow = "hidden";
+                if (anchoBarra > 0) body.style.paddingRight = `${anchoBarra}px`;
+            } else {
+                body.style.overflow = "";
+                body.style.paddingRight = "";
+            }
+        },
+
         verPerfil(entrenador) {
-            // Guardar posición actual del scroll antes de abrir el modal
-            this.scrollPosition =
-                window.pageYOffset || document.documentElement.scrollTop;
-
-            // Deshabilitar scroll del body
-            document.body.style.overflow = "hidden";
-            document.body.style.position = "fixed";
-            document.body.style.top = `-${this.scrollPosition}px`;
-            document.body.style.width = "100%";
-
             this.entrenadorSeleccionado = entrenador;
         },
 
         cerrarPerfil() {
-            try {
-                // Habilitar scroll del body
-                document.body.style.overflow = "auto";
-                document.body.style.position = "";
-                document.body.style.top = "";
-                document.body.style.width = "";
-
-                // Restaurar posición del scroll
-                window.scrollTo(0, this.scrollPosition);
-            } finally {
-                document.body.style.overflow = "auto";
-                this.entrenadorSeleccionado = null;
-            }
+            this.entrenadorSeleccionado = null;
         },
 
         contactarEntrenador(entrenador) {
@@ -549,36 +589,14 @@ export default {
                 nombre: entrenador.nombre,
             };
             this.mostrarFormularioContacto = true;
-
-            // Guardar posición actual del scroll antes de abrir el modal
-            this.scrollPosition =
-                window.pageYOffset || document.documentElement.scrollTop;
-
-            // Deshabilitar scroll del body
-            document.body.style.overflow = "hidden";
-            document.body.style.position = "fixed";
-            document.body.style.top = `-${this.scrollPosition}px`;
-            document.body.style.width = "100%";
         },
 
         cerrarFormularioContacto() {
-            try {
-                // Habilitar scroll del body
-                document.body.style.overflow = "auto";
-                document.body.style.position = "";
-                document.body.style.top = "";
-                document.body.style.width = "";
-
-                // Restaurar posición del scroll
-                window.scrollTo(0, this.scrollPosition);
-            } finally {
-                this.mostrarFormularioContacto = false;
-                this.formularioContacto = {
-                    edad: "",
-                    nivel: "",
-                    objetivos: "",
-                };
-            }
+            this.mostrarFormularioContacto = false;
+            this.formularioContacto = {
+                nivel: "",
+                objetivos: "",
+            };
         },
 
         async enviarFormularioContacto() {
@@ -826,6 +844,17 @@ export default {
         busqueda() {
             this.currentPage = 1;
         },
+        // Un solo punto decide el bloqueo: el formulario de contacto se puede
+        // abrir desde el perfil, y cerrar uno no debe liberar el scroll si el
+        // otro sigue abierto.
+        hayModalAbierto(abierto) {
+            this.bloquearScroll(abierto);
+        },
+    },
+    beforeUnmount() {
+        // Si se navega a otra seccion con un modal abierto, no dejar la
+        // pagina siguiente sin scroll.
+        this.bloquearScroll(false);
     },
     mounted() {
 
@@ -1089,7 +1118,9 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070') no-repeat center center/cover;
+    /* Se muestra al 10% de opacidad: no hace falta la foto de 2070px a q=80,
+       que era una descarga y decodificacion pesada en la primera visita. */
+    background: url('https://images.unsplash.com/photo-1518611012118-696072aa579a?q=60&w=1200&auto=format') no-repeat center center/cover;
     opacity: 0.1;
     z-index: -1;
 }
