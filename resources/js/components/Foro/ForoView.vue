@@ -21,40 +21,49 @@
 
 
     <!-- Filtros y búsqueda -->
+    <!-- Misma estructura que el buscador de Deportes y Entrenadores, con el
+         color de la seccion del foro (--accent). -->
     <div class="filtros-container">
       <div class="search-bar">
-        <input type="text" v-model="terminoBusqueda" @input="filtrarPosts" placeholder="Buscar en el foro..."
-          class="search-input">
-        <button class="search-btn" @click="filtrarPosts">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
+        <label for="buscador-foro" class="visually-hidden">Buscar en el foro</label>
+        <input id="buscador-foro" type="search" v-model="terminoBusqueda" @input="filtrarPosts"
+          placeholder="Buscar publicaciones por título o contenido..." class="search-input" autocomplete="off">
+        <button v-if="terminoBusqueda" class="search-clear" type="button" @click="limpiarBusqueda"
+          aria-label="Borrar búsqueda">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <span class="search-icon" aria-hidden="true">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+
+      <!-- En el telefono solo se ven las primeras categorias (las demas llevan
+           'categoria-extra' y el CSS las oculta) hasta pulsar "Ver más". -->
+      <div class="filtros-categorias" :class="{ expandida: categoriasExpandidas }" role="group"
+        aria-label="Filtrar por categoría">
+        <button v-for="(cat, i) in categoriasConTotal" :key="cat.valor" type="button" class="filtro-btn"
+          @click="cambiarCategoria(cat.valor)"
+          :class="{ active: categoriaSeleccionada === cat.valor, 'categoria-extra': i >= CATEGORIAS_VISIBLES_MOVIL }"
+          :aria-pressed="categoriaSeleccionada === cat.valor">
+          <i :class="cat.icono" aria-hidden="true"></i>
+          <span>{{ cat.etiqueta }}</span>
+          <span class="filter-count">{{ cat.total }}</span>
+        </button>
+        <button type="button" class="ver-mas-categorias" @click="categoriasExpandidas = !categoriasExpandidas"
+          :aria-expanded="categoriasExpandidas">
+          <i :class="categoriasExpandidas ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" aria-hidden="true"></i>
+          {{ categoriasExpandidas ? 'Ver menos' : `Ver más (${categoriasConTotal.length - CATEGORIAS_VISIBLES_MOVIL})` }}
         </button>
       </div>
 
-      <div class="filtros-categorias">
-        <button @click="cambiarCategoria('')" :class="{ active: categoriaSeleccionada === '' }" class="filtro-btn">
-          Todos
-        </button>
-        <button @click="cambiarCategoria('🏅 Deporte')" :class="{ active: categoriaSeleccionada === '🏅 Deporte' }"
-          class="filtro-btn">
-          🏅 Deporte
-        </button>
-        <button @click="cambiarCategoria('🏋️ Gimnasio y Fitness')"
-          :class="{ active: categoriaSeleccionada === '🏋️ Gimnasio y Fitness' }" class="filtro-btn">
-          🏋️ Gimnasio y Fitness
-        </button>
-        <button @click="cambiarCategoria('📍 Lugares y Centros')"
-          :class="{ active: categoriaSeleccionada === '📍 Lugares y Centros' }" class="filtro-btn">
-          📍 Lugares y Centros
-        </button>
-        <button @click="cambiarCategoria('🧠 Consejos y Bienestar')"
-          :class="{ active: categoriaSeleccionada === '🧠 Consejos y Bienestar' }" class="filtro-btn">
-          🧠 Consejos y Bienestar
-        </button>
-      </div>
+      <p class="results-summary" aria-live="polite">
+        <template v-if="postsFiltrados.length">
+          {{ postsFiltrados.length }}
+          {{ postsFiltrados.length === 1 ? 'publicación' : 'publicaciones' }}
+          <template v-if="categoriaSeleccionada"> en {{ etiquetaCategoria(categoriaSeleccionada) }}</template>
+          <template v-if="terminoBusqueda"> para “{{ terminoBusqueda }}”</template>
+        </template>
+      </p>
     </div>
 
 
@@ -501,10 +510,7 @@
                 <label for="categoria">Categoría</label>
                 <select v-model="nuevoPost.categoria" id="categoria" required>
                   <option value="">Selecciona una categoría</option>
-                  <option value="🏅 Deporte">🏅 Deporte</option>
-                  <option value="🏋️ Gimnasio y Fitness">🏋️ Gimnasio y Fitness</option>
-                  <option value="📍 Lugares y Centros">📍 Lugares y Centros</option>
-                  <option value="🧠 Consejos y Bienestar">🧠 Consejos y Bienestar</option>
+                  <option v-for="cat in categoriasForo" :key="cat.valor" :value="cat.valor">{{ cat.valor }}</option>
                 </select>
               </div>
             </div>
@@ -577,6 +583,28 @@ import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
 
+// Unica lista de categorias del foro: alimenta los botones de filtro, el
+// <select> del formulario de crear/editar post y el color de la etiqueta de
+// cada post. 'valor' es el texto EXACTO que se guarda en posts.categoria, asi
+// que las cuatro primeras no se pueden renombrar sin migrar los posts que ya
+// existen (y ForoSeeder::CATEGORIAS). El backend solo valida string|max:50.
+// 'icono' es de Font Awesome 6 (cargado en app.blade.php).
+const CATEGORIAS_FORO = [
+  { valor: '🏅 Deporte', etiqueta: 'Deporte', icono: 'fas fa-medal', color: '#007bff' },
+  { valor: '🏋️ Gimnasio y Fitness', etiqueta: 'Gimnasio y Fitness', icono: 'fas fa-dumbbell', color: '#6f42c1' },
+  { valor: '📍 Lugares y Centros', etiqueta: 'Lugares y Centros', icono: 'fas fa-location-dot', color: '#fd7e14' },
+  { valor: '🧠 Consejos y Bienestar', etiqueta: 'Consejos y Bienestar', icono: 'fas fa-brain', color: '#20c997' },
+  { valor: '🥗 Nutrición', etiqueta: 'Nutrición', icono: 'fas fa-apple-whole', color: '#28a745' },
+  { valor: '🏃 Running y Atletismo', etiqueta: 'Running y Atletismo', icono: 'fas fa-person-running', color: '#e83e8c' },
+  { valor: '🚴 Ciclismo', etiqueta: 'Ciclismo', icono: 'fas fa-person-biking', color: '#17a2b8' },
+  { valor: '🏆 Competencias y Eventos', etiqueta: 'Competencias y Eventos', icono: 'fas fa-trophy', color: '#d4a106' },
+  { valor: '🩹 Lesiones y Recuperación', etiqueta: 'Lesiones y Recuperación', icono: 'fas fa-kit-medical', color: '#dc3545' },
+  { valor: '🎽 Equipamiento', etiqueta: 'Equipamiento', icono: 'fas fa-shirt', color: '#795548' },
+  { valor: '🤝 Busco Compañeros', etiqueta: 'Busco Compañeros', icono: 'fas fa-user-group', color: '#5c6bc0' },
+  { valor: '📸 Logros y Progreso', etiqueta: 'Logros y Progreso', icono: 'fas fa-chart-line', color: '#ff5722' },
+  { valor: '💬 General', etiqueta: 'General', icono: 'fas fa-comments', color: '#6c757d' },
+];
+
 export default {
   name: 'ForoComponent',
   components: {
@@ -603,6 +631,11 @@ export default {
       posts: [],
       postsFiltrados: [],
       categoriaSeleccionada: '',
+      categoriasForo: CATEGORIAS_FORO,
+      // Cuantas pastillas (contando "Todas") se ven en el telefono antes de
+      // pulsar "Ver más".
+      CATEGORIAS_VISIBLES_MOVIL: 6,
+      categoriasExpandidas: false,
       terminoBusqueda: '',
       mostrarModal: false,
       nuevoPost: {
@@ -633,6 +666,20 @@ export default {
   },
 
   computed: {
+
+    // Botones de filtro con cuantos posts hay en cada categoria. A diferencia
+    // de Deportes, las categorias vacias SI se muestran: son las nuevas y
+    // sirven para invitar a publicar en ellas.
+    categoriasConTotal() {
+      const totales = {};
+      for (const post of this.posts) {
+        totales[post.categoria] = (totales[post.categoria] || 0) + 1;
+      }
+      return [
+        { valor: '', etiqueta: 'Todas', icono: 'fas fa-table-cells-large', total: this.posts.length },
+        ...CATEGORIAS_FORO.map(c => ({ ...c, total: totales[c.valor] || 0 })),
+      ];
+    },
 
     postsPaginados() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
@@ -1456,14 +1503,17 @@ export default {
       this.filtrarPosts();
     },
 
+    limpiarBusqueda() {
+      this.terminoBusqueda = '';
+      this.filtrarPosts();
+    },
+
+    etiquetaCategoria(valor) {
+      return CATEGORIAS_FORO.find(c => c.valor === valor)?.etiqueta || valor;
+    },
+
     categoryColor(categoria) {
-      const colors = {
-        '🏅 Deporte': '#007bff',
-        '🏋️ Gimnasio y Fitness': '#6f42c1',
-        '📍 Lugares y Centros': '#fd7e14',
-        '🧠 Consejos y Bienestar': '#20c997'
-      };
-      return colors[categoria] || '#adb5bd';
+      return CATEGORIAS_FORO.find(c => c.valor === categoria)?.color || '#adb5bd';
     },
 
     formatDate(dateString) {

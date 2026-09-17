@@ -605,33 +605,34 @@ textarea {
   opacity: 0;
 }
 
-/* Buscador y categorias en pantallas estrechas: igual que en Deportes, la
-   barra de categorias pasa a scroll horizontal en vez de apilarse en varias
-   filas que empujaban el listado muy abajo. */
+/* Buscador y categorias en pantallas estrechas. */
 @media (max-width: 767.98px) {
-    .controls-section {
-        gap: 20px;
-        padding: 0 16px;
-    }
-
+    /* Las categorias se acomodan en varias filas CENTRADAS con pastillas
+       compactas. Antes eran una sola fila con scroll horizontal y en el
+       telefono solo se veian las dos o tres primeras: el resto quedaba
+       escondido fuera de la pantalla sin ninguna pista de que existia. */
     .filter-tabs {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding: 4px 16px 14px;
-        margin: 0 -16px;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .filter-tabs::-webkit-scrollbar {
-        display: none;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
     }
 
     .filter-tabs button {
-        flex: 0 0 auto;
-        padding: 9px 16px;
-        font-size: 0.9rem;
+        gap: 6px;
+        padding: 7px 12px;
+        font-size: 0.82rem;
+        box-shadow: none;
+    }
+
+    .filter-tabs button:hover {
+        transform: none;
+    }
+
+    .filter-tabs button .filter-count {
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        font-size: 0.7rem;
     }
 
     .search-input {
@@ -641,5 +642,12 @@ textarea {
 
     .results-summary {
         font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .filter-tabs button {
+        padding: 6px 10px;
+        font-size: 0.78rem;
     }
 }

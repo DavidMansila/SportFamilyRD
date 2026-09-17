@@ -362,11 +362,6 @@
         gap: 20px;
     }
 
-    .filter-buttons {
-        justify-content: flex-start;
-        overflow-x: auto;
-        padding-bottom: 15px;
-    }
 }
 
 /* Teléfonos grandes - 576px-767px */
@@ -679,9 +674,7 @@
 }
 
 /* ---------- Responsive ----------
-   Los breakpoints siguen los que ya usa este archivo. En pantallas
-   estrechas la barra de categorías pasa a scroll horizontal en vez de
-   apilarse en cuatro filas, que dejaba el listado muy abajo. */
+   Los breakpoints siguen los que ya usa este archivo. */
 
 @media (max-width: 1023.98px) {
     .controls {
@@ -690,25 +683,32 @@
 }
 
 @media (max-width: 767.98px) {
+    /* Las categorias se acomodan en varias filas CENTRADAS con pastillas
+       compactas. Antes eran una sola fila con scroll horizontal y en el
+       telefono solo se veian las dos o tres primeras: el resto quedaba
+       escondido fuera de la pantalla sin ninguna pista de que existia. */
     .filter-buttons {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding: 4px 16px 14px;
-        margin: 0 -16px;
-        /* Oculta la barra de scroll sin perder el gesto de arrastrar. */
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .filter-buttons::-webkit-scrollbar {
-        display: none;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
     }
 
     .filter-buttons button {
-        flex: 0 0 auto;
-        padding: 9px 16px;
-        font-size: 0.9rem;
+        gap: 6px;
+        padding: 7px 12px;
+        font-size: 0.82rem;
+        box-shadow: none;
+    }
+
+    .filter-buttons button:hover {
+        transform: none;
+    }
+
+    .filter-buttons button .filter-count {
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        font-size: 0.7rem;
     }
 
     .search-input {
@@ -721,13 +721,14 @@
     }
 }
 
-@media (max-width: 480px) {
-    .filter-buttons button span:not(.filter-count) {
-        /* En pantallas muy estrechas el icono + el número bastan para
-           reconocer la categoría, y así caben todas sin scroll infinito. */
-        font-size: 0.85rem;
+@media (max-width: 380px) {
+    .filter-buttons button {
+        padding: 6px 10px;
+        font-size: 0.78rem;
     }
+}
 
+@media (max-width: 480px) {
     .sin-resultados {
         padding: 40px 16px;
     }

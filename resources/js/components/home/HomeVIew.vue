@@ -347,10 +347,6 @@
             <span class="contact-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
             <span>info@sportfamilyrd.com</span>
           </a>
-          <a class="contact-item" href="tel:+18498814028">
-            <span class="contact-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 4h-2A1.6 1.6 0 003 5.7C3 13 11 21 18.3 21a1.6 1.6 0 001.7-1.6v-2l-4-1.6-2 2a13 13 0 01-6.8-6.8l2-2L6.6 4z"/></svg></span>
-            <span>(849) 881-4028</span>
-          </a>
           <div class="contact-item contact-item--static">
             <span class="contact-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></span>
             <span>Santo Domingo, República Dominicana</span>
