@@ -61,8 +61,25 @@ if (! function_exists('resolve_user_image')) {
             return;
         }
 
-        $user->image = $user->image
-            ? public_storage_url('users/' . $user->id . '/' . $user->image)
-            : null;
+        if (!$user->image) {
+            $user->image = null;
+
+            return;
+        }
+
+        // Ya resuelta: no se vuelve a prefijar.
+        //
+        // Esta funcion MUTA el modelo, y a la misma instancia de User se la
+        // puede llamar mas de una vez en la misma peticion: en el foro, quien
+        // escribe el post puede ser ademas autor de un comentario o de una
+        // respuesta de ese mismo post, y el recorrido pasa por los tres. El
+        // resultado era una URL con el prefijo repetido
+        // (".../users/61/https://.../users/61/avatar.jpg"), que devuelve 404 y
+        // dejaba el avatar en blanco en el foro.
+        if (Str::startsWith($user->image, ['http://', 'https://', '/'])) {
+            return;
+        }
+
+        $user->image = public_storage_url('users/' . $user->id . '/' . $user->image);
     }
 }

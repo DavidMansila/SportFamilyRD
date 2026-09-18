@@ -629,17 +629,26 @@ export default {
   position: relative;
 }
 
+/* Aviso de "debes iniciar sesion para ver el carrito".
+   Cuelga del boton del carrito, que mide 40 px. Al ser absolute sin ancho
+   propio, el navegador lo ajustaba a esos 40 px y el texto se salia de la
+   caja amarilla hacia la derecha, fuera de la pantalla en el movil.
+   'width: max-content' le da el ancho del texto y el max-width lo corta
+   antes de llegar al borde de la ventana, envolviendo en dos lineas. */
 .auth-alert {
   position: absolute;
   top: 50px;
   right: 0;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 32px));
   background: #fff3cd;
   color: #856404;
   padding: 0.8rem 1.2rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   font-size: 0.9rem;
-  white-space: nowrap;
+  line-height: 1.4;
+  text-align: center;
   z-index: 100;
   border: 1px solid #ffeeba;
 }
@@ -652,6 +661,30 @@ export default {
   border-width: 5px;
   border-style: solid;
   border-color: transparent transparent #fff3cd transparent;
+}
+
+/* En movil el carrito esta hacia el centro de la barra, no pegado a la
+   derecha: anclado por la derecha, el aviso se salia por la izquierda. Se
+   centra bajo el propio icono y la flechita se centra con el. */
+@media (max-width: 768px) {
+  .auth-alert {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 46px;
+    /* 80vw y no 'calc(100vw - 24px)': al ir centrado bajo el icono, y estando
+       este a poco mas del 40% del ancho, un ancho de casi toda la ventana se
+       salia por la izquierda en pantallas de 320 px. 80vw es el maximo que
+       cabe centrado ahi sin tocar ningun borde. */
+    max-width: min(280px, 80vw);
+    font-size: 0.85rem;
+  }
+
+  .auth-alert::before {
+    right: auto;
+    left: 50%;
+    margin-left: -5px;
+  }
 }
 
 .fade-enter-active,

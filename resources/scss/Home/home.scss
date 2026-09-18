@@ -34,14 +34,35 @@
 /* Hero Section */
 .hero-banner {
   position: relative;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)),
+
+  /* El velo era plano (negro al 60% arriba y 40% abajo) y apagaba por igual
+     toda la foto. Ahora va en diagonal: bien oscuro por la izquierda, que es
+     donde la imagen no tiene nada y donde apoya el texto, y mucho mas suave
+     por la derecha, que es donde esta el jugador. Se lee igual de bien y la
+     figura deja de verse lavada. */
+  background-image:
+    linear-gradient(100deg,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.70) 42%,
+      rgba(0, 0, 0, 0.38) 100%),
     url("/imagenes/estadio.jpg");
   background-size: cover;
-  background-position: center;
-  height: 100vh;
-  height: 100dvh; /* alto real en moviles */
-  min-height: 600px;
-  padding: 0 20px;
+
+  /* 'center' recortaba al jugador por la derecha en pantallas anchas, porque
+     la figura no esta centrada en el archivo: esta pegada al borde derecho.
+     El 15% vertical es para las pantallas anchas y bajas (portatiles): ahi el
+     recorte se come el alto, y centrado dejaba al jugador sin cabeza. */
+  background-position: 72% 15%;
+  background-repeat: no-repeat;
+
+  /* La navbar no flota: va en el flujo, justo encima. Con 100dvh a secas el
+     hero terminaba ~100 px por debajo del borde de la pantalla y las cifras
+     quedaban cortadas. 'height: auto' + min-height para que, si el contenido
+     creciera, el hero se estire en vez de recortarlo. */
+  height: auto;
+  min-height: calc(100dvh - 102px);
+  padding: 40px 20px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -76,11 +97,17 @@
 }
 
 .hero-title {
-  font-size: 4rem;
+  /* clamp() en vez de un tamaño fijo: el titulo se adapta solo al ancho y no
+     hace falta corregirlo en cada breakpoint. */
+  font-size: clamp(2.2rem, 5.4vw, 4.2rem);
   font-weight: 800;
-  margin-bottom: 1rem;
-  line-height: 1.2;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1.25rem;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+
+  /* Sombra difusa y sin desplazamiento lateral: separa el texto de la foto
+     sin que se note el relieve, que con 2px marcados parecia un doble texto. */
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 .title-line {
@@ -88,8 +115,10 @@
 }
 
 .highlight {
-  color: #c92e40;
-  text-shadow: 0 0 10px rgba(184, 23, 23, 0.5);
+  /* Un punto mas claro que el rojo de marca: sobre la foto, el #c92e40 se
+     quedaba corto de contraste. */
+  color: #e2384c;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
 }
 
 .hero-subtitle {
@@ -103,27 +132,53 @@
 /* Stats */
 .hero-stats {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 40px;
-  margin-top: 50px;
+  gap: clamp(20px, 4vw, 48px);
+  margin-top: clamp(32px, 5vh, 52px);
 }
 
+/* Una linea fina entre cifra y cifra. Antes solo las separaba el hueco, y
+   con tres numeros sueltos sobre la foto se leian como un bloque. */
 .stat-item {
+  position: relative;
   text-align: center;
+  padding: 0 clamp(10px, 2vw, 24px);
+}
+
+.stat-item + .stat-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.28), transparent);
 }
 
 .stat-number {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 5px;
-  color: #c92e40;
+  font-size: clamp(2rem, 3.2vw, 2.9rem);
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: #e2384c;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  font-variant-numeric: tabular-nums; /* los numeros no bailan al refrescarse */
 }
 
 .stat-label {
-  font-size: 1rem;
-  opacity: 0.8;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.75);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.14em;
+}
+
+.stat-label-foro {
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
 }
 
 /* Scroll Indicator */
@@ -171,59 +226,142 @@
   }
 }
 
-/* Section Styles */
-.section-header {
+/* Section Styles
+   ---------------
+   La cabecera se repite cinco veces en el Home (deportes, noticias, eventos,
+   tienda y comunidad) y es lo que marca el tono de la pagina. La estructura es
+   siempre la misma: etiqueta pequeña, titulo grande y descripcion.
+
+       [ · DEPORTES ]        <- .section-kicker, en el color de la seccion
+     Descubre tu Deporte     <- .section-title
+   Explora mas de 20 ...     <- .section-description
+         Ver todos >         <- .view-all-*, tambien en el color de la seccion
+
+   El color NO esta escrito en cada regla: cada <section> declara --acento y
+   --acento-suave, y la etiqueta y el enlace los heredan. Asi cada seccion
+   mantiene el color que ya tenia (rojo deportes, azul noticias, verde
+   eventos, cian tienda, morado comunidad) sin repetir las reglas cinco veces,
+   y cambiar el color de una seccion es tocar una sola linea. */
+
+/* Deportes usa el naranja del directorio (scss/Directorio/directorio.scss:
+   --dir-acento), que a su vez sale del degradado de su navbar #000 -> #a13300.
+   Antes aqui estaba el rojo del Home, que es el color de otra seccion. */
+.category-section  { --acento: #b86640; --acento-fuerte: #ac4b1f; --acento-suave: rgba(184, 102, 64, 0.12); }
+.news-section      { --acento: #0051a8; --acento-fuerte: #003a78; --acento-suave: rgba(0, 81, 168, 0.10); }
+.events-section    { --acento: #00a816; --acento-fuerte: #00780f; --acento-suave: rgba(0, 168, 22, 0.12); }
+.products-section  { --acento: #008fa8; --acento-fuerte: #006376; --acento-suave: rgba(0, 143, 168, 0.10); }
+.community-section { --acento: #6a11cb; --acento-fuerte: #44008d; --acento-suave: rgba(106, 17, 203, 0.10); }
+
+/* Ritmo vertical comun. Cada seccion traia su propio padding (90, 40, 60,
+   100 px) y .category-section directamente no tenia ninguno: su titulo
+   arrancaba pegado al borde de la foto del hero. */
+.category-section,
+.news-section,
+.events-section,
+.products-section,
+.community-section {
+  padding: clamp(64px, 7vw, 100px) 0;
+}
+
+.section-header,
+.community-header {
   text-align: center;
-  margin-bottom: 50px;
+  max-width: 760px;
+  margin: 0 auto clamp(40px, 4.5vw, 62px);
+  padding: 0 20px;
+}
+
+/* La etiqueta de seccion. Es la pieza nueva: da contexto de un vistazo y es
+   la que lleva el color, asi que el titulo puede quedarse en negro y grande
+   sin que la cabecera se vea sosa. */
+.section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 16px 7px 14px;
+  margin-bottom: 22px;
+  border-radius: 999px;
+  background: var(--acento-suave, rgba(201, 46, 64, 0.10));
+  color: var(--acento, #c92e40);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.section-kicker::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .section-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 15px;
-  position: relative;
-  display: inline-block;
-  margin-top: 25px;
+  /* Mas grande que antes (llegaba a 2.5rem fijo) y con el interletrado
+     cerrado, que es lo que hace que un titular grande se vea compuesto y no
+     solo escalado. */
+  font-size: clamp(2.05rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #14161b; /* negro suavizado: el #000 puro sobre blanco vibra */
+  margin: 0 0 16px;
 }
 
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 3px;
-  background: #000000;
-}
+/* El subrayado negro de 80 px que llevaba el titulo se quito: la etiqueta de
+   arriba ya marca la seccion, y las dos cosas juntas cargaban la cabecera. */
 
 .section-description {
-  font-size: 1.2rem;
-  color: #666;
-  max-width: 700px;
+  font-size: clamp(1rem, 1.2vw, 1.12rem);
+  line-height: 1.65;
+  color: #5b6472;
+  max-width: 580px;
   margin: 0 auto;
 }
 
-.view-all {
-  display: inline-block;
-  margin-top: 15px;
-  color: #c92e40;
+/* 'Ver todos'. Cada seccion conserva su color, heredado de --acento. */
+.view-all,
+.view-all-news,
+.view-all-calendar,
+.view-all-products,
+.view-all-threads {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  color: var(--acento, #c92e40);
+  font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: color 0.25s ease;
 }
 
-.view-all:hover {
-  color: #000000;
+.view-all:hover,
+.view-all-news:hover,
+.view-all-calendar:hover,
+.view-all-products:hover,
+.view-all-threads:hover {
+  color: var(--acento-fuerte, #830d1b);
 }
 
-.view-all i {
-  margin-left: 5px;
-  transition: transform 0.3s ease;
+.view-all i,
+.view-all-news i,
+.view-all-calendar i,
+.view-all-products i,
+.view-all-threads i {
+  margin-left: 0;
+  font-size: 0.8rem;
+  transition: transform 0.25s ease;
 }
 
-.view-all:hover i {
-  transform: translateX(5px);
+.view-all:hover i,
+.view-all-news:hover i,
+.view-all-calendar:hover i,
+.view-all-products:hover i,
+.view-all-threads:hover i {
+  transform: translateX(4px);
 }
 
 
@@ -310,7 +448,7 @@
   position: absolute;
   top: 15px;
   right: 15px;
-  background: #ff4757;
+  background: var(--acento, #b86640);
   color: white;
   padding: 5px 15px;
   border-radius: 20px;
@@ -394,41 +532,13 @@
 
 
 
-.view-all-calendar {
-  display: inline-block;
-  margin-top: 15px;
-  color: #00a816;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-
-
-.view-all-products{
-  display: inline-block;
-  margin-top: 15px;
-  color: #008fa8;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
+/* Los 'Ver todos' de calendario (verde), tienda (cian) y noticias (azul)
+   estaban definidos aqui sueltos. Ahora salen del bloque unico de arriba. */
 
 /* News Section */
 
-.view-all-news {
-  display: inline-block;
-  margin-top: 15px;
-  color: #0051a8;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
 .news-section {
-  padding: 90px 0;
-  background: #f8f9fa;
+  background: #f8f9fa; /* el padding vertical es comun a todas las secciones */
 }
 
 .news-tabs {
@@ -623,7 +733,11 @@
 
 .news-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  /* auto-FIT y no auto-fill: con tres tarjetas, 'auto-fill' dejaba montada
+     una cuarta columna vacia y las tres se quedaban encogidas a la izquierda.
+     'auto-fit' colapsa la columna sobrante y reparte el ancho entre las que
+     de verdad hay. */
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 20px;
 }
 
@@ -752,7 +866,6 @@
 
 /* Events Section */
 .events-section {
-  padding: 40px 0;
   background: #f8f9fa;
 }
 
@@ -1048,7 +1161,6 @@
 
 /* Products Section */
 .products-section {
-  padding: 60px 0;
   background: white;
 }
 
@@ -1177,25 +1289,9 @@
   color: #333;
 }
 
-.product-rating {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 10px;
-}
-
-.stars {
-  color: #ddd;
-}
-
-.stars .filled {
-  color: #ffc107;
-}
-
-.review-count {
-  font-size: 0.8rem;
-  color: #666;
-}
+/* Aqui estaban .product-rating, .stars y .review-count. Se quitaron con las
+   estrellas de las tarjetas de producto: la puntuacion no se recoge en
+   ninguna parte de la app, asi que pintaba siempre cinco estrellas grises. */
 
 .product-pricing {
   display: flex;
@@ -1259,13 +1355,14 @@
 
 /* Community Section */
 .community-section {
-  padding: 100px 0;
   background: #f8f9fa;
 }
 
 .community-header {
   text-align: center;
-  margin-bottom: 50px;
+  max-width: 720px;
+  margin: 0 auto 46px;
+  padding: 0 20px;
 }
 
 .community-grid {
@@ -1282,11 +1379,13 @@
 }
 
 .sub-section-title {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: #333;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 22px;
+  color: #16181d;
   position: relative;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
 }
 
 .sub-section-title::after {
@@ -1294,9 +1393,10 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 50px;
+  width: 40px;
   height: 3px;
-  background: #6a11cb;
+  border-radius: 3px;
+  background: var(--acento, #6a11cb);
 }
 
 .forum-thread {
@@ -1405,27 +1505,7 @@
   color: white;
 }
 
-.view-all-threads {
-  display: inline-block;
-  margin-top: 10px;
-  color: #6a11cb;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.view-all-threads:hover {
-  color: #44008d;
-}
-
-.view-all-threads i {
-  margin-left: 5px;
-  transition: transform 0.3s ease;
-}
-
-.view-all-threads:hover i {
-  transform: translateX(5px);
-}
+/* .view-all-threads (morado) tambien se unifico arriba. */
 
 .member-spotlight {
   background: white;
@@ -2084,9 +2164,7 @@
 
 /* Responsive Styles */
 @media (max-width: 1199.98px) {
-  .hero-title {
-    font-size: 3.5rem;
-  }
+  /* .hero-title ya no se fija por breakpoint: lo resuelve clamp(). */
 
   .community-grid {
     grid-template-columns: 1fr;
@@ -2145,14 +2223,6 @@
     gap: 25px;
   }
 
-  .hero-title {
-    font-size: 2.8rem;
-  }
-
-  .hero-subtitle {
-    font-size: 1.2rem;
-  }
-
   .app-content {
     flex-direction: column;
     text-align: center;
@@ -2197,17 +2267,17 @@
 }
 
 @media (max-width: 575.98px) {
-  .hero-title {
-    font-size: 2.2rem;
-  }
-
   .hero-stats {
-    flex-direction: column;
-    gap: 20px;
+    gap: 6px;
   }
 
-  .section-title {
-    font-size: 2rem;
+  .stat-item {
+    padding: 0 10px;
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
   }
 
   .footer-links {

@@ -467,32 +467,39 @@
                 margin-left: auto;
             }
 
-            .toggle-replies-btn {
-                background: none;
-                border: none;
-                color: #636e72;
-                cursor: pointer;
-                font-size: 12px;
-                padding: 6px 12px;
-                border-radius: 20px;
-                transition: all 0.3s ease;
+        }
 
-                &:hover {
-                    color: #2d3436;
-                    transform: translateY(-1px);
-                }
+        /* "Ver N respuesta(s)" / "Ocultar respuestas".
+           Antes estaba dentro de .comment-header (arriba, junto al nombre) y
+           por eso se estilaba como una pildora suelta. Ahora cuelga debajo del
+           comentario, justo encima de las respuestas que abre, asi que se
+           compone como los demas enlaces de accion: alineado a la izquierda,
+           sin padding lateral, para que empiece en la misma vertical que el
+           texto del comentario. */
+        .toggle-replies-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 2px 0 6px;
+            padding: 4px 0;
+            background: none;
+            border: none;
+            color: #6c5ce7;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.25s ease;
 
-                &.neon-toggle {
-                    color: #a5b1c2;
-                    text-shadow: 0 0 5px rgba(165, 177, 194, 0.3);
-                    border: 1px solid rgba(165, 177, 194, 0.3);
+            &::before {
+                content: "";
+                width: 18px;
+                height: 1px;
+                background: currentColor;
+                opacity: 0.45;
+            }
 
-                    &:hover {
-                        color: #fff;
-                        background: linear-gradient(90deg, #fc5c7d, #6a82fb);
-                        box-shadow: 0 0 10px rgba(106, 130, 251, 0.5);
-                    }
-                }
+            &:hover {
+                color: #4a34c7;
             }
         }
 
@@ -566,8 +573,11 @@
 
 /* ==================== RESPUESTAS A COMENTARIOS ==================== */
 .comment-replies {
-    margin-left: 48px;
-    padding-left: 16px;
+    /* 48px arrastraba la respuesta casi 100px desde el borde: este bloque ya
+       vive dentro de .comment-content, que de por si esta sangrado el ancho
+       del avatar. 20px basta para que se lea como respuesta. */
+    margin-left: 20px;
+    padding-left: 14px;
     border-left: 2px dashed rgba(108, 92, 231, 0.3);
     position: relative;
 
@@ -588,20 +598,15 @@
     .reply-item {
         background: rgba(245, 245, 245, 0.6);
         backdrop-filter: blur(4px);
-        border-radius: 0 12px 12px 12px;
+        border-radius: 12px;
         padding: 12px;
         margin: 8px 0;
         position: relative;
 
-        &::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -8px;
-            width: 8px;
-            height: 16px;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='16' viewBox='0 0 8 16'%3E%3Cpath d='M0 0 L8 8 L0 16' fill='none' stroke='%23ACB6E5' stroke-width='1'/%3E%3C/svg%3E");
-        }
+        /* Aqui habia una flechita en SVG pegada al borde izquierdo de cada
+           respuesta. Apuntaba al bloque cuando este colgaba 48px a la derecha;
+           con la sangria de ahora queda suelta sobre la linea guia, y esa guia
+           ya dice lo mismo. */
     }
 }
 
@@ -1644,69 +1649,68 @@
     }
 
     /* --- 2. Cabecera de una linea ----------------------------------------
-       Era un flex de tres cosas peleando por 390px, y tanto el nombre como la
-       categoria acababan en puntos suspensivos. Con un grid, el avatar ocupa
-       las dos filas y a su derecha van el nombre arriba y la categoria debajo:
-       cabe todo entero y se lee como el "nombre / subtitulo" de Instagram. */
+       Avatar, nombre y categoria en la MISMA fila, como en escritorio.
+
+       Aqui hubo antes un grid de dos filas (nombre arriba, categoria debajo)
+       para que ambos cupieran enteros, pero apilados se leen como dos cosas
+       distintas. En una fila caben si los dos textos pueden encogerse: por eso
+       ninguno lleva un ancho fijo y los dos tienen 'min-width: 0' con recorte
+       por puntos suspensivos. El nombre va primero en el reparto -la categoria
+       tiene un tope del 46%-, asi que en un movil estrecho es la etiqueta la
+       que se recorta, no el nombre de la persona. */
     /* Se anida bajo .post-popout-details a proposito: la regla base que pone
        "display: flex" en este bloque vive como
        ".post-popout-details .post-popout-header .post-author-info" (tres
-       niveles). Escribiendolo con dos niveles, el grid de abajo NO se aplicaba
-       -lo comprobe midiendo: display seguia siendo flex- y el nombre continuaba
-       partiendose. Hay que igualar la especificidad, no bajarla. */
+       niveles). Escribiendolo con dos niveles NO se aplicaria -lo comprobe
+       midiendo-. Hay que igualar la especificidad, no bajarla. */
     .post-popout-details .post-popout-header {
         padding: 0.55rem 0.85rem;
 
         .post-author-info {
-            display: grid;
-            /* minmax(0, 1fr) y no 1fr: con "1fr" la columna nunca baja del
-               min-content de su hijo mas ancho, y la etiqueta de categoria va
-               en una sola linea (~207px). Eso desbordaba la cabecera, el bloque
-               se encogia por el flex del padre y el nombre acababa partido en
-               "Patr / Nun". Con minmax(0, 1fr) la columna si puede encoger: la
-               etiqueta recorta con puntos suspensivos si hace falta y el nombre
-               se queda con la fila entera. */
-            grid-template-columns: auto minmax(0, 1fr);
+            display: flex;
             align-items: center;
-            column-gap: 0.6rem;
-            row-gap: 0.15rem;
+            gap: 0.5rem;
             min-width: 0;
             /* Reclama el ancho libre de la cabecera. Sin esto el bloque se
-               quedaba en su tamaño minimo (ahora que puede encoger) y el nombre
-               salia con puntos suspensivos aunque sobrara sitio al lado. */
+               queda en su tamaño minimo y los textos se recortan aunque sobre
+               sitio al lado. */
             flex: 1;
 
             .author-avatar {
-                grid-row: 1 / span 2;
-                width: 38px;
-                height: 38px;
+                width: 34px;
+                height: 34px;
+                flex-shrink: 0;
             }
 
+            /* El nombre NO encoge (flex-shrink: 0) mientras quepa en el 62%
+               de la cabecera: asi el recorte se lo lleva siempre la etiqueta
+               de categoria, que se entiende igual a medias, y no el nombre de
+               la persona. */
             > div {
-                grid-column: 2;
-                grid-row: 1;
                 min-width: 0;
+                flex: 0 0 auto;
+                max-width: 62%;
             }
 
             .author-name {
                 margin: 0;
-                font-size: 0.92rem;
+                font-size: 0.88rem;
                 line-height: 1.2;
-                /* Tiene la fila entera para el, pero si el nombre es larguisimo
-                   se recorta en una linea en vez de partir la cabecera. */
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
 
             .post-category-badge {
-                grid-column: 2;
-                grid-row: 2;
-                justify-self: start;
-                max-width: 100%;
-                padding: 3px 9px;
-                font-size: 0.6rem;
-                letter-spacing: 0.03em;
+                flex: 0 1 auto;
+                min-width: 0;
+                max-width: 50%;
+                padding: 3px 8px;
+                font-size: 0.52rem;
+                letter-spacing: 0.02em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
         }
     }

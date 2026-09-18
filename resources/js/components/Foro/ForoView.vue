@@ -284,11 +284,6 @@
                         <span class="comment-author">{{ comentario.user?.name || `Usuario${comentario.user_id}`
                           }}</span>
                         <span class="comment-time">{{ formatRelativeTime(comentario.created_at) }}</span>
-                        <button v-if="comentario.replies && comentario.replies.length > 0"
-                          @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
-                          {{ comentariosExpandidos.includes(comentario.id) ? 'Ocultar respuestas' : `Ver
-                          ${comentario.replies.length} respuesta(s)` }}
-                        </button>
                       </div>
 
 
@@ -349,6 +344,17 @@
 
 
 
+
+                      <!-- "Ver N respuesta(s)". Estaba dentro de .comment-header,
+                           es decir ARRIBA del comentario y a la altura del
+                           nombre, asi que se leia antes de saber a que
+                           comentario pertenecia. Va aqui: debajo del comentario
+                           y justo encima de las respuestas que despliega. -->
+                      <button v-if="comentario.replies && comentario.replies.length > 0"
+                        @click="toggleCommentExpansion(comentario.id)" class="toggle-replies-btn">
+                        {{ comentariosExpandidos.includes(comentario.id) ? 'Ocultar respuestas' : `Ver
+                        ${comentario.replies.length} respuesta(s)` }}
+                      </button>
 
                       <!-- Respuestas // HAY QUE PONER QUE SI EL REPLY USER ID ES IGUAL AL USER ID QUE INICIO SECCION PUES QUE TE SALGAN LOS BOTONES DE EDITAR Y ELIMINAR-->
                       <div
@@ -1876,7 +1882,8 @@ export default {
 .comment-avatar {
   width: 32px;
   height: 32px;
-  margin-right: 10px;
+  /* Sin margin-right: .comment-item es un flex con 'gap', y el margen se
+     sumaba al hueco dejando el nombre y el texto separados del avatar. */
 }
 
 /* Ajustes para el popup */

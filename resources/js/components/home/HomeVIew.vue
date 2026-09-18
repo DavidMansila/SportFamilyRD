@@ -50,6 +50,7 @@
     <!-- Directorio de deportes -->
     <section class="category-section">
       <div class="section-header">
+        <span class="section-kicker">Deportes</span>
         <h2 class="section-title">Descubre tu Deporte</h2>
         <p class="section-description">Explora más de 20 disciplinas deportivas</p>
         <router-link to="/directorio" class="view-all"> Ver todos <i
@@ -88,6 +89,7 @@
     <!-- Noticias deportivas -->
     <section class="news-section">
       <div class="section-header">
+        <span class="section-kicker">Actualidad</span>
         <h2 class="section-title">Últimas Noticias Deportivas</h2>
         <p class="section-description">Mantente al día con lo último del mundo deportivo</p>
         <router-link to="/noticias" class="view-all-news">
@@ -124,7 +126,7 @@
 
         <!-- Listado de Noticias -->
         <div class="news-list" v-if="recentNews.length > 1">
-          <div class="news-card is-interactive" v-for="news in recentNews.slice(1, 7)" :key="news.id" role="button"
+          <div class="news-card is-interactive" v-for="news in recentNews.slice(1, 4)" :key="news.id" role="button"
             tabindex="0" :aria-label="`Leer noticia: ${news.title}`" @click="openNews(news)"
             @keydown.enter.prevent="openNews(news)" @keydown.space.prevent="openNews(news)">
             <div class="news-card-image">
@@ -152,6 +154,7 @@
     <!-- Eventos -->
     <section class="events-section">
       <div class="section-header">
+        <span class="section-kicker">Agenda</span>
         <h2 class="section-title">Eventos Destacados</h2>
         <p class="section-description">No te pierdas los próximos eventos deportivos</p>
         <router-link to="/calendario" class="view-all-calendar">
@@ -189,6 +192,7 @@
     <!-- Productos -->
     <section class="products-section">
       <div class="section-header">
+        <span class="section-kicker">Tienda</span>
         <h2 class="section-title">Equipamiento Premium</h2>
         <p class="section-description">Los mejores productos para tu rendimiento</p>
         <router-link to="/tienda" class="view-all-products">
@@ -215,11 +219,6 @@
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
-            <div class="product-rating">
-              <div class="stars">
-                <i class="fas fa-star" v-for="n in 5" :key="n" :class="{ 'filled': n <= product.rating }"></i>
-              </div>
-            </div>
             <div class="product-pricing">
               <span class="current-price">${{ product.price }}</span>
               <span class="original-price" v-if="product.originalPrice">${{ product.originalPrice }}</span>
@@ -238,6 +237,7 @@
     <!-- Comunidad Interactiva -->
     <section class="community-section">
       <div class="community-header">
+        <span class="section-kicker">Comunidad</span>
         <h2 class="section-title">Únete a la Comunidad</h2>
         <p class="section-description">Conecta con otros apasionados del deporte</p>
       </div>
@@ -265,12 +265,12 @@
               <div class="thread-stats">
                 <span class="stat">
                   <i class="fas fa-comments" aria-hidden="true"></i>
-                  <span class="stat-label">Comentarios</span>
+                  <span class="stat-label-foro">Comentarios</span>
                   <span class="stat-value">{{ post.comments_count || 0 }}</span>
                 </span>
                 <span class="stat">
                   <i class="fas fa-heart" aria-hidden="true"></i>
-                  <span class="stat-label">Likes</span>
+                  <span class="stat-label-foro">Likes</span>
                   <span class="stat-value">{{ post.likes_count || 0 }}</span>
                 </span>
               </div>
@@ -1465,25 +1465,37 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2rem;
-  background: #830d1b;
+  padding: 1rem 2.2rem;
+
+  /* Era un rojo plano sin sombra: sobre la foto no se distinguia del fondo y
+     no parecia pulsable. El degradado y la sombra proyectada lo despegan, y
+     el filo claro de arriba (inset) le da el volumen del boton. */
+  background: linear-gradient(135deg, #c92e40 0%, #830d1b 100%);
+  box-shadow:
+    0 14px 30px rgba(131, 13, 27, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+
   color: white;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   border-radius: 50px;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
   position: relative;
   overflow: hidden;
 }
 
 .cta-button:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, #d93b4e 0%, #9a1122 100%);
+  box-shadow:
+    0 20px 38px rgba(201, 46, 64, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .cta-button:active {
-  transform: translateY(2px);
-  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+  transform: translateY(1px);
+  box-shadow: 0 6px 16px rgba(131, 13, 27, 0.45);
 }
 
 .cta-button i {

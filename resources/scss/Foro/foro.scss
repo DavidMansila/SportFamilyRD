@@ -342,10 +342,13 @@ $transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 /* ================= RESPONSIVE POPOUT PARA MÓVILES ================= */
 @media (max-width: 767.98px) {
   
-  .comment-content {
-    margin-left: 42px; /* Espacio para el avatar */
-  }
-  
+  /* Aqui habia un '.comment-content { margin-left: 42px }' con el comentario
+     "espacio para el avatar". Ese hueco ya lo hace el avatar, que es un
+     hermano dentro del flex de .comment-item: el margen se sumaba encima y
+     empujaba nombre y texto 42 px a la derecha. En las respuestas se sumaba
+     dos veces (la del comentario y la de la respuesta) y el texto quedaba
+     aplastado contra el borde derecho. */
+
   .comment-header {
     flex-wrap: wrap;
     margin-bottom: 5px;
