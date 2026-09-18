@@ -108,14 +108,23 @@ class HealthEndpointTest extends TestCase
     }
 
     /**
-     * Render tiene su propio "Health Check Path" en la configuracion del
-     * servicio, distinto del monitor externo: lo usa para decidir si un deploy
-     * esta sano antes de mandarle trafico. Si ahi sigue puesto /up, esa ruta
-     * tiene que seguir devolviendo 200 o los despliegues se quedan esperando.
+     * TEMPORAL (ver commit 5e942d1). Esta prueba existe solo mientras el
+     * "Health Check Path" del servicio en el dashboard de Render siga
+     * apuntando a /up. En cuanto se cambie ahi a /health, BORRAR esta prueba
+     * -o darle la vuelta a la asercion-, porque deja de haber motivo para
+     * sostener el comportamiento que fija.
      *
-     * Responde 200 con el HTML del SPA, no con la vista de salud de Laravel
-     * -nunca lo hizo: el comodin se registra antes y se la come-, pero para el
-     * probe de Render un 200 es un 200. Lo suyo es apuntarlo a /health.
+     * Y conviene borrarla, porque lo que fija no es deseable: /up responde 200
+     * con el HTML COMPLETO del SPA y, al ir por el grupo de middleware 'web',
+     * arranca sesion y escribe en la tabla 'sessions' en cada comprobacion.
+     * Justo lo que /health existe para evitar. No es un healthcheck: es la
+     * pagina de la aplicacion devolviendo 200 por casualidad, porque el comodin
+     * de routes/web.php se registra antes que la ruta de salud de Laravel y se
+     * la come. Nunca funciono de otra forma.
+     *
+     * Se sostiene igualmente hasta entonces porque el probe de Render decide si
+     * un deploy esta sano antes de mandarle trafico: si /up dejara de dar 200,
+     * los despliegues se quedarian colgados esperandolo.
      */
     public function test_up_sigue_devolviendo_200_para_el_probe_de_render(): void
     {
