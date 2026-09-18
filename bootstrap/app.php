@@ -3,13 +3,49 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
-        health: '/up',
+
+        // -------------------------------------------------------------------
+        // GET /health  -> 200 {"status":"ok"}
+        // -------------------------------------------------------------------
+        //
+        // Para el monitor externo que despierta la instancia de Render cada
+        // pocos minutos. Tiene que ser lo mas barato posible: es una peticion
+        // que se repite dia y noche y nadie mira.
+        //
+        // Va aqui, en 'then', y NO en routes/web.php a proposito: las rutas de
+        // ese archivo entran en el grupo de middleware 'web', que arranca la
+        // sesion, y con SESSION_DRIVER=database eso significa abrir una
+        // conexion y escribir una fila en 'sessions' EN CADA PING. Definida
+        // aqui no pasa por ningun grupo: sin sesion, sin cookies, sin CSRF y
+        // sin tocar la base de datos. Solo la atraviesan los middleware
+        // globales (CORS y cabeceras de seguridad), que no consultan nada.
+        //
+        // Aqui estaba antes "health: '/up'", el endpoint que trae Laravel 11.
+        // Se quito porque no servia para esto por dos motivos: lo registra
+        // tambien dentro del grupo 'web' (misma sesion en BD), y ademas nunca
+        // llegaba a responder -el catch-all del SPA en routes/web.php se
+        // registra primero y se lo comia, asi que /up devolvia el HTML de la
+        // aplicacion con un 200 enganoso-.
+        //
+        // Para que el catch-all no haga lo mismo con /health, la ruta esta
+        // excluida en su expresion regular (ver routes/web.php).
+        then: function () {
+            Route::get('/health', function () {
+                return response()
+                    ->json(['status' => 'ok'])
+                    // Que ningun proxy ni CDN cachee la respuesta: un 200
+                    // servido de cache diria que la instancia esta viva
+                    // aunque estuviera caida.
+                    ->header('Cache-Control', 'no-store, max-age=0');
+            })->name('health');
+        },
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Render pone la app detras de su propio proxy HTTPS -> HTTP interno.

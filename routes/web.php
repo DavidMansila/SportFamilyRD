@@ -38,6 +38,11 @@ Route::get('/email/verified-success', function () {
 //
 // Los archivos que SI existen los sirve Apache antes de llegar a Laravel (ver
 // las RewriteCond de public/.htaccess), asi que esto solo afecta a los que no.
+// 'health' tambien queda fuera: es el ping de disponibilidad (definido en
+// bootstrap/app.php, fuera del grupo 'web' para no abrir sesion en cada
+// llamada). Sin esta exclusion lo atraparia esta ruta -que se registra antes-
+// y el monitor recibiria el HTML del SPA en vez del JSON, con 200 igualmente.
+// Es justo lo que le pasaba al /up que trae Laravel.
 Route::get('/{any}', function () {
     return view('app');
-})->where('any', '^(?!storage/|imagenes/|build/|defaults/|public/).*');
+})->where('any', '^(?!storage/|imagenes/|build/|defaults/|public/|health$).*');
