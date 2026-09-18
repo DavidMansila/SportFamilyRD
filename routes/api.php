@@ -175,10 +175,16 @@ Route::get('/user-by-id/{id}', [UserController::class, 'getUserByID'])
 //   GET /api/internal/cron/news      -> php artisan news:import
 //   GET /api/internal/cron/calendar  -> php artisan calendar:import
 //
-// Van separadas y no encadenadas en una sola peticion porque cada scraper
-// descarga varias paginas externas: juntas es facil pasar de los 30s que
-// espera cron-job.org antes de dar el job por fallido, y ademas un error del
-// primero se llevaria al segundo por delante.
+// Las dos responden 202 de inmediato y hacen el trabajo DESPUES de enviar la
+// respuesta (middleware cron.background, en terminate()). Antes corrian el
+// comando dentro de la peticion y news:import tardaba ~28s, pegado a los 30s
+// a los que cron-job.org corta y marca el job como fallido aunque el servidor
+// lo terminara bien.
+//
+// Siguen siendo dos rutas y no una que dispare ambos: cada scraper conserva su
+// propio horario, y como produccion corre con el servidor embebido de PHP
+// -una peticion a la vez, ver Dockerfile- mientras uno scrapea el sitio no
+// responde. Mejor dos ratos cortos en horas distintas que uno largo.
 //
 // El token se manda en la cabecera X-Cron-Token (en cron-job.org: pestana
 // Advanced -> Headers). Tambien se acepta ?token= por comodidad al probar,
@@ -204,32 +210,43 @@ $cronAutorizado = function (Request $request): bool {
     return hash_equals($secret, $recibido);
 };
 
-// La salida del comando se devuelve en el JSON para poder ver desde el
-// historial de cron-job.org cuantas noticias/eventos entraron.
-$cronEjecutar = function (string $comando) {
-    \Illuminate\Support\Facades\Artisan::call($comando);
+// 202 Accepted y no 200: cuando esta respuesta sale, el comando todavia no ha
+// empezado. El middleware lo arranca justo despues, y solo si el estado es 202
+// -asi un 403 por token invalido no dispara nada-.
+//
+// El Content-Length explicito no es decorativo. En produccion el servidor es
+// el embebido de PHP ("artisan serve"), donde no existe
+// fastcgi_finish_request(): Laravel vacia el buffer hacia el cliente, pero la
+// conexion sigue abierta hasta que el proceso termina. Un cliente que no sabe
+// cuantos bytes esperar se queda escuchando hasta el cierre, o sea los ~28s
+// enteros, que es justo lo que estamos evitando. Con la cabecera puesta lee
+// esos bytes, da la respuesta por completa y cuelga.
+$cronAceptar = function (string $comando) {
+    $cuerpo = json_encode([
+        'message' => "{$comando} aceptado; se ejecuta en segundo plano",
+    ]);
 
-    return response()->json([
-        'message' => "{$comando} ejecutado",
-        'salida' => \Illuminate\Support\Facades\Artisan::output(),
+    return response($cuerpo, 202, [
+        'Content-Type' => 'application/json',
+        'Content-Length' => (string) strlen($cuerpo),
     ]);
 };
 
-Route::get('/internal/cron/news', function (Request $request) use ($cronAutorizado, $cronEjecutar) {
+Route::get('/internal/cron/news', function (Request $request) use ($cronAutorizado, $cronAceptar) {
     if (! $cronAutorizado($request)) {
         return response()->json(['message' => 'No autorizado'], 403);
     }
 
-    return $cronEjecutar('news:import');
-})->middleware('throttle:10,1');
+    return $cronAceptar('news:import');
+})->middleware(['throttle:10,1', 'cron.background:news:import']);
 
-Route::get('/internal/cron/calendar', function (Request $request) use ($cronAutorizado, $cronEjecutar) {
+Route::get('/internal/cron/calendar', function (Request $request) use ($cronAutorizado, $cronAceptar) {
     if (! $cronAutorizado($request)) {
         return response()->json(['message' => 'No autorizado'], 403);
     }
 
-    return $cronEjecutar('calendar:import');
-})->middleware('throttle:10,1');
+    return $cronAceptar('calendar:import');
+})->middleware(['throttle:10,1', 'cron.background:calendar:import']);
 
 // --- CRON EXTERNO (Render free no trae cron propio) ---
 // Un servicio externo (p. ej. cron-job.org) llama esta ruta cada minuto con

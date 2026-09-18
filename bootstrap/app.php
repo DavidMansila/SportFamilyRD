@@ -106,6 +106,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
             'broadcast.auth' => \App\Http\Middleware\BroadcastAuth::class,
+
+            // Responde 202 y ejecuta el comando despues de enviar la respuesta.
+            // Lo usan las rutas de cron de routes/api.php para no agotar los
+            // 30s que espera cron-job.org. Uso: 'cron.background:news:import'.
+            'cron.background' => \App\Http\Middleware\RunCommandAfterResponse::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
