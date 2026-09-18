@@ -31,15 +31,26 @@ Artisan::command('inspire', function () {
 | contra el mismo sitio scrapeado y la misma tabla.
 */
 
-Schedule::command('news:import')
-    ->dailyAt('08:00')
-    ->withoutOverlapping()
-    ->onFailure(fn() => \Illuminate\Support\Facades\Log::error('Fallo news:import'));
-
-Schedule::command('calendar:import')
-    ->dailyAt('09:00')
-    ->withoutOverlapping()
-    ->onFailure(fn() => \Illuminate\Support\Facades\Log::error('Fallo calendar:import'));
+// news:import y calendar:import ya no se programan aqui.
+//
+// Estuvieron puestos como tareas diarias (08:00 y 09:00) y nunca llegaron a
+// importar nada: el planificador solo se despierta si algo llama a
+// "schedule:run" cada minuto, y ese disparador -el cron externo contra
+// /api/internal/schedule-run- no estaba operativo. La prueba estaba en la base
+// de datos: las 105 filas de NewsScrapping y las 13 de calendars tenian todas
+// la misma fecha de creacion, la de la ultima ejecucion a mano.
+//
+// Ahora cada scraper tiene su propio job en cron-job.org, que llama su URL
+// directamente y no depende de este planificador ni de que la peticion de ese
+// minuto exacto llegue:
+//
+//   GET /api/internal/cron/news      -> news:import
+//   GET /api/internal/cron/calendar  -> calendar:import
+//
+// Las dos rutas estan en routes/api.php. Si algun dia se arregla el disparador
+// de schedule:run, NO volver a anadirlos aqui: correrian dos veces.
+//
+// Abajo quedan solo las tareas que no dependen de scraping externo.
 
 Schedule::command('training:expire')
     ->dailyAt('03:00')

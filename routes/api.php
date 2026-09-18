@@ -168,6 +168,69 @@ Route::get('/user-by-id/{id}', [UserController::class, 'getUserByID'])
     ->whereNumber('id')
     ->middleware('throttle:60,1');
 
+// --- URLS PARA EL CRON EXTERNO (cron-job.org) ---
+//
+// Dos jobs, uno por scraper. Cada URL ejecuta UN comando y nada mas:
+//
+//   GET /api/internal/cron/news      -> php artisan news:import
+//   GET /api/internal/cron/calendar  -> php artisan calendar:import
+//
+// Van separadas y no encadenadas en una sola peticion porque cada scraper
+// descarga varias paginas externas: juntas es facil pasar de los 30s que
+// espera cron-job.org antes de dar el job por fallido, y ademas un error del
+// primero se llevaria al segundo por delante.
+//
+// El token se manda en la cabecera X-Cron-Token (en cron-job.org: pestana
+// Advanced -> Headers). Tambien se acepta ?token= por comodidad al probar,
+// pero en la URL queda escrito en los logs de acceso de Render, en cualquier
+// proxy intermedio y en el historial de ejecuciones del propio cron.
+//
+// config('app.cron_secret') y no env('CRON_SECRET'): despues de un
+// "php artisan config:cache" env() devuelve null fuera de config/*.php, y
+// comparar contra null dejaria estas rutas abiertas a cualquiera.
+$cronAutorizado = function (Request $request): bool {
+    $secret = config('app.cron_secret');
+
+    // Sin CRON_SECRET en .env las rutas quedan desactivadas solas.
+    if (! $secret) {
+        return false;
+    }
+
+    $recibido = (string) $request->header('X-Cron-Token', '');
+    if ($recibido === '') {
+        $recibido = (string) $request->query('token', '');
+    }
+
+    return hash_equals($secret, $recibido);
+};
+
+// La salida del comando se devuelve en el JSON para poder ver desde el
+// historial de cron-job.org cuantas noticias/eventos entraron.
+$cronEjecutar = function (string $comando) {
+    \Illuminate\Support\Facades\Artisan::call($comando);
+
+    return response()->json([
+        'message' => "{$comando} ejecutado",
+        'salida' => \Illuminate\Support\Facades\Artisan::output(),
+    ]);
+};
+
+Route::get('/internal/cron/news', function (Request $request) use ($cronAutorizado, $cronEjecutar) {
+    if (! $cronAutorizado($request)) {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    return $cronEjecutar('news:import');
+})->middleware('throttle:10,1');
+
+Route::get('/internal/cron/calendar', function (Request $request) use ($cronAutorizado, $cronEjecutar) {
+    if (! $cronAutorizado($request)) {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    return $cronEjecutar('calendar:import');
+})->middleware('throttle:10,1');
+
 // --- CRON EXTERNO (Render free no trae cron propio) ---
 // Un servicio externo (p. ej. cron-job.org) llama esta ruta cada minuto con
 // ?token=CRON_SECRET para disparar el scheduler de Laravel (news:import,
