@@ -378,6 +378,7 @@ import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import paginatorComponent from '@/components/paginatorComponent.vue';
 import Alert from '../Alert.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
 
 export default {
   name: 'TiendaComponent',
@@ -527,12 +528,13 @@ export default {
       if (this.categoriaDelFiltroActivo !== null) {
         this.mobileCategoryOpen = this.categoriaDelFiltroActivo;
       }
-      document.body.style.overflow = 'hidden';
+      bloquearScrollDeFondo();
     },
 
     cerrarFiltrosMoviles() {
+      if (!this.showMobileFilters) return;
       this.showMobileFilters = false;
-      document.body.style.overflow = '';
+      liberarScrollDeFondo();
     },
 
     // Elegir una categoria filtra y cierra el menu.
@@ -608,14 +610,16 @@ export default {
     },
 
     abrirPopup(producto) {
+      if (this.popupVisible) return;
       this.productoSeleccionado = { ...producto };
       this.popupVisible = true;
-      document.body.style.overflow = 'hidden';
+      bloquearScrollDeFondo();
     },
 
     cerrarPopup() {
+      if (!this.popupVisible) return;
       this.popupVisible = false;
-      document.body.style.overflow = 'auto';
+      liberarScrollDeFondo();
     },
 
     incrementQuantity() {
@@ -850,6 +854,11 @@ export default {
     this.generarCategoriasFlat()
   },
   beforeUnmount() {
+    // Irse de la tienda con el producto o los filtros abiertos no pasa por los
+    // metodos de cerrar, y el body se quedaria fijo en la siguiente pantalla.
+    if (this.popupVisible) liberarScrollDeFondo();
+    if (this.showMobileFilters) liberarScrollDeFondo();
+
     window.removeEventListener('keyup', this.handleKeyup);
   }
 };

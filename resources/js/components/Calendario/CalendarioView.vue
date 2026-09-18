@@ -309,6 +309,7 @@ import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import { supabase } from '../../supabaseClient';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
 
 export default {
   name: 'Calendario',
@@ -398,14 +399,18 @@ export default {
 
 
     openEventDetail(event) {
+      // La clase .no-scroll era solo 'overflow: hidden' sobre el body, que en
+      // el movil no frena el dedo: la pagina de detras seguia moviendose.
+      const yaAbierto = !!this.selectedEvent;
       this.selectedEvent = event;
       this.ticketQuantity = 1;
-      document.body.classList.add('no-scroll');
+      if (!yaAbierto) bloquearScrollDeFondo();
     },
 
     closeEventDetail() {
+      if (!this.selectedEvent) return;
       this.selectedEvent = null;
-      document.body.classList.remove('no-scroll');
+      liberarScrollDeFondo();
     },
 
 
@@ -774,6 +779,9 @@ export default {
     this.selectedDay = null;
   },
   beforeUnmount() {
+    // Salir del calendario con el detalle abierto no pasa por closeEventDetail.
+    if (this.selectedEvent) liberarScrollDeFondo();
+
     clearTimeout(this._realtimeDebounceTimer);
     if (this.realtimeChannel) {
       supabase.removeChannel(this.realtimeChannel);

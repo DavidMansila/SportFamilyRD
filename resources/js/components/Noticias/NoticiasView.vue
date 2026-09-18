@@ -245,6 +245,7 @@ import Navbar from '../navbarComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
 import { supabase } from '../../supabaseClient';
 
 export default {
@@ -394,7 +395,7 @@ export default {
 
     async abrirNoticia(noticia) {
       this.noticiaSeleccionada = noticia;
-      document.body.style.overflow = 'hidden';
+      bloquearScrollDeFondo();
 
       // El listado ya no trae el texto completo del articulo: pesaba el 87% de
       // la respuesta (366 KB de 420) para pintar extractos de 120 caracteres.
@@ -416,8 +417,12 @@ export default {
     },
 
     cerrarNoticia() {
+      // Puede llamarse sin que haya nada abierto (al guardar, al borrar...);
+      // liberarScrollDeFondo ignora la llamada si no queda bloqueo vivo, pero
+      // aun asi se comprueba para no descontar el de otro modal.
+      const habiaAlgoAbierto = !!this.noticiaSeleccionada;
       this.noticiaSeleccionada = null;
-      document.body.style.overflow = 'auto';
+      if (habiaAlgoAbierto) liberarScrollDeFondo();
     },
 
     resetFilters() {
@@ -511,11 +516,14 @@ export default {
     },
 
     editarNoticia(noticia) {
+      // Si ya habia una noticia abierta, el bloqueo ya esta puesto: solo se
+      // cambia el contenido del mismo pop-out.
+      const yaAbierto = !!this.noticiaSeleccionada;
       this.noticiaSeleccionada = {
         ...noticia,
         isEditing: true
       };
-      document.body.style.overflow = 'hidden';
+      if (!yaAbierto) bloquearScrollDeFondo();
     },
 
     pedirConfirmacionBorrado(noticia) {
@@ -739,6 +747,9 @@ export default {
   },
 
   beforeUnmount() {
+    // Salir de la pagina con el pop-out abierto no pasa por cerrarNoticia().
+    if (this.noticiaSeleccionada) liberarScrollDeFondo();
+
     clearTimeout(this._realtimeDebounceTimer);
     if (this.realtimeChannel) {
       supabase.removeChannel(this.realtimeChannel);

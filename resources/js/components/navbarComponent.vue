@@ -166,6 +166,7 @@
 <script>
 import axios from 'axios';
 import CarritoComponent from './CarritoComponent.vue';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../utils/scrollLock';
 import { teardownEcho } from '../echo';
 
 export default {
@@ -196,7 +197,8 @@ export default {
     window.addEventListener('resize', this.handleResize);
   },
   beforeUnmount() {
-    document.body.style.overflow = '';
+    if (this.showLogoutConfirm) liberarScrollDeFondo();
+
     window.removeEventListener('user-authenticated', this.checkAuthStatus);
     window.removeEventListener('user-logged-out', this.checkAuthStatus);
     window.removeEventListener('user-updated', this.checkAuthStatus);
@@ -205,21 +207,18 @@ export default {
 
   watch: {
 
-    showLogoutConfirm(newVal) {
-      if (newVal) {
-        document.body.classList.add('no-scroll');
-      } else {
-        document.body.classList.remove('no-scroll');
-      }
+    // El bloqueo se engancha a la variable y no a openLogoutModal/
+    // closeLogoutModal porque logout() tambien la pone a false por su cuenta.
+    // La clase .no-scroll de antes era solo 'overflow: hidden' sobre el body:
+    // en el movil el dedo seguia arrastrando la pagina de detras.
+    showLogoutConfirm(abierto) {
+      if (abierto) bloquearScrollDeFondo();
+      else liberarScrollDeFondo();
     },
 
-    isCartVisible(newVal) {
-      if (newVal) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
-    },
+    // El carrito ya bloquea por su cuenta al recibir isVisible (ver
+    // CarritoComponent): hacerlo tambien aqui contaba el bloqueo dos veces y
+    // la pagina se quedaba fija al cerrarlo.
 
     $route() {
       if (this.isCartVisible) {

@@ -42,3 +42,20 @@
     scroll-behavior: auto !important;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Pagina bloqueada detras de un pop-out
+// ---------------------------------------------------------------------------
+//
+// La clase la pone y la quita utils/scrollLock.js, que ademas fija el body.
+// Aqui solo se corta el rebote elastico del movil: sin esto, aunque el
+// documento ya no tenga scroll, el gesto sigue despegando la pagina del borde
+// (y en Chrome de Android puede disparar el "tirar para recargar").
+body.scroll-bloqueado {
+  overscroll-behavior: none;
+}
+
+// Nada de 'touch-action: none' aqui: esa propiedad se resuelve mirando el
+// elemento Y TODOS sus ancestros, asi que ponerla en el body tambien anula el
+// desplazamiento con el dedo DENTRO del pop-out, y volver a declarar 'auto' en
+// el hijo no lo recupera. Con el body fijo ya no hay pagina que mover.

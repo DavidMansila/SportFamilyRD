@@ -43,6 +43,8 @@
 </template>
 
 <script>
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
+
 let idCounter = 0;
 
 const FOCUSABLE = 'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -67,13 +69,19 @@ export default {
     return {
       titleId: `confirm-title-${n}`,
       bodyId: `confirm-body-${n}`,
-      previouslyFocused: null
+      previouslyFocused: null,
+      bloqueoPuesto: false
     };
   },
   watch: {
     open(isOpen) {
       if (isOpen) {
         this.previouslyFocused = document.activeElement;
+        // El contador de utils/scrollLock es lo que hace que esto sea seguro
+        // aunque el dialogo se abra ENCIMA de otro modal: al cerrarlo, la
+        // pagina sigue bloqueada por el que queda debajo.
+        bloquearScrollDeFondo();
+        this.bloqueoPuesto = true;
         document.addEventListener('keydown', this.onKeydown, true);
         // El foco arranca en "Cancelar" a proposito: en un dialogo de borrado,
         // la opcion segura es la que debe estar bajo el dedo.
@@ -89,6 +97,11 @@ export default {
     },
 
     release() {
+      if (this.bloqueoPuesto) {
+        liberarScrollDeFondo();
+        this.bloqueoPuesto = false;
+      }
+
       document.removeEventListener('keydown', this.onKeydown, true);
       if (this.previouslyFocused?.focus) {
         this.previouslyFocused.focus({ preventScroll: true });
@@ -120,7 +133,10 @@ export default {
     }
   },
   beforeUnmount() {
-    if (this.open) this.release();
+    // Sin condicion: si el dialogo se destruye con el bloqueo puesto (la vista
+    // entera se desmonta tras confirmar un borrado, por ejemplo), hay que
+    // soltarlo igual. release() ya comprueba si habia algo que soltar.
+    this.release();
   }
 };
 </script>

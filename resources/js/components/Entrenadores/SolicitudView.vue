@@ -422,6 +422,7 @@
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import Alert from '../Alert.vue';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
 
 export default {
   name: 'SolicitudView',
@@ -525,6 +526,19 @@ export default {
         'Valverde'
       ],
     }
+  },
+
+  watch: {
+    // Igual que en Ajustes: la confirmacion se abre cambiando la variable, no
+    // con un metodo, asi que el bloqueo va enganchado a ella.
+    mostrarConfirmacion(abierto) {
+      if (abierto) bloquearScrollDeFondo();
+      else liberarScrollDeFondo();
+    },
+  },
+
+  beforeUnmount() {
+    if (this.mostrarConfirmacion) liberarScrollDeFondo();
   },
 
   methods: {

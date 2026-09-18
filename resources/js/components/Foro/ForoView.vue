@@ -588,6 +588,7 @@ import paginatorComponent from '@/components/paginatorComponent.vue';
 import ChatBubbleComponent from '../ChatBubbleComponent.vue';
 import Alert from '../Alert.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
 
 // Unica lista de categorias del foro: alimenta los botones de filtro, el
 // <select> del formulario de crear/editar post y el color de la etiqueta de
@@ -711,18 +712,20 @@ export default {
         return;
       }
       this.mostrarModal = true;
-      document.body.style.overflow = 'hidden';
+      bloquearScrollDeFondo();
     },
 
     cerrarModal() {
+      const estabaAbierto = this.mostrarModal;
       this.mostrarModal = false;
       this.nuevoPost = { titulo: '', contenido: '', categoria: '', imagenFile: null };
       this.imagenMiniatura = null;
       this.modoEdicion = false;
 
-      if (!this.postSeleccionado) {
-        document.body.style.overflow = 'auto';
-      }
+      // Solo suelta SU bloqueo. Si este modal se abrio encima del pop-out de
+      // un post, la pagina sigue bloqueada por el pop-out: de eso se encarga
+      // el contador de utils/scrollLock.
+      if (estabaAbierto) liberarScrollDeFondo();
     },
 
 
@@ -750,7 +753,7 @@ export default {
     abrirPopout(post) {
       try {
         this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-        document.body.style.overflow = 'hidden';
+        bloquearScrollDeFondo();
 
         this.postSeleccionado = {
           ...post,
@@ -773,18 +776,20 @@ export default {
     },
 
     cerrarPopout() {
+      // Sin esto, cerrar dos veces (o cerrar sin haber abierto) descontaria el
+      // bloqueo de otro modal que siguiera abierto.
+      if (!this.postSeleccionado) return;
+
       try {
-        document.body.style.overflow = 'auto';
+        liberarScrollDeFondo();
         this.postSeleccionado = null;
         this.comentarioRespondiendo = null;
         this.nuevoComentario = '';
 
-        // abrirPopout ya guardaba scrollPosition pero nunca se usaba para
-        // restaurarla: al cerrar el post, la pagina volvia siempre al tope
-        // en vez de quedarse donde estaba el usuario en el listado.
-        this.$nextTick(() => {
-          window.scrollTo({ top: this.scrollPosition, behavior: 'auto' });
-        });
+        // Volver a la posicion del listado ya lo hace liberarScrollDeFondo(),
+        // que guarda el scroll al bloquear y lo restaura al soltar. Hacerlo
+        // tambien aqui era repetir el mismo salto con otro valor guardado a
+        // mano.
       } catch (error) {
         console.error('Popup close error:', error);
       }
@@ -1203,9 +1208,13 @@ export default {
         // Actualizar lista de posts
         await this.getPost();
 
-        // Cerrar modal y popup
+        // Cerrar modal y popup.
+        //
+        // El pop-out se cierra por su metodo y no vaciando postSeleccionado a
+        // mano: asi tambien suelta su bloqueo del scroll. Haciendolo a mano, la
+        // pagina se quedaba fija despues de editar un post desde el pop-out.
         this.cerrarModal();
-        this.postSeleccionado = null;
+        this.cerrarPopout();
 
         // Forzar actualización del paginador
         this.currentPage = Math.min(this.currentPage, Math.ceil(this.postsFiltrados.length / this.itemsPerPage));
@@ -1283,8 +1292,7 @@ export default {
       };
       this.imagenMiniatura = post.imagen;
 
-      // Agregar clase para deshabilitar scroll
-      document.body.style.overflow = 'hidden';
+      bloquearScrollDeFondo();
     },
 
 
@@ -1689,7 +1697,12 @@ export default {
     this.subscribeRealtime();
   },
   beforeUnmount() {
-    document.body.style.overflow = 'auto';
+    // Salir de la pagina con algo abierto (un enlace del navbar, el boton
+    // atras) no pasa por cerrarPopout/cerrarModal: sin esto el body se
+    // quedaria fijo en la siguiente pantalla.
+    if (this.postSeleccionado) liberarScrollDeFondo();
+    if (this.mostrarModal) liberarScrollDeFondo();
+
     this.postSeleccionado = null;
     clearTimeout(this.temporizadorCorazon);
     clearTimeout(this._realtimeDebounceTimer);

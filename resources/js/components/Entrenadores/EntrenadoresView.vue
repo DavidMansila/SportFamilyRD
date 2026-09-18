@@ -434,6 +434,7 @@ import Navbar from "../navbarComponent.vue";
 import ChatBubbleComponent from "../ChatBubbleComponent.vue";
 import paginatorComponent from "@/components/paginatorComponent.vue";
 import Alert from '../Alert.vue';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
 
 export default {
     name: "Entrenadores",
@@ -445,6 +446,12 @@ export default {
     },
     data() {
         return {
+            // Si este componente tiene ahora mismo puesto el bloqueo de
+            // scroll. Evita descontar dos veces el contador compartido cuando
+            // beforeUnmount llama a bloquearScroll(false) sobre algo que ya
+            // estaba liberado.
+            scrollBloqueado: false,
+
             openModal: false,
             alertMessage: "",
             alertType: "", // 'error', 'success', 'alert'.
@@ -560,20 +567,25 @@ export default {
             this.currentPage = 1;
         },
 
-        // Bloqueo de scroll mientras hay un modal abierto. Antes se hacia con
-        // body { position: fixed; top: -Npx } + window.scrollTo al cerrar, lo
-        // que obligaba a recalcular el layout de toda la pagina al abrir y al
-        // cerrar. overflow:hidden deja el scroll donde esta; el padding-right
-        // compensa el ancho de la barra de scroll para que el grid no salte.
+        // Bloqueo de scroll mientras hay un modal abierto.
+        //
+        // Esto hacia 'overflow: hidden' sobre el body por ahorrarse el
+        // recalculo de layout que trae 'position: fixed'. En escritorio
+        // funcionaba, pero con el dedo no: en el movil la pagina de detras
+        // seguia subiendo y bajando por debajo del modal. Ahora lo resuelve
+        // utils/scrollLock, que fija el body (y sigue compensando el ancho de
+        // la barra de scroll, que era lo que evitaba el salto lateral).
+        //
+        // Se conserva el metodo con su firma porque hay dos sitios que lo
+        // llaman con un booleano.
         bloquearScroll(bloquear) {
-            const body = document.body;
+            if (bloquear === this.scrollBloqueado) return;
+            this.scrollBloqueado = bloquear;
+
             if (bloquear) {
-                const anchoBarra = window.innerWidth - document.documentElement.clientWidth;
-                body.style.overflow = "hidden";
-                if (anchoBarra > 0) body.style.paddingRight = `${anchoBarra}px`;
+                bloquearScrollDeFondo();
             } else {
-                body.style.overflow = "";
-                body.style.paddingRight = "";
+                liberarScrollDeFondo();
             }
         },
 

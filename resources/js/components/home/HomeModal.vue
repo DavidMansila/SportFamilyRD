@@ -40,11 +40,11 @@
 </template>
 
 <script>
-// Contador global de modales abiertos. Sin esto, cerrar un modal mientras
-// otro sigue abierto devolveria el scroll al body y la pagina de atras se
-// moveria por debajo del que queda.
-let openModalCount = 0;
-let previousBodyOverflow = '';
+// El contador de modales abiertos y el guardado del overflow del body vivian
+// aqui. Ahora los lleva utils/scrollLock, que ademas fija el body: con
+// 'overflow: hidden' a secas el dedo seguia arrastrando la pagina de detras en
+// el movil.
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
 
 let idCounter = 0;
 
@@ -100,11 +100,7 @@ export default {
 
       this.previouslyFocused = document.activeElement;
 
-      if (openModalCount === 0) {
-        previousBodyOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-      }
-      openModalCount++;
+      bloquearScrollDeFondo();
 
       // En fase de captura, para atender Escape antes que cualquier otro
       // manejador de la pagina (por ejemplo el del carrito o el chat).
@@ -123,10 +119,7 @@ export default {
 
       document.removeEventListener('keydown', this.onKeydown, true);
 
-      openModalCount = Math.max(0, openModalCount - 1);
-      if (openModalCount === 0) {
-        document.body.style.overflow = previousBodyOverflow;
-      }
+      liberarScrollDeFondo();
 
       // Devuelve el foco a la tarjeta que abrio el modal, para no perder el
       // sitio en la pagina al cerrarlo con teclado.

@@ -132,6 +132,7 @@
 import axios from 'axios';
 import Navbar from '../navbarComponent.vue';
 import Alert from '../Alert.vue';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../../utils/scrollLock';
 export default {
   name: 'Ajustes',
   components: {
@@ -214,6 +215,25 @@ export default {
       showSuccessMessage: false
 
     }
+  },
+
+  // Los dos modales de esta pantalla se abren cambiando la variable desde la
+  // plantilla (@click="showModal = true"), asi que el bloqueo se engancha al
+  // cambio de la variable y no a un metodo de abrir/cerrar que no existe.
+  watch: {
+    showModal(abierto) {
+      if (abierto) bloquearScrollDeFondo();
+      else liberarScrollDeFondo();
+    },
+    showDeleteModal(abierto) {
+      if (abierto) bloquearScrollDeFondo();
+      else liberarScrollDeFondo();
+    },
+  },
+
+  beforeUnmount() {
+    if (this.showModal) liberarScrollDeFondo();
+    if (this.showDeleteModal) liberarScrollDeFondo();
   },
 
   methods: {

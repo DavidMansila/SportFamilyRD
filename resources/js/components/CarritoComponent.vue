@@ -199,6 +199,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
+import { bloquearScrollDeFondo, liberarScrollDeFondo } from '../utils/scrollLock';
 import axios from 'axios';
 
 const props = defineProps({
@@ -274,6 +275,9 @@ const fetchCart = async () => {
 watch(() => props.isVisible, (newVal) => {
   if (newVal) {
     fetchCart();
+    bloquearScrollDeFondo();
+  } else {
+    liberarScrollDeFondo();
   }
 });
 
@@ -356,14 +360,17 @@ const clearCartFromDatabase = async () => {
 
 watch(showPaymentModal, (newVal) => {
   if (newVal) {
-    document.body.style.overflow = 'hidden';
+    bloquearScrollDeFondo();
   } else {
-    document.body.style.overflow = '';
+    liberarScrollDeFondo();
   }
 });
 
 onUnmounted(() => {
-  document.body.style.overflow = '';
+  // El carrito vive en el navbar, asi que solo se destruye al cerrar sesion o
+  // recargar; aun asi, si se va con algo abierto hay que soltar su bloqueo.
+  if (showPaymentModal.value) liberarScrollDeFondo();
+  if (props.isVisible) liberarScrollDeFondo();
 });
 
 const paymentMethods = ref([
@@ -399,10 +406,10 @@ const startPayment = () => {
 
 // Resetear el proceso de pago
 const resetPayment = () => {
+  // El watcher de showPaymentModal es quien libera el bloqueo.
   showPaymentModal.value = false;
   paymentStep.value = 1;
   progress.value = 0;
-  document.body.style.overflow = '';
 };
 
 // Completar el pago
