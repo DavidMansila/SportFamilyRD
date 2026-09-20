@@ -377,12 +377,52 @@ Route::middleware('auth:sanctum')->group(function () {
 // Reenviar el correo de verificacion. Solo para el usuario autenticado: antes
 // aceptaba un 'user_id' del cliente sin comprobar nada, asi que servia para
 // mandarle correos de verificacion a la cuenta de cualquier otra persona.
+//
+// El envio va dentro de un try/catch a proposito. Antes esta ruta respondia
+// siempre "¡Correo de verificación enviado!" con un 200, aunque el envio no
+// hubiera ocurrido, y el frontend pintaba el mensaje verde: el usuario se
+// quedaba esperando un correo que nunca iba a llegar, sin rastro del fallo en
+// ningun sitio. Ahora, si el transporte falla, se registra el error (visible en
+// los logs de Render) y se devuelve 503 para que el frontend avise de verdad.
+//
+// Ademas se comprueba el mailer configurado: con MAIL_MAILER=log -que es el
+// valor por defecto de config/mail.php cuando la variable no esta puesta en el
+// entorno- Laravel NO manda nada, solo escribe el correo en el log, y lo hace
+// sin lanzar ninguna excepcion. Ese silencio es exactamente lo que hacia que
+// todo pareciera correcto desde fuera.
 Route::post('/email/verification-notification', function (Request $request) {
     $user = $request->user();
     if ($user->hasVerifiedEmail()) {
         return response()->json(['message' => 'El correo ya está verificado.'], 200);
     }
-    $user->sendEmailVerificationNotification();
+
+    $mailer = config('mail.default');
+
+    if (in_array($mailer, ['log', 'array'], true) && app()->environment('production')) {
+        Log::error('MAIL_MAILER no esta configurado en produccion: el correo de verificacion no se envia', [
+            'mailer' => $mailer,
+            'user_id' => $user->id,
+        ]);
+
+        return response()->json([
+            'message' => 'El servicio de correo no está configurado. Avisa al administrador.',
+        ], 503);
+    }
+
+    try {
+        $user->sendEmailVerificationNotification();
+    } catch (\Throwable $e) {
+        Log::error('Fallo al reenviar el correo de verificacion', [
+            'user_id' => $user->id,
+            'mailer' => $mailer,
+            'error' => $e->getMessage(),
+        ]);
+
+        return response()->json([
+            'message' => 'No se pudo enviar el correo ahora mismo. Inténtalo de nuevo en unos minutos.',
+        ], 503);
+    }
+
     return response()->json(['message' => '¡Correo de verificación enviado!']);
 })->middleware(['auth:sanctum', 'throttle:correo'])->name('api.verification.send');
 

@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\VerifyEmail as BaseVerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Carbon;
 
@@ -34,5 +35,36 @@ class VerifyEmail extends BaseVerifyEmail
                 'hash' => sha1($notifiable->getEmailForVerification()),
             ]
         );
+    }
+
+    /**
+     * Cuerpo del correo.
+     *
+     * Antes se usaba el de Laravel: la plantilla generica en ingles ("Verify
+     * Email Address" / "If you did not create an account...") con el logo de
+     * Laravel de fabrica. Ahora usa la plantilla propia, en español y con la
+     * marca, y manda tambien la parte en texto plano.
+     */
+    public function toMail($notifiable)
+    {
+        $appName = config('app.name', 'SportFamilyRD');
+
+        $datos = [
+            'appName' => $appName,
+            'nombre' => $notifiable->name ?: 'atleta',
+            'url' => $this->verificationUrl($notifiable),
+            'expiraMinutos' => config('auth.verification.expire', 60),
+            // El logo se adjunta desde disco (la vista lo incrusta con
+            // $message->embed), no se enlaza: los clientes de correo bloquean
+            // las imagenes remotas por defecto.
+            'logoPath' => public_path('imagenes/Logo2.png'),
+        ];
+
+        return (new MailMessage)
+            ->subject('Confirma tu correo · ' . $appName)
+            ->view(
+                ['emails.verificar-correo', 'emails.verificar-correo-texto'],
+                $datos
+            );
     }
 }

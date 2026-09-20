@@ -212,12 +212,29 @@ export default {
         const response = await axios.post('/user', this.registerForm);
         sessionStorage.setItem('token', response.data.token);
         sessionStorage.setItem('user', JSON.stringify(response.data.user));
+
+        // La cuenta se crea aunque falle el envio del correo de verificacion.
+        // Se deja la marca para que la pantalla de "verifica tu correo" avise en
+        // vez de mandar a la persona a esperar un mensaje que no salio.
+        if (response.data.verification_email_sent === false) {
+          sessionStorage.setItem('verificationEmailFailed', '1');
+        } else {
+          sessionStorage.removeItem('verificationEmailFailed');
+        }
+
         this.$router.push('/');
       } catch (error) {
         console.error(error);
-        
+
+        // Antes se mostraba siempre el mismo texto ("la contraseña debe tener
+        // al menos 4 caracteres"), que ademas ya no era cierto -el backend pide
+        // 8- y tapaba el motivo real: con un correo repetido, el aviso hablaba
+        // de la contraseña. Ahora se muestra el error que devuelve la API.
         this.alertType = 'alert';
-        this.alertMessage = 'Contraseña debe tener al menos 4 caracteres y ser igual a la confirmación.';
+        const errores = error.response?.data?.errors;
+        this.alertMessage = errores
+          ? Object.values(errores).flat().join(' ')
+          : (error.response?.data?.message || 'No se pudo crear la cuenta. Inténtalo de nuevo.');
         this.alertKey++;
         this.openModal = true;
 

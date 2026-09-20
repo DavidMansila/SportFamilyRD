@@ -2,8 +2,11 @@
   <div class="verifica-correo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
     <h2>Verifica tu correo electrónico</h2>
     <p>Hemos enviado un enlace de verificación a <b>{{ user.email }}</b>. Por favor, revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.</p>
-    <p>Puedes chequear el spam si el correo no llega de 2-5 segundos.</p>
+    <p>Si no lo ves en un minuto, revisa la carpeta de spam o correo no deseado.</p>
     <!-- <p>Para tu seguridad, solo puedes verificar tu cuenta usando el enlace enviado a tu correo electrónico.</p> -->
+    <p v-if="envioFallido" style="color: #c03a3a;">
+      No pudimos enviar el correo al crear tu cuenta. Pulsa «Reenviar» para intentarlo otra vez.
+    </p>
     <p v-if="reenviado" style="color: green;">¡Correo de verificación reenviado!</p>
     <button @click="reenviarCorreo" :disabled="reenviando" style="margin-top: 1rem;">
       <span v-if="reenviando">Enviando...</span>
@@ -35,6 +38,11 @@ const emit = defineEmits(['logout']);
 const reenviando = ref(false);
 const reenviado = ref(false);
 
+// La marca la deja SignUpView cuando el registro devuelve
+// verification_email_sent === false (la cuenta se creo, pero el correo no
+// llego a salir). Se limpia en cuanto un reenvio funciona.
+const envioFallido = ref(sessionStorage.getItem('verificationEmailFailed') === '1');
+
 const alertMessage = ref('');
 const alertType = ref('');
 const alertKey = ref(0);
@@ -48,11 +56,19 @@ async function reenviarCorreo() {
     // token lo agrega el interceptor de resources/js/bootstrap.js.
     await axios.post('/email/verification-notification');
     reenviado.value = true;
+    envioFallido.value = false;
+    sessionStorage.removeItem('verificationEmailFailed');
   } catch (e) {
+    // Se muestra el mensaje que manda el backend, no uno generico: distingue
+    // "el servicio de correo no esta configurado" (503) de "has pedido
+    // demasiados reenvios" (429, el limite es de 5 por hora), y esas dos cosas
+    // se resuelven de forma muy distinta.
     alertType.value = 'error';
-    alertMessage.value = 'Error al reenviar el correo.';
+    alertMessage.value = e.response?.status === 429
+      ? 'Has pedido demasiados reenvíos. Espera un rato antes de volver a intentarlo.'
+      : (e.response?.data?.message || 'Error al reenviar el correo.');
     openModal.value = true;
-    
+
   }
   reenviando.value = false;
 }

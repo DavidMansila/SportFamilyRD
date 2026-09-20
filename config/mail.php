@@ -65,6 +65,16 @@ return [
             'transport' => 'resend',
         ],
 
+        // Brevo por API HTTP. Es el que se usa en Render: el plan gratuito
+        // bloquea los puertos SMTP, asi que el correo tiene que salir por
+        // HTTPS. El transporte se registra en AppServiceProvider (Laravel no
+        // trae driver de Brevo de serie) y la clave se saca de
+        // Brevo > SMTP & API > API Keys.
+        'brevo' => [
+            'transport' => 'brevo',
+            'key' => env('BREVO_KEY'),
+        ],
+
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),

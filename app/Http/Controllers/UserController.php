@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -56,7 +57,26 @@ class UserController extends Controller
 
             //iniciar sesion automaticamente al crear un usuario y mandar correo
             Auth::login($user);
-            event(new Registered($user));
+
+            // El correo de verificacion va en su propio try: si falla el envio
+            // (proveedor caido, credenciales mal, puerto SMTP bloqueado...) la
+            // cuenta YA esta creada, y antes esa excepcion caia en el catch de
+            // abajo y devolvia 500 "No se pudo crear el usuario". El usuario
+            // veia un error, se registraba de nuevo y le saltaba "el correo ya
+            // esta en uso". Ahora el registro se completa igual y el frontend
+            // sabe, por 'verification_email_sent', si tiene que avisar de que
+            // el correo no salio.
+            $correoEnviado = true;
+            try {
+                event(new Registered($user));
+            } catch (\Throwable $e) {
+                $correoEnviado = false;
+                Log::error('No se pudo enviar el correo de verificacion al registrar', [
+                    'user_id' => $user->id,
+                    'mailer' => config('mail.default'),
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
             // Generar token para el usuario
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -65,6 +85,7 @@ class UserController extends Controller
                 'message' => 'Usuario creado con éxito',
                 'user' => $user,
                 'token' => $token,
+                'verification_email_sent' => $correoEnviado,
             ], 201);
         } catch (\Exception $e) {
             return error_json($e, 'No se pudo crear el usuario', 500);
