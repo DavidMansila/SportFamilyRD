@@ -69,8 +69,17 @@ Route::post('/logout', [AuthController::class, 'logout']);
 // esta salida, el contador se quedaria congelado hasta un minuto despues de que
 // alguien publica algo, y la suscripcion no serviria de nada.
 Route::get('/home-stats', function (Request $request) {
+    // Solo cuentan las cuentas VERIFICADAS. Una cuenta sin verificar es una
+    // direccion de correo que nadie ha confirmado: puede ser un registro a
+    // medias, una prueba o un alta automatizada, y no representa a una persona
+    // de la comunidad. Es el numero que se enseña en la portada, asi que tiene
+    // que significar algo.
+    //
+    // El MISMO filtro esta en broadcast_user_count_change() (ver la migracion
+    // del trigger). Si los dos dejan de coincidir, el contador cambia de valor
+    // al refrescarse en vivo y vuelve a cambiar al recargar la pagina.
     $calcular = fn() => [
-        'users' => User::count(),
+        'users' => User::whereNotNull('email_verified_at')->count(),
         'events' => Calendar::count(),
         'posts' => Post::count(),
     ];
