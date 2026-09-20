@@ -69,9 +69,8 @@ class NewsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
         // 'description', no 'content': la columna con el cuerpo del articulo en
         // la tabla NewsScrapping se llama 'description' (la vieja tabla 'news'
@@ -130,9 +129,8 @@ class NewsController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            if ($request->user()->user_type !== 'admin') {
-                return response()->json(['message' => 'No autorizado'], 403);
-            }
+            // La comprobacion de admin la hace el middleware 'admin' en
+            // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
             $news = News::findOrFail($id);
 

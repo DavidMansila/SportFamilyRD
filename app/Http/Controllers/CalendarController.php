@@ -48,9 +48,8 @@ class CalendarController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
         $calendar = Calendar::create($request->validate([
             'Title'=> 'required|string|max:255',
@@ -107,9 +106,8 @@ class CalendarController extends Controller
      */
     public function update(Request $request, Calendar $calendar)
     {
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
         $calendar->update($request->validate([
             'Title'=> 'required|string|max:255',
@@ -129,9 +127,8 @@ class CalendarController extends Controller
      */
     public function destroy(Request $request, Calendar $calendar)
     {
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
         $calendar->delete();
         return response()->json(null, 204);

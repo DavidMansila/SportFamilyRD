@@ -140,33 +140,22 @@ class ConfigurationController extends Controller
      *
      * Antes store/update/destroy no comprobaban nada mas alla de estar
      * autenticado: cualquier cuenta recien registrada podia borrar el catalogo
-     * entero. index() y updateValue() si son de cada usuario (tocan su propia
-     * fila en configuration_user) y no llevan este chequeo.
+     * entero, y borrar duele el doble porque configuration_user tiene la clave
+     * foranea en cascada: se llevaba por delante el ajuste de todos.
+     *
+     * Esa comprobacion la hace ahora el middleware 'admin' sobre las rutas de
+     * show/store/update/destroy (routes/api.php). index() y updateValue() NO
+     * llevan el middleware a proposito: son de cada usuario y tocan su propia
+     * fila en configuration_user.
      */
-    private function soloAdmin(Request $request): ?\Illuminate\Http\JsonResponse
-    {
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
-
-        return null;
-    }
 
     public function show(Request $request, $id)
     {
-        if ($resp = $this->soloAdmin($request)) {
-            return $resp;
-        }
-
         return response()->json(Configuration::findOrFail($id));
     }
 
     public function store(Request $request)
     {
-        if ($resp = $this->soloAdmin($request)) {
-            return $resp;
-        }
-
         $configuration = Configuration::create($request->validate([
             'configuration' => 'required|string|max:255',
         ]));
@@ -176,10 +165,6 @@ class ConfigurationController extends Controller
 
     public function update(Request $request, $id)
     {
-        if ($resp = $this->soloAdmin($request)) {
-            return $resp;
-        }
-
         $configuration = Configuration::findOrFail($id);
         $configuration->update($request->validate([
             'configuration' => 'required|string|max:255',
@@ -190,10 +175,6 @@ class ConfigurationController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        if ($resp = $this->soloAdmin($request)) {
-            return $resp;
-        }
-
         Configuration::findOrFail($id)->delete();
 
         return response()->json(null, 204);

@@ -4,7 +4,7 @@ Revisión original del proyecto (Laravel 11 + Vue 3 SPA) hecha el **7 de septiem
 
 > **Revisado el 20 de septiembre de 2026.** Se comprobó punto por punto contra el código
 > actual, buscando por contenido (los números de línea del documento original ya no valen:
-> el código cambió mucho). **De los 30 puntos, 13 están resueltos y 4 parcialmente.** El
+> el código cambió mucho). **De los 30 puntos, 15 están resueltos y 3 parcialmente.** El
 > Bloque 1 completo —lo único marcado como crítico— está cerrado. Al final hay un
 > **Bloque 8** con lo que encontró esta revisión y que el documento original no recogía.
 
@@ -41,10 +41,10 @@ caducado de `AutorizacionTest` / `BarridoAutorizacionTest`.
 
 ### 1.2 🔴 Cualquier usuario puede editar o borrar el catálogo global de ajustes — ✅ RESUELTO
 
-**Hoy:** `ConfigurationController` centraliza la comprobación en `soloAdmin()` y la invoca
-en `show`, `store`, `update` y `destroy`. Se resolvió dentro del controlador y no como
-middleware de ruta (que es lo que pedía el punto 2.1), pero el agujero está cerrado.
-Prueba: `test_gestionar_la_configuracion_global_exige_admin`.
+**Hoy:** `show`, `store`, `update` y `destroy` están detrás del middleware `admin` en
+`routes/api.php` (ver 2.1); `index` sigue abierto a cualquier usuario autenticado, porque
+todos necesitan leer el catálogo para elegir sus preferencias. Pruebas:
+`test_gestionar_la_configuracion_global_exige_admin` y `RutasDeAdminTest`.
 
 ### 1.3 🟠 IDOR en entrenamientos — ✅ RESUELTO
 
@@ -76,16 +76,24 @@ cabecera y aceptan `?token=` solo por compatibilidad con el cron ya configurado.
 
 ## Bloque 2 — Autorización y consistencia del backend
 
-### 2.1 🟠 23 comprobaciones de admin copiadas a mano — ⬜ PENDIENTE (hoy son 29)
+### 2.1 🟠 23 comprobaciones de admin copiadas a mano — ✅ RESUELTO
 
-No existe el middleware `EnsureUserIsAdmin` ni el alias `admin` en `bootstrap/app.php`, y
-ninguna ruta lo usa. El patrón `user_type !== 'admin'` aparece **29 veces repartidas en 10
-controladores** — cuatro más que cuando se escribió el documento.
+Existe `EnsureUserIsAdmin` registrado como alias `admin` en `bootstrap/app.php`, y **16
+rutas** lo usan agrupadas en `routes/api.php`: calendario, productos, noticias, el catálogo
+de ajustes, la importación del calendario y las tres acciones de administración de
+entrenadores. La comprobación se retiró de esos 16 métodos.
 
-Sigue vigente el argumento original: basta olvidarlo una vez para abrir un agujero, y es
-exactamente lo que pasó en 1.2 y 1.3. Con la suite de autorización que ahora existe (7.1),
-hacer este cambio es mucho menos arriesgado que en septiembre: las pruebas avisan si alguna
-ruta se queda sin protección.
+**No se movió todo**: las 15 comprobaciones que quedan son de la forma «el dueño del recurso
+**o** un admin» (editar tu propio post, ver tus entrenamientos, cambiar tus datos). Eso no
+es un rol, depende del recurso concreto, así que sigue en su método. También se quedaron dos
+casos que parecen iguales y no lo son: la protección del rol de admin al aprobar una ficha
+de entrenador, y el `elseif` de `GET /training`, que admite al entrenador dueño *o* a un
+admin según venga el parámetro.
+
+Red de seguridad: `RutasDeAdminTest` comprueba **en la tabla de rutas** que las 16 llevan el
+middleware. Importa porque ahora esa es la única barrera —el controlador ya no comprueba
+nada—, así que si alguien lo quita al reorganizar el archivo, no queda nada debajo. Un
+barrido funcional no lo detectaría si la ruta cambiara de URI; esto sí, y dice cuál falta.
 
 ### 2.2 🟡 Falta validación de entrada en varios endpoints — ✅ RESUELTO
 
@@ -327,13 +335,6 @@ de realtime): conviene documentarlas o eliminarlas.
 
 Lo de los bloques 1 y 7 ya está. Este es el orden que tiene sentido hoy.
 
-### Ahora que hay pruebas: el middleware `admin` (2.1)
-
-Es el punto de más valor que sigue abierto, y el momento es bueno: con 57 pruebas —entre
-ellas dos barridos que comprueban que ninguna acción de administración es accesible para una
-cuenta normal— el cambio se puede hacer con red debajo. Sustituir 29 comprobaciones
-repartidas por una regla visible en el archivo de rutas.
-
 ### Limpieza barata (medio día, riesgo cero)
 
 | # | Tarea | Punto |
@@ -366,21 +367,21 @@ sigue siendo la misma: si abres un archivo para otra cosa, aprovecha.
 | Bloque | ✅ Resuelto | 🟡 Parcial | ⬜ Pendiente |
 |---|:-:|:-:|:-:|
 | 1. Seguridad | 7 | — | — |
-| 2. Autorización | 1 | — | 2 |
+| 2. Autorización | 2 | — | 1 |
 | 3. Rendimiento | 1 | 2 | 1 |
 | 4. Frontend | 1 | 1 | 7 |
 | 5. Estilos | — | — | 3 |
 | 6. Repositorio | 2 | — | 1 |
 | 7. Pruebas | 1 | — | — |
 | 8. Revisión del 20 sep | 1 | — | 5 |
-| **Total** | **14** | **3** | **19** |
+| **Total** | **15** | **3** | **18** |
 
 **Los dos puntos críticos están cerrados**, y con ellos todo el Bloque 1. La cobertura de
 pruebas pasó de cero a 57, que era lo que el documento señalaba como condición para que lo
 demás no se re-rompiera en silencio.
 
-Lo que queda se reparte en tres grupos: **lo que no se hizo** (middleware `admin`, API
-Resources, paginación real), **la limpieza que nunca es urgente** (routers muertos, CSS,
+Lo que queda se reparte en tres grupos: **lo que no se hizo** (API Resources, paginación
+real), **la limpieza que nunca es urgente** (routers muertos, CSS,
 `@import`, linter) y **lo que apareció después** del documento original, en el Bloque 8. El
 patrón que más se repite en esa última parte merece atención: piezas que existen, parecen
 montadas y no están conectadas a nada.

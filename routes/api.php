@@ -308,16 +308,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/{user}/image', [UserController::class, 'updateAvatar']);
     Route::get('/user-stats/{userId}', [UserStatsController::class, 'getStats']);
 
-    // --- CALENDARIO (solo admin, ver check dentro del controller) ---
-    Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store'])->middleware('throttle:5,1');
-    Route::post('/calendar', [CalendarController::class, 'store']);
-    Route::put('/calendar/{calendar}', [CalendarController::class, 'update']);
-    Route::delete('/calendar/{calendar}', [CalendarController::class, 'destroy']);
+    // --- CALENDARIO Y PRODUCTOS (solo admin) ---
+    //
+    // El middleware 'admin' sustituye a la comprobacion de user_type que cada
+    // uno de estos metodos hacia por su cuenta. Antes, para saber quien podia
+    // llamar a estas rutas habia que abrir el controlador; ahora se lee aqui.
+    Route::middleware('admin')->group(function () {
+        Route::post('/scrap-calendar', [ScrapCalendarController::class, 'store'])->middleware('throttle:5,1');
+        Route::post('/calendar', [CalendarController::class, 'store']);
+        Route::put('/calendar/{calendar}', [CalendarController::class, 'update']);
+        Route::delete('/calendar/{calendar}', [CalendarController::class, 'destroy']);
 
-    // --- PRODUCTOS (solo admin, ver check dentro del controller) ---
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/products/{id}', [ProductController::class, 'update']);
-    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::put('/products/{id}', [ProductController::class, 'update']);
+        Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    });
 
     // --- CARRITO ---
     Route::get('/cart', [CartController::class, 'getCart']);
@@ -341,25 +346,38 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- NOTICIAS ---
     Route::post('/news/{newsId}/toggle-save', [SavedNewsController::class, 'toggleSave']);
     Route::get('/saved-news', [SavedNewsController::class, 'index']);
-    Route::put('/news/{id}', [NewsController::class, 'update']);
-    Route::delete('/news/{id}', [NewsController::class, 'destroy']);
+    Route::middleware('admin')->group(function () {
+        Route::put('/news/{id}', [NewsController::class, 'update']);
+        Route::delete('/news/{id}', [NewsController::class, 'destroy']);
+    });
 
-    // --- TRAINER (index/updateStatus/trainer-requests solo admin, ver checks
-    // dentro del controller) ---
-    Route::get('/trainer', [TrainerController::class, 'index']);
+    // --- TRAINER ---
     // Manda correo al admin en cada peticion -> throttle:correo (5/hora).
     Route::post('/solicitud-entrenador', [TrainerController::class, 'store'])
         ->middleware('throttle:correo');
+    // Editar la ficha: la comprueba el controlador, porque es "el dueño de la
+    // ficha O un admin", no admin a secas.
     Route::put('/trainer/{id}', [TrainerController::class, 'update']);
-    // Aprobar/rechazar manda correo al solicitante -> throttle:correo.
-    Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus'])
-        ->middleware('throttle:correo');
-    Route::get('/trainer-requests', [TrainerController::class, 'getAllTrainerRequests']);
+
+    Route::middleware('admin')->group(function () {
+        // Listado completo de solicitudes, con telefono, correo y ciudad.
+        Route::get('/trainer', [TrainerController::class, 'index']);
+        Route::get('/trainer-requests', [TrainerController::class, 'getAllTrainerRequests']);
+        // Aprobar/rechazar manda correo al solicitante -> throttle:correo.
+        Route::put('/update-status/{id}', [TrainerController::class, 'updateStatus'])
+            ->middleware('throttle:correo');
+    });
 
     // --- CONFIGURACIÓN ---
     Route::post('/config-update-value', [ConfigurationController::class, 'updateValue']);
     Route::post('/change-password', [ConfigurationController::class, 'changePassword']);
-    Route::resource('/config', ConfigurationController::class);
+    // El catalogo de ajustes lo LEEN todos (index) pero solo lo toca un admin.
+    // Cada usuario cambia SU valor por /config-update-value, de aqui arriba.
+    Route::resource('/config', ConfigurationController::class)->only(['index']);
+    Route::middleware('admin')->group(function () {
+        Route::resource('/config', ConfigurationController::class)
+            ->only(['show', 'store', 'update', 'destroy']);
+    });
 
     // --- ENTRENAMIENTOS ---
     // check-existing va ANTES del resource: si no, "/training/{training}" del

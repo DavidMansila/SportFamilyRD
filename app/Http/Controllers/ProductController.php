@@ -37,9 +37,8 @@ class ProductController extends Controller
         try {
             // Gestionar el catalogo es solo de admin (la UI ya lo oculta a los
             // demas usuarios, pero eso no impedia llamar el endpoint directo).
-            if ($request->user()->user_type !== 'admin') {
-                return response()->json(['message' => 'No autorizado'], 403);
-            }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
@@ -71,9 +70,8 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            if ($request->user()->user_type !== 'admin') {
-                return response()->json(['message' => 'No autorizado'], 403);
-            }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
             $product = Product::find($id);
 
@@ -113,9 +111,8 @@ class ProductController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            if ($request->user()->user_type !== 'admin') {
-                return response()->json(['message' => 'No autorizado'], 403);
-            }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
             $product = Product::find($id);
 

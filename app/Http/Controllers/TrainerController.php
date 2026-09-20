@@ -19,9 +19,8 @@ class TrainerController extends Controller
         // Lista completa de solicitudes de entrenador (incluye pendientes/rechazadas,
         // con telefono/email/ciudad): solo un admin puede verla. Antes esta ruta
         // era publica y exponia esos datos de TODAS las solicitudes sin autenticacion.
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
         $status = $request->query('status', 'all');
 
@@ -264,9 +263,8 @@ class TrainerController extends Controller
     {
         // Aprobar/rechazar una solicitud (y con eso, convertir al usuario en
         // entrenador) es una accion solo de admin.
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
         $request->validate([
             'status' => 'required|string|in:pending,approved,rejected'
@@ -402,9 +400,8 @@ class TrainerController extends Controller
 
     public function getAllTrainerRequests(Request $request)
     {
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
         $requests = Trainer::all();
         return response()->json([

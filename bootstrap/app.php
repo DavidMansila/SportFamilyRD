@@ -107,6 +107,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => \App\Http\Middleware\Authenticate::class,
             'broadcast.auth' => \App\Http\Middleware\BroadcastAuth::class,
 
+            // Acciones reservadas a administracion. Va detras de 'auth:sanctum'
+            // y sustituye a la comprobacion de user_type que estaba copiada en
+            // cada metodo: asi la regla se lee en routes/api.php, junto a la
+            // ruta, y no se puede olvidar dentro del controlador -que es como
+            // se abrieron dos agujeros en este proyecto-.
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+
             // Responde 202 y ejecuta el comando despues de enviar la respuesta.
             // Lo usan las rutas de cron de routes/api.php para no agotar los
             // 30s que espera cron-job.org. Uso: 'cron.background:news:import'.

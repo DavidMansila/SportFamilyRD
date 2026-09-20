@@ -22,9 +22,8 @@ class ScrapCalendarController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->user()->user_type !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
+        // La comprobacion de admin la hace el middleware 'admin' en
+        // routes/api.php, junto a la ruta. Ver EnsureUserIsAdmin.
 
         // Los nombres de campo son los que manda el frontend en
         // CalendarioView.vue (Title/date/Description), no los que leia antes
