@@ -1,16 +1,32 @@
 # SportFamilyRD
 
 Plataforma web para la comunidad deportiva dominicana: foro, tienda, calendario de
-eventos, noticias, directorio de deportes, perfiles de entrenadores y chat en
-tiempo real.
+eventos, noticias, directorio de deportes, fichas de entrenadores y chat en tiempo
+real entre atletas y entrenadores.
 
-Aplicación de página única (SPA) en **Vue 3** sobre una **API REST en Laravel 11**,
-con **PostgreSQL** como base de datos.
+Aplicación de página única en **Vue 3** sobre una **API REST en Laravel 11**, con
+**PostgreSQL** como base de datos y despliegue continuo en Render.
+
+### ▶ [Ver la aplicación en funcionamiento](https://sportfamilyrd.onrender.com)
+
+> **La primera carga puede tardar cerca de un minuto.** El servicio está en el plan
+> gratuito de Render, que suspende la instancia cuando pasa un rato sin visitas y
+> vuelve a levantarla con la siguiente petición. A partir de ahí la navegación es
+> inmediata.
+>
+> Se puede recorrer **sin crear cuenta**: foro, noticias, calendario, tienda,
+> directorio de deportes y fichas de entrenadores. El registro está abierto si
+> quieres probar el carrito, publicar en el foro o solicitar entrenamiento.
+
+<img width="1853" alt="Portada de SportFamilyRD" src="https://github.com/user-attachments/assets/90fa6171-ce34-4582-906a-6bee2c3b0ae3" />
 
 ---
 
 ## Índice
 
+- [Qué incluye](#qué-incluye)
+- [Decisiones técnicas](#decisiones-técnicas)
+- [Pruebas y calidad del código](#pruebas-y-calidad-del-código)
 - [Stack tecnológico](#stack-tecnológico)
 - [Requisitos previos](#requisitos-previos)
 - [Instalación y configuración](#instalación-y-configuración)
@@ -20,8 +36,86 @@ con **PostgreSQL** como base de datos.
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Tareas programadas](#tareas-programadas)
 - [Solución de problemas](#solución-de-problemas)
-- [Imágenes del Proyecto](#imágenes-del-proyecto)
+- [Capturas](#capturas)
 
+---
+
+## Qué incluye
+
+Unas 7.200 líneas de PHP repartidas en 67 archivos, 27 componentes de Vue, 79 rutas
+de API sobre 29 tablas, y 6 comandos de consola propios.
+
+| Módulo | Qué hace |
+|---|---|
+| **Foro** | Publicaciones por categoría, con comentarios, respuestas anidadas y «me gusta» en los tres niveles. Imagen opcional por publicación. |
+| **Noticias** | Se alimenta solo: cinco fuentes deportivas dominicanas se recorren de forma programada y las noticias entran clasificadas por deporte. Cada usuario puede guardar las suyas. |
+| **Calendario** | Eventos deportivos con detalle, precio y aforo, también alimentado por importación automática. Los destacados salen en la portada. |
+| **Tienda** | Catálogo con carrito persistente por usuario, control de existencias y aforo, y gestión desde el panel de administración. El paso de pago es una simulación: no hay pasarela real conectada. |
+| **Entrenadores** | Solicitud para darse de alta con logros y especialidades, aprobación por administración y directorio público de los aprobados. |
+| **Entrenamientos** | Un atleta solicita entrenar con alguien del directorio; el entrenador acepta o rechaza, y al aceptar se abre el chat entre ambos. |
+| **Chat** | Mensajería en tiempo real por WebSocket, con contador de no leídos, marcado de leído y aviso de conexión. |
+| **Directorio de deportes** | Fichas por deporte con requisitos, lugares donde practicarlo y datos de interés. |
+| **Perfil y ajustes** | Datos personales, avatar, preferencias y cambio de contraseña. |
+| **Administración** | Gestión de productos, eventos, noticias, solicitudes de entrenador y catálogo de ajustes. |
+
+---
+
+## Decisiones técnicas
+
+Algunas cosas del proyecto no son la opción obvia, y el motivo está en las
+restricciones reales del entorno donde corre:
+
+**El correo sale por API HTTP, no por SMTP.** El plan gratuito de Render bloquea el
+tráfico saliente a los puertos 25, 465 y 587, así que ningún envío por SMTP puede
+completarse. El transporte usa la API HTTPS del proveedor, que no depende de esos
+puertos.
+
+**Los archivos subidos van a almacenamiento externo.** El sistema de archivos del
+contenedor es efímero: cualquier avatar o imagen subida desaparecería en el
+siguiente reinicio. Todo se guarda en Supabase Storage a través del disco `s3` de
+Laravel, y el código no distingue entre uno y otro.
+
+**El tiempo real llega por dos caminos distintos.** Las tablas públicas —eventos y
+publicaciones— se escuchan directamente. La de usuarios no: lleva correo y
+teléfono, así que en vez de exponer las filas, un disparador en la base emite solo
+un aviso de que la cuenta cambió, y el cliente vuelve a pedir el dato agregado.
+
+**Las importaciones responden antes de trabajar.** El servicio de cron corta a los
+30 segundos y un ciclo de scraping ronda los 28. La petición devuelve `202` de
+inmediato y el trabajo arranca después de enviar la respuesta, con un cerrojo que
+impide que dos importaciones se solapen.
+
+**Cachés con invalidación por modelo.** Los endpoints públicos se sirven cacheados,
+y el caché se limpia desde el propio modelo al guardar o borrar, no desde los
+controladores: así no hay forma de añadir una ruta nueva y olvidarse de invalidar.
+
+---
+
+## Pruebas y calidad del código
+
+**76 pruebas automatizadas** con 218 aserciones (`php artisan test`), sobre SQLite en
+memoria. No cubren la interfaz: están donde un fallo silencioso hace daño.
+
+| Área | Qué se comprueba |
+|---|---|
+| Autorización | Barridos genéricos: ningún recurso ajeno es accesible y ninguna acción de administración funciona con una cuenta normal |
+| Verificación de correo | Enlace firmado, caducidad, id manipulado y parámetros añadidos |
+| Chat | Quién puede abrir una conversación, escribir en ella y verla; coherencia de roles cuando una cuenta cambia de tipo |
+| Carrito | Existencias, cantidades acumuladas, líneas huérfanas y unicidad |
+| Rendimiento | Que la bandeja de mensajes no haga una consulta por conversación |
+
+Dos detalles de las pruebas que valen más que el número:
+
+- Algunas comprueban el **SQL generado** en lugar del resultado. Las pruebas corren
+  sobre SQLite y producción es PostgreSQL: un filtro booleano mal construido pasa en
+  una y revienta en la otra, así que comprobar el resultado daría verde sobre código
+  roto.
+- Otras miran la **tabla de rutas**, no la respuesta: verifican que las rutas de
+  administración llevan su middleware. Un barrido funcional no detectaría que falta
+  si la ruta cambiara de dirección.
+
+El archivo [`MEJORAS.md`](MEJORAS.md) mantiene el estado de la deuda técnica
+pendiente, con lo que está resuelto y lo que no, y por qué.
 
 ---
 
@@ -411,124 +505,151 @@ php artisan cache:clear
 
 ---
 
+---
 
-## Imágenes del Proyecto
+## Capturas
 
+Recorrido por las pantallas principales. Cada bloque se despliega al pulsarlo.
 
-### REGISTRO Y INICIO DE SECCION 
+<details>
+<summary><b>Registro e inicio de sesión</b> — Alta de cuenta y acceso (2)</summary>
 
-<img width="1253" height="757" alt="image" src="https://github.com/user-attachments/assets/8c2b39aa-8053-4f0d-9859-0f61c7859d7a" />
+<img width="1253" height="757" alt="Registro e inicio de sesión" src="https://github.com/user-attachments/assets/8c2b39aa-8053-4f0d-9859-0f61c7859d7a" />
 
-<img width="1247" height="737" alt="image" src="https://github.com/user-attachments/assets/68d97bb3-7cb4-41e1-85a5-9c23f754d066" />
+<img width="1247" height="737" alt="Registro e inicio de sesión" src="https://github.com/user-attachments/assets/68d97bb3-7cb4-41e1-85a5-9c23f754d066" />
 
+</details>
 
-### HOME
+<details>
+<summary><b>Portada</b> — Estadísticas en vivo, eventos destacados, noticias y publicaciones populares (6)</summary>
 
-<img width="1853" height="922" alt="image" src="https://github.com/user-attachments/assets/90fa6171-ce34-4582-906a-6bee2c3b0ae3" />
+<img width="1853" height="922" alt="Portada" src="https://github.com/user-attachments/assets/90fa6171-ce34-4582-906a-6bee2c3b0ae3" />
 
-<img width="1841" height="867" alt="image" src="https://github.com/user-attachments/assets/9089dc1d-7cf8-4623-b5ad-aa9123451f37" />
+<img width="1841" height="867" alt="Portada" src="https://github.com/user-attachments/assets/9089dc1d-7cf8-4623-b5ad-aa9123451f37" />
 
-<img width="1835" height="916" alt="image" src="https://github.com/user-attachments/assets/66a48a97-c854-4da7-a24d-a1b93c8b7d15" />
+<img width="1835" height="916" alt="Portada" src="https://github.com/user-attachments/assets/66a48a97-c854-4da7-a24d-a1b93c8b7d15" />
 
-<img width="1832" height="915" alt="image" src="https://github.com/user-attachments/assets/afbf9655-e7f3-444b-9d14-cee83993392f" />
+<img width="1832" height="915" alt="Portada" src="https://github.com/user-attachments/assets/afbf9655-e7f3-444b-9d14-cee83993392f" />
 
-<img width="1845" height="915" alt="image" src="https://github.com/user-attachments/assets/a8fae0e5-86c7-463c-bac7-268836279285" />
+<img width="1845" height="915" alt="Portada" src="https://github.com/user-attachments/assets/a8fae0e5-86c7-463c-bac7-268836279285" />
 
-<img width="1841" height="917" alt="image" src="https://github.com/user-attachments/assets/7d7a1261-2f2d-4adb-9d7c-d0ce3e51e72e" />
+<img width="1841" height="917" alt="Portada" src="https://github.com/user-attachments/assets/7d7a1261-2f2d-4adb-9d7c-d0ce3e51e72e" />
 
+</details>
 
-### DEPORTES
+<details>
+<summary><b>Directorio de deportes</b> — Fichas con requisitos y lugares donde practicar (2)</summary>
 
-<img width="1848" height="917" alt="image" src="https://github.com/user-attachments/assets/f9bb7177-36ba-40c0-8c3d-067464a1108f" />
+<img width="1848" height="917" alt="Directorio de deportes" src="https://github.com/user-attachments/assets/f9bb7177-36ba-40c0-8c3d-067464a1108f" />
 
-<img width="1850" height="921" alt="image" src="https://github.com/user-attachments/assets/8ff19da1-2f74-4591-a908-619bc0a7e2ab" />
+<img width="1850" height="921" alt="Directorio de deportes" src="https://github.com/user-attachments/assets/8ff19da1-2f74-4591-a908-619bc0a7e2ab" />
 
+</details>
 
-### NOTICIAS
+<details>
+<summary><b>Noticias</b> — Listado por deporte y detalle, alimentado por importación automática (2)</summary>
 
-<img width="1841" height="925" alt="image" src="https://github.com/user-attachments/assets/cebf1852-699b-4583-ae78-937c8ba59608" />
+<img width="1841" height="925" alt="Noticias" src="https://github.com/user-attachments/assets/cebf1852-699b-4583-ae78-937c8ba59608" />
 
-<img width="1845" height="917" alt="image" src="https://github.com/user-attachments/assets/9778040f-61b1-41e2-a001-0c05911d7a00" />
+<img width="1845" height="917" alt="Noticias" src="https://github.com/user-attachments/assets/9778040f-61b1-41e2-a001-0c05911d7a00" />
 
+</details>
 
-### CALENDARIO
+<details>
+<summary><b>Calendario</b> — Eventos con detalle, precio y aforo (3)</summary>
 
-<img width="1846" height="912" alt="image" src="https://github.com/user-attachments/assets/95ac218a-846a-4bd4-ba3d-199f62795828" />
+<img width="1846" height="912" alt="Calendario" src="https://github.com/user-attachments/assets/95ac218a-846a-4bd4-ba3d-199f62795828" />
 
-<img width="1847" height="917" alt="image" src="https://github.com/user-attachments/assets/b6e5ab35-8dfc-49e7-9d17-a5b4e18abcfc" />
+<img width="1847" height="917" alt="Calendario" src="https://github.com/user-attachments/assets/b6e5ab35-8dfc-49e7-9d17-a5b4e18abcfc" />
 
-<img width="1862" height="927" alt="image" src="https://github.com/user-attachments/assets/b104a19c-928d-4675-b371-4b00a9911fcb" />
+<img width="1862" height="927" alt="Calendario" src="https://github.com/user-attachments/assets/b104a19c-928d-4675-b371-4b00a9911fcb" />
 
+</details>
 
-### TIENDA 
+<details>
+<summary><b>Tienda</b> — Catálogo, ficha de producto y gestión (4)</summary>
 
-<img width="1847" height="922" alt="image" src="https://github.com/user-attachments/assets/f250ab2e-3d1e-4781-8102-620c2fc53a08" />
+<img width="1847" height="922" alt="Tienda" src="https://github.com/user-attachments/assets/f250ab2e-3d1e-4781-8102-620c2fc53a08" />
 
-<img width="1843" height="918" alt="image" src="https://github.com/user-attachments/assets/0893c12c-873f-4968-bd8d-94f3026f3c67" />
+<img width="1843" height="918" alt="Tienda" src="https://github.com/user-attachments/assets/0893c12c-873f-4968-bd8d-94f3026f3c67" />
 
-<img width="1837" height="918" alt="image" src="https://github.com/user-attachments/assets/48975a29-8ef9-48e3-9eb0-8a545b71b7fb" />
+<img width="1837" height="918" alt="Tienda" src="https://github.com/user-attachments/assets/48975a29-8ef9-48e3-9eb0-8a545b71b7fb" />
 
-<img width="1858" height="916" alt="image" src="https://github.com/user-attachments/assets/92e81f51-bede-4bda-8815-b1fa469c5b48" />
+<img width="1858" height="916" alt="Tienda" src="https://github.com/user-attachments/assets/92e81f51-bede-4bda-8815-b1fa469c5b48" />
 
+</details>
 
-### ENTRENADORES 
+<details>
+<summary><b>Entrenadores</b> — Directorio de entrenadores aprobados y su ficha (3)</summary>
 
-<img width="1847" height="918" alt="image" src="https://github.com/user-attachments/assets/7a610ff8-467f-4beb-8d19-a29403d0c799" />
+<img width="1847" height="918" alt="Entrenadores" src="https://github.com/user-attachments/assets/7a610ff8-467f-4beb-8d19-a29403d0c799" />
 
-<img width="1841" height="920" alt="image" src="https://github.com/user-attachments/assets/57ffafec-cb00-41a7-99fd-252656c9db97" />
+<img width="1841" height="920" alt="Entrenadores" src="https://github.com/user-attachments/assets/57ffafec-cb00-41a7-99fd-252656c9db97" />
 
-<img width="1845" height="922" alt="image" src="https://github.com/user-attachments/assets/970940f4-5ad2-4df4-9bca-d0375f2d8f08" />
+<img width="1845" height="922" alt="Entrenadores" src="https://github.com/user-attachments/assets/970940f4-5ad2-4df4-9bca-d0375f2d8f08" />
 
-### ENTRENADORES FORMULARIO
+</details>
 
-<img width="1295" height="845" alt="image" src="https://github.com/user-attachments/assets/ef793123-00c9-40cb-b218-a6b94a47358b" />
+<details>
+<summary><b>Alta de entrenador</b> — Solicitud con logros, especialidades y horarios (6)</summary>
 
-<img width="1202" height="721" alt="image" src="https://github.com/user-attachments/assets/c251d7d4-9e76-45e7-a1e6-cf6408b3e928" />
+<img width="1295" height="845" alt="Alta de entrenador" src="https://github.com/user-attachments/assets/ef793123-00c9-40cb-b218-a6b94a47358b" />
 
-<img width="1156" height="845" alt="image" src="https://github.com/user-attachments/assets/92b0b1e5-9d12-4901-ae43-be2b450032a9" />
+<img width="1202" height="721" alt="Alta de entrenador" src="https://github.com/user-attachments/assets/c251d7d4-9e76-45e7-a1e6-cf6408b3e928" />
 
-<img width="1017" height="713" alt="image" src="https://github.com/user-attachments/assets/579df4a2-439b-4d6f-8cd4-1b04f6867448" />
+<img width="1156" height="845" alt="Alta de entrenador" src="https://github.com/user-attachments/assets/92b0b1e5-9d12-4901-ae43-be2b450032a9" />
 
-<img width="928" height="898" alt="image" src="https://github.com/user-attachments/assets/6d3d037f-efbc-430a-b037-1395aba97e5c" />
+<img width="1017" height="713" alt="Alta de entrenador" src="https://github.com/user-attachments/assets/579df4a2-439b-4d6f-8cd4-1b04f6867448" />
 
-<img width="472" height="382" alt="image" src="https://github.com/user-attachments/assets/dd64acfe-e043-49bb-ae46-f0db95166156" />
+<img width="928" height="898" alt="Alta de entrenador" src="https://github.com/user-attachments/assets/6d3d037f-efbc-430a-b037-1395aba97e5c" />
 
-### FORO
+<img width="472" height="382" alt="Alta de entrenador" src="https://github.com/user-attachments/assets/dd64acfe-e043-49bb-ae46-f0db95166156" />
 
-<img width="1843" height="921" alt="image" src="https://github.com/user-attachments/assets/73454250-bbac-4106-95bc-f8afd208a738" />
+</details>
 
-<img width="1846" height="921" alt="image" src="https://github.com/user-attachments/assets/33541382-a11b-46fd-ac9b-49c72c65259c" />
+<details>
+<summary><b>Foro</b> — Publicaciones, comentarios anidados y «me gusta» (4)</summary>
 
-<img width="1652" height="835" alt="image" src="https://github.com/user-attachments/assets/792bf97b-e022-4f4f-9efa-a439db93f8c9" />
+<img width="1843" height="921" alt="Foro" src="https://github.com/user-attachments/assets/73454250-bbac-4106-95bc-f8afd208a738" />
 
-<img width="1653" height="823" alt="image" src="https://github.com/user-attachments/assets/69e5e501-58a5-47fc-afd9-2b25d8766d56" />
+<img width="1846" height="921" alt="Foro" src="https://github.com/user-attachments/assets/33541382-a11b-46fd-ac9b-49c72c65259c" />
 
+<img width="1652" height="835" alt="Foro" src="https://github.com/user-attachments/assets/792bf97b-e022-4f4f-9efa-a439db93f8c9" />
 
-### CARRITO DE COMPRAS
+<img width="1653" height="823" alt="Foro" src="https://github.com/user-attachments/assets/69e5e501-58a5-47fc-afd9-2b25d8766d56" />
 
-<img width="1860" height="921" alt="image" src="https://github.com/user-attachments/assets/dc6c83de-15f7-4053-adff-5e0dfa1067b0" />
+</details>
 
-<img width="938" height="852" alt="image" src="https://github.com/user-attachments/assets/95d616a7-9ffd-46b4-b3ef-57b131418520" />
+<details>
+<summary><b>Carrito</b> — Carrito persistente y proceso de compra (3)</summary>
 
-<img width="717" height="721" alt="image" src="https://github.com/user-attachments/assets/e0fae731-da6f-4efe-b78f-8f2fd86c2d65" />
+<img width="1860" height="921" alt="Carrito" src="https://github.com/user-attachments/assets/dc6c83de-15f7-4053-adff-5e0dfa1067b0" />
 
+<img width="938" height="852" alt="Carrito" src="https://github.com/user-attachments/assets/95d616a7-9ffd-46b4-b3ef-57b131418520" />
 
-### CONFIGURACION 
+<img width="717" height="721" alt="Carrito" src="https://github.com/user-attachments/assets/e0fae731-da6f-4efe-b78f-8f2fd86c2d65" />
 
-<img width="1842" height="922" alt="image" src="https://github.com/user-attachments/assets/e3f4ab61-2991-455a-a290-76a3547d478d" />
+</details>
 
-<img width="1843" height="922" alt="image" src="https://github.com/user-attachments/assets/14beccef-8635-4d32-8876-f796d89bc8e0" />
+<details>
+<summary><b>Ajustes</b> — Preferencias de la cuenta (2)</summary>
 
+<img width="1842" height="922" alt="Ajustes" src="https://github.com/user-attachments/assets/e3f4ab61-2991-455a-a290-76a3547d478d" />
 
-### PERFIL
+<img width="1843" height="922" alt="Ajustes" src="https://github.com/user-attachments/assets/14beccef-8635-4d32-8876-f796d89bc8e0" />
 
-<img width="1847" height="920" alt="image" src="https://github.com/user-attachments/assets/1fcee57c-8669-4fb3-a69b-17ffdb3f1317" />
+</details>
 
-<img width="1616" height="702" alt="image" src="https://github.com/user-attachments/assets/92ca9d33-5ab2-4fb0-95dd-2a39e0f99ce5" />
+<details>
+<summary><b>Perfil</b> — Datos personales, avatar y estadísticas (2)</summary>
 
+<img width="1847" height="920" alt="Perfil" src="https://github.com/user-attachments/assets/1fcee57c-8669-4fb3-a69b-17ffdb3f1317" />
 
+<img width="1616" height="702" alt="Perfil" src="https://github.com/user-attachments/assets/92ca9d33-5ab2-4fb0-95dd-2a39e0f99ce5" />
 
+</details>
 
+---
 
 ## Licencia
 
