@@ -63,7 +63,7 @@ class Chat extends Model
     public function getUnreadCountAttribute()
     {
         return $this->messages()
-            ->where('read', false)
+            ->noLeidos()
             ->where('sender_id', '!=', \Illuminate\Support\Facades\Auth::user()->id)
             ->count();
     }

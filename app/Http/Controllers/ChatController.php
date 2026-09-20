@@ -45,7 +45,7 @@ class ChatController extends Controller
                     'status' => $chat->status,
                     'unread_count' => $chat->messages()
                         ->where('sender_id', '!=', $userId)
-                        ->where('read', false)
+                        ->noLeidos()
                         ->count(),
                     'last_message' => $chat->lastMessage ? [
                         'id' => $chat->lastMessage->id,
@@ -120,10 +120,12 @@ class ChatController extends Controller
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
+        // Message::booleano() y no true/false de PHP: en Postgres la columna es
+        // boolean y Laravel enlaza los booleanos como enteros. Ver el modelo.
         Message::where('chat_id', $chatId)
             ->where('sender_id', '!=', $userId)
-            ->where('read', false)
-            ->update(['read' => true]);
+            ->noLeidos()
+            ->update(['read' => Message::booleano(true)]);
 
         broadcast(new MessageRead($chatId))->toOthers();
 
@@ -185,7 +187,7 @@ class ChatController extends Controller
 
         Message::where('chat_id', $id)
             ->where('sender_id', '!=', Auth::id())
-            ->update(['read' => true]);
+            ->update(['read' => Message::booleano(true)]);
 
         return response()->json([
             'messages' => $chat->messages,
