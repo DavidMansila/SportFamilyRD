@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -64,6 +65,25 @@ class RunCommandAfterResponse
         // proceso en cuanto PHP intente escribir algo.
         ignore_user_abort(true);
 
+        // UN cron a la vez. Sin esto, cada peticion valida lanzaba su propia
+        // importacion sin mirar si ya habia otra en marcha: el throttle de la
+        // ruta permite 10 por minuto y por IP, y cada ciclo de scraping ocupa
+        // el UNICO proceso PHP del contenedor hasta cinco minutos. Quien
+        // tuviera el token -que ademas viaja en la URL y queda escrito en los
+        // logs de acceso- podia dejar el sitio sin responder encadenando
+        // importaciones, y de paso martillear los seis sitios que se scrapean.
+        //
+        // El bloqueo caduca solo a los 10 minutos: si el proceso muere a mitad
+        // (se queda sin memoria, Render reinicia el contenedor), no deja el
+        // cron bloqueado para siempre.
+        $cerrojo = Cache::lock('cron-en-curso:' . $comando, 600);
+
+        if (! $cerrojo->get()) {
+            Log::warning("Cron en segundo plano: {$comando} ya estaba en curso, se ignora esta llamada");
+
+            return;
+        }
+
         $empezo = microtime(true);
 
         try {
@@ -81,6 +101,10 @@ class RunCommandAfterResponse
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+        } finally {
+            // Se suelta pase lo que pase: si el comando revienta, el siguiente
+            // cron tiene que poder entrar sin esperar a que caduque el bloqueo.
+            $cerrojo->release();
         }
     }
 }

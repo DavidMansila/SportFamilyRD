@@ -12,7 +12,12 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\SavedNewsController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\MessageController;
+// ELIMINADO: MessageController. Su unico metodo, store(), escribia en el
+// chat_id que le pasaran SIN comprobar que quien llama participe en esa
+// conversacion -a diferencia de ChatController::storeMessage, que si lo
+// comprueba- y ademas fijaba el sender_type por el rol global de la cuenta.
+// Nunca estuvo enrutado, pero era una copia aparentemente equivalente del
+// endpoint real: reactivarla habria reabierto un IDOR de escritura.
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ScrapCalendarController;
 use App\Http\Controllers\ScrapperController;
@@ -253,9 +258,16 @@ Route::get('/internal/cron/calendar', function (Request $request) use ($cronAuto
 // ?token=CRON_SECRET para disparar el scheduler de Laravel (news:import,
 // calendar:import, training:expire). Sin el token correcto, 403. Si
 // CRON_SECRET no esta configurado en .env, la ruta se desactiva sola.
-Route::get('/internal/schedule-run', function (Request $request) {
-    $secret = config('app.cron_secret');
-    if (!$secret || !hash_equals($secret, (string) $request->query('token'))) {
+Route::get('/internal/schedule-run', function (Request $request) use ($cronAutorizado) {
+    // Se reutiliza $cronAutorizado, igual que las otras dos rutas de cron. Esta
+    // se habia quedado con su propia comprobacion, que solo miraba
+    // ?token= y no admitia la cabecera X-Cron-Token: el secreto no tenia mas
+    // remedio que ir en la URL, donde queda escrito en los logs de acceso de
+    // Render, en cualquier proxy por el que pase y en el historial de
+    // ejecuciones del servicio de cron. Ahora acepta la cabecera, que es la
+    // forma de llamarla sin dejar el secreto por escrito; el ?token= se
+    // mantiene para no romper el cron que ya esta configurado.
+    if (! $cronAutorizado($request)) {
         return response()->json(['message' => 'No autorizado'], 403);
     }
     \Illuminate\Support\Facades\Artisan::call('schedule:run');

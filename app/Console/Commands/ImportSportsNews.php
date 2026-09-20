@@ -72,8 +72,20 @@ class ImportSportsNews extends Command
                     $publishedAt = now();
                 }
 
-                // Verificación de duplicados
-                $duplicate = News::where('title', 'like', '%' . mb_substr($article['title'], 0, 30) . '%')
+                // Verificación de duplicados.
+                //
+                // La comparacion va en minusculas por los dos lados, no con un
+                // LIKE directo: en Postgres -que es la base de produccion- LIKE
+                // distingue mayusculas de minusculas, mientras que en SQLite
+                // (donde corre la suite) y en MySQL no. El mismo titular
+                // rescrapeado con otra capitalizacion, algo corriente cuando la
+                // fuente cambia su maquetacion, no se reconocia como duplicado
+                // y entraba otra vez: la noticia salia repetida en el listado
+                // publico, sin ningun error que lo delatara y sin que ninguna
+                // prueba pudiera verlo.
+                $fragmento = mb_strtolower(mb_substr($article['title'], 0, 30));
+
+                $duplicate = News::whereRaw('LOWER(title) LIKE ?', ['%' . $fragmento . '%'])
                     ->where('category', $category)
                     ->whereDate('published_at', $publishedAt->toDateString())
                     ->exists();
@@ -416,7 +428,15 @@ class ImportSportsNews extends Command
 
     private function scrapeBasketballNews()
     {
-        $client = new Client(['verify' => true]);
+        $client = new Client([
+            'verify' => true,
+            // Timeout explicito: sin el, Guzzle espera indefinidamente. Aqui la
+            // espera no la paga un usuario, la paga el UNICO proceso PHP del
+            // contenedor, que se queda bloqueado y deja el sitio entero sin
+            // responder mientras un sitio externo no contesta.
+            'timeout' => 20,
+            'connect_timeout' => 10,
+        ]);
         $articles = [];
 
         $response = $client->request('GET', 'https://fedombal.org/seccion/noticia/');
@@ -465,12 +485,39 @@ class ImportSportsNews extends Command
 
     private function scrapeVolleyballNews()
     {
-        $client = new Client(['verify' => true]);
+        $client = new Client([
+            'verify' => true,
+            // Timeout explicito: sin el, Guzzle espera indefinidamente. Aqui la
+            // espera no la paga un usuario, la paga el UNICO proceso PHP del
+            // contenedor, que se queda bloqueado y deja el sitio entero sin
+            // responder mientras un sitio externo no contesta.
+            'timeout' => 20,
+            'connect_timeout' => 10,
+        ]);
         $baseUrl = 'https://voleiboldominicano.com/author/admin/';
         $currentPage = $baseUrl;
         $articles = [];
 
+        // Tope de paginas. El bucle seguia el enlace "siguiente" sin ningun
+        // limite: basta con que el sitio cambie de maqueta y encadene paginas,
+        // o que dos de ellas se apunten entre si, para que el comando no
+        // termine nunca. Por la via del cron lo cortaria set_time_limit(300)
+        // -tras tener el sitio cinco minutos bloqueado-, pero ejecutandolo a
+        // mano desde la consola no hay limite de tiempo que valga.
+        // 20 paginas son ~200 articulos, muy por encima de lo que publica esta
+        // fuente entre pasadas del cron.
+        $maximoPaginas = 20;
+        $paginasVistas = [];
+
         do {
+            // Un enlace "siguiente" que apunte a una pagina ya visitada cierra
+            // el ciclo aqui mismo.
+            if (in_array($currentPage, $paginasVistas, true) || count($paginasVistas) >= $maximoPaginas) {
+                break;
+            }
+
+            $paginasVistas[] = $currentPage;
+
             try {
                 $response = $client->request('GET', $currentPage);
                 $html = (string) $response->getBody();
@@ -531,7 +578,15 @@ class ImportSportsNews extends Command
 
     private function scrapeSwimmingNews()
     {
-        $client = new Client(['verify' => true]);
+        $client = new Client([
+            'verify' => true,
+            // Timeout explicito: sin el, Guzzle espera indefinidamente. Aqui la
+            // espera no la paga un usuario, la paga el UNICO proceso PHP del
+            // contenedor, que se queda bloqueado y deja el sitio entero sin
+            // responder mientras un sitio externo no contesta.
+            'timeout' => 20,
+            'connect_timeout' => 10,
+        ]);
         $articles = [];
 
         $response = $client->request('GET', 'https://cdndeportes.com.do/tag/natacion/');
