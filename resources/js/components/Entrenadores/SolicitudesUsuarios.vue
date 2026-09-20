@@ -273,39 +273,17 @@ export default {
 
                 this.mostrarNotificacion(`Solicitud ${accion} correctamente`);
 
-                if (accion === 'aprobado') {
-                    await this.crearChat(id);
-                }
+                // El chat con el atleta lo abre el backend dentro de la misma
+                // llamada que acepta la solicitud (TrainingController::update).
+                // Aqui se hacia con un POST /chats aparte que creaba el chat a
+                // nombre del ENTRENADOR -el backend usa el usuario autenticado,
+                // no el user_id que se le mandaba-, asi que al atleta no le
+                // aparecia, y si esa llamada fallaba nadie se enteraba.
 
             } catch (error) {
                 console.error("Error en manejarAccion:", error);
                 const errorMsg = error.response?.data?.message || error.message;
                 this.mostrarNotificacion('Error: ' + errorMsg);
-            }
-        },
-
-        async crearChat(trainingId) {
-            try {
-                const solicitud = this.solicitudes.find(s => s.id === trainingId);
-
-                const response = await axios.post('/chats', {
-                    user_id: solicitud.userId,
-                    trainer_id: solicitud.trainer_id
-                });
-
-                console.log('Chat creado:', response.data);
-                this.mostrarNotificacion('Chat creado exitosamente');
-
-            } catch (error) {
-                console.error('Error creando chat:', error);
-
-                if (error.response?.status === 200 && error.response.data?.message
-                    === 'Ya existe un chat entre estos usuarios') {
-                    this.mostrarNotificacion('Ya existe un chat con este usuario');
-                } else {
-                    this.mostrarNotificacion('Error creando chat: ' +
-                        (error.response?.data?.message || error.message));
-                }
             }
         },
 

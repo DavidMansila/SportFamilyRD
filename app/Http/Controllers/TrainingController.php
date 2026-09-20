@@ -6,6 +6,7 @@ use App\Mail\SolicitudRechazadaMail;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NuevaSolicitudEntrenadorMail;
 
+use App\Models\Chat;
 use App\Models\Training;
 use App\Models\Trainer;
 use App\Models\User;
@@ -191,6 +192,7 @@ class TrainingController extends Controller
             // Enviar correo solo si se actualizó el status
             if (isset($validated['status'])) {
                 if ($validated['status'] === 'accepted') {
+                    $this->abrirChatDeLaSolicitud($training);
                     Mail::to($training->user->email)->send(new SolicitudAprobadaMail($training->user));
                 }
                 if ($validated['status'] === 'rejected') {
@@ -199,6 +201,37 @@ class TrainingController extends Controller
             }
 
         return response()->json($training);
+    }
+
+    /**
+     * Abre el chat entre el atleta y el entrenador de una solicitud aceptada.
+     *
+     * Esto lo hacia el FRONTEND: al pulsar "aprobar", SolicitudesUsuarios.vue
+     * lanzaba un POST /chats aparte. Dos problemas.
+     *
+     * Uno, el chat salia del participante equivocado. Ese POST mandaba el
+     * user_id del atleta en el cuerpo, pero ChatController::store dejo de
+     * hacerle caso al cerrar el IDOR que permitia crear chats a nombre de
+     * cualquiera, y usa el id del usuario AUTENTICADO... que ahi es el
+     * entrenador. El chat quedaba con user_id = entrenador, o sea el entrenador
+     * consigo mismo, y al atleta no le aparecia por ningun lado.
+     *
+     * Dos, si esa segunda llamada fallaba, el fallo solo iba a la consola: la
+     * solicitud quedaba aceptada y sin chat, sin manera de reintentarlo.
+     *
+     * Aqui los dos participantes salen de la propia solicitud, que es el dato
+     * fiable, y se crea en la misma operacion que la aceptacion. firstOrCreate
+     * lo hace idempotente: aceptar dos veces no duplica el chat.
+     */
+    private function abrirChatDeLaSolicitud(Training $training): void
+    {
+        Chat::firstOrCreate(
+            [
+                'user_id' => $training->user_id,
+                'trainer_id' => $training->trainer_id,
+            ],
+            ['status' => 'accepted']
+        );
     }
 
     /**
