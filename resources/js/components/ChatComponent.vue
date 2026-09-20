@@ -142,8 +142,15 @@ export default {
     isMessageFromMe(message) {
       if (!message || !this.user) return false;
 
-      const myType = this.user.user_type === 'entrenador' ? 'trainer' : 'user';
-      return message.sender_id === this.user.id && message.sender_type === myType;
+      // Basta con quién lo envió. Antes se exigía además que el sender_type
+      // guardado en el mensaje coincidiera con el rol ACTUAL de la cuenta, y
+      // esas dos cosas se separan en cuanto el rol cambia: los mensajes que
+      // alguien escribió siendo 'user' quedan marcados así para siempre, pero
+      // si más tarde le aprueban como entrenador, dejaban de reconocerse como
+      // propios y aparecían alineados como recibidos dentro de su propia
+      // conversación. sender_id siempre es un id de users, tanto si escribe el
+      // atleta como si escribe el entrenador, así que no hay ambigüedad.
+      return message.sender_id === this.user.id;
     },
 
     async fetchMessages() {

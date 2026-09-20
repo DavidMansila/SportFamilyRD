@@ -7,6 +7,7 @@ use App\Events\NewMessage;
 use App\Events\MessageRead;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\Training;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,15 @@ class ChatController extends Controller
             'trainer.user:id,name,image',
             'lastMessage'
         ])
+            // El contador de no leidos se calcula en la MISMA consulta. Antes
+            // se resolvia dentro del map(), es decir, una consulta extra por
+            // cada conversacion de la bandeja: el clasico N+1. Contra una base
+            // remota como Supabase lo que se paga no es tanto la consulta como
+            // la ida y vuelta, asi que una bandeja con 20 chats hacia 20 viajes
+            // evitables cada vez que se abre.
+            ->withCount(['messages as unread_count' => function ($query) use ($userId) {
+                $query->where('sender_id', '!=', $userId)->noLeidos();
+            }])
             ->where(function ($query) use ($userId) {
                 $query->where('user_id', $userId)
                     ->orWhereHas('trainer', function ($q) use ($userId) {
@@ -43,10 +53,7 @@ class ChatController extends Controller
                     'user_id' => $chat->user_id,
                     'trainer_id' => $chat->trainer_id,
                     'status' => $chat->status,
-                    'unread_count' => $chat->messages()
-                        ->where('sender_id', '!=', $userId)
-                        ->noLeidos()
-                        ->count(),
+                    'unread_count' => (int) $chat->unread_count,
                     'last_message' => $chat->lastMessage ? [
                         'id' => $chat->lastMessage->id,
                         'message' => $chat->lastMessage->message,
@@ -84,16 +91,36 @@ class ChatController extends Controller
         $chat = Chat::with('trainer')->findOrFail($chatId);
 
         // Solo alguno de los dos participantes del chat puede escribir en el.
-        $isParticipant = $chat->user_id == $user->id
-            || optional($chat->trainer)->user_id == $user->id;
-        if (!$isParticipant) {
+        $esElAtleta = $chat->user_id == $user->id;
+        $esElEntrenador = optional($chat->trainer)->user_id == $user->id;
+
+        if (! $esElAtleta && ! $esElEntrenador) {
             return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        // La conversacion tiene que estar abierta. Sin esto, un chat cerrado
+        // -porque el entrenador rechazo la solicitud despues de haberla
+        // aceptado- seguia admitiendo mensajes: desaparecia de las dos bandejas
+        // (index solo lista los 'accepted') pero se podia seguir escribiendo en
+        // el llamando al endpoint directamente.
+        if ($chat->status !== 'accepted') {
+            return response()->json([
+                'message' => 'Esta conversación ya no está activa.',
+            ], 403);
         }
 
         $message = Message::create([
             'chat_id' => $chatId,
+            // El papel se deduce de la POSICION en este chat, no del user_type
+            // global de la cuenta. Con el rol global, un entrenador que ademas
+            // entrena con otro entrenador -es decir, que es el atleta de ESE
+            // chat- enviaba sus mensajes marcados como 'trainer'. Y cuando a un
+            // usuario se le aprueba la solicitud de entrenador, su user_type
+            // cambia: los mensajes que mandara a partir de entonces en sus
+            // conversaciones antiguas, donde sigue siendo el atleta, quedaban
+            // marcados al reves que los anteriores, dentro del mismo hilo.
             'sender_id' => $user->id,
-            'sender_type' => $user->user_type === 'user' ? 'user' : 'trainer',
+            'sender_type' => $esElAtleta ? 'user' : 'trainer',
             'message' => $request->message
         ]);
 
@@ -141,6 +168,24 @@ class ChatController extends Controller
         ]);
 
         $userId = $request->user()->id;
+
+        // El chat NACE de una solicitud de entrenamiento aceptada: lo abre
+        // TrainingController::update cuando el entrenador acepta. Este endpoint
+        // creaba uno directamente, con 'status' => 'accepted' fijo y sin mirar
+        // la tabla de solicitudes, asi que bastaba con conocer el trainer_id
+        // -publico, sale en el directorio de entrenadores- para colarse en la
+        // bandeja de cualquier entrenador y escribirle: sin solicitud, o
+        // incluso despues de que la hubiera RECHAZADO.
+        $solicitudAceptada = Training::where('user_id', $userId)
+            ->where('trainer_id', $request->trainer_id)
+            ->where('status', 'accepted')
+            ->exists();
+
+        if (! $solicitudAceptada) {
+            return response()->json([
+                'message' => 'Necesitas una solicitud de entrenamiento aceptada para abrir este chat.',
+            ], 403);
+        }
 
         // Verificar si ya existe un chat
         $existingChat = Chat::where('user_id', $userId)
@@ -197,11 +242,10 @@ class ChatController extends Controller
 
 
 
-    public function acceptChat(Request $request, $id)
-    {
-        $chat = Chat::findOrFail($id);
-        $chat->update(['status' => 'accepted']);
-
-        return response()->json($chat);
-    }
+    // ELIMINADO: acceptChat(). Hacia Chat::findOrFail($id)->update(['status'
+    // => 'accepted']) sin comprobar que quien llama participe en ese chat ni
+    // que sea el entrenador, asi que habria bastado con recorrer los ids para
+    // reabrir conversaciones ajenas. No estaba enrutado -era resto del flujo
+    // antiguo en el que el chat se aceptaba aparte-, y hoy el estado lo
+    // gobierna TrainingController al aceptar o rechazar la solicitud.
 }

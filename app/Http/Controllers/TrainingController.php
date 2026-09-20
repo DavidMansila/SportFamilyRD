@@ -39,7 +39,13 @@ class TrainingController extends Controller
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        $query = Training::with('user');
+        // Columnas explicitas: cargando la relacion entera, dentro de cada
+        // solicitud viajaba el registro completo del solicitante -fecha de
+        // nacimiento, biografia, estado de verificacion...-. El entrenador
+        // necesita nombre, foto y como contactar para coordinar el
+        // entrenamiento; el resto no pinta nada aqui. Es la misma seleccion que
+        // ya hacia a proposito getReceivedTrainings() mas abajo.
+        $query = Training::with('user:id,name,email,phone,image,location');
 
         if ($request->has('trainer_id')) {
             $query->where('trainer_id', $request->trainer_id);
@@ -196,6 +202,7 @@ class TrainingController extends Controller
                     Mail::to($training->user->email)->send(new SolicitudAprobadaMail($training->user));
                 }
                 if ($validated['status'] === 'rejected') {
+                    $this->cerrarChatDeLaSolicitud($training);
                     Mail::to($training->user->email)->send(new SolicitudRechazadaMail($training->user));
                 }
             }
@@ -225,13 +232,41 @@ class TrainingController extends Controller
      */
     private function abrirChatDeLaSolicitud(Training $training): void
     {
-        Chat::firstOrCreate(
-            [
-                'user_id' => $training->user_id,
-                'trainer_id' => $training->trainer_id,
-            ],
-            ['status' => 'accepted']
-        );
+        // firstOrNew + status en vez de firstOrCreate: si el chat ya existe
+        // pero esta cerrado (el entrenador rechazo la solicitud despues de
+        // haberla aceptado, ver cerrarChatDeLaSolicitud), volver a aceptarla
+        // tiene que reabrirlo con su historial. Con firstOrCreate se encontraba
+        // el chat rechazado, no se tocaba, y la conversacion no reaparecia en
+        // ninguna de las dos bandejas.
+        $chat = Chat::firstOrNew([
+            'user_id' => $training->user_id,
+            'trainer_id' => $training->trainer_id,
+        ]);
+
+        $chat->status = 'accepted';
+        $chat->save();
+    }
+
+    /**
+     * Cierra el chat cuando la solicitud pasa a rechazada.
+     *
+     * El estado de la solicitud se puede cambiar las veces que haga falta: nada
+     * impide aceptar y despues rechazar. Al aceptar se abre el chat, pero al
+     * rechazar no se cerraba, asi que la conversacion seguia viva y el atleta
+     * conservaba acceso completo a ella pese a que el entrenador habia
+     * retirado la aceptacion.
+     *
+     * Se marca como 'rejected' en vez de borrarla para no perder el historial
+     * de mensajes: index() solo lista las conversaciones 'accepted', asi que
+     * desaparece de las dos bandejas, y storeMessage() rechaza escribir en una
+     * conversacion que no este aceptada. Si mas adelante el entrenador vuelve a
+     * aceptar, abrirChatDeLaSolicitud la reactiva con su historial intacto.
+     */
+    private function cerrarChatDeLaSolicitud(Training $training): void
+    {
+        Chat::where('user_id', $training->user_id)
+            ->where('trainer_id', $training->trainer_id)
+            ->update(['status' => 'rejected']);
     }
 
     /**

@@ -122,9 +122,17 @@ export default {
         const response = await axios.get('/chats', { params: { user_id: this.user.id } });
 
         this.chats = response.data.map(chat => {
-          const isUser = this.user.user_type === 'user';
+          // Quién es "el otro" se decide POR ESTE CHAT, no por el user_type
+          // global de la cuenta. Con el rol global, a un usuario al que le
+          // aprueban la solicitud de entrenador (user_type pasa de 'user' a
+          // 'entrenador', ver TrainerController::updateStatus) sus
+          // conversaciones ANTIGUAS, en las que sigue siendo el atleta, se le
+          // daban la vuelta: la lista le mostraba su propio nombre y su propia
+          // foto como interlocutor. Comparar chat.user_id con su id dice
+          // exactamente qué papel ocupa en cada conversación.
+          const soyElAtleta = chat.user_id === this.user.id;
 
-          if (isUser && chat.trainer && chat.trainer.user) {
+          if (soyElAtleta && chat.trainer && chat.trainer.user) {
             return {
               id: chat.id,
               user_id: chat.user_id,
@@ -142,7 +150,7 @@ export default {
                 type: 'trainer'
               }
             };
-          } else if (!isUser && chat.user) {
+          } else if (!soyElAtleta && chat.user) {
             return {
               id: chat.id,
               user_id: chat.user_id,

@@ -40,7 +40,15 @@ class NewMessage implements ShouldBroadcastNow
             'sender_id'   => $this->message->sender_id,
             'sender_type' => $this->message->sender_type === 'trainer' ? 'trainer' : 'user',
             'message'     => $this->message->message,
-            'created_at'  => $this->message->created_at->toDateTimeString(),
+            // toJSON() y no toDateTimeString(): el mensaje que llega en vivo
+            // tiene que traer la fecha en el MISMO formato que la que devuelve
+            // la API al recargar la conversacion (ISO-8601 con la Z de UTC).
+            // "Y-m-d H:i:s" no lleva zona horaria, y `new Date(...)` en el
+            // navegador interpreta esa cadena como hora LOCAL: el mismo mensaje
+            // aparecia con una hora al recibirlo y con otra distinta al
+            // recargar la pagina -cuatro horas de diferencia en Republica
+            // Dominicana-.
+            'created_at'  => $this->message->created_at->toJSON(),
             'read'        => $this->message->read,
         ];
     }

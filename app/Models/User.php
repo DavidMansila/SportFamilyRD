@@ -125,9 +125,29 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     
 
+    /**
+     * Conversaciones en las que esta cuenta participa COMO ENTRENADOR.
+     *
+     * Va a traves de la tabla 'trainer' a proposito. Antes era un
+     * hasMany(Chat::class, 'trainer_id'), que compara chats.trainer_id -la
+     * clave de la tabla 'trainer'- contra users.id: dos espacios de
+     * identificadores distintos. No solo devolvia los chats equivocados, es que
+     * podia devolver la conversacion de OTRA persona, la del entrenador cuyo id
+     * de ficha coincidiera por casualidad con el id de usuario de esta cuenta.
+     *
+     * Hoy no la llama nadie, y por eso el fallo nunca se noto; el problema es
+     * que el nombre invita a usarla.
+     */
     public function chatsAsTrainer()
     {
-        return $this->hasMany(Chat::class, 'trainer_id');
+        return $this->hasManyThrough(
+            Chat::class,
+            Trainer::class,
+            'user_id',    // trainer.user_id -> users.id
+            'trainer_id', // chats.trainer_id -> trainer.id
+            'id',
+            'id'
+        );
     }
 
 
