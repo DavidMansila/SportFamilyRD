@@ -18,7 +18,19 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    /*
+     * En produccion el valor por defecto es 'stderr', no 'stack'.
+     *
+     * 'stack' termina escribiendo en storage/logs/laravel.log, un fichero
+     * DENTRO del contenedor: en Render nadie puede abrirlo -la pestaña Logs
+     * solo muestra lo que sale por stdout/stderr- y ademas se pierde en cada
+     * reinicio, porque el disco del contenedor es efimero. Es decir, los
+     * errores se registraban en un sitio donde no servian para nada.
+     *
+     * LOG_CHANNEL sigue mandando si se define en el entorno; esto solo cambia
+     * que pasa cuando no esta puesta.
+     */
+    'default' => env('LOG_CHANNEL', env('APP_ENV') === 'production' ? 'stderr' : 'stack'),
 
     /*
     |--------------------------------------------------------------------------

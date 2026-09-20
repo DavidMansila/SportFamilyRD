@@ -418,9 +418,17 @@ Route::post('/email/verification-notification', function (Request $request) {
             'error' => $e->getMessage(),
         ]);
 
-        return response()->json([
-            'message' => 'No se pudo enviar el correo ahora mismo. Inténtalo de nuevo en unos minutos.',
-        ], 503);
+        $respuesta = ['message' => 'No se pudo enviar el correo ahora mismo. Inténtalo de nuevo en unos minutos.'];
+
+        // A un administrador se le devuelve ademas el motivo que dio el
+        // proveedor. Es quien puede arreglarlo, y sin esto el dato solo existe
+        // en los logs del servidor: en Render, si LOG_CHANNEL no es 'stderr',
+        // eso es un fichero dentro del contenedor que nadie puede abrir.
+        if ($user->user_type === 'admin') {
+            $respuesta['detalle'] = $e->getMessage();
+        }
+
+        return response()->json($respuesta, 503);
     }
 
     return response()->json(['message' => '¡Correo de verificación enviado!']);
