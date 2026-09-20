@@ -138,6 +138,16 @@ class UserController extends Controller
             ]);
 
             $imageName = Post::addImages($request->file('image'), $user->id, 'users');
+
+            // addImages devuelve null cuando el fichero no se llego a escribir.
+            // Guardar el nombre igualmente dejaria el perfil apuntando a una
+            // imagen inexistente, que es peor que no cambiar nada.
+            if ($imageName === null) {
+                return response()->json([
+                    'message' => 'No se pudo guardar la imagen. Inténtalo de nuevo.',
+                ], 503);
+            }
+
             $user->update(['image' => $imageName]);
             $user->image = public_storage_url('users/' . $user->id . '/' . $user->image);
 
@@ -178,7 +188,13 @@ class UserController extends Controller
 
             if ($request->hasFile('image')) {
                 $imageName = Post::addImages($request->file('image'), $user->id, 'users');
-                $user->update(['image' => $imageName]);
+
+                // Si la imagen no se pudo guardar se conserva la anterior: el
+                // resto del perfil (nombre, telefono...) ya se actualizo y esa
+                // parte si es valida, asi que no se tira la peticion entera.
+                if ($imageName !== null) {
+                    $user->update(['image' => $imageName]);
+                }
             }
 
             $user->image = $user->image

@@ -278,13 +278,29 @@ class TrainerController extends Controller
         $user = User::findOrFail($trainer->user_id);
 
         if ($trainer->status === 'approved') {
-            $user->user_type = 'entrenador';
+            // El rol de admin no se pisa. Nada impide que un administrador
+            // mande su propia solicitud de entrenador, y aprobarla lo
+            // convertia en 'entrenador': perdia el acceso al panel de
+            // administracion de golpe, sin ninguna advertencia y sin manera de
+            // recuperarlo desde la propia aplicacion. Sigue apareciendo en el
+            // directorio igual, porque eso lo gobierna trainer.status.
+            if ($user->user_type !== 'admin') {
+                $user->user_type = 'entrenador';
+            }
+
             $user->category = $trainer->sport_category;
             $user->save();
             Mail::to($user->email)->send(new SolicitudAprobadaEntrenador($user));
         } elseif ($trainer->status === 'rejected') {
-            $user->user_type = 'user';
-            $user->save();
+            // Degradar solo a quien de verdad es entrenador. Antes se ponia
+            // 'user' a secas: rechazar la ficha de un administrador lo bajaba a
+            // usuario normal, y rechazar la de alguien que nunca llego a ser
+            // entrenador reescribia su rol sin motivo.
+            if ($user->user_type === 'entrenador') {
+                $user->user_type = 'user';
+                $user->save();
+            }
+
             Mail::to($user->email)->send(new SolicitudRechazadaEntrenador($user));
         }
         $trainer->save();

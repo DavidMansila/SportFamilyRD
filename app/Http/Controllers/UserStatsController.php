@@ -14,8 +14,23 @@ use Illuminate\Support\Facades\Log;
 
 class UserStatsController extends Controller
 {
-    public function getStats($userId)
+    /**
+     * Estadisticas del perfil.
+     *
+     * Las pide PerfilView.vue SIEMPRE para la cuenta de la sesion: no existe
+     * ninguna pantalla que muestre el perfil de otra persona. Aun asi, el
+     * metodo ni siquiera recibia la peticion, asi que no habia forma de
+     * comprobar nada: con un token cualquiera se podian recorrer los ids
+     * (son enteros consecutivos) y sacar la actividad de toda la base de
+     * usuarios, incluido el numero exacto de solicitudes que recibe cada
+     * entrenador -que es informacion de negocio de la competencia-.
+     */
+    public function getStats(Request $request, $userId)
     {
+        if ((int) $userId !== $request->user()->id && $request->user()->user_type !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         try {
             // 1. Total de publicaciones del usuario
             $postCount = Post::where('user_id', $userId)->count();

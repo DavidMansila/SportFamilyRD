@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\CacheDeContenido;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,19 +34,47 @@ class Post extends Model
     // llamadas pasan arrays explicitos, asi que quitarlo no cambia nada.
     protected $fillable = ['titulo', 'contenido', 'user_id', 'likes_quantity', 'imagen', 'video', 'categoria'];
 
-    public static function addImages($image, $id, $model)
+    /**
+     * Guarda la imagen de una entidad y devuelve su nombre, o null si no se
+     * pudo guardar.
+     *
+     * EL ORDEN IMPORTA. Antes se borraba el contenido anterior del directorio y
+     * DESPUES se subía el nuevo fichero, sin mirar el resultado. El disco
+     * 'public' esta configurado con 'throw' => false y 'report' => false
+     * (config/filesystems.php), asi que una subida fallida -credenciales
+     * caducadas, cuota agotada, corte de red contra Supabase Storage- no lanza
+     * excepcion: devuelve false en silencio. Con el orden antiguo eso dejaba a
+     * la persona sin la foto vieja (ya borrada) y sin la nueva, y ademas el
+     * llamador guardaba en la base el nombre del fichero inexistente, porque
+     * hashName() lo devuelve igual.
+     *
+     * Ahora se sube primero, se comprueba, y solo con el fichero nuevo ya
+     * escrito se limpian los anteriores. Si la subida falla no se toca nada y
+     * se devuelve null, para que quien llama no escriba un nombre que no apunta
+     * a ningun sitio.
+     */
+    public static function addImages($image, $id, $model): ?string
     {
-        // Get the path to store the images
         $path = "/$model/$id";
-        $files = Storage::disk('public')->files($path);
 
-        foreach ($files as $file) {
-            Storage::disk('public')->delete($file);
+        if ($image->store($path, 'public') === false) {
+            Log::error('No se pudo guardar la imagen en el disco publico', [
+                'directorio' => $path,
+                'disco' => config('filesystems.disks.public.driver'),
+            ]);
+
+            return null;
         }
 
-        $image->store($path, 'public');
-
         $imageName = $image->hashName();
+
+        // Limpieza de las versiones anteriores, saltandose la recien subida.
+        foreach (Storage::disk('public')->files($path) as $file) {
+            if (basename($file) !== $imageName) {
+                Storage::disk('public')->delete($file);
+            }
+        }
+
         return $imageName;
     }
 
