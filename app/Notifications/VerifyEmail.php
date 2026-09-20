@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\VerifyEmail as BaseVerifyEmail;
+use Illuminate\Mail\Attachment;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Carbon;
@@ -57,7 +58,14 @@ class VerifyEmail extends BaseVerifyEmail
             // El logo se adjunta desde disco (la vista lo incrusta con
             // $message->embed), no se enlaza: los clientes de correo bloquean
             // las imagenes remotas por defecto.
-            'logoPath' => public_path('imagenes/Logo2.png'),
+            //
+            // Va como Attachment con nombre y tipo explicitos, no como ruta a
+            // secas: pasando la ruta, Laravel nombra el adjunto con
+            // Str::random(10) -un nombre SIN extension- y la API de Brevo
+            // valida el formato por la extension del fichero, asi que rechazaba
+            // el correo entero con "Unsupported file format: <nombre>" (400).
+            // Por SMTP no se notaba, porque ahi el nombre del adjunto da igual.
+            'logoAdjunto' => $this->logoAdjunto(),
         ];
 
         return (new MailMessage)
@@ -66,5 +74,21 @@ class VerifyEmail extends BaseVerifyEmail
                 ['emails.verificar-correo', 'emails.verificar-correo-texto'],
                 $datos
             );
+    }
+
+    /**
+     * El logo como adjunto listo para incrustar, o null si el fichero no esta
+     * (un despliegue sin public/, por ejemplo). En ese caso la plantilla pinta
+     * el nombre de la marca en texto en lugar de dejar una imagen rota.
+     */
+    private function logoAdjunto(): ?Attachment
+    {
+        $ruta = public_path('imagenes/Logo2.png');
+
+        if (! is_file($ruta)) {
+            return null;
+        }
+
+        return Attachment::fromPath($ruta)->as('logo.png')->withMime('image/png');
     }
 }

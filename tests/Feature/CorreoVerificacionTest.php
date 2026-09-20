@@ -67,6 +67,29 @@ class CorreoVerificacionTest extends TestCase
         $this->assertStringContainsString('El enlace caduca en', $correo->getTextBody());
     }
 
+    public function test_el_logo_incrustado_va_con_nombre_de_fichero_y_extension(): void
+    {
+        $usuario = User::factory()->unverified()->create();
+
+        $this->actingAs($usuario)
+            ->postJson('/api/email/verification-notification')
+            ->assertOk();
+
+        $adjuntos = Mail::mailer()->getSymfonyTransport()->messages()[0]
+            ->getOriginalMessage()
+            ->getAttachments();
+
+        $this->assertCount(1, $adjuntos);
+
+        // El nombre importa: pasandole una ruta a embed(), Laravel bautiza el
+        // adjunto con Str::random(10), un nombre sin extension. Por SMTP da
+        // igual, pero la API de Brevo mira la extension para decidir si acepta
+        // el fichero y respondia "Unsupported file format: <nombre>" (400),
+        // tirando el correo entero. Con un nombre normal, se acepta.
+        $this->assertSame('logo.png', $adjuntos[0]->getFilename());
+        $this->assertSame('image/png', $adjuntos[0]->getMediaType() . '/' . $adjuntos[0]->getMediaSubtype());
+    }
+
     public function test_si_el_envio_falla_el_reenvio_lo_dice_en_vez_de_responder_ok(): void
     {
         $usuario = User::factory()->unverified()->create();

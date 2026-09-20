@@ -42,11 +42,11 @@
 
                          $message es la instancia del correo que Laravel inyecta
                          en las vistas de mail; embed() adjunta el fichero y
-                         devuelve el "cid:" al que apunta el <img>. Si el fichero
-                         no estuviera (por ejemplo, un despliegue sin public/),
-                         se cae al nombre en texto en vez de dejar una imagen
-                         rota. --}}
-                    @php($logo = ($logoPath && is_file($logoPath)) ? $message->embed($logoPath) : null)
+                         devuelve el "cid:" al que apunta el <img>. Si el logo no
+                         estuviera (un despliegue sin public/, por ejemplo), la
+                         notificacion manda null y aqui se cae al nombre en texto
+                         en vez de dejar una imagen rota. --}}
+                    @php($logo = $logoAdjunto ? $message->embed($logoAdjunto) : null)
                     <tr>
                         <td align="center" style="padding:32px 32px 8px 32px;">
                             @if ($logo)
